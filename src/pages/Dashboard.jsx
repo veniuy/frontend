@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { 
-  Plus, 
-  Calendar, 
-  Users, 
-  Eye, 
+import {
+  Plus,
+  Calendar,
+  Users,
+  Eye,
   MoreHorizontal,
   Copy,
   Edit,
@@ -68,6 +68,7 @@ export function Dashboard() {
     });
   };
 
+  // Helpers coherentes con event.status
   const getEventStatus = (event) => {
     switch (event.status) {
       case 'DRAFT':
@@ -100,7 +101,7 @@ export function Dashboard() {
 
   const getEventActions = (event) => {
     const actions = [];
-    
+
     if (event.status === 'DRAFT') {
       actions.push({
         label: 'Publicar',
@@ -109,7 +110,7 @@ export function Dashboard() {
         variant: 'default'
       });
     }
-    
+
     if (event.status === 'PENDING_PAYMENT') {
       actions.push({
         label: 'Ver Pago',
@@ -118,7 +119,7 @@ export function Dashboard() {
         variant: 'outline'
       });
     }
-    
+
     if (event.status === 'PUBLISHED') {
       actions.push({
         label: 'Ver Invitación',
@@ -127,14 +128,14 @@ export function Dashboard() {
         variant: 'outline'
       });
     }
-    
+
     return actions;
   };
 
   const handleDuplicateEvent = async (eventId) => {
     try {
       await apiClient.duplicateEvent(eventId);
-      loadEvents(); // Recargar la lista
+      loadEvents();
     } catch (error) {
       console.error('Error al duplicar evento:', error);
     }
@@ -144,44 +145,10 @@ export function Dashboard() {
     if (window.confirm('¿Estás seguro de que quieres eliminar este evento?')) {
       try {
         await apiClient.deleteEvent(eventId);
-        loadEvents(); // Recargar la lista
+        loadEvents();
       } catch (error) {
         console.error('Error al eliminar evento:', error);
       }
-    }
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
-
-  const getEventStatusColor = (event) => {
-    const eventDate = new Date(event.fecha_evento);
-    const today = new Date();
-    
-    if (eventDate < today) {
-      return 'bg-gray-100 text-gray-800';
-    } else if (eventDate.toDateString() === today.toDateString()) {
-      return 'bg-green-100 text-green-800';
-    } else {
-      return 'bg-blue-100 text-blue-800';
-    }
-  };
-
-  const getEventStatus = (event) => {
-    const eventDate = new Date(event.fecha_evento);
-    const today = new Date();
-    
-    if (eventDate < today) {
-      return 'Finalizado';
-    } else if (eventDate.toDateString() === today.toDateString()) {
-      return 'Hoy';
-    } else {
-      return 'Próximo';
     }
   };
 
@@ -231,7 +198,7 @@ export function Dashboard() {
             <div className="text-2xl font-bold">{events.length}</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Invitados</CardTitle>
@@ -243,7 +210,7 @@ export function Dashboard() {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Confirmados</CardTitle>
@@ -260,7 +227,7 @@ export function Dashboard() {
       {/* Lista de eventos */}
       <div>
         <h2 className="text-xl font-semibold text-gray-900 mb-4">Tus Eventos</h2>
-        
+
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
             {error}
@@ -316,7 +283,7 @@ export function Dashboard() {
                               <Copy className="h-4 w-4 mr-2" />
                               Duplicar
                             </DropdownMenuItem>
-                            <DropdownMenuItem 
+                            <DropdownMenuItem
                               onClick={() => handleDeleteEvent(event.id)}
                               className="text-red-600"
                             >
@@ -333,7 +300,7 @@ export function Dashboard() {
                       <p className="text-sm text-gray-600 line-clamp-2">
                         {event.description || 'Sin descripción'}
                       </p>
-                      
+
                       <div className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-4">
                           <span className="flex items-center gap-1">
@@ -345,15 +312,15 @@ export function Dashboard() {
                           </span>
                         </div>
                       </div>
-                      
+
                       <div className="flex gap-2 pt-2">
                         {actions.map((action, index) => {
                           const Icon = action.icon;
                           return (
-                            <Button 
+                            <Button
                               key={index}
-                              variant={action.variant} 
-                              size="sm" 
+                              variant={action.variant}
+                              size="sm"
                               className="flex-1"
                               onClick={action.onClick}
                             >
@@ -363,8 +330,8 @@ export function Dashboard() {
                           );
                         })}
                         {actions.length === 0 && (
-                          <Button 
-                            size="sm" 
+                          <Button
+                            size="sm"
                             className="flex-1"
                             onClick={() => navigate(`/events/${event.id}/manage`)}
                           >
