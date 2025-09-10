@@ -35,6 +35,9 @@ function App() {
         <Route path="payment/transfer/:eventId" element={<PaymentTransfer />} />
         <Route path="payment/code/:eventId" element={<PaymentCode />} />
       </Route>
+
+      {/* fallback */}
+      <Route path="*" element={<Navigate to={user ? '/dashboard' : '/login'} />} />
     </Routes>
   );
 }
