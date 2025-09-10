@@ -529,8 +529,8 @@ function Landing() {
             Al suscribirte aceptas recibir emails promocionales. Puedes darte de baja en cualquier momento.
           </p>
         </div>
-      </section>
-  {/* Digital Features Section */}
+        
+      {/* Digital Features Section */}
       <section className="py-16 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -584,8 +584,7 @@ function Landing() {
             </div>
           </div>
         </div>
-      </section>
-
+      
       {/* Footer */}
       <footer className="bg-foreground text-background py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
