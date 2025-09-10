@@ -18,7 +18,8 @@ import {
   Play,
   Eye,
   Zap,
-  Crown
+  Crown,
+  Leaf
 } from 'lucide-react'
 
 import { asset, ph, onImgError } from '../utils/assets';
@@ -449,22 +450,48 @@ function Products() {
               <Smartphone className="w-4 h-4 mr-2" />
               Solicitar Diseño Personalizado
             </Button>
-            <Button 
-              size="lg"
-              variant="outline"
-              onClick={() => navigate('/demo/boda')}
-            >
-              <Globe className="w-4 h-4 mr-2" />
-              Demo Boda
-            </Button>
-            <Button 
-              size="lg"
-              variant="outline"
-              onClick={() => navigate('/demo/quinceanera')}
-            >
-              <Crown className="w-4 h-4 mr-2" />
-              Demo Quinceañera
-            </Button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Button 
+                size="lg"
+                variant="outline"
+                onClick={() => navigate('/demo/black')}
+              >
+                <Globe className="w-4 h-4 mr-2" />
+                Demo Black
+              </Button>
+              <Button 
+                size="lg"
+                variant="outline"
+                onClick={() => navigate('/demo/premium')}
+              >
+                <Heart className="w-4 h-4 mr-2" />
+                Demo Premium
+              </Button>
+              <Button 
+                size="lg"
+                variant="outline"
+                onClick={() => navigate('/demo/clasica')}
+              >
+                <Leaf className="w-4 h-4 mr-2" />
+                Demo Clásica
+              </Button>
+              <Button 
+                size="lg"
+                variant="outline"
+                onClick={() => navigate('/demo/boda')}
+              >
+                <Heart className="w-4 h-4 mr-2" />
+                Demo Romántica
+              </Button>
+              <Button 
+                size="lg"
+                variant="outline"
+                onClick={() => navigate('/demo/quinceanera')}
+              >
+                <Crown className="w-4 h-4 mr-2" />
+                Demo Quinceañera
+              </Button>
+            </div>
           </div>
         </div>
       </section>
