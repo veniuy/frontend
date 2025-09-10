@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth.jsx';
 import Layout from './components/Layout';
+import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -25,11 +26,16 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
-      <Route path="/register" element={!user ? <Register /> : <Navigate to="/dashboard" />} />
+      {/* Landing page - accessible to everyone */}
+      <Route path="/" element={<Landing />} />
+      
+      {/* Auth routes */}
+      <Route path="/login" element={!user ? <Login /> : <Navigate to="/app/dashboard" />} />
+      <Route path="/register" element={!user ? <Register /> : <Navigate to="/app/dashboard" />} />
 
-      <Route path="/" element={user ? <Layout /> : <Navigate to="/login" />}>
-        <Route index element={<Navigate to="/dashboard" />} />
+      {/* Protected app routes */}
+      <Route path="/app" element={user ? <Layout /> : <Navigate to="/login" />}>
+        <Route index element={<Navigate to="/app/dashboard" />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="events/create" element={<CreateEvent />} />
         <Route path="payment/transfer/:eventId" element={<PaymentTransfer />} />
@@ -37,7 +43,7 @@ function App() {
       </Route>
 
       {/* fallback */}
-      <Route path="*" element={<Navigate to={user ? '/dashboard' : '/login'} />} />
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 }
