@@ -15,6 +15,9 @@ import PaymentTransfer from './pages/PaymentTransfer';
 import PaymentCode from './pages/PaymentCode';
 import DemoWedding from './pages/DemoWedding';
 import DemoQuinceanera from './pages/DemoQuinceanera';
+import DemoBlack from './pages/DemoBlack';
+import DemoPremium from './pages/DemoPremium';
+import DemoClassic from './pages/DemoClassic';
 
 function App() {
   const { user, loading } = useAuth();
@@ -40,6 +43,9 @@ function App() {
       <Route path="/contact" element={<Contact />} />
       <Route path="/demo/boda" element={<DemoWedding />} />
       <Route path="/demo/quinceanera" element={<DemoQuinceanera />} />
+      <Route path="/demo/black" element={<DemoBlack />} />
+      <Route path="/demo/premium" element={<DemoPremium />} />
+      <Route path="/demo/clasica" element={<DemoClassic />} />
       
       {/* Auth routes */}
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/app/dashboard" />} />
