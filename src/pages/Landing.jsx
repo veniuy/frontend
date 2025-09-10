@@ -19,8 +19,6 @@ import {
   ChevronDown
 } from 'lucide-react'
 
-import { asset, ph, onImgError } from '../utils/assets';
-
 function Landing() {
   const navigate = useNavigate()
 
@@ -29,21 +27,21 @@ function Landing() {
       id: 1,
       name: "Elegancia Floral",
       category: "Boda",
-      image: ph(300, 400, 'Elegancia Floral'),
+      image: "/api/placeholder/300/400",
       badge: "Popular"
     },
     {
       id: 2,
       name: "Minimalista Moderna",
       category: "Boda", 
-      image: ph(300, 400, 'Minimalista Moderna'),
+      image: "/api/placeholder/300/400",
       badge: "Nuevo"
     },
     {
       id: 3,
       name: "Corte Láser",
       category: "Boda",
-      image: ph(300, 400, 'Corte Láser'),
+      image: "/api/placeholder/300/400",
       badge: null
     }
   ]
@@ -178,12 +176,15 @@ function Landing() {
             </div>
             <div className="relative">
               <div className="relative z-10 bg-white rounded-2xl shadow-warm-lg p-8 max-w-md mx-auto">
-                <img 
-                  src={asset("/src/assets/elegant-floral.jpg")} 
-                  alt="Invitación elegante" 
-                  className="w-full rounded-lg shadow-warm"
-                  onError={(e)=>onImgError(e, "Invitación")}
-                />
+                <figure className="relative w-full" style={{ aspectRatio: "955 / 650" }}>
+  <img 
+    src="/src/assets/elegant-floral.jpg" 
+    alt="Invitación elegante" 
+    className="absolute inset-0 w-full h-full object-contain rounded-lg shadow-warm"
+    loading="eager"
+  />
+</figure>
+
                 <div className="mt-4 text-center">
                   <h3 className="font-display text-lg font-medium text-warm-gray-900">
                     María & Carlos
@@ -231,8 +232,7 @@ function Landing() {
                   <img 
                     src={template.image} 
                     alt={template.name}
-                    className="w-full h-full object-cover hover-scale"
-                    onError={(e)=>onImgError(e, template.name)}
+                    className="w-full h-full object-contain hover-scale"
                   />
                 </div>
                 <CardContent className="p-6">
