@@ -236,7 +236,7 @@ function Landing() {
                   <img
                     src={product.image}
                     alt={product.name}
-                    className="absolute inset-0 w-full h-full object-contain block hover-scale"
+                    className="absolute inset-0 w-full h-full object-cover block hover-scale"
                     onError={(e) => onImgError(e, product.name)}
                   />
                   {product.badge && (
@@ -287,7 +287,7 @@ function Landing() {
                   <img
                     src={category.image}
                     alt={category.name}
-                    className="absolute inset-0 w-full h-full object-contain block hover-scale"
+                    className="absolute inset-0 w-full h-full object-cover block hover-scale"
                     onError={(e) => onImgError(e, category.name)}
                   />
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
@@ -399,7 +399,7 @@ function Landing() {
               <img 
                 src={asset('/src/assets/cotton_bird_images/taller_produccion_cotton_bird.webp')} 
                 alt="Diseño de invitaciones digitales"
-                className="block w-full h-full object-contain"
+                className="block w-full h-full object-cover"
                 onError={(e) => onImgError(e, "Diseño de invitaciones digitales")}
               />
             </div>
