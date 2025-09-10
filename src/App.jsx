@@ -18,6 +18,8 @@ import DemoQuinceanera from './pages/DemoQuinceanera';
 import DemoBlack from './pages/DemoBlack';
 import DemoPremium from './pages/DemoPremium';
 import DemoClassic from './pages/DemoClassic';
+import './utils/assets';
+
 
 function App() {
   const { user, loading } = useAuth();
