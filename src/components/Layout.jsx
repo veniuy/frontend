@@ -5,8 +5,6 @@ import { Button } from './ui/button';
 import {
   Home,
   Calendar,
-  Users,
-  Settings,
   LogOut,
   Menu,
   X,
@@ -25,12 +23,9 @@ export default function Layout() {
     navigate('/login');
   };
 
-  // Ajusté enlaces a rutas que existen; podés reponer otros cuando crees sus páginas
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Crear Evento', href: '/events/create', icon: Calendar },
-    // { name: 'Invitados', href: '/guests', icon: Users },      // aún sin ruta
-    // { name: 'Configuración', href: '/settings', icon: Settings } // aún sin ruta
   ];
 
   return (
