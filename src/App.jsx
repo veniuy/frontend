@@ -1,51 +1,98 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from './hooks/useAuth.jsx';
-import Layout from './components/Layout';
-import Landing from './pages/Landing';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import CreateEvent from './pages/CreateEvent';
-import PaymentTransfer from './pages/PaymentTransfer';
-import PaymentCode from './pages/PaymentCode';
+import { useState, useEffect, createContext, useContext, useMemo } from 'react';
+import { apiClient } from '../lib/api';
 
-function App() {
-  const { user, loading } = useAuth();
+// Creamos el contexto
+const AuthContext = createContext(null);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-rose-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando...</p>
-        </div>
-      </div>
-    );
-  }
+// Provider con estado y métodos de auth
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);     // objeto usuario o null
+  const [loading, setLoading] = useState(true); // true mientras verificamos sesión
+  const [error, setError] = useState(null);     // último error de auth
+
+  // Verifica sesión al montar (usa /api/auth/me)
+  useEffect(() => {
+    let abort = false;
+    async function checkAuthStatus() {
+      try {
+        setLoading(true);
+        const res = await apiClient.getCurrentUser(); // GET /api/auth/me
+        if (!abort) setUser(res?.user || null);
+      } catch {
+        if (!abort) setUser(null);
+      } finally {
+        if (!abort) setLoading(false);
+      }
+    }
+    checkAuthStatus();
+    return () => { abort = true; };
+  }, []);
+
+  // Login (POST /api/auth/login)
+  const login = async (credentials) => {
+    try {
+      setError(null);
+      setLoading(true);
+      const res = await apiClient.login(credentials);
+      setUser(res?.user || null);
+      return res;
+    } catch (e) {
+      const msg = e?.message || 'Error al iniciar sesión';
+      setError(msg);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Register (POST /api/auth/register)
+  const register = async (userData) => {
+    try {
+      setError(null);
+      setLoading(true);
+      const res = await apiClient.register(userData);
+      setUser(res?.user || null);
+      return res;
+    } catch (e) {
+      const msg = e?.message || 'Error al registrar';
+      setError(msg);
+      throw e;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Logout (POST /api/auth/logout)
+  const logout = async () => {
+    try {
+      setLoading(true);
+      await apiClient.logout();
+    } finally {
+      setUser(null);
+      setLoading(false);
+    }
+  };
+
+  const value = useMemo(() => ({
+    user,
+    loading,
+    error,
+    login,
+    register,
+    logout,
+    isAuthenticated: !!user,
+  }), [user, loading, error]);
 
   return (
-    <Routes>
-      {/* Landing page - accessible to everyone */}
-      <Route path="/" element={<Landing />} />
-      
-      {/* Auth routes */}
-      <Route path="/login" element={!user ? <Login /> : <Navigate to="/app/dashboard" />} />
-      <Route path="/register" element={!user ? <Register /> : <Navigate to="/app/dashboard" />} />
-
-      {/* Protected app routes */}
-      <Route path="/app" element={user ? <Layout /> : <Navigate to="/login" />}>
-        <Route index element={<Navigate to="/app/dashboard" />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="events/create" element={<CreateEvent />} />
-        <Route path="payment/transfer/:eventId" element={<PaymentTransfer />} />
-        <Route path="payment/code/:eventId" element={<PaymentCode />} />
-      </Route>
-
-      {/* fallback */}
-      <Route path="*" element={<Navigate to="/" />} />
-    </Routes>
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
   );
 }
 
-export default App;
+// Hook para consumir el contexto
+export function useAuth() {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth debe ser usado dentro de AuthProvider');
+  return ctx;
+}
