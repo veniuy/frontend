@@ -1,59 +1,76 @@
 // Landing.jsx
-import React, { useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
+import { Card, CardContent } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Input } from '../components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { CartIcon, ShoppingCartSidebar } from '../components/ShoppingCart'
 import { 
   Heart, 
-  Users, 
   Send, 
-  FileText, 
-  Edit, 
-  Share,
-  Check,
-  Star,
+  Edit,
   Sparkles,
-  ArrowRight,
-  Play,
-  ChevronDown,
-  Search,
-  ShoppingCart,
-  User,
-  Menu,
-  Phone,
-  Leaf,
-  Recycle,
-  Award,
-  Instagram,
-  Facebook,
-  Twitter,
   Smartphone,
   Globe,
   Zap,
-  Clock,
-  Crown
+  Crown,
+  Search,
+  User,
+  Menu,
+  Phone,
+  Instagram,
+  Facebook,
+  Twitter
 } from 'lucide-react'
 
-import { asset, ph, onImgError } from '../utils/assets';
+import { asset, onImgError } from '../utils/assets';
 
 function Landing() {
   const navigate = useNavigate()
-  const [selectedCategory, setSelectedCategory] = useState('Todas')
 
-  const categories = [
+  // --- UI State ---
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  // --- Wishlist state (persistente en localStorage) ---
+  const LS_KEY = 'venite_wishlist_v1'
+  const [wishlist, setWishlist] = useState(() => {
+    try {
+      const raw = localStorage.getItem(LS_KEY)
+      return raw ? JSON.parse(raw) : []
+    } catch {
+      return []
+    }
+  })
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(wishlist))
+    } catch {}
+  }, [wishlist])
+
+  const isFav = (id) => wishlist.includes(id)
+  const toggleFav = (id) => {
+    setWishlist((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter(x => x !== id)
+      }
+      return [...prev, id]
+    })
+  }
+
+  // --- Data ---
+  const categories = useMemo(() => ([
     { name: 'Bodas', image: asset('/src/assets/cotton_bird_images/categoria_boda_grid.webp') },
     { name: 'Quinceañeras', image: asset('/src/assets/cotton_bird_images/categoria_bebes_ninos.webp') },
     { name: 'Cumpleaños Infantiles', image: asset('/src/assets/cotton_bird_images/categoria_cumpleanos.webp') },
     { name: 'Eventos Corporativos', image: asset('/src/assets/cotton_bird_images/categoria_productos_fotos.webp') },
     { name: 'Baby Shower', image: asset('/src/assets/cotton_bird_images/categoria_bautizo.webp') },
     { name: 'Graduaciones', image: asset('/src/assets/cotton_bird_images/categoria_invitaciones_digitales.webp') }
-  ]
+  ]), [])
 
-  const featuredProducts = [
+  const featuredProducts = useMemo(() => ([
     {
       id: 1,
       name: "Invitación Digital Elegante",
@@ -86,9 +103,9 @@ function Landing() {
       price: "Desde 30,00 €",
       badge: null
     }
-  ]
+  ]), [])
 
-  const values = [
+  const values = useMemo(() => ([
     {
       icon: Smartphone,
       title: "100% Digital y Ecológico",
@@ -109,9 +126,9 @@ function Landing() {
       title: "Personalización Total",
       description: "Diseños únicos adaptados a tu estilo y evento especial"
     }
-  ]
+  ]), [])
 
-  const digitalFeatures = [
+  const digitalFeatures = useMemo(() => ([
     {
       title: "Invitaciones Interactivas",
       description: "Incluye mapas, confirmación de asistencia, música de fondo y animaciones que sorprenderán a tus invitados."
@@ -128,7 +145,20 @@ function Landing() {
       title: "Actualizaciones en Tiempo Real",
       description: "¿Cambió algo? Actualiza la información y todos tus invitados verán los cambios automáticamente."
     }
-  ]
+  ]), [])
+
+  // --- Helpers UI ---
+  const NavLinks = ({ onClick }) => (
+    <>
+      <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" onClick={onClick} href="#bodas">Bodas</a>
+      <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" onClick={onClick} href="#quinceaneras">Quinceañeras</a>
+      <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" onClick={onClick} href="#infantiles">Cumpleaños Infantiles</a>
+      <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" onClick={onClick} href="#baby-shower">Baby Shower</a>
+      <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" onClick={onClick} href="#corporativos">Eventos Corporativos</a>
+      <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" onClick={onClick} href="#graduaciones">Graduaciones</a>
+      <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" onClick={onClick} href="#plantillas">Todas las Plantillas</a>
+    </>
+  )
 
   return (
     <div className="min-h-screen bg-background font-ui">
@@ -143,31 +173,63 @@ function Landing() {
             </div>
             
             {/* Logo */}
-            <div className="font-display text-2xl font-medium text-foreground tracking-wide cursor-pointer" onClick={() => navigate('/')}>
+            <div
+              className="font-display text-2xl font-medium text-foreground tracking-wide cursor-pointer select-none"
+              onClick={() => navigate('/')}
+            >
               Venite
               <span className="text-xs text-muted-foreground ml-2">invitaciones digitales que enamoran</span>
             </div>
             
             {/* User Actions */}
             <div className="flex items-center space-x-4">
-              <Search className="w-5 h-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" />
-              <Heart className="w-5 h-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" />
-              <User className="w-5 h-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" onClick={() => navigate('/login')} />
+              <Search
+                className="w-5 h-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                onClick={() => navigate('/products')}
+              />
+              {/* Wishlist quick-access (muestra cantidad) */}
+              <div className="relative">
+                <Heart
+                  className={`w-5 h-5 cursor-pointer transition-colors ${wishlist.length ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+                  onClick={() => navigate('/wishlist')}
+                  // Relleno visual cuando hay favoritos
+                  fill={wishlist.length ? 'currentColor' : 'none'}
+                />
+                {wishlist.length > 0 && (
+                  <span className="absolute -top-2 -right-3 text-[10px] px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground">
+                    {wishlist.length}
+                  </span>
+                )}
+              </div>
+
+              <User
+                className="w-5 h-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                onClick={() => navigate('/login')}
+              />
               <CartIcon />
-              <Menu className="w-5 h-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors md:hidden" />
+              {/* Mobile menu toggle */}
+              <Menu
+                className="w-6 h-6 text-muted-foreground cursor-pointer hover:text-foreground transition-colors md:hidden"
+                onClick={() => setMobileMenuOpen((v) => !v)}
+                aria-label="Menú"
+                aria-expanded={mobileMenuOpen}
+              />
             </div>
           </div>
-          
-          {/* Navigation Menu */}
+
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center justify-center space-x-8 py-4 border-t border-border">
-            <a href="#bodas" className="text-muted-foreground hover:text-primary transition-colors font-medium" onClick={() => navigate('/products')}>Bodas</a>
-            <a href="#quinceaneras" className="text-muted-foreground hover:text-primary transition-colors font-medium" onClick={() => navigate('/products')}>Quinceañeras</a>
-            <a href="#infantiles" className="text-muted-foreground hover:text-primary transition-colors font-medium" onClick={() => navigate('/products')}>Cumpleaños Infantiles</a>
-            <a href="#baby-shower" className="text-muted-foreground hover:text-primary transition-colors font-medium" onClick={() => navigate('/products')}>Baby Shower</a>
-            <a href="#corporativos" className="text-muted-foreground hover:text-primary transition-colors font-medium" onClick={() => navigate('/products')}>Eventos Corporativos</a>
-            <a href="#graduaciones" className="text-muted-foreground hover:text-primary transition-colors font-medium" onClick={() => navigate('/products')}>Graduaciones</a>
-            <a href="#plantillas" className="text-muted-foreground hover:text-primary transition-colors font-medium" onClick={() => navigate('/products')}>Todas las Plantillas</a>
+            <NavLinks onClick={() => navigate('/products')} />
           </nav>
+
+          {/* Mobile Navigation (desplegable) */}
+          {mobileMenuOpen && (
+            <div className="md:hidden border-t border-border py-2 animate-in fade-in slide-in-from-top-2">
+              <div className="flex flex-col">
+                <NavLinks onClick={() => { setMobileMenuOpen(false); navigate('/products') }} />
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
@@ -229,40 +291,60 @@ function Landing() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product) => (
-              <Card key={product.id} className="group cursor-pointer hover-lift shadow-warm border-border" onClick={() => navigate(`/product/${product.id}`)}>
-                <div className="aspect-square overflow-hidden rounded-t-lg relative">
-                  {/* IMG sin gaps: absoluta y block */}
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="absolute inset-0 w-full h-full object-cover block hover-scale"
-                    onError={(e) => onImgError(e, product.name)}
-                  />
-                  {product.badge && (
-                    <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground">
-                      {product.badge}
-                    </Badge>
-                  )}
-                  <div className="absolute top-2 right-2">
-                    <Heart className="w-5 h-5 text-muted-foreground hover:text-primary cursor-pointer transition-colors" />
+            {featuredProducts.map((product) => {
+              const fav = isFav(product.id)
+              return (
+                <Card
+                  key={product.id}
+                  className="group cursor-pointer hover-lift shadow-warm border-border"
+                  onClick={() => navigate(`/product/${product.id}`)}
+                >
+                  <div className="aspect-square overflow-hidden rounded-t-lg relative">
+                    {/* IMG sin franjas: absoluta + object-cover + block */}
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="absolute inset-0 w-full h-full object-cover block will-change-transform transition-transform duration-300 group-hover:scale-[1.03]"
+                      onError={(e) => onImgError(e, product.name)}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    {product.badge && (
+                      <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground">
+                        {product.badge}
+                      </Badge>
+                    )}
+                    {/* Wishlist button */}
+                    <button
+                      type="button"
+                      className="absolute top-2 right-2 p-1 rounded-full bg-white/80 hover:bg-white shadow"
+                      aria-pressed={fav}
+                      aria-label={fav ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+                      onClick={(e) => { e.stopPropagation(); toggleFav(product.id) }}
+                    >
+                      <Heart
+                        className={`w-5 h-5 ${fav ? 'text-primary' : 'text-muted-foreground'}`}
+                        fill={fav ? 'currentColor' : 'none'}
+                      />
+                    </button>
+
+                    <div className="absolute bottom-2 left-2">
+                      <Badge variant="secondary" className="bg-black/70 text-white">
+                        <Globe className="w-3 h-3 mr-1" />
+                        Digital
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="absolute bottom-2 left-2">
-                    <Badge variant="secondary" className="bg-black/70 text-white">
-                      <Globe className="w-3 h-3 mr-1" />
-                      Digital
-                    </Badge>
-                  </div>
-                </div>
-                <CardContent className="p-4">
-                  <h3 className="font-medium text-foreground mb-1 line-clamp-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-2">{product.category}</p>
-                  <p className="font-semibold text-foreground">{product.price}</p>
-                </CardContent>
-              </Card>
-            ))}
+                  <CardContent className="p-4">
+                    <h3 className="font-medium text-foreground mb-1 line-clamp-2">
+                      {product.name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-2">{product.category}</p>
+                    <p className="font-semibold text-foreground">{product.price}</p>
+                  </CardContent>
+                </Card>
+              )
+            })}
           </div>
         </div>
       </section>
@@ -281,14 +363,20 @@ function Landing() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map((category, index) => (
-              <Card key={index} className="group cursor-pointer hover-lift shadow-warm border-border overflow-hidden" onClick={() => navigate('/products')}>
+              <Card
+                key={index}
+                className="group cursor-pointer hover-lift shadow-warm border-border overflow-hidden"
+                onClick={() => navigate('/products')}
+              >
                 <div className="aspect-[4/3] overflow-hidden relative">
-                  {/* IMG sin borde arriba/abajo */}
+                  {/* IMG sin borde/gap: absoluta + cover + block */}
                   <img
                     src={category.image}
                     alt={category.name}
-                    className="absolute inset-0 w-full h-full object-cover block hover-scale"
+                    className="absolute inset-0 w-full h-full object-cover block transition-transform duration-300 group-hover:scale-[1.03]"
                     onError={(e) => onImgError(e, category.name)}
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
                   <div className="absolute bottom-4 left-4 right-4">
@@ -401,6 +489,8 @@ function Landing() {
                 alt="Diseño de invitaciones digitales"
                 className="block w-full h-full object-cover"
                 onError={(e) => onImgError(e, "Diseño de invitaciones digitales")}
+                loading="lazy"
+                decoding="async"
               />
             </div>
             <div className="space-y-8">
