@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
-import { asset, onImgError } from '../utils/assets';
 import { 
   Palette, 
   Users, 
@@ -20,6 +19,8 @@ import {
   ChevronDown
 } from 'lucide-react'
 
+import { asset, ph, onImgError } from '../utils/assets';
+
 function Landing() {
   const navigate = useNavigate()
 
@@ -28,21 +29,21 @@ function Landing() {
       id: 1,
       name: "Elegancia Floral",
       category: "Boda",
-      image: "/api/placeholder/300/400",
+      image: ph(300, 400, 'Elegancia Floral'),
       badge: "Popular"
     },
     {
       id: 2,
       name: "Minimalista Moderna",
       category: "Boda", 
-      image: "/api/placeholder/300/400",
+      image: ph(300, 400, 'Minimalista Moderna'),
       badge: "Nuevo"
     },
     {
       id: 3,
       name: "Corte Láser",
       category: "Boda",
-      image: "/api/placeholder/300/400",
+      image: ph(300, 400, 'Corte Láser'),
       badge: null
     }
   ]
@@ -178,9 +179,10 @@ function Landing() {
             <div className="relative">
               <div className="relative z-10 bg-white rounded-2xl shadow-warm-lg p-8 max-w-md mx-auto">
                 <img 
-                  src="/src/assets/elegant-floral.jpg" 
+                  src={asset("/src/assets/elegant-floral.jpg")} 
                   alt="Invitación elegante" 
                   className="w-full rounded-lg shadow-warm"
+                  onError={(e)=>onImgError(e, "Invitación")}
                 />
                 <div className="mt-4 text-center">
                   <h3 className="font-display text-lg font-medium text-warm-gray-900">
@@ -230,6 +232,7 @@ function Landing() {
                     src={template.image} 
                     alt={template.name}
                     className="w-full h-full object-cover hover-scale"
+                    onError={(e)=>onImgError(e, template.name)}
                   />
                 </div>
                 <CardContent className="p-6">
