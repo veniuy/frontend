@@ -2,14 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { Button } from './ui/button';
-import {
-  Home,
-  Calendar,
-  LogOut,
-  Menu,
-  X,
-  Sparkles
-} from 'lucide-react';
+import { Home, Calendar, LogOut, Menu, X, Sparkles } from 'lucide-react';
 import './Layout.css';
 
 export default function Layout() {
@@ -18,15 +11,19 @@ export default function Layout() {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const BASE = '/app';
+
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Crear Evento', href: '/events/create', icon: Calendar },
+    { name: 'Dashboard', href: `${BASE}/dashboard`, icon: Home },
+    { name: 'Crear Evento', href: `${BASE}/events/create`, icon: Calendar },
   ];
+
+  const isActive = (href) => location.pathname.startsWith(href);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -46,16 +43,16 @@ export default function Layout() {
               <X className="h-5 w-5" />
             </Button>
           </div>
+
           <nav className="flex-1 space-y-1 px-2 py-4">
             {navigation.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.href;
               return (
                 <Link
                   key={item.name}
                   to={item.href}
                   className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                    isActive
+                    isActive(item.href)
                       ? 'bg-blue-100 text-blue-900'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
@@ -67,14 +64,13 @@ export default function Layout() {
               );
             })}
           </nav>
+
           <div className="border-t border-gray-200 p-4">
             <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
-                  <span className="text-sm font-medium text-white">
-                    {user?.username?.charAt(0)?.toUpperCase()}
-                  </span>
-                </div>
+              <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
+                <span className="text-sm font-medium text-white">
+                  {user?.username?.charAt(0)?.toUpperCase()}
+                </span>
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-700">{user?.username}</p>
@@ -96,16 +92,16 @@ export default function Layout() {
             <Sparkles className="h-8 w-8 text-blue-600" />
             <span className="ml-2 text-xl font-bold text-gray-900">Invitaciones</span>
           </div>
+
           <nav className="mt-8 flex-1 space-y-1 bg-white px-2">
             {navigation.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.href;
               return (
                 <Link
                   key={item.name}
                   to={item.href}
                   className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                    isActive
+                    isActive(item.href)
                       ? 'bg-blue-100 text-blue-900'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
@@ -116,14 +112,13 @@ export default function Layout() {
               );
             })}
           </nav>
+
           <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
             <div className="flex items-center w-full">
-              <div className="flex-shrink-0">
-                <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
-                  <span className="text-sm font-medium text-white">
-                    {user?.username?.charAt(0)?.toUpperCase()}
-                  </span>
-                </div>
+              <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
+                <span className="text-sm font-medium text-white">
+                  {user?.username?.charAt(0)?.toUpperCase()}
+                </span>
               </div>
               <div className="ml-3 flex-1">
                 <p className="text-sm font-medium text-gray-700">{user?.username}</p>
@@ -139,14 +134,12 @@ export default function Layout() {
 
       {/* Contenido principal */}
       <div className="lg:pl-64 flex flex-col flex-1">
-        {/* Header móvil */}
         <div className="sticky top-0 z-10 lg:hidden pl-1 pt-1 sm:pl-3 sm:pt-3 bg-gray-50">
           <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </Button>
         </div>
 
-        {/* Contenido enrutado */}
         <main className="flex-1">
           <Outlet />
         </main>
