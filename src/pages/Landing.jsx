@@ -34,8 +34,7 @@ import {
   Globe,
   Zap,
   Clock,
-  Crown,
-  Leaf
+  Crown
 } from 'lucide-react'
 
 import { asset, ph, onImgError } from '../utils/assets';
@@ -420,42 +419,18 @@ function Landing() {
                   </p>
                 </div>
               ))}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
                   variant="outline" 
                   className="border-primary text-primary hover:bg-primary/10"
-                  onClick={() => navigate('/demo/black')}
+                  onClick={() => navigate('/demo/boda')}
                 >
                   <Globe className="w-4 h-4 mr-2" />
-                  Demo Black
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="border-blue-500 text-blue-500 hover:bg-blue-50"
-                  onClick={() => navigate('/demo/premium')}
-                >
-                  <Heart className="w-4 h-4 mr-2" />
-                  Demo Premium
+                  Demo Boda
                 </Button>
                 <Button 
                   variant="outline" 
                   className="border-sage-400 text-sage-400 hover:bg-sage-100"
-                  onClick={() => navigate('/demo/clasica')}
-                >
-                  <Leaf className="w-4 h-4 mr-2" />
-                  Demo Clásica
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="border-rose-400 text-rose-400 hover:bg-rose-50"
-                  onClick={() => navigate('/demo/boda')}
-                >
-                  <Globe className="w-4 h-4 mr-2" />
-                  Demo Romántica
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="border-purple-500 text-purple-500 hover:bg-purple-50"
                   onClick={() => navigate('/demo/quinceanera')}
                 >
                   <Crown className="w-4 h-4 mr-2" />
