@@ -1,66 +1,79 @@
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, useContext, useMemo } from 'react';
 import { apiClient } from '../lib/api';
 
-const AuthContext = createContext();
+// Creamos el contexto
+const AuthContext = createContext(null);
 
+// Provider con estado y métodos de auth
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);     // objeto usuario o null
+  const [loading, setLoading] = useState(true); // true mientras verificamos sesión
+  const [error, setError] = useState(null);     // último error de auth
 
+  // Verifica sesión al montar (usa /api/auth/me)
   useEffect(() => {
+    let abort = false;
+    async function checkAuthStatus() {
+      try {
+        setLoading(true);
+        const res = await apiClient.getCurrentUser(); // GET /api/auth/me
+        if (!abort) setUser(res?.user || null);
+      } catch {
+        if (!abort) setUser(null);
+      } finally {
+        if (!abort) setLoading(false);
+      }
+    }
     checkAuthStatus();
+    return () => { abort = true; };
   }, []);
 
-  const checkAuthStatus = async () => {
+  // Login (POST /api/auth/login)
+  const login = async (credentials) => {
     try {
+      setError(null);
       setLoading(true);
-      const response = await apiClient.getCurrentUser();
-      setUser(response.user);
-    } catch (error) {
-      // Usuario no autenticado
-      setUser(null);
+      const res = await apiClient.login(credentials);
+      setUser(res?.user || null);
+      return res;
+    } catch (e) {
+      const msg = e?.message || 'Error al iniciar sesión';
+      setError(msg);
+      throw e;
     } finally {
       setLoading(false);
     }
   };
 
-  const login = async (credentials) => {
-    try {
-      setError(null);
-      const response = await apiClient.login(credentials);
-      setUser(response.user);
-      return response;
-    } catch (error) {
-      setError(error.message);
-      throw error;
-    }
-  };
-
+  // Register (POST /api/auth/register)
   const register = async (userData) => {
     try {
       setError(null);
-      const response = await apiClient.register(userData);
-      setUser(response.user);
-      return response;
-    } catch (error) {
-      setError(error.message);
-      throw error;
+      setLoading(true);
+      const res = await apiClient.register(userData);
+      setUser(res?.user || null);
+      return res;
+    } catch (e) {
+      const msg = e?.message || 'Error al registrar';
+      setError(msg);
+      throw e;
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Logout (POST /api/auth/logout)
   const logout = async () => {
     try {
+      setLoading(true);
       await apiClient.logout();
+    } finally {
       setUser(null);
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error);
-      // Limpiar usuario local incluso si hay error en el servidor
-      setUser(null);
+      setLoading(false);
     }
   };
 
-  const value = {
+  const value = useMemo(() => ({
     user,
     loading,
     error,
@@ -68,7 +81,7 @@ export function AuthProvider({ children }) {
     register,
     logout,
     isAuthenticated: !!user,
-  };
+  }), [user, loading, error]);
 
   return (
     <AuthContext.Provider value={value}>
@@ -77,11 +90,9 @@ export function AuthProvider({ children }) {
   );
 }
 
+// Hook para consumir el contexto
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth debe ser usado dentro de AuthProvider');
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth debe ser usado dentro de AuthProvider');
+  return ctx;
 }
-
