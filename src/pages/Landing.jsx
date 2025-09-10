@@ -232,10 +232,11 @@ function Landing() {
             {featuredProducts.map((product) => (
               <Card key={product.id} className="group cursor-pointer hover-lift shadow-warm border-border" onClick={() => navigate(`/product/${product.id}`)}>
                 <div className="aspect-square overflow-hidden rounded-t-lg relative">
-                  <img 
-                    src={product.image} 
+                  {/* IMG sin gaps: absoluta y block */}
+                  <img
+                    src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover hover-scale"
+                    className="absolute inset-0 w-full h-full object-cover block hover-scale"
                     onError={(e) => onImgError(e, product.name)}
                   />
                   {product.badge && (
@@ -282,10 +283,11 @@ function Landing() {
             {categories.map((category, index) => (
               <Card key={index} className="group cursor-pointer hover-lift shadow-warm border-border overflow-hidden" onClick={() => navigate('/products')}>
                 <div className="aspect-[4/3] overflow-hidden relative">
-                  <img 
-                    src={category.image} 
+                  {/* IMG sin borde arriba/abajo */}
+                  <img
+                    src={category.image}
                     alt={category.name}
-                    className="w-full h-full object-cover hover-scale"
+                    className="absolute inset-0 w-full h-full object-cover block hover-scale"
                     onError={(e) => onImgError(e, category.name)}
                   />
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
@@ -392,11 +394,12 @@ function Landing() {
       <section className="py-16 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
+            <div className="relative overflow-hidden rounded-lg shadow-warm-lg">
+              {/* IMG sin gap por baseline */}
               <img 
                 src={asset('/src/assets/cotton_bird_images/taller_produccion_cotton_bird.webp')} 
                 alt="Diseño de invitaciones digitales"
-                className="w-full rounded-lg shadow-warm-lg"
+                className="block w-full h-full object-cover"
                 onError={(e) => onImgError(e, "Diseño de invitaciones digitales")}
               />
             </div>
