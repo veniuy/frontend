@@ -109,31 +109,32 @@ function Landing() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200">
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-rose-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="text-2xl font-bold text-gray-900 tracking-wide">
               InvitaElegante
             </div>
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="#plantillas" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <a href="#plantillas" className="text-gray-600 hover:text-rose-600 transition-colors">
                 Plantillas
               </a>
-              <a href="#caracteristicas" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <a href="#caracteristicas" className="text-gray-600 hover:text-rose-600 transition-colors">
                 Características
               </a>
-              <a href="#precios" className="text-gray-600 hover:text-gray-900 transition-colors">
+              <a href="#precios" className="text-gray-600 hover:text-rose-600 transition-colors">
                 Precios
               </a>
               <Button 
                 variant="outline" 
                 onClick={() => navigate('/login')}
+                className="border-rose-200 text-rose-700 hover:bg-rose-50"
               >
                 Iniciar Sesión
               </Button>
               <Button 
                 onClick={() => navigate('/register')}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-rose-500 hover:bg-rose-600 text-white"
               >
                 Empezar Gratis
               </Button>
@@ -143,13 +144,13 @@ function Landing() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100">
+      <section className="relative overflow-hidden bg-gradient-to-br from-rose-50 to-pink-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-center lg:text-left">
               <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
                 Invitaciones digitales que 
-                <span className="text-blue-600"> enamoran</span>
+                <span className="text-rose-600"> enamoran</span>
               </h1>
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
                 Crea, personaliza y envía invitaciones elegantes para tus eventos más especiales. 
@@ -159,12 +160,12 @@ function Landing() {
                 <Button 
                   size="lg" 
                   onClick={() => navigate('/register')}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg"
+                  className="bg-rose-500 hover:bg-rose-600 text-white px-8 py-4 text-lg"
                 >
                   <Sparkles className="w-5 h-5 mr-2" />
                   Crear mi invitación gratis
                 </Button>
-                <Button size="lg" variant="outline" className="px-8 py-4 text-lg">
+                <Button size="lg" variant="outline" className="px-8 py-4 text-lg border-rose-200 text-rose-700 hover:bg-rose-50">
                   <Play className="w-5 h-5 mr-2" />
                   Ver ejemplos
                 </Button>
@@ -175,9 +176,9 @@ function Landing() {
             </div>
             <div className="relative">
               <div className="relative z-10 bg-white rounded-2xl shadow-xl p-8 max-w-md mx-auto">
-                <div className="w-full h-64 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center">
+                <div className="w-full h-64 bg-gradient-to-br from-rose-100 to-pink-100 rounded-lg flex items-center justify-center">
                   <div className="text-center">
-                    <Heart className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+                    <Heart className="w-12 h-12 text-rose-500 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold text-gray-900">
                       María & Carlos
                     </h3>
@@ -185,7 +186,7 @@ function Landing() {
                   </div>
                 </div>
               </div>
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-200/50 to-purple-200/50 rounded-3xl transform rotate-3"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-rose-200/50 to-pink-200/50 rounded-3xl transform rotate-3"></div>
             </div>
           </div>
         </div>
@@ -210,7 +211,7 @@ function Landing() {
                 <Button 
                   key={category}
                   variant={category === 'Todas' ? 'default' : 'outline'}
-                  className={category === 'Todas' ? 'bg-blue-600 hover:bg-blue-700' : ''}
+                  className={category === 'Todas' ? 'bg-rose-500 hover:bg-rose-600' : 'border-rose-200 text-rose-700 hover:bg-rose-50'}
                 >
                   {category}
                 </Button>
@@ -220,12 +221,12 @@ function Landing() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {templates.map((template) => (
-              <Card key={template.id} className="group cursor-pointer hover:shadow-lg transition-shadow">
-                <div className="aspect-[3/4] overflow-hidden rounded-t-lg bg-gradient-to-br from-gray-100 to-gray-200">
+              <Card key={template.id} className="group cursor-pointer hover:shadow-lg transition-shadow border-rose-100">
+                <div className="aspect-[3/4] overflow-hidden rounded-t-lg bg-gradient-to-br from-rose-50 to-pink-50">
                   <div className="w-full h-full flex items-center justify-center">
                     <div className="text-center">
-                      <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-500">Plantilla de muestra</p>
+                      <FileText className="w-16 h-16 text-rose-300 mx-auto mb-4" />
+                      <p className="text-rose-400">Plantilla de muestra</p>
                     </div>
                   </div>
                 </div>
@@ -238,12 +239,12 @@ function Landing() {
                       <p className="text-gray-600">{template.category}</p>
                     </div>
                     {template.badge && (
-                      <Badge variant="secondary">
+                      <Badge variant="secondary" className="bg-rose-100 text-rose-700">
                         {template.badge}
                       </Badge>
                     )}
                   </div>
-                  <Button variant="outline" className="w-full mt-4">
+                  <Button variant="outline" className="w-full mt-4 border-rose-200 text-rose-700 hover:bg-rose-50">
                     Ver plantilla
                   </Button>
                 </CardContent>
@@ -252,7 +253,7 @@ function Landing() {
           </div>
 
           <div className="text-center mt-12">
-            <Button variant="outline" size="lg">
+            <Button variant="outline" size="lg" className="border-rose-200 text-rose-700 hover:bg-rose-50">
               Ver todas las plantillas
               <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
@@ -261,7 +262,7 @@ function Landing() {
       </section>
 
       {/* Features */}
-      <section id="caracteristicas" className="py-20 bg-gray-50">
+      <section id="caracteristicas" className="py-20 bg-rose-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
@@ -275,9 +276,9 @@ function Landing() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <Card key={index} className="text-center p-8 bg-white">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <feature.icon className="w-8 h-8 text-blue-600" />
+              <Card key={index} className="text-center p-8 bg-white border-rose-100">
+                <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <feature.icon className="w-8 h-8 text-rose-600" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
                   {feature.title}
@@ -307,7 +308,7 @@ function Landing() {
           <div className="grid md:grid-cols-3 gap-8">
             {steps.map((step, index) => (
               <div key={index} className="text-center relative">
-                <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div className="w-20 h-20 bg-rose-500 rounded-full flex items-center justify-center mx-auto mb-6">
                   <step.icon className="w-10 h-10 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">
@@ -318,7 +319,7 @@ function Landing() {
                 </p>
                 {index < steps.length - 1 && (
                   <div className="hidden md:block absolute top-10 left-full w-full">
-                    <ArrowRight className="w-6 h-6 text-gray-300 mx-auto" />
+                    <ArrowRight className="w-6 h-6 text-rose-300 mx-auto" />
                   </div>
                 )}
               </div>
@@ -328,7 +329,7 @@ function Landing() {
       </section>
 
       {/* Pricing */}
-      <section id="precios" className="py-20 bg-gray-50">
+      <section id="precios" className="py-20 bg-rose-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
@@ -342,7 +343,7 @@ function Landing() {
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {/* Free Plan */}
-            <Card className="bg-white">
+            <Card className="bg-white border-rose-100">
               <CardHeader className="text-center pb-8">
                 <CardTitle className="text-2xl font-bold text-gray-900">
                   Gratuito
@@ -369,7 +370,7 @@ function Landing() {
                 </ul>
                 <Button 
                   variant="outline" 
-                  className="w-full"
+                  className="w-full border-rose-200 text-rose-700 hover:bg-rose-50"
                   onClick={() => navigate('/register')}
                 >
                   Empezar gratis
@@ -378,9 +379,9 @@ function Landing() {
             </Card>
 
             {/* Premium Plan */}
-            <Card className="bg-white border-blue-500 relative">
+            <Card className="bg-white border-rose-300 relative">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-blue-600 text-white px-4 py-1">
+                <Badge className="bg-rose-500 text-white px-4 py-1">
                   Más Popular
                 </Badge>
               </div>
@@ -413,7 +414,7 @@ function Landing() {
                   </li>
                 </ul>
                 <Button 
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  className="w-full bg-rose-500 hover:bg-rose-600 text-white"
                   onClick={() => navigate('/register')}
                 >
                   Elegir Premium
@@ -422,7 +423,7 @@ function Landing() {
             </Card>
 
             {/* Pro Plan */}
-            <Card className="bg-white">
+            <Card className="bg-white border-rose-100">
               <CardHeader className="text-center pb-8">
                 <CardTitle className="text-2xl font-bold text-gray-900">
                   Pro
@@ -453,7 +454,7 @@ function Landing() {
                 </ul>
                 <Button 
                   variant="outline" 
-                  className="w-full"
+                  className="w-full border-rose-200 text-rose-700 hover:bg-rose-50"
                   onClick={() => navigate('/register')}
                 >
                   Elegir Pro
@@ -479,7 +480,7 @@ function Landing() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <Card key={index} className="bg-white">
+              <Card key={index} className="bg-white border-rose-100">
                 <CardContent className="p-8">
                   <div className="flex items-center mb-4">
                     {[...Array(testimonial.rating)].map((_, i) => (
@@ -490,7 +491,7 @@ function Landing() {
                     "{testimonial.quote}"
                   </p>
                   <div className="flex items-center">
-                    <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mr-4">
+                    <div className="w-12 h-12 bg-rose-500 rounded-full flex items-center justify-center mr-4">
                       <span className="text-white font-medium">
                         {testimonial.avatar}
                       </span>
@@ -529,23 +530,23 @@ function Landing() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-blue-700">
+      <section className="py-20 bg-gradient-to-r from-rose-500 to-pink-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold text-white mb-4">
             ¿Listo para crear tu invitación perfecta?
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-rose-100 mb-8">
             Únete a miles de personas que ya confían en nosotros para sus eventos especiales
           </p>
           <Button 
             size="lg" 
-            className="bg-white text-blue-600 hover:bg-gray-50 px-8 py-4 text-lg"
+            className="bg-white text-rose-600 hover:bg-gray-50 px-8 py-4 text-lg"
             onClick={() => navigate('/register')}
           >
             <Sparkles className="w-5 h-5 mr-2" />
             Empezar gratis ahora
           </Button>
-          <p className="text-blue-100 mt-4">
+          <p className="text-rose-100 mt-4">
             ✨ Sin tarjeta de crédito requerida
           </p>
         </div>
