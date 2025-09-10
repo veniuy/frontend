@@ -1,3 +1,4 @@
+// Landing.jsx
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button'
@@ -44,12 +45,12 @@ function Landing() {
   const [selectedCategory, setSelectedCategory] = useState('Todas')
 
   const categories = [
-    { name: 'Bodas', image: '/src/assets/cotton_bird_images/categoria_boda_grid.webp' },
-    { name: 'Quinceañeras', image: '/src/assets/cotton_bird_images/categoria_bebes_ninos.webp' },
-    { name: 'Cumpleaños Infantiles', image: '/src/assets/cotton_bird_images/categoria_cumpleanos.webp' },
-    { name: 'Eventos Corporativos', image: '/src/assets/cotton_bird_images/categoria_productos_fotos.webp' },
-    { name: 'Baby Shower', image: '/src/assets/cotton_bird_images/categoria_bautizo.webp' },
-    { name: 'Graduaciones', image: '/src/assets/cotton_bird_images/categoria_invitaciones_digitales.webp' }
+    { name: 'Bodas', image: asset('/src/assets/cotton_bird_images/categoria_boda_grid.webp') },
+    { name: 'Quinceañeras', image: asset('/src/assets/cotton_bird_images/categoria_bebes_ninos.webp') },
+    { name: 'Cumpleaños Infantiles', image: asset('/src/assets/cotton_bird_images/categoria_cumpleanos.webp') },
+    { name: 'Eventos Corporativos', image: asset('/src/assets/cotton_bird_images/categoria_productos_fotos.webp') },
+    { name: 'Baby Shower', image: asset('/src/assets/cotton_bird_images/categoria_bautizo.webp') },
+    { name: 'Graduaciones', image: asset('/src/assets/cotton_bird_images/categoria_invitaciones_digitales.webp') }
   ]
 
   const featuredProducts = [
@@ -57,7 +58,7 @@ function Landing() {
       id: 1,
       name: "Invitación Digital Elegante",
       category: "Bodas",
-      image: '/src/assets/cotton_bird_images/album_le_petit_quotidien.webp',
+      image: asset('/src/assets/cotton_bird_images/album_le_petit_quotidien.webp'),
       price: "Desde 25,00 €",
       badge: "Nuevo"
     },
@@ -65,7 +66,7 @@ function Landing() {
       id: 2,
       name: "Invitación Quinceañera Premium",
       category: "Quinceañeras", 
-      image: '/src/assets/cotton_bird_images/invitacion_creacion_propia.webp',
+      image: asset('/src/assets/cotton_bird_images/invitacion_creacion_propia.webp'),
       price: "Desde 20,00 €",
       badge: "Popular"
     },
@@ -73,7 +74,7 @@ function Landing() {
       id: 3,
       name: "Invitación Infantil Animada",
       category: "Cumpleaños Infantiles",
-      image: '/src/assets/cotton_bird_images/novedades_boda.webp',
+      image: asset('/src/assets/cotton_bird_images/novedades_boda.webp'),
       price: "Desde 15,00 €",
       badge: null
     },
@@ -81,7 +82,7 @@ function Landing() {
       id: 4,
       name: "Invitación Corporativa",
       category: "Eventos Corporativos",
-      image: '/src/assets/cotton_bird_images/producto_jazmin_cuadro.webp',
+      image: asset('/src/assets/cotton_bird_images/producto_jazmin_cuadro.webp'),
       price: "Desde 30,00 €",
       badge: null
     }
@@ -393,7 +394,7 @@ function Landing() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <img 
-                src="/src/assets/cotton_bird_images/taller_produccion_cotton_bird.webp" 
+                src={asset('/src/assets/cotton_bird_images/taller_produccion_cotton_bird.webp')} 
                 alt="Diseño de invitaciones digitales"
                 className="w-full rounded-lg shadow-warm-lg"
                 onError={(e) => onImgError(e, "Diseño de invitaciones digitales")}
