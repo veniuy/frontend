@@ -14,22 +14,10 @@ import {
   Edit, 
   Share,
   Check,
-  Star,
-  Sparkles,
-  ArrowRight,
-  Play,
-  ChevronDown,
-  Search,
-  ShoppingCart,
-  User,
-  Menu,
-  Phone,
-  Leaf,
-  Recycle,
-  Award,
-  Instagram,
-  Facebook,
-  Twitter,
+  Shield,
+  Music4,
+  MapPin,
+  Calendar as CalendarIcon,
   Smartphone,
   Globe,
   Zap,
@@ -41,13 +29,14 @@ import { asset, ph, onImgError } from '../utils/assets';
 
 function Landing() {
   const navigate = useNavigate()
-  const [selectedCategory, setSelectedCategory] = useState('Todas')
+  const [selectedCategory, setSelectedCategory] = useState('all')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const categories = [
     { name: 'Bodas', image: '/src/assets/cotton_bird_images/categoria_boda_grid.webp' },
-    { name: 'Quinceañeras', image: '/src/assets/cotton_bird_images/categoria_bebes_ninos.webp' },
-    { name: 'Cumpleaños Infantiles', image: '/src/assets/cotton_bird_images/categoria_cumpleanos.webp' },
-    { name: 'Eventos Corporativos', image: '/src/assets/cotton_bird_images/categoria_productos_fotos.webp' },
+    { name: 'Bebés y Niños', image: '/src/assets/cotton_bird_images/categoria_bebes_ninos.webp' },
+    { name: 'Cumpleaños', image: '/src/assets/cotton_bird_images/categoria_cumpleanos.webp' },
+    { name: 'Productos con Foto', image: '/src/assets/cotton_bird_images/categoria_productos_fotos.webp' },
     { name: 'Baby Shower', image: '/src/assets/cotton_bird_images/categoria_bautizo.webp' },
     { name: 'Graduaciones', image: '/src/assets/cotton_bird_images/categoria_invitaciones_digitales.webp' }
   ]
@@ -71,37 +60,47 @@ function Landing() {
     },
     {
       id: 3,
-      name: "Invitación Infantil Animada",
-      category: "Cumpleaños Infantiles",
+      name: "Save the Date Minimal",
+      category: "Bodas",
       image: '/src/assets/cotton_bird_images/novedades_boda.webp',
-      price: "Desde 15,00 €",
-      badge: null
+      price: "Desde 10,00 €",
+      badge: "-20%"
     },
     {
       id: 4,
-      name: "Invitación Corporativa",
-      category: "Eventos Corporativos",
+      name: "Invitación con Foto Jazmín",
+      category: "Cumpleaños",
       image: '/src/assets/cotton_bird_images/producto_jazmin_cuadro.webp',
-      price: "Desde 30,00 €",
+      price: "Desde 14,00 €",
       badge: null
     }
   ]
 
-  const values = [
+  const sellingPoints = [
     {
-      icon: Smartphone,
-      title: "100% Digital y Ecológico",
-      description: "Invitaciones completamente digitales que cuidan el medio ambiente"
+      icon: Heart,
+      title: "Diseños que Enamoran",
+      description: "Estilos elegantes y contemporáneos, listos para personalizar"
     },
     {
-      icon: Zap,
-      title: "Entrega Instantánea",
-      description: "Recibe tu invitación en minutos, no en días"
+      icon: Users,
+      title: "Hecho para Compartir",
+      description: "Comparte por WhatsApp, redes sociales o email en segundos"
     },
     {
-      icon: Globe,
-      title: "Comparte en Cualquier Lugar",
-      description: "WhatsApp, email, redes sociales - llega a todos tus invitados"
+      icon: Send,
+      title: "Entrega Inmediata",
+      description: "Tu invitación lista para enviar, sin demoras"
+    },
+    {
+      icon: FileText,
+      title: "Gestión de RSVP",
+      description: "Recibe confirmaciones y organiza asistentes"
+    },
+    {
+      icon: Share,
+      title: "Multiplaformas",
+      description: "Se ve perfecta en cualquier dispositivo"
     },
     {
       icon: Edit,
@@ -130,134 +129,154 @@ function Landing() {
   ]
 
   return (
-    <div className="min-h-screen bg-background font-ui">
+    <div className="min-h-screen bg-white text-gray-900">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Contact Info */}
-            <div className="hidden md:flex items-center text-sm text-muted-foreground">
-              <Phone className="w-4 h-4 mr-2" />
-              +34 919 03 36 08
-            </div>
-            
-            {/* Logo */}
-            <div className="font-display text-2xl font-medium text-foreground tracking-wide cursor-pointer" onClick={() => navigate('/')}>
-              Venite
-              <span className="text-xs text-muted-foreground ml-2">invitaciones digitales que enamoran</span>
-            </div>
-            
-            {/* User Actions */}
-            <div className="flex items-center space-x-4">
-              <Search className="w-5 h-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" />
-              <Heart className="w-5 h-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" />
-              <User className="w-5 h-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" onClick={() => navigate('/login')} />
-              <CartIcon />
-              <Menu className="w-5 h-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors md:hidden" />
-            </div>
+      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img src={ph(40,40,'AF')} alt="Logo" className="w-10 h-10 rounded-full"/>
+            <span className="font-semibold tracking-tight">AgendaLaFecha</span>
           </div>
-          
-          {/* Navigation Menu */}
-          <nav className="hidden md:flex items-center justify-center space-x-8 py-4 border-t border-border">
-            <a href="#bodas" className="text-muted-foreground hover:text-primary transition-colors font-medium" onClick={() => navigate('/products')}>Bodas</a>
-            <a href="#quinceaneras" className="text-muted-foreground hover:text-primary transition-colors font-medium" onClick={() => navigate('/products')}>Quinceañeras</a>
-            <a href="#infantiles" className="text-muted-foreground hover:text-primary transition-colors font-medium" onClick={() => navigate('/products')}>Cumpleaños Infantiles</a>
-            <a href="#baby-shower" className="text-muted-foreground hover:text-primary transition-colors font-medium" onClick={() => navigate('/products')}>Baby Shower</a>
-            <a href="#corporativos" className="text-muted-foreground hover:text-primary transition-colors font-medium" onClick={() => navigate('/products')}>Eventos Corporativos</a>
-            <a href="#graduaciones" className="text-muted-foreground hover:text-primary transition-colors font-medium" onClick={() => navigate('/products')}>Graduaciones</a>
-            <a href="#plantillas" className="text-muted-foreground hover:text-primary transition-colors font-medium" onClick={() => navigate('/products')}>Todas las Plantillas</a>
+          <nav className="hidden md:flex items-center gap-6 text-sm">
+            <a className="hover:text-gray-700" href="#categorias">Categorías</a>
+            <a className="hover:text-gray-700" href="#novedades">Novedades</a>
+            <a className="hover:text-gray-700" href="#digitales">Invitaciones Digitales</a>
+            <a className="hover:text-gray-700" href="#faq">Preguntas Frecuentes</a>
           </nav>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm" onClick={()=>navigate('/login')}>Iniciar sesión</Button>
+            <Button size="sm" onClick={()=>navigate('/register')}>Crear cuenta</Button>
+            <CartIcon onClick={()=>setSidebarOpen(true)} />
+          </div>
         </div>
       </header>
 
-      {/* Hero Section - Digital Focus */}
+      {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="grid lg:grid-cols-2 min-h-[500px]">
-          {/* Wedding Section */}
-          <div className="relative bg-gradient-warm flex items-center justify-center p-8">
-            <div className="text-center lg:text-left max-w-md">
-              <h1 className="font-display text-3xl lg:text-4xl font-medium text-foreground leading-tight mb-4">
-                Invitaciones digitales para tu boda perfecta
-              </h1>
-              <p className="text-muted-foreground mb-6">
-                Diseños elegantes, interactivos y completamente personalizables. Sorprende a tus invitados desde el primer momento.
-              </p>
-              <Button 
-                size="lg" 
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
-                onClick={() => navigate('/products')}
-              >
-                <Smartphone className="w-4 h-4 mr-2" />
-                Ver Invitaciones de Boda
-              </Button>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 grid md:grid-cols-2 gap-10 items-center">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-medium mb-4">
+              <Crown className="w-4 h-4"/>
+              <span>Nueva colección Premium 2025</span>
+            </div>
+            <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-tight">
+              Invitaciones digitales y de papel para celebrar <span className="text-emerald-700">momentos únicos</span>
+            </h1>
+            <p className="mt-4 text-gray-600 md:text-lg">
+              Diseños elegantes, personalización total y envío inmediato. Creá tu invitación perfecta y compartila con un clic.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Button onClick={()=>navigate('/create')}>Crear invitación</Button>
+              <Button variant="outline" onClick={()=>document.getElementById('digitales')?.scrollIntoView({behavior:'smooth'})}>Ver cómo funciona</Button>
+            </div>
+
+            <div className="mt-8 grid grid-cols-3 md:grid-cols-6 gap-3 text-xs text-gray-600">
+              {sellingPoints.slice(0,6).map((s, i)=> (
+                <div key={i} className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-600"/>
+                  <span>{s.title}</span>
+                </div>
+              ))}
             </div>
           </div>
-          
-          {/* Quinceañera Section */}
-          <div className="relative bg-gradient-sage flex items-center justify-center p-8">
-            <div className="text-center lg:text-left max-w-md">
-              <h1 className="font-display text-3xl lg:text-4xl font-medium text-foreground leading-tight mb-4">
-                ¡Quinceañeras que brillan!
-              </h1>
-              <p className="text-muted-foreground mb-6">
-                Invitaciones digitales únicas para celebrar sus 15 años con estilo y elegancia.
-              </p>
-              <Button 
-                size="lg" 
-                className="bg-sage-400 hover:bg-sage-400/90 text-white px-8"
-                onClick={() => navigate('/products')}
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Descubre Quinceañeras
-              </Button>
+
+          <div className="relative">
+            <div className="aspect-[4/5] w-full max-w-md md:max-w-none md:w-4/5 ml-auto rounded-2xl overflow-hidden shadow-lg">
+              <img 
+                src={asset('/src/assets/cotton_bird_images/taller_produccion_cotton_bird.webp')} 
+                alt="Diseño de invitaciones digitales"
+                className="w-full rounded-lg shadow-md"
+                onError={(e)=> onImgError(e,'Hero')}
+              />
+            </div>
+            <div className="absolute -bottom-4 -left-4 bg-white border border-gray-100 rounded-xl shadow p-3 flex items-center gap-3">
+              <Shield className="w-5 h-5 text-emerald-600"/>
+              <div>
+                <p className="text-sm font-medium">Pago seguro</p>
+                <p className="text-xs text-gray-500">ABITAB, RedPagos, transferencia</p>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Products Section */}
-      <section className="py-16 bg-background">
+      {/* Categorías */}
+      <section id="categorias" className="py-14 md:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-display text-3xl font-medium text-foreground mb-4">
-              Nuestras invitaciones más populares
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Diseños digitales que combinan elegancia, interactividad y personalización para hacer de tu evento algo inolvidable.
-            </p>
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">Explorá por categorías</h2>
+              <p className="text-gray-600 mt-1">Todo lo que necesitás para tu evento, en un solo lugar</p>
+            </div>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Todas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas</SelectItem>
+                {categories.map(c => (
+                  <SelectItem key={c.name} value={c.name}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {categories
+              .filter(c => selectedCategory==='all' || c.name===selectedCategory)
+              .map((category) => (
+                <Card key={category.name} className="group cursor-pointer hover:shadow-md transition" onClick={()=>setSelectedCategory(category.name)}>
+                  <div className="aspect-square overflow-hidden rounded-t-lg relative">
+                    <img 
+                    src={asset(category.image)} 
+                    alt={category.name}
+                    className="w-full h-full object-cover hover-scale"
+                    onError={(e) => onImgError(e, category.name)}
+                  />
+                  </div>
+                  <CardHeader className="py-3">
+                    <CardTitle className="text-sm font-medium">{category.name}</CardTitle>
+                  </CardHeader>
+                </Card>
+              ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Novedades / Destacados */}
+      <section id="novedades" className="py-14 md:py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">Novedades</h2>
+              <p className="text-gray-600 mt-1">Descubrí los últimos diseños añadidos</p>
+            </div>
+            <Button variant="outline" onClick={()=>navigate('/catalog')}>Ver todo</Button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.map((product) => (
-              <Card key={product.id} className="group cursor-pointer hover-lift shadow-warm border-border" onClick={() => navigate(`/product/${product.id}`)}>
+              <Card key={product.id} className="overflow-hidden group">
                 <div className="aspect-square overflow-hidden rounded-t-lg relative">
                   <img 
-                    src={product.image} 
+                    src={asset(product.image)} 
                     alt={product.name}
                     className="w-full h-full object-cover hover-scale"
                     onError={(e) => onImgError(e, product.name)}
                   />
                   {product.badge && (
-                    <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground">
-                      {product.badge}
-                    </Badge>
+                    <Badge className="absolute top-2 left-2 bg-primary text-white">{product.badge}</Badge>
                   )}
-                  <div className="absolute top-2 right-2">
-                    <Heart className="w-5 h-5 text-muted-foreground hover:text-primary cursor-pointer transition-colors" />
-                  </div>
-                  <div className="absolute bottom-2 left-2">
-                    <Badge variant="secondary" className="bg-black/70 text-white">
-                      <Globe className="w-3 h-3 mr-1" />
-                      Digital
-                    </Badge>
-                  </div>
                 </div>
-                <CardContent className="p-4">
-                  <h3 className="font-medium text-foreground mb-1 line-clamp-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground mb-2">{product.category}</p>
-                  <p className="font-semibold text-foreground">{product.price}</p>
+                <CardHeader>
+                  <CardTitle className="text-base">{product.name}</CardTitle>
+                  <CardDescription className="text-sm text-gray-600">{product.category}</CardDescription>
+                </CardHeader>
+                <CardContent className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-700">{product.price}</span>
+                    <Button size="sm" onClick={()=>navigate(`/product/${product.id}`)}>Ver</Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
@@ -265,284 +284,178 @@ function Landing() {
         </div>
       </section>
 
-      {/* Categories Grid */}
-      <section className="py-16 bg-secondary">
+      {/* Invitaciones Digitales */}
+      <section id="digitales" className="py-14 md:py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-display text-3xl font-medium text-foreground mb-4">
-              Invitaciones para cada ocasión especial
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Desde bodas elegantes hasta cumpleaños infantiles llenos de diversión. Tenemos el diseño perfecto para tu evento.
-            </p>
-          </div>
+          <div className="grid md:grid-cols-2 gap-10 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium mb-4">
+                <Smartphone className="w-4 h-4"/>
+                <span>Invitaciones Digitales</span>
+              </div>
+              <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">
+                Sorprendé con una invitación web <span className="text-blue-700">interactiva</span>
+              </h2>
+              <p className="mt-3 text-gray-600">
+                Añadí música, mapa con ubicación, confirmación de asistencia (RSVP), cuenta regresiva y más. Todo en un link que podés compartir.
+              </p>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map((category, index) => (
-              <Card key={index} className="group cursor-pointer hover-lift shadow-warm border-border overflow-hidden" onClick={() => navigate('/products')}>
-                <div className="aspect-[4/3] overflow-hidden relative">
-                  <img 
-                    src={category.image} 
-                    alt={category.name}
-                    className="w-full h-full object-cover hover-scale"
-                    onError={(e) => onImgError(e, category.name)}
-                  />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300"></div>
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <h3 className="font-display text-xl font-medium text-white mb-2">
-                      {category.name}
-                    </h3>
-                    <Button variant="secondary" size="sm" className="bg-white/90 text-foreground hover:bg-white">
-                      <Globe className="w-3 h-3 mr-2" />
-                      Ver Diseños
-                    </Button>
+              <div className="mt-6 space-y-3">
+                {digitalFeatures.map((f, i)=> (
+                  <div key={i} className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                      <Check className="w-4 h-4 text-blue-700"/>
+                    </div>
+                    <div>
+                      <p className="font-medium">{f.title}</p>
+                      <p className="text-sm text-gray-600">{f.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 flex gap-3">
+                <Button onClick={()=>navigate('/create')}>Crear invitación web</Button>
+                <Button variant="outline" onClick={()=>navigate('/demo')}>Ver demo</Button>
+              </div>
+            </div>
+
+            <div className="relative">
+              <Card className="p-0 overflow-hidden shadow-xl">
+                <div className="aspect-[9/16] bg-black">
+                  {/* mockup de teléfono */}
+                  <div className="relative w-full h-full">
+                    <div className="absolute inset-0">
+                      <img 
+                        src={asset('/src/assets/cotton_bird_images/album_le_petit_quotidien.webp')}
+                        alt="Demo"
+                        className="w-full h-full object-cover"
+                        onError={(e)=> onImgError(e,'Demo')}
+                      />
+                    </div>
+                    <div className="absolute inset-0 bg-black/30"/>
+                    <div className="absolute bottom-0 w-full p-4 text-white">
+                      <p className="text-xs uppercase tracking-widest">Boda</p>
+                      <h3 className="text-2xl font-semibold">Sofía & Ignacio</h3>
+                      <div className="flex items-center gap-4 text-xs mt-1 opacity-90">
+                        <div className="flex items-center gap-1"><CalendarIcon className="w-3 h-3"/> 23 Nov 2025</div>
+                        <div className="flex items-center gap-1"><MapPin className="w-3 h-3"/> Montevideo</div>
+                        <div className="flex items-center gap-1"><Music4 className="w-3 h-3"/> Música</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Digital Advantages Section */}
-      <section className="py-16 bg-background">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-display text-3xl font-medium text-foreground mb-4">
-              ¿Por qué elegir invitaciones digitales?
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              La evolución natural de las invitaciones tradicionales. Más interactivas, ecológicas y convenientes.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {values.map((value, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <value.icon className="w-8 h-8 text-sage-400" />
-                </div>
-                <h3 className="font-medium text-foreground mb-2">
-                  {value.title}
-                </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {value.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Newsletter Section */}
-      <section className="py-16 bg-background">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-display text-3xl font-medium text-foreground mb-4">
-            ¡Únete a la revolución digital!
-          </h2>
-          <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Suscríbete y recibe plantillas exclusivas, descuentos especiales y las últimas tendencias en invitaciones digitales. 
-            ¡Además obtén un 20% de descuento en tu primera invitación!
-          </p>
-          
-          <div className="max-w-md mx-auto space-y-4">
-            <Input 
-              type="email" 
-              placeholder="Correo electrónico"
-              className="border-border"
-            />
-            <Input 
-              type="email" 
-              placeholder="Repetir correo"
-              className="border-border"
-            />
-            <Select>
-              <SelectTrigger className="border-border">
-                <SelectValue placeholder="Tipo de evento" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="boda">Boda</SelectItem>
-                <SelectItem value="quinceanera">Quinceañera</SelectItem>
-                <SelectItem value="infantil">Cumpleaños Infantil</SelectItem>
-                <SelectItem value="baby-shower">Baby Shower</SelectItem>
-                <SelectItem value="corporativo">Evento Corporativo</SelectItem>
-                <SelectItem value="graduacion">Graduación</SelectItem>
-                <SelectItem value="otro">Otro evento</SelectItem>
-              </SelectContent>
-            </Select>
-            <Input 
-              type="date" 
-              placeholder="Fecha del evento"
-              className="border-border"
-            />
-            <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-              <Send className="w-4 h-4 mr-2" />
-              Quiero mi descuento del 20%
-            </Button>
-          </div>
-          
-          <p className="text-xs text-muted-foreground mt-4">
-            Al suscribirte aceptas recibir emails promocionales. Puedes darte de baja en cualquier momento.
-          </p>
-        </div>
-      </section>
-
-      {/* Digital Features Section */}
-      <section className="py-16 bg-secondary">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <img 
-                src="/src/assets/cotton_bird_images/taller_produccion_cotton_bird.webp" 
-                alt="Diseño de invitaciones digitales"
-                className="w-full rounded-lg shadow-warm-lg"
-                onError={(e) => onImgError(e, "Diseño de invitaciones digitales")}
-              />
             </div>
-            <div className="space-y-8">
-              <div className="mb-8">
-                <h2 className="font-display text-3xl font-medium text-foreground mb-4">
-                  Tecnología al servicio de tus eventos
-                </h2>
-                <p className="text-muted-foreground">
-                  Nuestras invitaciones digitales van más allá del diseño. Son experiencias interactivas que conectan con tus invitados.
-                </p>
-              </div>
-              
-              {digitalFeatures.map((feature, index) => (
-                <div key={index}>
-                  <h3 className="font-semibold text-foreground mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    {feature.description}
-                  </p>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA intermedio */}
+      <section className="py-10 md:py-14">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Card className="p-6 md:p-8 bg-gradient-to-r from-emerald-50 to-blue-50 border-emerald-100">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              <div>
+                <h3 className="text-xl md:text-2xl font-semibold tracking-tight">Probá gratis la creación de tu invitación digital</h3>
+                <p className="text-gray-600 mt-2">Elegí un diseño, cargá tus datos y vista previa instantánea. Pagás solo al publicarla.</p>
+                <div className="mt-4 flex gap-3">
+                  <Button onClick={()=>navigate('/create')}>Empezar</Button>
+                  <Button variant="outline" onClick={()=>navigate('/pricing')}>Precios</Button>
                 </div>
-              ))}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <Button 
-                  variant="outline" 
-                  className="border-primary text-primary hover:bg-primary/10"
-                  onClick={() => navigate('/demo/black')}
-                >
-                  <Globe className="w-4 h-4 mr-2" />
-                  Demo Black
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="border-blue-500 text-blue-500 hover:bg-blue-50"
-                  onClick={() => navigate('/demo/premium')}
-                >
-                  <Heart className="w-4 h-4 mr-2" />
-                  Demo Premium
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="border-sage-400 text-sage-400 hover:bg-sage-100"
-                  onClick={() => navigate('/demo/clasica')}
-                >
-                  <Leaf className="w-4 h-4 mr-2" />
-                  Demo Clásica
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="border-rose-400 text-rose-400 hover:bg-rose-50"
-                  onClick={() => navigate('/demo/boda')}
-                >
-                  <Globe className="w-4 h-4 mr-2" />
-                  Demo Romántica
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="border-purple-500 text-purple-500 hover:bg-purple-50"
-                  onClick={() => navigate('/demo/quinceanera')}
-                >
-                  <Crown className="w-4 h-4 mr-2" />
-                  Demo Quinceañera
-                </Button>
               </div>
+              <ul className="space-y-2 text-sm text-gray-700">
+                <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-600"/> Publicación tras pago (Abitab / RedPagos / Transferencia)</li>
+                <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-600"/> Link único para compartir</li>
+                <li className="flex items-center gap-2"><Check className="w-4 h-4 text-emerald-600"/> Edición posterior sin costo</li>
+              </ul>
             </div>
+          </Card>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section id="faq" className="py-14 md:py-20 bg-gray-50">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl md:text-3xl font-semibold tracking-tight mb-6">Preguntas frecuentes</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">¿Cómo publico mi invitación?</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-gray-700">
+                Creás la invitación, la revisás y realizás el pago (Abitab/RedPagos/transferencia). Al acreditarse, tu invitación queda pública con su link único.
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">¿Puedo editarla después?</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-gray-700">
+                Sí. Podés modificar textos, fecha, lugar o música. Los cambios se reflejan al instante sin costo adicional.
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">¿Cómo confirman asistencia mis invitados?</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-gray-700">
+                Incluí un botón de RSVP que abre un formulario o integra WhatsApp. Verás quién confirmó en tu panel.
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">¿Se puede agregar música y mapa?</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-gray-700">
+                Sí. Podés subir una pista o usar un tema y añadir el mapa con la ubicación exacta del evento.
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-foreground text-background py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
-            {/* Company Info */}
-            <div>
-              <h3 className="font-display text-xl font-medium mb-4">Venite</h3>
-              <p className="text-muted text-sm mb-4">
-                invitaciones digitales que enamoran
-              </p>
-              <div className="flex space-x-4">
-                <Instagram className="w-5 h-5 text-muted hover:text-background cursor-pointer transition-colors" />
-                <Facebook className="w-5 h-5 text-muted hover:text-background cursor-pointer transition-colors" />
-                <Twitter className="w-5 h-5 text-muted hover:text-background cursor-pointer transition-colors" />
-              </div>
+      <footer className="border-t border-gray-100 py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-4 gap-8 text-sm">
+          <div>
+            <div className="flex items-center gap-2">
+              <img src={ph(36,36,'AF')} alt="Logo" className="w-9 h-9 rounded-full"/>
+              <span className="font-semibold">AgendaLaFecha</span>
             </div>
-
-            {/* Services */}
-            <div>
-              <h4 className="font-medium mb-4">Nuestros Servicios</h4>
-              <ul className="space-y-2 text-sm text-muted">
-                <li><a href="#" className="hover:text-background transition-colors">Invitaciones de Boda</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Quinceañeras</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Cumpleaños Infantiles</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Baby Shower</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Eventos Corporativos</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Graduaciones</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Diseño Personalizado</a></li>
-              </ul>
-            </div>
-
-            {/* Support */}
-            <div>
-              <h4 className="font-medium mb-4">Soporte y Ayuda</h4>
-              <ul className="space-y-2 text-sm text-muted">
-                <li><a href="#" className="hover:text-background transition-colors">Cómo funciona</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Guía de personalización</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Gestión de invitados</a></li>
-                <li><a href="/faq" className="hover:text-background transition-colors">Preguntas frecuentes</a></li>
-                <li><a href="/contact" className="hover:text-background transition-colors">Contacto</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Soporte técnico</a></li>
-              </ul>
-            </div>
-
-            {/* Company */}
-            <div>
-              <h4 className="font-medium mb-4">Empresa</h4>
-              <ul className="space-y-2 text-sm text-muted">
-                <li><a href="#" className="hover:text-background transition-colors">Sobre nosotros</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Nuestro equipo</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Términos de servicio</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Política de privacidad</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Afiliados</a></li>
-              </ul>
-            </div>
+            <p className="text-gray-600 mt-3">Invitaciones digitales y en papel hechas en Uruguay, con foco en diseño, simpleza y experiencia.</p>
           </div>
-
-          <div className="border-t border-muted mt-12 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <p className="text-sm text-muted">
-                © 2024 Venite. Todos los derechos reservados.
-              </p>
-              <div className="flex items-center space-x-4 mt-4 md:mt-0">
-                <span className="text-sm text-muted">Métodos de pago:</span>
-                <div className="flex space-x-2">
-                  <div className="w-8 h-5 bg-muted rounded text-xs flex items-center justify-center text-foreground">VISA</div>
-                  <div className="w-8 h-5 bg-muted rounded text-xs flex items-center justify-center text-foreground">MC</div>
-                  <div className="w-8 h-5 bg-muted rounded text-xs flex items-center justify-center text-foreground">PP</div>
-                </div>
-              </div>
-            </div>
+          <div>
+            <p className="font-medium">Productos</p>
+            <ul className="mt-2 space-y-2 text-gray-600">
+              <li>Invitaciones digitales</li>
+              <li>Save the Date</li>
+              <li>Tarjetas de agradecimiento</li>
+              <li>Etiquetas y stickers</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-medium">Ayuda</p>
+            <ul className="mt-2 space-y-2 text-gray-600">
+              <li>Centro de ayuda</li>
+              <li>Soporte</li>
+              <li>Privacidad</li>
+              <li>Términos</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-medium">Seguinos</p>
+            <ul className="mt-2 space-y-2 text-gray-600">
+              <li>Instagram</li>
+              <li>Facebook</li>
+              <li>Twitter</li>
+            </ul>
           </div>
         </div>
+        <div className="text-center text-xs text-gray-500 mt-8">© {new Date().getFullYear()} AgendaLaFecha</div>
       </footer>
 
-      {/* Shopping Cart Sidebar */}
-      <ShoppingCartSidebar />
+      <ShoppingCartSidebar open={sidebarOpen} onClose={()=>setSidebarOpen(false)} />
     </div>
   )
 }
