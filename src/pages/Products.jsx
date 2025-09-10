@@ -1,3 +1,4 @@
+// Products.jsx
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button'
@@ -46,7 +47,7 @@ function Products() {
       id: 1,
       name: "Elegancia Dorada",
       category: "Bodas",
-      image: '/src/assets/cotton_bird_images/categoria_boda_grid.webp',
+      image: asset('/src/assets/cotton_bird_images/categoria_boda_grid.webp'),
       price: "Desde 25,00 €",
       originalPrice: "35,00 €",
       rating: 4.9,
@@ -59,7 +60,7 @@ function Products() {
       id: 2,
       name: "Princesa de Ensueño",
       category: "Quinceañeras",
-      image: '/src/assets/cotton_bird_images/categoria_bebes_ninos.webp',
+      image: asset('/src/assets/cotton_bird_images/categoria_bebes_ninos.webp'),
       price: "Desde 20,00 €",
       rating: 4.8,
       reviews: 89,
@@ -71,7 +72,7 @@ function Products() {
       id: 3,
       name: "Fiesta Arcoíris",
       category: "Cumpleaños Infantiles",
-      image: '/src/assets/cotton_bird_images/categoria_cumpleanos.webp',
+      image: asset('/src/assets/cotton_bird_images/categoria_cumpleanos.webp'),
       price: "Desde 15,00 €",
       rating: 4.7,
       reviews: 156,
@@ -83,7 +84,7 @@ function Products() {
       id: 4,
       name: "Dulce Espera",
       category: "Baby Shower",
-      image: '/src/assets/cotton_bird_images/categoria_bautizo.webp',
+      image: asset('/src/assets/cotton_bird_images/categoria_bautizo.webp'),
       price: "Desde 18,00 €",
       rating: 4.9,
       reviews: 73,
@@ -95,7 +96,7 @@ function Products() {
       id: 5,
       name: "Corporativo Elegante",
       category: "Eventos Corporativos",
-      image: '/src/assets/cotton_bird_images/categoria_productos_fotos.webp',
+      image: asset('/src/assets/cotton_bird_images/categoria_productos_fotos.webp'),
       price: "Desde 30,00 €",
       rating: 4.6,
       reviews: 45,
@@ -107,7 +108,7 @@ function Products() {
       id: 6,
       name: "Graduación Triunfal",
       category: "Graduaciones",
-      image: '/src/assets/cotton_bird_images/categoria_invitaciones_digitales.webp',
+      image: asset('/src/assets/cotton_bird_images/categoria_invitaciones_digitales.webp'),
       price: "Desde 22,00 €",
       rating: 4.8,
       reviews: 92,
@@ -119,7 +120,7 @@ function Products() {
       id: 7,
       name: "Boda Minimalista",
       category: "Bodas",
-      image: '/src/assets/cotton_bird_images/album_le_petit_quotidien.webp',
+      image: asset('/src/assets/cotton_bird_images/album_le_petit_quotidien.webp'),
       price: "Desde 28,00 €",
       rating: 4.7,
       reviews: 68,
@@ -131,7 +132,7 @@ function Products() {
       id: 8,
       name: "Quinceañera Real",
       category: "Quinceañeras",
-      image: '/src/assets/cotton_bird_images/invitacion_creacion_propia.webp',
+      image: asset('/src/assets/cotton_bird_images/invitacion_creacion_propia.webp'),
       price: "Desde 24,00 €",
       rating: 4.9,
       reviews: 134,
@@ -441,7 +442,7 @@ function Products() {
           <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
             Nuestro equipo de diseñadores puede crear una invitación 100% personalizada para tu evento especial.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justificenter">
             <Button 
               size="lg"
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
