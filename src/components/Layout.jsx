@@ -1,21 +1,21 @@
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { Button } from './ui/button';
-import { 
-  Home, 
-  Calendar, 
-  Users, 
-  Settings, 
-  LogOut, 
+import {
+  Home,
+  Calendar,
+  Users,
+  Settings,
+  LogOut,
   Menu,
   X,
   Sparkles
 } from 'lucide-react';
 import './Layout.css';
 
-export function Layout({ children }) {
-  const { user, logout, isAuthenticated } = useAuth();
+export default function Layout() {
+  const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -25,37 +25,29 @@ export function Layout({ children }) {
     navigate('/login');
   };
 
+  // Ajusté enlaces a rutas que existen; podés reponer otros cuando crees sus páginas
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Mis Eventos', href: '/events', icon: Calendar },
-    { name: 'Invitados', href: '/guests', icon: Users },
-    { name: 'Configuración', href: '/settings', icon: Settings },
+    { name: 'Crear Evento', href: '/events/create', icon: Calendar },
+    // { name: 'Invitados', href: '/guests', icon: Users },      // aún sin ruta
+    // { name: 'Configuración', href: '/settings', icon: Settings } // aún sin ruta
   ];
-
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-        {children}
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Sidebar móvil */}
       <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
+        <div
+          className="fixed inset-0 bg-gray-600 bg-opacity-75"
+          onClick={() => setSidebarOpen(false)}
+        />
         <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white shadow-xl">
           <div className="flex h-16 items-center justify-between px-4">
             <div className="flex items-center">
               <Sparkles className="h-8 w-8 text-blue-600" />
               <span className="ml-2 text-xl font-bold text-gray-900">Invitaciones</span>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarOpen(false)}
-            >
+            <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>
               <X className="h-5 w-5" />
             </Button>
           </div>
@@ -85,7 +77,7 @@ export function Layout({ children }) {
               <div className="flex-shrink-0">
                 <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
                   <span className="text-sm font-medium text-white">
-                    {user?.username?.charAt(0).toUpperCase()}
+                    {user?.username?.charAt(0)?.toUpperCase()}
                   </span>
                 </div>
               </div>
@@ -94,11 +86,7 @@ export function Layout({ children }) {
                 <p className="text-xs text-gray-500">{user?.email}</p>
               </div>
             </div>
-            <Button
-              variant="ghost"
-              className="mt-3 w-full justify-start"
-              onClick={handleLogout}
-            >
+            <Button variant="ghost" className="mt-3 w-full justify-start" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               Cerrar Sesión
             </Button>
@@ -138,7 +126,7 @@ export function Layout({ children }) {
               <div className="flex-shrink-0">
                 <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
                   <span className="text-sm font-medium text-white">
-                    {user?.username?.charAt(0).toUpperCase()}
+                    {user?.username?.charAt(0)?.toUpperCase()}
                   </span>
                 </div>
               </div>
@@ -146,11 +134,7 @@ export function Layout({ children }) {
                 <p className="text-sm font-medium text-gray-700">{user?.username}</p>
                 <p className="text-xs text-gray-500">{user?.email}</p>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleLogout}
-              >
+              <Button variant="ghost" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4" />
               </Button>
             </div>
@@ -162,23 +146,16 @@ export function Layout({ children }) {
       <div className="lg:pl-64 flex flex-col flex-1">
         {/* Header móvil */}
         <div className="sticky top-0 z-10 lg:hidden pl-1 pt-1 sm:pl-3 sm:pt-3 bg-gray-50">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setSidebarOpen(true)}
-          >
+          <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </Button>
         </div>
 
-        {/* Contenido */}
+        {/* Contenido enrutado */}
         <main className="flex-1">
-          {children}
+          <Outlet />
         </main>
       </div>
     </div>
   );
 }
-
-export default Layout;
-
