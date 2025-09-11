@@ -1,5 +1,5 @@
 // Landing.jsx
-import React, { useEffect, useMemo, useState, useCallback } from 'react'
+import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
@@ -24,7 +24,9 @@ import {
   Twitter,
   X as CloseIcon,
   Trash2,
-  Crown
+  Crown,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react'
 
 import { asset, onImgError } from '../utils/assets'
@@ -206,6 +208,104 @@ function Landing() {
   }
 
   // -----------------------------
+  // HERO SLIDER (nuevo)
+  // -----------------------------
+  const heroPanels = useMemo(() => ([
+    {
+      key: 'boda',
+      bg: asset('/src/assets/cotton_bird_images/categoria_boda_grid.webp'),
+      title: 'Invitaciones digitales para tu boda perfecta',
+      desc: 'Diseños elegantes, interactivos y completamente personalizables.',
+      cta: 'Ver Invitaciones de Boda',
+      to: '/products?category=Bodas',
+      btnClass: 'bg-primary hover:bg-primary/90 text-primary-foreground',
+      icon: Smartphone
+    },
+    {
+      key: 'quince',
+      bg: asset('/src/assets/cotton_bird_images/categoria_bebes_ninos.webp'),
+      title: '¡Quinceañeras que brillan!',
+      desc: 'Celebra sus 15 con estilo y elegancia.',
+      cta: 'Descubrir Quinceañeras',
+      to: '/products?category=Quinceañeras',
+      btnClass: 'bg-sage-400 hover:bg-sage-400/90 text-white',
+      icon: Sparkles
+    },
+    {
+      key: 'infantiles',
+      bg: asset('/src/assets/cotton_bird_images/categoria_cumpleanos.webp'),
+      title: 'Cumpleaños infantiles inolvidables',
+      desc: 'Invitaciones divertidas y animadas para los más peques.',
+      cta: 'Ver Infantiles',
+      to: '/products?category=Cumpleaños Infantiles',
+      btnClass: 'bg-amber-400 hover:bg-amber-400/90 text-black',
+      icon: Crown
+    },
+    {
+      key: 'baby',
+      bg: asset('/src/assets/cotton_bird_images/categoria_bautizo.webp'),
+      title: 'Baby shower con ternura',
+      desc: 'Detalles dulces para una bienvenida especial.',
+      cta: 'Ver Baby Shower',
+      to: '/products?category=Baby Shower',
+      btnClass: 'bg-pink-400 hover:bg-pink-400/90 text-white',
+      icon: Globe
+    }
+  ]), [])
+
+  // Desktop: 2 paneles por slide => [[0,1], [2,3]]
+  const desktopSlides = useMemo(() => {
+    const pairs = []
+    for (let i = 0; i < heroPanels.length; i += 2) {
+      pairs.push(heroPanels.slice(i, i + 2))
+    }
+    return pairs
+  }, [heroPanels])
+
+  // Carrusel estado
+  const [slide, setSlide] = useState(0) // índice desktop
+  const totalDesktopSlides = desktopSlides.length
+
+  const nextSlide = useCallback(() => {
+    setSlide((s) => (s + 1) % totalDesktopSlides)
+  }, [totalDesktopSlides])
+
+  const prevSlide = useCallback(() => {
+    setSlide((s) => (s - 1 + totalDesktopSlides) % totalDesktopSlides)
+  }, [totalDesktopSlides])
+
+  // Autoplay con pausa al hover
+  const [paused, setPaused] = useState(false)
+  useEffect(() => {
+    if (paused) return
+    const id = setInterval(() => nextSlide(), 6000)
+    return () => clearInterval(id)
+  }, [paused, nextSlide])
+
+  // Mobile slider (1 panel por slide) con swipe
+  const [mSlide, setMSlide] = useState(0)
+  const totalMobileSlides = heroPanels.length
+  const mNext = () => setMSlide((s) => (s + 1) % totalMobileSlides)
+  const mPrev = () => setMSlide((s) => (s - 1 + totalMobileSlides) % totalMobileSlides)
+
+  const touchStartX = useRef(0)
+  const touchDeltaX = useRef(0)
+  const onTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX
+    touchDeltaX.current = 0
+  }
+  const onTouchMove = (e) => {
+    touchDeltaX.current = e.touches[0].clientX - touchStartX.current
+  }
+  const onTouchEnd = () => {
+    const dx = touchDeltaX.current
+    if (Math.abs(dx) > 50) {
+      if (dx < 0) mNext()
+      else mPrev()
+    }
+  }
+
+  // -----------------------------
   // Render
   // -----------------------------
   const NavLinks = ({ onClick }) => (
@@ -295,48 +395,174 @@ function Landing() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="grid lg:grid-cols-2 min-h-[500px]">
-          {/* Wedding Section */}
-          <div className="relative bg-gradient-warm flex items-center justify-center p-8">
-            <div className="text-center lg:text-left max-w-md">
-              <h1 className="font-display text-3xl lg:text-4xl font-medium text-foreground leading-tight mb-4">
-                Invitaciones digitales para tu boda perfecta
-              </h1>
-              <p className="text-muted-foreground mb-6">
-                Diseños elegantes, interactivos y completamente personalizables. Sorprende a tus invitados desde el primer momento.
-              </p>
-              <Button
-                size="lg"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8"
-                onClick={() => navigate('/products')}
+      {/* Hero Slider */}
+      {/* Desktop / Tablets grandes: 2 paneles por slide */}
+      <section
+        className="relative overflow-hidden hidden lg:block"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        aria-roledescription="carousel"
+        aria-label="Promociones principales"
+      >
+        <div className="relative">
+          {/* Track */}
+          <div
+            className="whitespace-nowrap transition-transform duration-700 ease-out"
+            style={{ transform: `translateX(-${slide * 100}%)` }}
+          >
+            {desktopSlides.map((pair, idx) => (
+              <div
+                key={`desk-slide-${idx}`}
+                className="inline-block align-top w-full"
+                role="group"
+                aria-roledescription="slide"
+                aria-label={`${idx + 1} de ${totalDesktopSlides}`}
               >
-                <Smartphone className="w-4 h-4 mr-2" />
-                Ver Invitaciones de Boda
-              </Button>
-            </div>
+                <div className="grid lg:grid-cols-2 min-h-[520px]">
+                  {pair.map((p, i) => {
+                    const Icon = p.icon
+                    return (
+                      <div key={p.key} className="relative flex items-center justify-center p-10">
+                        <img
+                          src={p.bg}
+                          alt={p.title}
+                          className="absolute inset-0 w-full h-full object-cover"
+                          onError={(e) => onImgError(e, p.title)}
+                          loading="eager"
+                          decoding="async"
+                        />
+                        <div className="absolute inset-0 bg-black/20" />
+                        <div className="relative z-[1] text-center lg:text-left max-w-md">
+                          <h1 className="font-display text-4xl font-medium text-white leading-tight mb-4 drop-shadow">
+                            {p.title}
+                          </h1>
+                          <p className="text-white/90 mb-6 drop-shadow">{p.desc}</p>
+                          <Button
+                            size="lg"
+                            className={`${p.btnClass} px-8`}
+                            onClick={() => navigate(p.to)}
+                          >
+                            <Icon className="w-4 h-4 mr-2" />
+                            {p.cta}
+                          </Button>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* Quinceañera Section */}
-          <div className="relative bg-gradient-sage flex items-center justify-center p-8">
-            <div className="text-center lg:text-left max-w-md">
-              <h1 className="font-display text-3xl lg:text-4xl font-medium text-foreground leading-tight mb-4">
-                ¡Quinceañeras que brillan!
-              </h1>
-              <p className="text-muted-foreground mb-6">
-                Invitaciones digitales únicas para celebrar sus 15 años con estilo y elegancia.
-              </p>
-              <Button
-                size="lg"
-                className="bg-sage-400 hover:bg-sage-400/90 text-white px-8"
-                onClick={() => navigate('/products')}
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Descubre Quinceañeras
-              </Button>
-            </div>
+          {/* Controles */}
+          <button
+            className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow"
+            onClick={prevSlide}
+            aria-label="Anterior"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <button
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow"
+            onClick={nextSlide}
+            aria-label="Siguiente"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+
+          {/* Bullets */}
+          <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+            {Array.from({ length: totalDesktopSlides }).map((_, i) => (
+              <button
+                key={`dot-${i}`}
+                onClick={() => setSlide(i)}
+                aria-label={`Ir al slide ${i + 1}`}
+                className={`h-2.5 w-2.5 rounded-full ${i === slide ? 'bg-white' : 'bg-white/50 hover:bg-white/80'} transition-colors`}
+              />
+            ))}
           </div>
+        </div>
+      </section>
+
+      {/* Mobile / Tablets chicas: 1 panel por slide */}
+      <section
+        className="relative overflow-hidden lg:hidden"
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        aria-roledescription="carousel"
+        aria-label="Promociones principales móviles"
+      >
+        <div
+          className="whitespace-nowrap transition-transform duration-700 ease-out"
+          style={{ transform: `translateX(-${mSlide * 100}%)` }}
+        >
+          {heroPanels.map((p, idx) => {
+            const Icon = p.icon
+            return (
+              <div
+                key={`mob-${p.key}`}
+                className="inline-block align-top w-full"
+                role="group"
+                aria-roledescription="slide"
+                aria-label={`${idx + 1} de ${totalMobileSlides}`}
+              >
+                <div className="relative min-h-[520px] flex items-center justify-center p-8">
+                  <img
+                    src={p.bg}
+                    alt={p.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => onImgError(e, p.title)}
+                    loading="eager"
+                    decoding="async"
+                  />
+                  <div className="absolute inset-0 bg-black/25" />
+                  <div className="relative z-[1] text-center max-w-sm">
+                    <h1 className="font-display text-3xl font-medium text-white leading-tight mb-4 drop-shadow">
+                      {p.title}
+                    </h1>
+                    <p className="text-white/90 mb-6 drop-shadow">{p.desc}</p>
+                    <Button
+                      size="lg"
+                      className={`${p.btnClass} px-8`}
+                      onClick={() => navigate(p.to)}
+                    >
+                      <Icon className="w-4 h-4 mr-2" />
+                      {p.cta}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {/* Controles */}
+        <button
+          className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow"
+          onClick={mPrev}
+          aria-label="Anterior"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+        <button
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow"
+          onClick={mNext}
+          aria-label="Siguiente"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
+
+        {/* Bullets */}
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+          {Array.from({ length: totalMobileSlides }).map((_, i) => (
+            <button
+              key={`mdot-${i}`}
+              onClick={() => setMSlide(i)}
+              aria-label={`Ir al slide ${i + 1}`}
+              className={`h-2.5 w-2.5 rounded-full ${i === mSlide ? 'bg-white' : 'bg-white/50 hover:bg-white/80'} transition-colors`}
+            />
+          ))}
         </div>
       </section>
 
