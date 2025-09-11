@@ -1,3 +1,4 @@
+// src/pages/Register.jsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
@@ -6,7 +7,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { Sparkles, Mail, Lock, User, Phone } from 'lucide-react';
+import { Mail, Lock, User, Phone } from 'lucide-react';
 import '../App.css';
 
 export function Register() {
@@ -14,7 +15,6 @@ export function Register() {
     username: '',
     email: '',
     password: '',
-    confirmPassword: '',
     nombre_completo: '',
     telefono: '',
   });
@@ -36,44 +36,32 @@ export function Register() {
     setLoading(true);
     setError('');
 
-    // Validar contraseñas
-    if (formData.password !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden');
-      setLoading(false);
-      return;
-    }
-
-    if (formData.password.length < 6) {
+    if (!formData.password || formData.password.length < 6) {
       setError('La contraseña debe tener al menos 6 caracteres');
       setLoading(false);
       return;
     }
 
     try {
-      const { confirmPassword, ...registerData } = formData;
-      await register(registerData);
+      await register(formData);
       navigate('/dashboard');
     } catch (error) {
-      setError(error.message);
+      setError(error.message || 'No se pudo crear la cuenta');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8">
       <div className="max-w-md w-full space-y-8">
-        {/* Logo y título */}
+        {/* Marca */}
         <div className="text-center">
-          <div className="flex justify-center">
-            <div className="bg-blue-600 p-3 rounded-full">
-              <Sparkles className="h-8 w-8 text-white" />
-            </div>
-          </div>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+          <div className="font-display text-4xl font-black tracking-wide text-foreground">Venite</div>
+          <h2 className="mt-4 text-2xl font-semibold text-foreground">
             Crear Cuenta
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-muted-foreground">
             Únete y comienza a crear invitaciones únicas
           </p>
         </div>
@@ -81,23 +69,24 @@ export function Register() {
         {/* Formulario */}
         <Card>
           <CardHeader>
-            <CardTitle>Registro</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-foreground">Registro</CardTitle>
+            <CardDescription className="text-muted-foreground">
               Completa los datos para crear tu cuenta
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
               {error && (
                 <Alert variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
 
+              {/* Usuario */}
               <div className="space-y-2">
-                <Label htmlFor="username">Nombre de Usuario</Label>
+                <Label htmlFor="username" className="text-foreground">Nombre de Usuario</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="username"
                     name="username"
@@ -107,14 +96,16 @@ export function Register() {
                     placeholder="usuario123"
                     value={formData.username}
                     onChange={handleChange}
+                    autoComplete="username"
                   />
                 </div>
               </div>
 
+              {/* Email */}
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-foreground">Email</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
                     name="email"
@@ -124,46 +115,53 @@ export function Register() {
                     placeholder="tu@email.com"
                     value={formData.email}
                     onChange={handleChange}
+                    autoComplete="email"
                   />
                 </div>
               </div>
 
+              {/* Nombre completo (sin “Opcional”) */}
               <div className="space-y-2">
-                <Label htmlFor="nombre_completo">Nombre Completo (Opcional)</Label>
+                <Label htmlFor="nombre_completo" className="text-foreground">Nombre Completo</Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="nombre_completo"
                     name="nombre_completo"
                     type="text"
                     className="pl-10"
-                    placeholder="Tu Nombre Completo"
+                    placeholder="Tu nombre y apellido"
                     value={formData.nombre_completo}
                     onChange={handleChange}
+                    autoComplete="name"
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="telefono">Teléfono (Opcional)</Label>
+              {/* Teléfono (sin “Opcional”) + texto de ayuda */}
+              <div className="space-y-1">
+                <Label htmlFor="telefono" className="text-foreground">Teléfono</Label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="telefono"
                     name="telefono"
                     type="tel"
                     className="pl-10"
-                    placeholder="+1234567890"
+                    placeholder="+598 099123456"
                     value={formData.telefono}
                     onChange={handleChange}
+                    autoComplete="tel"
                   />
                 </div>
+                <p className="text-xs text-muted-foreground">Ejemplo: +598 099123456</p>
               </div>
 
+              {/* Contraseña (única) */}
               <div className="space-y-2">
-                <Label htmlFor="password">Contraseña</Label>
+                <Label htmlFor="password" className="text-foreground">Contraseña</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
                     name="password"
@@ -173,25 +171,12 @@ export function Register() {
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={handleChange}
+                    autoComplete="new-password"
                   />
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type="password"
-                    required
-                    className="pl-10"
-                    placeholder="••••••••"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                  />
-                </div>
+                <p className="text-xs text-muted-foreground">
+                  Mínimo 6 caracteres.
+                </p>
               </div>
 
               <Button
@@ -204,11 +189,11 @@ export function Register() {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 ¿Ya tienes una cuenta?{' '}
                 <Link
                   to="/login"
-                  className="font-medium text-blue-600 hover:text-blue-500"
+                  className="font-medium underline underline-offset-4 text-foreground hover:opacity-80"
                 >
                   Inicia sesión aquí
                 </Link>
