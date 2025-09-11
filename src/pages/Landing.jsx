@@ -358,11 +358,11 @@ function Landing() {
               return (
                 <Card
                   key={product.id}
-                  className="group cursor-pointer hover-lift shadow-warm overflow-hidden rounded-lg"
+                  className="group cursor-pointer hover-lift shadow-warm overflow-hidden rounded-lg p-0"
                   onClick={() => navigate(`/product/${product.id}`)}
                 >
                   <div className="aspect-square relative">
-                    {/* IMG sin franjas: contenedor relative + img absoluta + object-cover + block */}
+                    {/* IMG sin franjas */}
                     <img
                       src={product.image}
                       alt={product.name}
@@ -427,11 +427,11 @@ function Landing() {
             {categories.map((category) => (
               <Card
                 key={category.id}
-                className="group cursor-pointer hover-lift shadow-warm overflow-hidden rounded-lg"
+                className="group cursor-pointer hover-lift shadow-warm overflow-hidden rounded-lg p-0"
                 onClick={() => navigate('/products')}
               >
                 <div className="aspect-[4/3] relative">
-                  {/* IMG sin bordes superiores/inferiores */}
+                  {/* IMG sin bordes */}
                   <img
                     src={category.image}
                     alt={category.name}
@@ -471,26 +471,10 @@ function Landing() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              {
-                icon: Smartphone,
-                title: '100% Digital y Ecológico',
-                description: 'Invitaciones completamente digitales que cuidan el medio ambiente'
-              },
-              {
-                icon: Zap,
-                title: 'Entrega Instantánea',
-                description: 'Recibe tu invitación en minutos, no en días'
-              },
-              {
-                icon: Globe,
-                title: 'Comparte en Cualquier Lugar',
-                description: 'WhatsApp, email, redes sociales - llega a todos tus invitados'
-              },
-              {
-                icon: Edit,
-                title: 'Personalización Total',
-                description: 'Diseños únicos adaptados a tu estilo y evento especial'
-              }
+              { icon: Smartphone, title: '100% Digital y Ecológico', description: 'Invitaciones completamente digitales que cuidan el medio ambiente' },
+              { icon: Zap, title: 'Entrega Instantánea', description: 'Recibe tu invitación en minutos, no en días' },
+              { icon: Globe, title: 'Comparte en Cualquier Lugar', description: 'WhatsApp, email, redes sociales - llega a todos tus invitados' },
+              { icon: Edit, title: 'Personalización Total', description: 'Diseños únicos adaptados a tu estilo y evento especial' }
             ].map((value, index) => (
               <div key={index} className="text-center">
                 <div className="w-16 h-16 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-4">
