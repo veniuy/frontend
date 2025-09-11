@@ -1,3 +1,4 @@
+// DemoBlack.jsx
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button'
@@ -30,12 +31,50 @@ import {
   ChevronDown,
   Church,
   PartyPopper,
-  CreditCard,
-  MessageCircle
+  CreditCard
 } from 'lucide-react'
+
+// ------------------------------------
+// Paleta (elegante, consistente)
+// ------------------------------------
+const PALETTE = {
+  ink: '#222222',
+  text: '#2E2E2E',
+  muted: '#6B7280',
+  // Verde "sage"
+  sage: '#8FAF86',
+  sageDark: '#789B70',
+  sageLight: '#E8F0E5',
+  // Arena "almond"
+  almond: '#D4B28A',
+  almondDark: '#C59A6A',
+  almondLight: '#F4E7D8',
+  white: '#FFFFFF',
+  paper: '#F8F8F6'
+}
+
+// Helpers para clases de botones con la paleta
+const btnPrimary = `bg-[${PALETTE.sage}] hover:bg-[${PALETTE.sageDark}] text-white`
+const btnOutline = `border-[${PALETTE.sage}] text-[${PALETTE.sage}] hover:bg-[${PALETTE.sageLight}]`
+
+// Helper celda de tiempo
+function TimeCell({ value, label }) {
+  return (
+    <div className="flex flex-col items-center">
+      <div className="font-light leading-none"
+           style={{ fontSize: 'clamp(2.25rem, 7vw, 4.5rem)', color: PALETTE.white }}>
+        {String(value).padStart(2, '0')}
+      </div>
+      <div className="opacity-90 text-sm sm:text-base" style={{ color: PALETTE.white }}>
+        {label}
+      </div>
+    </div>
+  )
+}
 
 function DemoBlack() {
   const navigate = useNavigate()
+
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(false)
   const [showRSVP, setShowRSVP] = useState(false)
@@ -48,53 +87,43 @@ function DemoBlack() {
     message: ''
   })
   const [showSuccess, setShowSuccess] = useState(false)
-  const [timeLeft, setTimeLeft] = useState({
-    days: 74,
-    hours: 6,
-    minutes: 12,
-    seconds: 21
-  })
 
-  // Countdown timer
+  // -----------------------------
+  // Countdown (a una fecha real)
+  // -----------------------------
+  const targetDate = new Date('2024-11-23T19:00:00') // ajusta según tu evento
+  const getDiff = () => {
+    const now = new Date()
+    const diff = Math.max(0, targetDate.getTime() - now.getTime())
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24)
+    const minutes = Math.floor((diff / (1000 * 60)) % 60)
+    const seconds = Math.floor((diff / 1000) % 60)
+    return { days, hours, minutes, seconds }
+  }
+  const [timeLeft, setTimeLeft] = useState(getDiff())
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => {
-        if (prev.seconds > 0) {
-          return { ...prev, seconds: prev.seconds - 1 }
-        } else if (prev.minutes > 0) {
-          return { ...prev, minutes: prev.minutes - 1, seconds: 59 }
-        } else if (prev.hours > 0) {
-          return { ...prev, hours: prev.hours - 1, minutes: 59, seconds: 59 }
-        } else if (prev.days > 0) {
-          return { ...prev, days: prev.days - 1, hours: 23, minutes: 59, seconds: 59 }
-        }
-        return prev
-      })
-    }, 1000)
-
-    return () => clearInterval(timer)
+    const t = setInterval(() => setTimeLeft(getDiff()), 1000)
+    return () => clearInterval(t)
   }, [])
 
   const weddingData = {
-    couple: {
-      bride: "Belén",
-      groom: "Amadeo"
-    },
-    date: "23 de Noviembre, 2024",
+    couple: { bride: 'Belén', groom: 'Amadeo' },
+    date: '23 de Noviembre, 2024',
     ceremony: {
-      time: "19:00 hs",
-      venue: "Iglesia Nuestra Señora del Carmen",
-      location: "Villa Allende, Córdoba",
-      address: "Av. San Martín 456, Villa Allende"
+      time: '19:00 hs',
+      venue: 'Iglesia Nuestra Señora del Carmen',
+      location: 'Villa Allende, Córdoba',
+      address: 'Av. San Martín 456, Villa Allende'
     },
     reception: {
-      time: "Después de la ceremonia",
-      venue: "Rincón Calina",
-      location: "Unquillo, Córdoba",
-      address: "Ruta Provincial E-53 Km 8, Unquillo"
+      time: 'Después de la ceremonia',
+      venue: 'Rincón Calina',
+      location: 'Unquillo, Córdoba',
+      address: 'Ruta Provincial E-53 Km 8, Unquillo'
     },
-    hashtag: "#beluyamador",
-    dressCode: "Vestimenta formal, elegante"
+    hashtag: '#beluyamador',
+    dressCode: 'Vestimenta formal, elegante'
   }
 
   const handleRSVPSubmit = (e) => {
@@ -103,36 +132,32 @@ function DemoBlack() {
     setTimeout(() => {
       setShowSuccess(false)
       setShowRSVP(false)
-      setRsvpData({
-        name: '',
-        email: '',
-        attendance: '',
-        guests: 1,
-        message: ''
-      })
-    }, 3000)
+      setRsvpData({ name: '', email: '', attendance: '', guests: 1, message: '' })
+    }, 2500)
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: PALETTE.paper }}>
       {/* Header con controles */}
       <div className="fixed top-4 left-4 right-4 z-50 flex justify-between items-center">
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           size="sm"
           onClick={() => navigate('/products')}
-          className="bg-white/90 backdrop-blur-sm shadow-lg"
+          className="backdrop-blur-sm shadow-lg"
+          style={{ backgroundColor: 'rgba(255,255,255,0.9)', borderColor: PALETTE.sage, color: PALETTE.sage }}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Volver
         </Button>
-        
+
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setIsPlaying(!isPlaying)}
-            className="bg-white/90 backdrop-blur-sm shadow-lg"
+            className="backdrop-blur-sm shadow-lg"
+            style={{ backgroundColor: 'rgba(255,255,255,0.9)', borderColor: PALETTE.sage, color: PALETTE.sage }}
           >
             {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
           </Button>
@@ -140,133 +165,131 @@ function DemoBlack() {
             variant="outline"
             size="sm"
             onClick={() => setIsMuted(!isMuted)}
-            className="bg-white/90 backdrop-blur-sm shadow-lg"
+            className="backdrop-blur-sm shadow-lg"
+            style={{ backgroundColor: 'rgba(255,255,255,0.9)', borderColor: PALETTE.sage, color: PALETTE.sage }}
           >
             {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
           </Button>
-          <Badge className="bg-green-600 text-white shadow-lg">
+          <Badge style={{ backgroundColor: PALETTE.sage, color: PALETTE.white }} className="shadow-lg">
             DEMO BLACK
           </Badge>
         </div>
       </div>
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-100">
-        {/* Elementos florales decorativos */}
-        <div className="absolute top-0 left-0 w-96 h-96 opacity-30">
-          <img 
-            src="/src/assets/cotton_bird_images/categoria_boda_grid.webp"
-            alt="Elementos florales"
-            className="w-full h-full object-cover"
-            style={{ filter: 'sepia(100%) hue-rotate(90deg) saturate(150%)' }}
+      {/* Hero Section con textura y florales */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* textura papel */}
+        <div className="absolute inset-0">
+          <img
+            src="/src/assets/portada.jpg" /* si no existe, reemplaza por tu textura */
+            alt="Textura papel"
+            className="absolute inset-0 w-full h-full object-cover object-center block"
           />
         </div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 opacity-30 transform rotate-180">
-          <img 
-            src="/src/assets/cotton_bird_images/categoria_boda_grid.webp"
-            alt="Elementos florales"
-            className="w-full h-full object-cover"
-            style={{ filter: 'sepia(100%) hue-rotate(90deg) saturate(150%)' }}
+
+        {/* florales decorativos (sin franjas) */}
+        <div className="absolute top-0 left-0 w-[420px] h-[260px] opacity-80 pointer-events-none">
+          <img
+            src="/src/assets/hero_top.png" /* usa tu PNG decorativo */
+            alt="Decorativo superior"
+            className="absolute inset-0 w-full h-full object-cover block"
+          />
+        </div>
+        <div className="absolute bottom-0 right-0 w-[460px] h-[280px] opacity-80 pointer-events-none">
+          <img
+            src="/src/assets/hero_bottom.png" /* usa tu PNG decorativo */
+            alt="Decorativo inferior"
+            className="absolute inset-0 w-full h-full object-cover block"
           />
         </div>
 
         {/* Contenido principal */}
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <div className="animate-fade-in-up">
-            {/* Nombres de la pareja */}
-            <h1 className="font-display text-6xl md:text-8xl font-light text-gray-800 mb-4 tracking-wider">
+          <div>
+            <h1
+              className="font-display font-light mb-3 tracking-wider"
+              style={{ color: PALETTE.ink, fontSize: 'clamp(2.75rem, 8vw, 6rem)' }}
+            >
               {weddingData.couple.bride.toUpperCase()}
             </h1>
-            
-            {/* Símbolo decorativo */}
-            <div className="flex items-center justify-center my-8">
-              <div className="w-16 h-px bg-gray-400"></div>
-              <div className="mx-4 text-4xl text-green-600 font-light">∞</div>
-              <div className="w-16 h-px bg-gray-400"></div>
+
+            <div className="flex items-center justify-center my-6">
+              <div className="h-px w-16" style={{ backgroundColor: '#CFCFCF' }} />
+              <div className="mx-4 font-light"
+                   style={{ color: PALETTE.sage, fontSize: 'clamp(1.75rem, 5vw, 3rem)' }}>
+                ∞
+              </div>
+              <div className="h-px w-16" style={{ backgroundColor: '#CFCFCF' }} />
             </div>
-            
-            <h1 className="font-display text-6xl md:text-8xl font-light text-gray-800 mb-8 tracking-wider">
+
+            <h1
+              className="font-display font-light mb-8 tracking-wider"
+              style={{ color: PALETTE.ink, fontSize: 'clamp(2.75rem, 8vw, 6rem)' }}
+            >
               {weddingData.couple.groom.toUpperCase()}
             </h1>
-            
-            <p className="text-xl md:text-2xl text-gray-600 mb-12 font-light tracking-wide">
+
+            <p className="font-light mb-10 tracking-wide"
+               style={{ color: PALETTE.muted, fontSize: 'clamp(1.1rem, 3.5vw, 1.5rem)' }}>
               ¡NOS CASAMOS!
             </p>
-            
-            {/* Scroll indicator */}
+
+            {/* Indicador scroll */}
             <div className="animate-bounce">
-              <ChevronDown className="w-8 h-8 text-green-600 mx-auto" />
+              <ChevronDown className="w-8 h-8 mx-auto" style={{ color: PALETTE.sage }} />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Countdown Section */}
-      <section className="py-16 bg-green-600 text-white">
+      {/* Countdown: grande, centrado, mobile-first */}
+      <section className="py-12 sm:py-16" style={{ backgroundColor: PALETTE.sage }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-light mb-8 tracking-wide">
+          <h2 className="font-light mb-6 sm:mb-8 tracking-wide"
+              style={{ color: PALETTE.white, fontSize: 'clamp(1.25rem, 3.5vw, 1.875rem)' }}>
             Bienvenidos a nuestra boda
           </h2>
-          
-          <div className="grid grid-cols-4 gap-4 max-w-2xl mx-auto">
-            <div className="text-center">
-              <div className="text-4xl md:text-6xl font-light mb-2">
-                {String(timeLeft.days).padStart(2, '0')}
-              </div>
-              <div className="text-sm md:text-base opacity-90">días</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-6xl font-light mb-2">:</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-6xl font-light mb-2">
-                {String(timeLeft.hours).padStart(2, '0')}
-              </div>
-              <div className="text-sm md:text-base opacity-90">hs</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-6xl font-light mb-2">:</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-6xl font-light mb-2">
-                {String(timeLeft.minutes).padStart(2, '0')}
-              </div>
-              <div className="text-sm md:text-base opacity-90">min</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-6xl font-light mb-2">:</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl md:text-6xl font-light mb-2">
-                {String(timeLeft.seconds).padStart(2, '0')}
-              </div>
-              <div className="text-sm md:text-base opacity-90">seg</div>
-            </div>
+
+          <div className="flex items-stretch justify-center gap-5 sm:gap-8">
+            <TimeCell value={timeLeft.days} label="días" />
+            <div className="self-center font-light"
+                 style={{ color: PALETTE.white, fontSize: 'clamp(2rem, 7vw, 4rem)' }}>:</div>
+            <TimeCell value={timeLeft.hours} label="hs" />
+            <div className="self-center font-light"
+                 style={{ color: PALETTE.white, fontSize: 'clamp(2rem, 7vw, 4rem)' }}>:</div>
+            <TimeCell value={timeLeft.minutes} label="min" />
+            <div className="self-center font-light"
+                 style={{ color: PALETTE.white, fontSize: 'clamp(2rem, 7vw, 4rem)' }}>:</div>
+            <TimeCell value={timeLeft.seconds} label="seg" />
           </div>
         </div>
       </section>
 
-      {/* Event Details */}
+      {/* Detalles de evento (iconos mismo color) */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12">
             {/* Ceremonia */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Church className="w-8 h-8 text-green-600" />
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+                style={{ backgroundColor: PALETTE.sageLight }}
+              >
+                <Church className="w-8 h-8" style={{ color: PALETTE.sage }} />
               </div>
-              <h3 className="text-2xl font-display font-medium text-gray-800 mb-6 tracking-wide">
+              <h3 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ color: PALETTE.ink }}>
                 CEREMONIA
               </h3>
-              <div className="space-y-3 text-gray-600 mb-8">
+              <div className="space-y-3 mb-8" style={{ color: PALETTE.text }}>
                 <p className="text-lg">{weddingData.date}</p>
                 <p className="text-lg">{weddingData.ceremony.time}</p>
                 <p className="font-medium">{weddingData.ceremony.venue}</p>
                 <p>{weddingData.ceremony.location}</p>
-                <p className="text-sm">Recibí debajo las indicaciones para llegar.</p>
+                <p className="text-sm" style={{ color: PALETTE.muted }}>Recibí debajo las indicaciones para llegar.</p>
               </div>
-              <Button 
-                className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full"
+              <Button
+                className="px-8 py-3 rounded-full"
+                style={{ backgroundColor: PALETTE.sage, color: PALETTE.white }}
                 onClick={() => window.open(`https://maps.google.com/?q=${weddingData.ceremony.address}`, '_blank')}
               >
                 LLEGAR A LA CEREMONIA
@@ -275,20 +298,24 @@ function DemoBlack() {
 
             {/* Fiesta */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <PartyPopper className="w-8 h-8 text-amber-600" />
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+                style={{ backgroundColor: PALETTE.sageLight }}
+              >
+                <PartyPopper className="w-8 h-8" style={{ color: PALETTE.sage }} />
               </div>
-              <h3 className="text-2xl font-display font-medium text-gray-800 mb-6 tracking-wide">
+              <h3 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ color: PALETTE.ink }}>
                 FIESTA
               </h3>
-              <div className="space-y-3 text-gray-600 mb-8">
+              <div className="space-y-3 mb-8" style={{ color: PALETTE.text }}>
                 <p className="text-lg">{weddingData.reception.time}</p>
                 <p className="font-medium">{weddingData.reception.venue}</p>
                 <p>{weddingData.reception.location}</p>
-                <p className="text-lg font-medium text-green-600">¡Te esperamos!</p>
+                <p className="text-lg font-medium" style={{ color: PALETTE.sage }}>¡Te esperamos!</p>
               </div>
-              <Button 
-                className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 rounded-full"
+              <Button
+                className="px-8 py-3 rounded-full"
+                style={{ backgroundColor: PALETTE.sage, color: PALETTE.white }}
                 onClick={() => window.open(`https://maps.google.com/?q=${weddingData.reception.address}`, '_blank')}
               >
                 LLEGAR A LA FIESTA
@@ -298,40 +325,42 @@ function DemoBlack() {
         </div>
       </section>
 
-      {/* Nosotros Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-display font-medium text-gray-800 mb-8 tracking-wide">
-            NOSOTROS...
-          </h2>
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Si deseás realizarnos un regalo podés colaborar con nuestra Luna de Miel...
+      {/* Sección regalos (almond) */}
+      <section className="py-16 text-center" style={{ backgroundColor: PALETTE.almond }}>
+        <div className="max-w-3xl mx-auto px-4">
+          <Gift className="w-10 h-10 mx-auto mb-6" style={{ color: PALETTE.white }} />
+          <p className="mb-8" style={{ color: PALETTE.white, fontSize: 'clamp(1rem, 2.5vw, 1.25rem)' }}>
+            Si deseás realizarnos un regalo podés colaborar con nuestra Luna de Miel…
           </p>
-          <Button 
-            variant="outline"
-            className="border-green-600 text-green-600 hover:bg-green-50 px-8 py-3 rounded-full"
+          <Button
+            className="rounded-full px-8 py-3"
+            style={{ backgroundColor: PALETTE.white, color: PALETTE.almondDark }}
             onClick={() => setShowGifts(true)}
           >
-            Ver Datos Bancarios
+            VER DATOS BANCARIOS
           </Button>
         </div>
       </section>
 
-      {/* Instagram Section */}
+      {/* Instagram */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="w-16 h-16 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Instagram className="w-8 h-8 text-pink-600" />
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+            style={{ backgroundColor: PALETTE.sageLight }}
+          >
+            <Instagram className="w-8 h-8" style={{ color: PALETTE.sage }} />
           </div>
-          <h2 className="text-2xl font-display font-medium text-gray-800 mb-4">
+          <h2 className="text-2xl font-display font-medium mb-4" style={{ color: PALETTE.ink }}>
             @{weddingData.hashtag.replace('#', '')}
           </h2>
-          <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-            ¡Preparate para nuestro gran día!<br />
-            Ya podés seguirnos en nuestra cuenta para ver todas las novedades del casamiento y etiquetarnos en tus fotos y videos.
+          <p className="mb-6 max-w-2xl mx-auto" style={{ color: PALETTE.text }}>
+            ¡Preparate para nuestro gran día! Ya podés seguirnos para ver todas las novedades del casamiento
+            y etiquetarnos en tus fotos y videos.
           </p>
-          <Button 
-            className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 rounded-full"
+          <Button
+            className="px-8 py-3 rounded-full"
+            style={{ backgroundColor: PALETTE.sage, color: PALETTE.white }}
             onClick={() => window.open('https://instagram.com', '_blank')}
           >
             Ver en Instagram
@@ -340,19 +369,17 @@ function DemoBlack() {
       </section>
 
       {/* Dress Code */}
-      <section className="py-16 bg-gray-800 text-white">
+      <section className="py-16" style={{ backgroundColor: '#1F2937', color: PALETTE.white }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-display font-medium mb-4 tracking-wide">
             DRESS CODE
           </h2>
-          <p className="text-lg">
-            {weddingData.dressCode}
-          </p>
+          <p className="text-lg">{weddingData.dressCode}</p>
         </div>
       </section>
 
-      {/* RSVP Section */}
-      <section className="py-16 bg-green-600 text-white">
+      {/* RSVP */}
+      <section className="py-16" style={{ backgroundColor: PALETTE.sage, color: PALETTE.white }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-display font-medium mb-6 tracking-wide">
             CONFIRMACIÓN DE ASISTENCIA
@@ -360,20 +387,20 @@ function DemoBlack() {
           <p className="text-lg mb-8 max-w-2xl mx-auto">
             Esperamos que seas parte de esta gran celebración. ¡Confirmanos tu asistencia!
           </p>
-          <Button 
-            className="bg-white text-green-600 hover:bg-gray-100 px-8 py-3 rounded-full font-medium"
+          <Button
+            className="px-8 py-3 rounded-full font-medium"
+            style={{ backgroundColor: PALETTE.white, color: PALETTE.sage }}
             onClick={() => setShowRSVP(true)}
           >
             Confirmar asistencia
           </Button>
-          
-          <div className="mt-8 pt-8 border-t border-green-500">
-            <p className="text-lg">
-              ¡Agendá la fecha en tu calendario!
-            </p>
-            <Button 
+
+          <div className="mt-8 pt-8" style={{ borderTop: `1px solid ${PALETTE.sageLight}` }}>
+            <p className="text-lg">¡Agendá la fecha en tu calendario!</p>
+            <Button
               variant="outline"
-              className="mt-4 border-white text-white hover:bg-white hover:text-green-600 px-8 py-3 rounded-full"
+              className="mt-4 rounded-full px-8 py-3"
+              style={{ borderColor: PALETTE.white, color: PALETTE.white }}
             >
               AGENDAR EVENTO
             </Button>
@@ -381,17 +408,18 @@ function DemoBlack() {
         </div>
       </section>
 
-      {/* Music Suggestions */}
+      {/* Sugerencias musicales */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-display font-medium text-gray-800 mb-6 tracking-wide">
+          <h2 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ color: PALETTE.ink }}>
             ¿QUÉ CANCIONES NO PUEDEN FALTAR?
           </h2>
-          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="mb-8 max-w-2xl mx-auto" style={{ color: PALETTE.text }}>
             ¡Ayudanos sugiriendo las canciones que pensás que no pueden faltar en la fiesta!
           </p>
-          <Button 
-            className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-full"
+          <Button
+            className="px-8 py-3 rounded-full"
+            style={{ backgroundColor: PALETTE.sage, color: PALETTE.white }}
           >
             <Music className="w-4 h-4 mr-2" />
             Sugerir canción
@@ -399,18 +427,19 @@ function DemoBlack() {
         </div>
       </section>
 
-      {/* Info Útil */}
-      <section className="py-16 bg-gray-50">
+      {/* Info útil */}
+      <section className="py-16" style={{ backgroundColor: PALETTE.paper }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-display font-medium text-gray-800 mb-6 tracking-wide">
+          <h2 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ color: PALETTE.ink }}>
             INFO ÚTIL
           </h2>
-          <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="mb-8 max-w-2xl mx-auto" style={{ color: PALETTE.text }}>
             Te dejamos sugerencias de alojamientos y traslados para que aproveches ese fin de semana al máximo.
           </p>
-          <Button 
+          <Button
             variant="outline"
-            className="border-green-600 text-green-600 hover:bg-green-50 px-8 py-3 rounded-full"
+            className="px-8 py-3 rounded-full"
+            style={{ borderColor: PALETTE.sage, color: PALETTE.sage }}
           >
             VER MÁS
           </Button>
@@ -418,22 +447,32 @@ function DemoBlack() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-white py-12">
+      <footer className="py-12" style={{ backgroundColor: '#1F2937', color: PALETTE.white }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-lg mb-8">
             ¡Gracias por acompañarnos en este momento tan importante!
           </p>
-          
-          <div className="border-t border-gray-600 pt-8">
-            <p className="text-sm text-gray-400 mb-4">
-              Invitación digital creada con ❤️ por <span className="text-green-400 font-medium">Venite</span>
+
+          <div className="pt-8" style={{ borderTop: '1px solid #4B5563' }}>
+            <p className="text-sm opacity-70 mb-4">
+              Invitación digital creada con ❤️ por <span className="font-medium" style={{ color: PALETTE.sage }}>Venite</span>
             </p>
-            <div className="flex justify-center space-x-4">
-              <Button variant="outline" size="sm" className="border-white text-white hover:bg-white hover:text-gray-800">
+            <div className="flex justify-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full"
+                style={{ borderColor: PALETTE.white, color: PALETTE.white }}
+              >
                 <Share2 className="w-4 h-4 mr-2" />
                 Compartir
               </Button>
-              <Button variant="outline" size="sm" className="border-white text-white hover:bg-white hover:text-gray-800">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full"
+                style={{ borderColor: PALETTE.white, color: PALETTE.white }}
+              >
                 <Download className="w-4 h-4 mr-2" />
                 Guardar
               </Button>
@@ -448,61 +487,57 @@ function DemoBlack() {
           <Card className="w-full max-w-md">
             <CardContent className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-medium text-gray-800">Confirmar Asistencia</h3>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => setShowRSVP(false)}
-                >
+                <h3 className="text-xl font-medium" style={{ color: PALETTE.ink }}>Confirmar Asistencia</h3>
+                <Button variant="ghost" size="sm" onClick={() => setShowRSVP(false)}>
                   <X className="w-4 h-4" />
                 </Button>
               </div>
-              
+
               {showSuccess ? (
                 <div className="text-center py-8">
-                  <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                  <h4 className="text-lg font-medium text-gray-800 mb-2">
+                  <CheckCircle className="w-16 h-16 mx-auto mb-4" style={{ color: PALETTE.sage }} />
+                  <h4 className="text-lg font-medium mb-2" style={{ color: PALETTE.ink }}>
                     ¡Confirmación Recibida!
                   </h4>
-                  <p className="text-gray-600">
+                  <p style={{ color: PALETTE.text }}>
                     Gracias por confirmar tu asistencia. ¡Te esperamos!
                   </p>
                 </div>
               ) : (
                 <form onSubmit={handleRSVPSubmit} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: PALETTE.ink }}>
                       Nombre completo *
                     </label>
                     <Input
                       required
                       value={rsvpData.name}
-                      onChange={(e) => setRsvpData({...rsvpData, name: e.target.value})}
+                      onChange={(e) => setRsvpData({ ...rsvpData, name: e.target.value })}
                       placeholder="Tu nombre completo"
                     />
                   </div>
-                  
+
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: PALETTE.ink }}>
                       Email *
                     </label>
                     <Input
                       type="email"
                       required
                       value={rsvpData.email}
-                      onChange={(e) => setRsvpData({...rsvpData, email: e.target.value})}
+                      onChange={(e) => setRsvpData({ ...rsvpData, email: e.target.value })}
                       placeholder="tu@email.com"
                     />
                   </div>
-                  
+
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: PALETTE.ink }}>
                       ¿Asistirás? *
                     </label>
-                    <select 
+                    <select
                       required
                       value={rsvpData.attendance}
-                      onChange={(e) => setRsvpData({...rsvpData, attendance: e.target.value})}
+                      onChange={(e) => setRsvpData({ ...rsvpData, attendance: e.target.value })}
                       className="w-full p-2 border border-gray-300 rounded-md"
                     >
                       <option value="">Selecciona una opción</option>
@@ -510,10 +545,10 @@ function DemoBlack() {
                       <option value="no">No podré asistir</option>
                     </select>
                   </div>
-                  
+
                   {rsvpData.attendance === 'yes' && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: PALETTE.ink }}>
                         Número de acompañantes
                       </label>
                       <Input
@@ -521,24 +556,28 @@ function DemoBlack() {
                         min="0"
                         max="5"
                         value={rsvpData.guests}
-                        onChange={(e) => setRsvpData({...rsvpData, guests: parseInt(e.target.value)})}
+                        onChange={(e) => setRsvpData({ ...rsvpData, guests: parseInt(e.target.value || '0', 10) })}
                       />
                     </div>
                   )}
-                  
+
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: PALETTE.ink }}>
                       Mensaje (opcional)
                     </label>
                     <Textarea
                       value={rsvpData.message}
-                      onChange={(e) => setRsvpData({...rsvpData, message: e.target.value})}
+                      onChange={(e) => setRsvpData({ ...rsvpData, message: e.target.value })}
                       placeholder="Déjanos un mensaje..."
                       rows={3}
                     />
                   </div>
-                  
-                  <Button type="submit" className="w-full bg-green-600 hover:bg-green-700 text-white">
+
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    style={{ backgroundColor: PALETTE.sage, color: PALETTE.white }}
+                  >
                     <Heart className="w-4 h-4 mr-2" />
                     Confirmar Asistencia
                   </Button>
@@ -555,43 +594,39 @@ function DemoBlack() {
           <Card className="w-full max-w-md">
             <CardContent className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-medium text-gray-800">Datos Bancarios</h3>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  onClick={() => setShowGifts(false)}
-                >
+                <h3 className="text-xl font-medium" style={{ color: PALETTE.ink }}>Datos Bancarios</h3>
+                <Button variant="ghost" size="sm" onClick={() => setShowGifts(false)}>
                   <X className="w-4 h-4" />
                 </Button>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="text-center mb-6">
-                  <CreditCard className="w-12 h-12 text-green-600 mx-auto mb-4" />
-                  <p className="text-gray-600">
+                  <CreditCard className="w-12 h-12 mx-auto mb-4" style={{ color: PALETTE.sage }} />
+                  <p style={{ color: PALETTE.text }}>
                     Si deseás colaborar con nuestra Luna de Miel, podés hacerlo a través de:
                   </p>
                 </div>
-                
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-800 mb-2">Transferencia Bancaria</h4>
-                  <div className="space-y-1 text-sm text-gray-600">
+
+                <div className="p-4 rounded-lg" style={{ backgroundColor: PALETTE.paper }}>
+                  <h4 className="font-medium mb-2" style={{ color: PALETTE.ink }}>Transferencia Bancaria</h4>
+                  <div className="space-y-1 text-sm" style={{ color: PALETTE.text }}>
                     <p><strong>Banco:</strong> Banco Nación</p>
                     <p><strong>CBU:</strong> 0110599520000012345678</p>
                     <p><strong>Alias:</strong> BELU.AMADEO.BODA</p>
                     <p><strong>Titular:</strong> Belén García</p>
                   </div>
                 </div>
-                
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-800 mb-2">Mercado Pago</h4>
-                  <div className="space-y-1 text-sm text-gray-600">
+
+                <div className="p-4 rounded-lg" style={{ backgroundColor: PALETTE.paper }}>
+                  <h4 className="font-medium mb-2" style={{ color: PALETTE.ink }}>Mercado Pago</h4>
+                  <div className="space-y-1 text-sm" style={{ color: PALETTE.text }}>
                     <p><strong>CVU:</strong> 0000003100012345678901</p>
                     <p><strong>Alias:</strong> BELU.MP</p>
                   </div>
                 </div>
-                
-                <p className="text-xs text-gray-500 text-center mt-4">
+
+                <p className="text-xs text-center" style={{ color: PALETTE.muted }}>
                   ¡Tu presencia es nuestro mejor regalo!
                 </p>
               </div>
