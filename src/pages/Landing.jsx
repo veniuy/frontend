@@ -9,6 +9,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { CartIcon, ShoppingCartSidebar } from '../components/ShoppingCart'
 import {
   Heart,
+  Send,
+  Edit,
+  Sparkles,
+  Smartphone,
+  Globe,
+  Zap,
   Search,
   User,
   Menu,
@@ -18,6 +24,9 @@ import {
   Twitter,
   X as CloseIcon,
   Trash2,
+  Crown,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react'
 
 import { asset, onImgError } from '../utils/assets'
@@ -131,23 +140,27 @@ function Landing() {
     []
   )
 
-  // --------- Ventajas digitales ---------
+  // --------- Ventajas digitales (con iconos) ---------
   const digitalFeatures = useMemo(() => [
     {
+      icon: Smartphone,
       title: 'Invitaciones Interactivas',
       description: 'Incluye mapas, confirmación de asistencia, música de fondo y animaciones que sorprenderán a tus invitados.'
     },
     {
-      title: 'Gestión de Invitados',
-      description: 'Panel de control para ver quién ha visto la invitación, confirmaciones de asistencia y gestión completa de tu lista.'
+      icon: Zap,
+      title: 'Entrega Instantánea',
+      description: 'Recibe tu invitación en minutos, no en días.'
     },
     {
-      title: 'Diseños Responsivos',
-      description: 'Perfectas en cualquier dispositivo: móvil, tablet o computadora.'
+      icon: Globe,
+      title: 'Comparte en Cualquier Lugar',
+      description: 'WhatsApp, email, redes sociales: llega a todos tus invitados.'
     },
     {
-      title: 'Actualizaciones en Tiempo Real',
-      description: '¿Cambió algo? Actualiza la información y todos verán los cambios automáticamente.'
+      icon: Edit,
+      title: 'Personalización Total',
+      description: 'Diseños únicos adaptados a tu estilo y evento especial.'
     }
   ], [])
 
@@ -224,7 +237,7 @@ function Landing() {
   }
 
   // -----------------------------
-  // HERO SLIDER (2 paneles en desktop, 1 en móvil)
+  // HERO SLIDER
   // -----------------------------
   const heroPanels = useMemo(() => ([
     {
@@ -291,13 +304,11 @@ function Landing() {
     if (Math.abs(dx) > 50) { if (dx < 0) mNext(); else mPrev() }
   }
 
-  // -----------------------------
-  // Botón unificado (blanco/negro) para resto del sitio
-  // -----------------------------
-  const PrimaryButton = ({ className = '', children, ...props }) => (
+  // Botón del slider (blanco/negro) — SOLO para el slider
+  const SliderButton = ({ className = '', children, ...props }) => (
     <Button
       {...props}
-      className={`bg-white text-black border border-black/10 hover:bg-white/90 ${className}`}
+      className={`mt-3 bg-white text-black border border-black/15 hover:bg-white/90 px-4 py-2 text-sm ${className}`}
     >
       {children}
     </Button>
@@ -330,7 +341,7 @@ function Landing() {
               +34 919 03 36 08
             </div>
 
-            {/* Logo (más grueso) + slogan actualizado (oculto en móviles) */}
+            {/* Logo (más grueso) + slogan actualizado; slogan oculto en móviles */}
             <div
               className="font-display text-2xl md:text-3xl font-extrabold text-foreground tracking-wide cursor-pointer select-none"
               onClick={() => navigate('/')}
@@ -420,7 +431,6 @@ function Landing() {
                 <div className="grid lg:grid-cols-2 min-h-[520px]">
                   {pair.map((p) => (
                     <div key={p.key} className="relative flex items-end justify-center">
-                      {/* IMG */}
                       <img
                         src={p.bg}
                         alt={p.headline}
@@ -430,20 +440,24 @@ function Landing() {
                         decoding="async"
                       />
                       <div className="absolute inset-0 bg-black/10" />
-                      {/* Tarjeta blanca clickeable al estilo de la referencia */}
+                      {/* Tarjeta blanca clickeable: más pequeña, sin bordes redondeados, título bold */}
                       <div
                         role="button"
                         tabIndex={0}
                         onClick={() => navigate(p.to)}
                         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigate(p.to)}
-                        className="relative z-[1] mb-10 max-w-[620px] w-[82%] bg-white/95 backdrop-blur-[1px] text-center shadow-xl rounded-md px-6 py-5 cursor-pointer select-none border border-black/5"
+                        className="relative z-[1] mb-8 w-[68%] max-w-[520px] bg-white/95 backdrop-blur-[1px] text-center shadow-xl px-5 py-4 cursor-pointer select-none border border-black/10"
                       >
-                        <h2 className="font-display text-2xl md:text-[28px] leading-snug text-foreground">
+                        <h2 className="font-display font-bold text-[22px] leading-snug text-foreground">
                           {p.headline}
                         </h2>
-                        <div className="mt-2 text-[13px] tracking-[0.12em] text-muted-foreground">
+                        <div className="mt-1.5 text-[12px] tracking-[0.12em] text-muted-foreground">
                           {p.sub}
                         </div>
+                        {/* Botón del slider: blanco/negro (opcional) */}
+                        <SliderButton onClick={(e) => { e.stopPropagation(); navigate(p.to) }}>
+                          Ver colección
+                        </SliderButton>
                       </div>
                     </div>
                   ))}
@@ -458,14 +472,14 @@ function Landing() {
             onClick={prevSlide}
             aria-label="Anterior"
           >
-            ‹
+            <ChevronLeft className="w-6 h-6" />
           </button>
           <button
             className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow"
             onClick={nextSlide}
             aria-label="Siguiente"
           >
-            ›
+            <ChevronRight className="w-6 h-6" />
           </button>
 
           {/* Bullets */}
@@ -482,7 +496,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* Hero Slider: móvil/tablet chica (1 panel por slide) */}
+      {/* Hero Slider: móvil/tablet (1 panel por slide) */}
       <section
         className="relative overflow-hidden lg:hidden"
         onTouchStart={onTouchStart}
@@ -512,20 +526,23 @@ function Landing() {
                   loading="eager"
                   decoding="async"
                 />
-                <div className="absolute inset-0 bg-black/15" />
+                <div className="absolute inset-0 bg-black/12" />
                 <div
                   role="button"
                   tabIndex={0}
                   onClick={() => navigate(p.to)}
                   onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigate(p.to)}
-                  className="relative z-[1] mb-8 w-[88%] bg-white/95 backdrop-blur-[1px] text-center shadow-xl rounded-md px-5 py-4 cursor-pointer select-none border border-black/5"
+                  className="relative z-[1] mb-7 w-[82%] max-w-[520px] bg-white/95 backdrop-blur-[1px] text-center shadow-xl px-4 py-3 cursor-pointer select-none border border-black/10"
                 >
-                  <h2 className="font-display text-xl sm:text-2xl leading-snug text-foreground">
+                  <h2 className="font-display font-bold text-[20px] sm:text-[22px] leading-snug text-foreground">
                     {p.headline}
                   </h2>
-                  <div className="mt-1.5 text-[12px] tracking-[0.12em] text-muted-foreground">
+                  <div className="mt-1 text-[11px] tracking-[0.12em] text-muted-foreground">
                     {p.sub}
                   </div>
+                  <SliderButton className="mt-2" onClick={(e) => { e.stopPropagation(); navigate(p.to) }}>
+                    Ver colección
+                  </SliderButton>
                 </div>
               </div>
             </div>
@@ -538,14 +555,14 @@ function Landing() {
           onClick={mPrev}
           aria-label="Anterior"
         >
-          ‹
+          <ChevronLeft className="w-6 h-6" />
         </button>
         <button
           className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow"
           onClick={mNext}
           aria-label="Siguiente"
         >
-          ›
+          <ChevronRight className="w-6 h-6" />
         </button>
 
         {/* Bullets */}
@@ -569,7 +586,7 @@ function Landing() {
               Nuestras invitaciones más populares
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Diseños digitales que combinan elegancia, interactividad y personalización.
+              Diseños digitales que combinan elegancia, interactividad y personalización para hacer de tu evento algo inolvidable.
             </p>
           </div>
 
@@ -612,6 +629,7 @@ function Landing() {
 
                     <div className="absolute bottom-2 left-2">
                       <Badge variant="secondary" className="bg-black/70 text-white">
+                        <Globe className="w-3 h-3 mr-1" />
                         Digital
                       </Badge>
                     </div>
@@ -638,7 +656,7 @@ function Landing() {
               Invitaciones para cada ocasión especial
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Desde bodas elegantes hasta cumpleaños infantiles llenos de diversión.
+              Desde bodas elegantes hasta cumpleaños infantiles llenos de diversión. Tenemos el diseño perfecto para tu evento.
             </p>
           </div>
 
@@ -663,7 +681,10 @@ function Landing() {
                     <h3 className="font-display text-xl font-medium text-white mb-2">
                       {category.name}
                     </h3>
-                    <PrimaryButton className="text-sm px-3 py-2">Ver Diseños</PrimaryButton>
+                    <Button variant="secondary" size="sm" className="bg-white/90 text-foreground hover:bg-white">
+                      <Globe className="w-3 h-3 mr-2" />
+                      Ver Diseños
+                    </Button>
                   </div>
                 </div>
               </Card>
@@ -672,7 +693,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* Digital Advantages */}
+      {/* Digital Advantages (con iconos restaurados) */}
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -680,14 +701,16 @@ function Landing() {
               ¿Por qué elegir invitaciones digitales?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Más interactivas, ecológicas y convenientes.
+              La evolución natural de las invitaciones tradicionales. Más interactivas, ecológicas y convenientes.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {digitalFeatures.map((value, index) => (
               <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-sage-100 rounded-full mx-auto mb-4" />
+                <div className="w-16 h-16 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <value.icon className="w-8 h-8 text-sage-400" />
+                </div>
                 <h3 className="font-medium text-foreground mb-2">{value.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{value.description}</p>
               </div>
@@ -701,7 +724,8 @@ function Landing() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="font-display text-3xl font-medium text-foreground mb-4">¡Únete a la revolución digital!</h2>
           <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Suscríbete y recibe plantillas exclusivas, descuentos y tendencias.
+            Suscríbete y recibe plantillas exclusivas, descuentos especiales y las últimas tendencias en invitaciones digitales.
+            ¡Además obtén un 20% de descuento en tu primera invitación!
           </p>
 
           <div className="max-w-md mx-auto space-y-4">
@@ -722,12 +746,68 @@ function Landing() {
               </SelectContent>
             </Select>
             <Input type="date" placeholder="Fecha del evento" className="border-border" />
-            <PrimaryButton className="w-full py-5">Quiero mi descuento del 20%</PrimaryButton>
+            <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Send className="w-4 h-4 mr-2" />
+              Quiero mi descuento del 20%
+            </Button>
           </div>
 
           <p className="text-xs text-muted-foreground mt-4">
-            Puedes darte de baja en cualquier momento.
+            Al suscribirte aceptas recibir emails promocionales. Puedes darte de baja en cualquier momento.
           </p>
+        </div>
+      </section>
+
+      {/* Digital Features Section (con demos e info abajo) */}
+      <section className="py-16 bg-secondary">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="relative overflow-hidden rounded-lg shadow-warm-lg">
+              <img 
+                src={asset('/src/assets/cotton_bird_images/taller_produccion_cotton_bird.webp')} 
+                alt="Diseño de invitaciones digitales"
+                className="block w-full h-full object-cover"
+                onError={(e) => onImgError(e, 'Diseño de invitaciones digitales')}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div className="space-y-8">
+              <div className="mb-8">
+                <h2 className="font-display text-3xl font-medium text-foreground mb-4">
+                  Tecnología al servicio de tus eventos
+                </h2>
+                <p className="text-muted-foreground">
+                  Nuestras invitaciones digitales van más allá del diseño. Son experiencias interactivas que conectan con tus invitados.
+                </p>
+              </div>
+              
+              {digitalFeatures.map((feature, index) => (
+                <div key={index}>
+                  <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
+                </div>
+              ))}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button 
+                  variant="outline" 
+                  className="border-primary text-primary hover:bg-primary/10"
+                  onClick={() => navigate('/demo/boda')}
+                >
+                  <Globe className="w-4 h-4 mr-2" />
+                  Demo Boda
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="border-sage-400 text-sage-400 hover:bg-sage-100"
+                  onClick={() => navigate('/demo/quinceanera')}
+                >
+                  <Crown className="w-4 h-4 mr-2" />
+                  Demo Quinceañera
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -861,9 +941,9 @@ function Landing() {
                         <p className="text-xs text-muted-foreground">{item.category}</p>
                         <p className="text-sm mt-1">{item.price}</p>
                         <div className="mt-2 flex gap-2">
-                          <PrimaryButton className="px-4 py-2" onClick={() => { setWishOpen(false); navigate(`/product/${item.id}`) }}>
+                          <Button size="sm" variant="outline" onClick={() => { setWishOpen(false); navigate(`/product/${item.id}`) }}>
                             Ver
-                          </PrimaryButton>
+                          </Button>
                           <Button size="sm" variant="ghost" onClick={() => removeFav(item.id)}>
                             Quitar
                           </Button>
@@ -876,9 +956,9 @@ function Landing() {
             </div>
 
             <div className="p-4 border-t border-border">
-              <PrimaryButton className="w-full py-3" onClick={() => { setWishOpen(false); navigate('/wishlist') }}>
+              <Button className="w-full" onClick={() => { setWishOpen(false); navigate('/wishlist') }}>
                 Ver lista completa
-              </PrimaryButton>
+              </Button>
             </div>
           </aside>
         </>
