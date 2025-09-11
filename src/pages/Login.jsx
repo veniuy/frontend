@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -10,33 +10,48 @@ import { Sparkles, Mail, Lock } from 'lucide-react';
 import '../App.css';
 
 export function Login() {
-  const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-  });
+  const [formData, setFormData] = useState({ username: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const { login } = useAuth();
+  // Si tu hook soporta Google, lo usamos. Si no, redirigimos a una ruta genérica (/oauth/google)
+  const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const redirectTo = params.get('redirect') || '/dashboard';
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
       await login(formData);
-      navigate('/dashboard');
+      navigate(redirectTo);
     } catch (error) {
-      setError(error.message);
+      setError(error.message || 'No se pudo iniciar sesión');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogle = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      if (typeof loginWithGoogle === 'function') {
+        await loginWithGoogle();
+        navigate(redirectTo);
+      } else {
+        // fallback genérico si aún no implementaste el hook
+        window.location.href = '/oauth/google';
+      }
+    } catch (error) {
+      setError(error.message || 'No se pudo iniciar sesión con Google');
     } finally {
       setLoading(false);
     }
@@ -52,23 +67,32 @@ export function Login() {
               <Sparkles className="h-8 w-8 text-white" />
             </div>
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Inicia Sesión
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Accede a tu cuenta para gestionar tus invitaciones
-          </p>
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">Inicia Sesión</h2>
+          <p className="mt-2 text-sm text-gray-600">Accede a tu cuenta para gestionar tus invitaciones</p>
         </div>
 
-        {/* Formulario */}
+        {/* Card */}
         <Card>
           <CardHeader>
             <CardTitle>Bienvenido de vuelta</CardTitle>
-            <CardDescription>
-              Ingresa tus credenciales para continuar
-            </CardDescription>
+            <CardDescription>Ingresa tus credenciales para continuar</CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Google */}
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full bg-white text-gray-900"
+              onClick={handleGoogle}
+              disabled={loading}
+            >
+              {/* “G” simple para no agregar librerías de iconos extras */}
+              <span className="mr-2 inline-flex items-center justify-center w-5 h-5 rounded-full border border-gray-300">G</span>
+              Acceder con Google
+            </Button>
+
+            <div className="my-4 h-px bg-gray-200" />
+
             <form onSubmit={handleSubmit} className="space-y-4">
               {error && (
                 <Alert variant="destructive">
@@ -110,11 +134,7 @@ export function Login() {
                 </div>
               </div>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={loading}
-              >
+              <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
               </Button>
             </form>
@@ -122,10 +142,7 @@ export function Login() {
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
                 ¿No tienes una cuenta?{' '}
-                <Link
-                  to="/register"
-                  className="font-medium text-blue-600 hover:text-blue-500"
-                >
+                <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
                   Regístrate aquí
                 </Link>
               </p>
@@ -138,4 +155,3 @@ export function Login() {
 }
 
 export default Login;
-
