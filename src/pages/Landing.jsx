@@ -11,7 +11,6 @@ import {
   Heart,
   Send,
   Edit,
-  Sparkles,
   Smartphone,
   Globe,
   Zap,
@@ -237,7 +236,7 @@ function Landing() {
   }
 
   // -----------------------------
-  // HERO SLIDER
+  // HERO SLIDER (2 paneles desktop / 1 móvil)
   // -----------------------------
   const heroPanels = useMemo(() => ([
     {
@@ -303,16 +302,6 @@ function Landing() {
     const dx = touchDeltaX.current
     if (Math.abs(dx) > 50) { if (dx < 0) mNext(); else mPrev() }
   }
-
-  // Botón del slider (blanco/negro) — SOLO para el slider
-  const SliderButton = ({ className = '', children, ...props }) => (
-    <Button
-      {...props}
-      className={`mt-3 bg-white text-black border border-black/15 hover:bg-white/90 px-4 py-2 text-sm ${className}`}
-    >
-      {children}
-    </Button>
-  )
 
   // -----------------------------
   // Render
@@ -407,7 +396,7 @@ function Landing() {
         </div>
       </header>
 
-      {/* Hero Slider: desktop (2 paneles por slide) */}
+      {/* Hero Slider: desktop (2 paneles por slide, sin botón interno) */}
       <section
         className="relative overflow-hidden hidden lg:block"
         onMouseEnter={() => setPaused(true)}
@@ -454,10 +443,6 @@ function Landing() {
                         <div className="mt-1.5 text-[12px] tracking-[0.12em] text-muted-foreground">
                           {p.sub}
                         </div>
-                        {/* Botón del slider: blanco/negro (opcional) */}
-                        <SliderButton onClick={(e) => { e.stopPropagation(); navigate(p.to) }}>
-                          Ver colección
-                        </SliderButton>
                       </div>
                     </div>
                   ))}
@@ -496,7 +481,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* Hero Slider: móvil/tablet (1 panel por slide) */}
+      {/* Hero Slider: móvil/tablet (sin botón interno) */}
       <section
         className="relative overflow-hidden lg:hidden"
         onTouchStart={onTouchStart}
@@ -540,9 +525,6 @@ function Landing() {
                   <div className="mt-1 text-[11px] tracking-[0.12em] text-muted-foreground">
                     {p.sub}
                   </div>
-                  <SliderButton className="mt-2" onClick={(e) => { e.stopPropagation(); navigate(p.to) }}>
-                    Ver colección
-                  </SliderButton>
                 </div>
               </div>
             </div>
@@ -693,7 +675,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* Digital Advantages (con iconos restaurados) */}
+      {/* Digital Advantages (con iconos) */}
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -758,7 +740,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* Digital Features Section (con demos e info abajo) */}
+      {/* Sección informativa con demos (restaurada) */}
       <section className="py-16 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
