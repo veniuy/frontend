@@ -113,7 +113,7 @@ function Landing() {
     []
   )
 
-  // --------- Ventajas digitales (faltaba en tu versión) ---------
+  // --------- Ventajas digitales ---------
   const digitalFeatures = useMemo(() => [
     {
       title: 'Invitaciones Interactivas',
@@ -358,15 +358,15 @@ function Landing() {
               return (
                 <Card
                   key={product.id}
-                  className="group cursor-pointer hover-lift shadow-warm border-border"
+                  className="group cursor-pointer hover-lift shadow-warm overflow-hidden rounded-lg"
                   onClick={() => navigate(`/product/${product.id}`)}
                 >
-                  <div className="aspect-square overflow-hidden rounded-t-lg relative">
-                    {/* IMG sin franjas */}
+                  <div className="aspect-square relative">
+                    {/* IMG sin franjas: contenedor relative + img absoluta + object-cover + block */}
                     <img
                       src={product.image}
                       alt={product.name}
-                      className="absolute inset-0 w-full h-full object-cover block will-change-transform transition-transform duration-300 group-hover:scale-[1.03]"
+                      className="absolute inset-0 w-full h-full object-cover object-center block will-change-transform transition-transform duration-300 group-hover:scale-[1.03]"
                       onError={(e) => onImgError(e, product.name)}
                       loading="lazy"
                       decoding="async"
@@ -427,15 +427,15 @@ function Landing() {
             {categories.map((category) => (
               <Card
                 key={category.id}
-                className="group cursor-pointer hover-lift shadow-warm border-border overflow-hidden"
+                className="group cursor-pointer hover-lift shadow-warm overflow-hidden rounded-lg"
                 onClick={() => navigate('/products')}
               >
-                <div className="aspect-[4/3] overflow-hidden relative">
+                <div className="aspect-[4/3] relative">
                   {/* IMG sin bordes superiores/inferiores */}
                   <img
                     src={category.image}
                     alt={category.name}
-                    className="absolute inset-0 w-full h-full object-cover block transition-transform duration-300 group-hover:scale-[1.03]"
+                    className="absolute inset-0 w-full h-full object-cover object-center block transition-transform duration-300 group-hover:scale-[1.03]"
                     onError={(e) => onImgError(e, category.name)}
                     loading="lazy"
                     decoding="async"
