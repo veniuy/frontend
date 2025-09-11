@@ -20,7 +20,8 @@ import {
   ChevronRight,
   Palette,
   FileImage,
-  Calendar
+  Calendar,
+  X as CloseIcon
 } from 'lucide-react'
 
 import { asset, ph, onImgError } from '../utils/assets';
@@ -32,8 +33,9 @@ function ProductDetail() {
   const [selectedFormat, setSelectedFormat] = useState('small')
   const [selectedPaper, setSelectedPaper] = useState('photo')
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [previewOpen, setPreviewOpen] = useState(false)
 
-  // Mock product data - in real app this would come from API
+  // Mock product data - en app real viene de API
   const product = {
     id: 1,
     name: "Cuadro foto personalizado Jazmín",
@@ -75,24 +77,9 @@ function ProductDetail() {
   }
 
   const relatedProducts = [
-    {
-      id: 2,
-      name: "Cuadro Pequeño mensaje",
-      image: '/src/assets/cotton_bird_images/album_le_petit_quotidien.webp',
-      price: "46,00 €"
-    },
-    {
-      id: 3,
-      name: "Cuadro Floral",
-      image: '/src/assets/cotton_bird_images/categoria_productos_fotos.webp',
-      price: "46,00 €"
-    },
-    {
-      id: 4,
-      name: "Cuadro Pure",
-      image: '/src/assets/cotton_bird_images/novedades_boda.webp',
-      price: "44,00 €"
-    }
+    { id: 2, name: "Cuadro Pequeño mensaje", image: '/src/assets/cotton_bird_images/album_le_petit_quotidien.webp', price: "46,00 €" },
+    { id: 3, name: "Cuadro Floral", image: '/src/assets/cotton_bird_images/categoria_productos_fotos.webp', price: "46,00 €" },
+    { id: 4, name: "Cuadro Pure", image: '/src/assets/cotton_bird_images/novedades_boda.webp', price: "44,00 €" }
   ]
 
   const getCurrentPrice = () => {
@@ -101,16 +88,15 @@ function ProductDetail() {
   }
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => 
-      prev === product.images.length - 1 ? 0 : prev + 1
-    )
+    setCurrentImageIndex((prev) => prev === product.images.length - 1 ? 0 : prev + 1)
   }
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => 
-      prev === 0 ? product.images.length - 1 : prev - 1
-    )
+    setCurrentImageIndex((prev) => prev === 0 ? product.images.length - 1 : prev - 1)
   }
+
+  const openPreview = () => setPreviewOpen(true)
+  const closePreview = () => setPreviewOpen(false)
 
   return (
     <div className="min-h-screen bg-white">
@@ -136,27 +122,19 @@ function ProductDetail() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Breadcrumb>
             <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/">Inicio</BreadcrumbLink>
-              </BreadcrumbItem>
+              <BreadcrumbItem><BreadcrumbLink href="/">Inicio</BreadcrumbLink></BreadcrumbItem>
               <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/products">Foto</BreadcrumbLink>
-              </BreadcrumbItem>
+              <BreadcrumbItem><BreadcrumbLink href="/products">Foto</BreadcrumbLink></BreadcrumbItem>
               <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/products/cuadros">Cuadro foto personalizado</BreadcrumbLink>
-              </BreadcrumbItem>
+              <BreadcrumbItem><BreadcrumbLink href="/products/cuadros">Cuadro foto personalizado</BreadcrumbLink></BreadcrumbItem>
               <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Jazmín</BreadcrumbPage>
-              </BreadcrumbItem>
+              <BreadcrumbItem><BreadcrumbPage>Jazmín</BreadcrumbPage></BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-28 md:pb-8">
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Product Images */}
           <div className="space-y-4">
@@ -173,30 +151,31 @@ function ProductDetail() {
                 </Badge>
               )}
               
-              {/* Navigation arrows */}
+              {/* Flechas */}
               <button 
                 onClick={prevImage}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg"
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg"
+                aria-label="Anterior"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <button 
                 onClick={nextImage}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg"
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg"
+                aria-label="Siguiente"
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
             </div>
             
-            {/* Thumbnail images */}
+            {/* Thumbnails */}
             <div className="flex space-x-2">
               {product.images.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentImageIndex(index)}
-                  className={`w-20 h-20 rounded-lg overflow-hidden border-2 ${
-                    currentImageIndex === index ? 'border-pink-600' : 'border-gray-200'
-                  }`}
+                  className={`w-20 h-20 rounded-lg overflow-hidden border-2 ${currentImageIndex === index ? 'border-pink-600' : 'border-gray-200'}`}
+                  aria-label={`Imagen ${index + 1}`}
                 >
                   <img 
                     src={image} 
@@ -213,27 +192,19 @@ function ProductDetail() {
           <div className="space-y-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                {product.badge && (
-                  <Badge className="bg-pink-600 text-white">{product.badge}</Badge>
-                )}
+                {product.badge && <Badge className="bg-pink-600 text-white">{product.badge}</Badge>}
                 <span className="text-gray-600">·</span>
                 <span className="text-gray-600">{product.category}</span>
               </div>
               
-              <h1 className="text-3xl font-serif font-medium text-gray-900 mb-4">
-                {product.name}
-              </h1>
+              <h1 className="text-3xl font-serif font-medium text-gray-900 mb-4">{product.name}</h1>
               
               <div className="flex items-center mb-4">
                 <div className="flex items-center">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-5 h-5 ${
-                        i < Math.floor(product.rating) 
-                          ? 'text-yellow-400 fill-current' 
-                          : 'text-gray-300'
-                      }`}
+                      className={`w-5 h-5 ${i < Math.floor(product.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
                     />
                   ))}
                 </div>
@@ -256,20 +227,11 @@ function ProductDetail() {
                   Cantidad: {quantity} ({getCurrentPrice().toFixed(2)} €)
                 </label>
                 <div className="flex items-center space-x-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    disabled={quantity <= 1}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setQuantity(Math.max(1, quantity - 1))} disabled={quantity <= 1}>
                     <Minus className="w-4 h-4" />
                   </Button>
                   <span className="w-12 text-center">{quantity}</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setQuantity(quantity + 1)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setQuantity(quantity + 1)}>
                     <Plus className="w-4 h-4" />
                   </Button>
                 </div>
@@ -282,9 +244,7 @@ function ProductDetail() {
                   Papel: {product.papers.find(p => p.id === selectedPaper)?.name} ({product.papers.find(p => p.id === selectedPaper)?.weight})
                 </label>
                 <Select value={selectedPaper} onValueChange={setSelectedPaper}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {product.papers.map((paper) => (
                       <SelectItem key={paper.id} value={paper.id}>
@@ -301,9 +261,7 @@ function ProductDetail() {
                   Formato: {product.formats.find(f => f.id === selectedFormat)?.name} ({product.formats.find(f => f.id === selectedFormat)?.size})
                 </label>
                 <Select value={selectedFormat} onValueChange={setSelectedFormat}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {product.formats.map((format) => (
                       <SelectItem key={format.id} value={format.id}>
@@ -315,16 +273,12 @@ function ProductDetail() {
               </div>
             </div>
 
-            {/* Price and CTA */}
+            {/* Price and CTA (desktop / tablet) */}
             <div className="border-t pt-6">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p className="text-3xl font-bold text-gray-900">
-                    {getCurrentPrice().toFixed(2)} €
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    / unidad a {(getCurrentPrice() / quantity).toFixed(2)} €
-                  </p>
+                  <p className="text-3xl font-bold text-gray-900">{getCurrentPrice().toFixed(2)} €</p>
+                  <p className="text-sm text-gray-600">/ unidad a {(getCurrentPrice() / quantity).toFixed(2)} €</p>
                 </div>
                 <Heart className="w-6 h-6 text-gray-400 hover:text-pink-600 cursor-pointer" />
               </div>
@@ -332,6 +286,7 @@ function ProductDetail() {
               <Button 
                 size="lg" 
                 className="w-full bg-green-700 hover:bg-green-800 text-white mb-4"
+                onClick={() => navigate(`/login?redirect=/personalizar/${id || product.id}`)}
               >
                 <Palette className="w-5 h-5 mr-2" />
                 PERSONALIZAR
@@ -357,13 +312,9 @@ function ProductDetail() {
             {/* Product Details */}
             <Accordion type="single" collapsible className="border-t pt-6">
               <AccordionItem value="description">
-                <AccordionTrigger className="text-left">
-                  Descripción
-                </AccordionTrigger>
+                <AccordionTrigger className="text-left">Descripción</AccordionTrigger>
                 <AccordionContent>
-                  <p className="text-gray-600 leading-relaxed mb-4">
-                    {product.description}
-                  </p>
+                  <p className="text-gray-600 leading-relaxed mb-4">{product.description}</p>
                   <ul className="space-y-2">
                     {product.features.map((feature, index) => (
                       <li key={index} className="flex items-center text-sm text-gray-600">
@@ -376,9 +327,7 @@ function ProductDetail() {
               </AccordionItem>
 
               <AccordionItem value="control">
-                <AccordionTrigger className="text-left">
-                  Opción control
-                </AccordionTrigger>
+                <AccordionTrigger className="text-left">Opción control</AccordionTrigger>
                 <AccordionContent>
                   <p className="text-gray-600 leading-relaxed">
                     Con esta opción nuestros diseñadores profesionales revisarán tu pedido antes de la impresión 
@@ -389,9 +338,7 @@ function ProductDetail() {
               </AccordionItem>
 
               <AccordionItem value="shipping">
-                <AccordionTrigger className="text-left">
-                  Envío y devoluciones
-                </AccordionTrigger>
+                <AccordionTrigger className="text-left">Envío y devoluciones</AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-4 text-sm text-gray-600">
                     <div className="flex items-start">
@@ -424,9 +371,7 @@ function ProductDetail() {
 
         {/* Related Products */}
         <div className="mt-16">
-          <h2 className="text-2xl font-serif font-medium text-gray-900 mb-8">
-            Productos relacionados
-          </h2>
+          <h2 className="text-2xl font-serif font-medium text-gray-900 mb-8">Productos relacionados</h2>
           <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
             {relatedProducts.map((relatedProduct) => (
               <Card key={relatedProduct.id} className="group cursor-pointer hover:shadow-lg transition-all duration-300">
@@ -439,9 +384,7 @@ function ProductDetail() {
                   />
                 </div>
                 <CardContent className="p-4">
-                  <h3 className="font-medium text-gray-900 mb-2 line-clamp-2">
-                    {relatedProduct.name}
-                  </h3>
+                  <h3 className="font-medium text-gray-900 mb-2 line-clamp-2">{relatedProduct.name}</h3>
                   <p className="font-semibold text-gray-900">{relatedProduct.price}</p>
                 </CardContent>
               </Card>
@@ -449,6 +392,58 @@ function ProductDetail() {
           </div>
         </div>
       </div>
+
+      {/* -------- Barra fija inferior SOLO móvil -------- */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-gray-200 md:hidden">
+        <div className="max-w-7xl mx-auto px-4 py-3">
+          <div className="grid grid-cols-2 gap-3">
+            <Button variant="outline" className="w-full" onClick={openPreview}>
+              Visualizar
+            </Button>
+            <Button className="w-full" onClick={() => navigate(`/login?redirect=/personalizar/${id || product.id}`)}>
+              Personalizar
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* -------- Lightbox de Visualización -------- */}
+      {previewOpen && (
+        <>
+          <div className="fixed inset-0 z-50 bg-black/70" onClick={closePreview} />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="relative w-full max-w-4xl aspect-[4/3] bg-black rounded-lg overflow-hidden">
+              <img
+                src={product.images[currentImageIndex]}
+                alt={`Preview ${currentImageIndex + 1}`}
+                className="absolute inset-0 w-full h-full object-contain"
+                onError={(e) => onImgError(e, product.name)}
+              />
+              <button
+                className="absolute top-3 right-3 p-2 rounded-full bg-white/90 hover:bg-white shadow"
+                onClick={closePreview}
+                aria-label="Cerrar"
+              >
+                <CloseIcon className="w-5 h-5" />
+              </button>
+              <button
+                className="absolute left-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 hover:bg-white"
+                onClick={prevImage}
+                aria-label="Anterior"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/90 hover:bg-white"
+                onClick={nextImage}
+                aria-label="Siguiente"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
