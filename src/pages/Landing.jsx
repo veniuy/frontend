@@ -91,12 +91,12 @@ function Landing() {
   // -----------------------------
   const categories = useMemo(
     () => [
-      { id: 'cat-bodas', name: 'Bodas', image: asset('/src/assets/cotton_bird_images/categoria_boda_grid.webp') },
-      { id: 'cat-quince', name: 'Quinceañeras', image: asset('/src/assets/cotton_bird_images/categoria_bebes_ninos.webp') },
-      { id: 'cat-infantiles', name: 'Cumpleaños Infantiles', image: asset('/src/assets/cotton_bird_images/categoria_cumpleanos.webp') },
-      { id: 'cat-corp', name: 'Eventos Corporativos', image: asset('/src/assets/cotton_bird_images/categoria_productos_fotos.webp') },
-      { id: 'cat-baby', name: 'Baby Shower', image: asset('/src/assets/cotton_bird_images/categoria_bautizo.webp') },
-      { id: 'cat-grad', name: 'Graduaciones', image: asset('/src/assets/cotton_bird_images/categoria_invitaciones_digitales.webp') }
+      { id: 'cat-bodas', slug: 'boda',          href: '/categorias/boda',          name: 'Bodas',                 image: asset('/src/assets/cotton_bird_images/categoria_boda_grid.webp') },
+      { id: 'cat-quince', slug: 'quinceaneras', href: '/categorias/quinceaneras',  name: 'Quinceañeras',          image: asset('/src/assets/cotton_bird_images/categoria_bebes_ninos.webp') },
+      { id: 'cat-infant', slug: 'infantiles',   href: '/categorias/infantiles',    name: 'Cumpleaños Infantiles', image: asset('/src/assets/cotton_bird_images/categoria_cumpleanos.webp') },
+      { id: 'cat-baby',   slug: 'bautizo',      href: '/categorias/bautizo',       name: 'Baby Shower / Bautizo', image: asset('/src/assets/cotton_bird_images/categoria_bautizo.webp') },
+      { id: 'cat-corp',   slug: 'corporativos', href: '/categorias/corporativos',  name: 'Eventos Corporativos',  image: asset('/src/assets/cotton_bird_images/categoria_productos_fotos.webp') },
+      { id: 'cat-grad',   slug: 'graduaciones', href: '/categorias/graduaciones',  name: 'Graduaciones',          image: asset('/src/assets/cotton_bird_images/categoria_invitaciones_digitales.webp') }
     ],
     []
   )
@@ -244,28 +244,28 @@ function Landing() {
       bg: asset('/src/assets/cotton_bird_images/categoria_boda_grid.webp'),
       headline: 'Una papelería de boda única',
       sub: '› DESCUBRE LAS INVITACIONES',
-      to: '/products?category=Bodas',
+      to: '/categorias/boda',
     },
     {
       key: 'quince',
       bg: asset('/src/assets/cotton_bird_images/categoria_bebes_ninos.webp'),
       headline: '¡Quinceañeras que brillan!',
       sub: '› DESCUBRE NUESTRA COLECCIÓN',
-      to: '/products?category=Quinceañeras',
+      to: '/categorias/quinceaneras',
     },
     {
       key: 'infantiles',
       bg: asset('/src/assets/cotton_bird_images/categoria_cumpleanos.webp'),
       headline: 'Cumpleaños infantiles inolvidables',
       sub: '› VER DISEÑOS',
-      to: '/products?category=Cumpleaños Infantiles',
+      to: '/categorias/infantiles',
     },
     {
       key: 'baby',
       bg: asset('/src/assets/cotton_bird_images/categoria_bautizo.webp'),
       headline: '¡Para el bautizo de tu peque!',
       sub: '› DESCUBRE NUESTRA COLECCIÓN',
-      to: '/products?category=Baby Shower',
+      to: '/categorias/bautizo',
     }
   ]), [])
 
@@ -308,13 +308,41 @@ function Landing() {
   // -----------------------------
   const NavLinks = ({ onClick }) => (
     <>
-      <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" onClick={onClick} href="#bodas">Bodas</a>
-      <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" onClick={onClick} href="#quinceaneras">Quinceañeras</a>
-      <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" onClick={onClick} href="#infantiles">Cumpleaños Infantiles</a>
-      <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" onClick={onClick} href="#baby-shower">Baby Shower</a>
-      <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" onClick={onClick} href="#corporativos">Eventos Corporativos</a>
-      <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" onClick={onClick} href="#graduaciones">Graduaciones</a>
-      <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" onClick={onClick} href="#plantillas">Todas las Plantillas</a>
+      <a
+        className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+        href="/categorias/boda"
+        onClick={(e) => { e.preventDefault(); onClick?.(); navigate('/categorias/boda') }}
+      >Bodas</a>
+      <a
+        className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+        href="/categorias/quinceaneras"
+        onClick={(e) => { e.preventDefault(); onClick?.(); navigate('/categorias/quinceaneras') }}
+      >Quinceañeras</a>
+      <a
+        className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+        href="/categorias/infantiles"
+        onClick={(e) => { e.preventDefault(); onClick?.(); navigate('/categorias/infantiles') }}
+      >Cumpleaños Infantiles</a>
+      <a
+        className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+        href="/categorias/bautizo"
+        onClick={(e) => { e.preventDefault(); onClick?.(); navigate('/categorias/bautizo') }}
+      >Baby Shower</a>
+      <a
+        className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+        href="/categorias/corporativos"
+        onClick={(e) => { e.preventDefault(); onClick?.(); navigate('/categorias/corporativos') }}
+      >Eventos Corporativos</a>
+      <a
+        className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+        href="/categorias/graduaciones"
+        onClick={(e) => { e.preventDefault(); onClick?.(); navigate('/categorias/graduaciones') }}
+      >Graduaciones</a>
+      <a
+        className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+        href="/products"
+        onClick={(e) => { e.preventDefault(); onClick?.(); navigate('/products') }}
+      >Todas las Plantillas</a>
     </>
   )
 
@@ -382,14 +410,14 @@ function Landing() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center justify-center space-x-8 py-4 border-t border-border">
-            <NavLinks onClick={() => navigate('/products')} />
+            <NavLinks onClick={() => { /* noop for desktop */ }} />
           </nav>
 
           {/* Mobile Navigation (desplegable) */}
           {mobileMenuOpen && (
             <div className="md:hidden border-t border-border py-2 animate-in fade-in slide-in-from-top-2">
               <div className="flex flex-col">
-                <NavLinks onClick={() => { setMobileMenuOpen(false); navigate('/products') }} />
+                <NavLinks onClick={() => setMobileMenuOpen(false)} />
               </div>
             </div>
           )}
@@ -630,7 +658,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* Categories */}
+      {/* Categories -> ahora navega a /categorias/... */}
       <section className="py-16 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -647,7 +675,7 @@ function Landing() {
               <Card
                 key={category.id}
                 className="group cursor-pointer hover-lift shadow-warm overflow-hidden rounded-lg p-0"
-                onClick={() => navigate('/products')}
+                onClick={() => navigate(category.href)}
               >
                 <div className="aspect-[4/3] relative">
                   <img
@@ -663,7 +691,12 @@ function Landing() {
                     <h3 className="font-display text-xl font-medium text-white mb-2">
                       {category.name}
                     </h3>
-                    <Button variant="secondary" size="sm" className="bg-white/90 text-foreground hover:bg-white">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="bg-white/90 text-foreground hover:bg-white"
+                      onClick={(e) => { e.stopPropagation(); navigate(category.href) }}
+                    >
                       <Globe className="w-3 h-3 mr-2" />
                       Ver Diseños
                     </Button>
@@ -740,7 +773,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* Sección informativa con demos (restaurada) */}
+      {/* Sección informativa con demos */}
       <section className="py-16 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -812,13 +845,13 @@ function Landing() {
             <div>
               <h4 className="font-medium mb-4">Nuestros Servicios</h4>
               <ul className="space-y-2 text-sm text-muted">
-                <li><a href="#" className="hover:text-background transition-colors">Invitaciones de Boda</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Quinceañeras</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Cumpleaños Infantiles</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Baby Shower</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Eventos Corporativos</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Graduaciones</a></li>
-                <li><a href="#" className="hover:text-background transition-colors">Diseño Personalizado</a></li>
+                <li><a href="/categorias/boda" className="hover:text-background transition-colors">Invitaciones de Boda</a></li>
+                <li><a href="/categorias/quinceaneras" className="hover:text-background transition-colors">Quinceañeras</a></li>
+                <li><a href="/categorias/infantiles" className="hover:text-background transition-colors">Cumpleaños Infantiles</a></li>
+                <li><a href="/categorias/bautizo" className="hover:text-background transition-colors">Baby Shower</a></li>
+                <li><a href="/categorias/corporativos" className="hover:text-background transition-colors">Eventos Corporativos</a></li>
+                <li><a href="/categorias/graduaciones" className="hover:text-background transition-colors">Graduaciones</a></li>
+                <li><a href="/products" className="hover:text-background transition-colors">Diseño Personalizado</a></li>
               </ul>
             </div>
 
@@ -1004,7 +1037,7 @@ function Landing() {
                   )}
                 </div>
 
-                {/* Categorías */}
+                {/* Categorías -> ahora van a /categorias/... */}
                 <div className="p-3 border-t border-border">
                   <h4 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Categorías</h4>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -1012,7 +1045,7 @@ function Landing() {
                       <button
                         key={c.id}
                         className="relative h-20 rounded overflow-hidden border border-border group"
-                        onClick={() => { closeSearch(); navigate(`/products?category=${encodeURIComponent(c.name)}`) }}
+                        onClick={() => { closeSearch(); navigate(c.href) }}
                       >
                         <img
                           src={c.image}
