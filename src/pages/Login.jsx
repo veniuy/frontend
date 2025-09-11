@@ -72,7 +72,6 @@ export function Login() {
         {/* Marca */}
         <div className="text-center">
           <div className="font-display text-4xl font-black tracking-wide text-foreground">Venite</div>
-          <h2 className="mt-4 text-2xl font-semibold text-foreground">Inicia Sesión</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Accede a tu cuenta para gestionar tus invitaciones
           </p>
