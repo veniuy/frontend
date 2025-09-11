@@ -11,7 +11,6 @@ import {
   Grid3X3,
   List,
   Heart,
-  Star,
   Smartphone,
   Globe,
   Zap,
@@ -22,7 +21,7 @@ import {
   Twitter
 } from 'lucide-react'
 
-import { asset, ph, onImgError } from '../utils/assets';
+import { asset, onImgError } from '../utils/assets';
 
 function Products() {
   const navigate = useNavigate()
@@ -49,8 +48,6 @@ function Products() {
       image: asset('/src/assets/cotton_bird_images/categoria_boda_grid.webp'),
       price: "Desde 25,00 €",
       originalPrice: "35,00 €",
-      rating: 4.9,
-      reviews: 127,
       badge: "Más Popular",
       features: ["Música de fondo", "Mapa interactivo", "RSVP", "Galería de fotos"],
       description: "Diseño elegante con detalles dorados, perfecto para bodas sofisticadas."
@@ -61,8 +58,6 @@ function Products() {
       category: "Quinceañeras",
       image: asset('/src/assets/cotton_bird_images/categoria_bebes_ninos.webp'),
       price: "Desde 20,00 €",
-      rating: 4.8,
-      reviews: 89,
       badge: "Nuevo",
       features: ["Animaciones", "Música personalizada", "Cuenta regresiva", "RSVP"],
       description: "Diseño mágico con animaciones especiales para quinceañeras."
@@ -73,8 +68,6 @@ function Products() {
       category: "Cumpleaños Infantiles",
       image: asset('/src/assets/cotton_bird_images/categoria_cumpleanos.webp'),
       price: "Desde 15,00 €",
-      rating: 4.7,
-      reviews: 156,
       badge: null,
       features: ["Juegos interactivos", "Música divertida", "Animaciones", "Lista de regalos"],
       description: "Colorida y divertida, perfecta para cumpleaños infantiles llenos de alegría."
@@ -85,8 +78,6 @@ function Products() {
       category: "Baby Shower",
       image: asset('/src/assets/cotton_bird_images/categoria_bautizo.webp'),
       price: "Desde 18,00 €",
-      rating: 4.9,
-      reviews: 73,
       badge: null,
       features: ["Música suave", "Galería de fotos", "Lista de regalos", "RSVP"],
       description: "Diseño tierno y delicado para celebrar la llegada del bebé."
@@ -97,8 +88,6 @@ function Products() {
       category: "Eventos Corporativos",
       image: asset('/src/assets/cotton_bird_images/categoria_productos_fotos.webp'),
       price: "Desde 30,00 €",
-      rating: 4.6,
-      reviews: 45,
       badge: null,
       features: ["Diseño profesional", "Agenda del evento", "Networking", "RSVP"],
       description: "Diseño profesional y sofisticado para eventos empresariales."
@@ -109,8 +98,6 @@ function Products() {
       category: "Graduaciones",
       image: asset('/src/assets/cotton_bird_images/categoria_invitaciones_digitales.webp'),
       price: "Desde 22,00 €",
-      rating: 4.8,
-      reviews: 92,
       badge: null,
       features: ["Música inspiradora", "Galería de logros", "Mensaje personalizado", "RSVP"],
       description: "Celebra este logro importante con un diseño que refleje el éxito."
@@ -121,8 +108,6 @@ function Products() {
       category: "Bodas",
       image: asset('/src/assets/cotton_bird_images/album_le_petit_quotidien.webp'),
       price: "Desde 28,00 €",
-      rating: 4.7,
-      reviews: 68,
       badge: null,
       features: ["Diseño limpio", "Tipografía elegante", "Mapa", "RSVP"],
       description: "Elegancia en la simplicidad, perfecto para bodas modernas."
@@ -133,8 +118,6 @@ function Products() {
       category: "Quinceañeras",
       image: asset('/src/assets/cotton_bird_images/invitacion_creacion_propia.webp'),
       price: "Desde 24,00 €",
-      rating: 4.9,
-      reviews: 134,
       badge: "Premium",
       features: ["Corona animada", "Música de vals", "Protocolo", "RSVP"],
       description: "Diseño real con detalles de corona y elementos de princesa."
@@ -143,25 +126,20 @@ function Products() {
 
   const filteredProducts = products.filter(product => {
     const matchesCategory = selectedCategory === 'Todas' || product.category === selectedCategory
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.description.toLowerCase().includes(searchTerm.toLowerCase())
+    const q = searchTerm.toLowerCase()
+    const matchesSearch =
+      product.name.toLowerCase().includes(q) ||
+      product.description.toLowerCase().includes(q)
     return matchesCategory && matchesSearch
   })
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
+    const num = (s) => parseFloat(s.replace(/[^\d,]/g, '').replace(',', '.'))
     switch (sortBy) {
-      case 'price-low':
-        return parseFloat(a.price.replace(/[^\d,]/g, '').replace(',', '.')) - 
-               parseFloat(b.price.replace(/[^\d,]/g, '').replace(',', '.'))
-      case 'price-high':
-        return parseFloat(b.price.replace(/[^\d,]/g, '').replace(',', '.')) - 
-               parseFloat(a.price.replace(/[^\d,]/g, '').replace(',', '.'))
-      case 'rating':
-        return b.rating - a.rating
-      case 'newest':
-        return b.id - a.id
-      default: // popular
-        return b.reviews - a.reviews
+      case 'price-low':  return num(a.price) - num(b.price)
+      case 'price-high': return num(b.price) - num(a.price)
+      case 'newest':     return b.id - a.id
+      default:           return 0 // popular (sin ratings)
     }
   })
 
@@ -250,7 +228,6 @@ function Products() {
                 <SelectContent>
                   <SelectItem value="popular">Más Popular</SelectItem>
                   <SelectItem value="newest">Más Nuevo</SelectItem>
-                  <SelectItem value="rating">Mejor Valorado</SelectItem>
                   <SelectItem value="price-low">Precio: Menor a Mayor</SelectItem>
                   <SelectItem value="price-high">Precio: Mayor a Menor</SelectItem>
                 </SelectContent>
@@ -323,14 +300,6 @@ function Products() {
                   </div>
 
                   <CardContent className="p-4">
-                    <div className="flex items-center mb-2">
-                      <div className="flex items-center">
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-sm text-muted-foreground ml-1">
-                          {product.rating} ({product.reviews})
-                        </span>
-                      </div>
-                    </div>
                     <h3 className="font-medium text-foreground mb-1 line-clamp-2">
                       {product.name}
                     </h3>
@@ -344,7 +313,7 @@ function Products() {
                           </span>
                         )}
                       </div>
-                      {/* (se quitó el botón "Ver" para un look más minimalista) */}
+                      {/* Minimalista: sin botón "Ver" */}
                     </div>
                   </CardContent>
                 </Card>
@@ -378,20 +347,11 @@ function Products() {
                       </div>
                       
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="min-w-0">
-                            <h3 className="font-semibold text-foreground text-lg mb-1 line-clamp-1">
-                              {product.name}
-                            </h3>
-                            <p className="text-muted-foreground text-sm mb-2">{product.category}</p>
-                            <div className="flex items-center mb-3">
-                              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                              <span className="text-sm text-muted-foreground ml-1">
-                                {product.rating} ({product.reviews} reseñas)
-                              </span>
-                            </div>
-                          </div>
-                          {/* (se quitaron iconos/acciones para un look más limpio) */}
+                        <div className="min-w-0 mb-2">
+                          <h3 className="font-semibold text-foreground text-lg mb-1 line-clamp-1">
+                            {product.name}
+                          </h3>
+                          <p className="text-muted-foreground text-sm mb-2">{product.category}</p>
                         </div>
                         
                         <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
@@ -415,7 +375,7 @@ function Products() {
                               </span>
                             )}
                           </div>
-                          {/* (se quitaron “Vista previa” y “Personalizar”) */}
+                          {/* Minimalista: sin acciones adicionales */}
                         </div>
                       </div>
                     </div>
@@ -457,7 +417,7 @@ function Products() {
           <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
             Nuestro equipo de diseñadores puede crear una invitación 100% personalizada para tu evento especial.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justificenter">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg"
               className="bg-primary hover:bg-primary/90 text-primary-foreground"
@@ -467,43 +427,23 @@ function Products() {
               Solicitar Diseño Personalizado
             </Button>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <Button 
-                size="lg"
-                variant="outline"
-                onClick={() => navigate('/demo/black')}
-              >
+              <Button size="lg" variant="outline" onClick={() => navigate('/demo/black')}>
                 <Globe className="w-4 h-4 mr-2" />
                 Demo Black
               </Button>
-              <Button 
-                size="lg"
-                variant="outline"
-                onClick={() => navigate('/demo/premium')}
-              >
+              <Button size="lg" variant="outline" onClick={() => navigate('/demo/premium')}>
                 <Heart className="w-4 h-4 mr-2" />
                 Demo Premium
               </Button>
-              <Button 
-                size="lg"
-                variant="outline"
-                onClick={() => navigate('/demo/clasica')}
-              >
+              <Button size="lg" variant="outline" onClick={() => navigate('/demo/clasica')}>
                 <Leaf className="w-4 h-4 mr-2" />
                 Demo Clásica
               </Button>
-              <Button 
-                size="lg"
-                variant="outline"
-                onClick={() => navigate('/demo/boda')}
-              >
+              <Button size="lg" variant="outline" onClick={() => navigate('/demo/boda')}>
                 <Heart className="w-4 h-4 mr-2" />
                 Demo Romántica
               </Button>
-              <Button 
-                size="lg"
-                variant="outline"
-                onClick={() => navigate('/demo/quinceanera')}
-              >
+              <Button size="lg" variant="outline" onClick={() => navigate('/demo/quinceanera')}>
                 <Crown className="w-4 h-4 mr-2" />
                 Demo Quinceañera
               </Button>
