@@ -8,19 +8,18 @@ import { Input } from '../components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { 
   Search,
-  Filter,
   Grid3X3,
   List,
   Heart,
   Star,
-  ArrowUpDown,
   Smartphone,
   Globe,
-  Play,
-  Eye,
   Zap,
   Crown,
-  Leaf
+  Leaf,
+  Instagram,
+  Facebook,
+  Twitter
 } from 'lucide-react'
 
 import { asset, ph, onImgError } from '../utils/assets';
@@ -172,13 +171,34 @@ function Products() {
       <header className="bg-background border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="font-display text-2xl font-medium text-foreground tracking-wide cursor-pointer" onClick={() => navigate('/')}>
+            <div
+              className="font-display text-2xl font-medium text-foreground tracking-wide cursor-pointer"
+              onClick={() => navigate('/')}
+            >
               Venite
             </div>
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-muted-foreground hover:text-primary transition-colors">Inicio</a>
-              <a href="/faq" className="text-muted-foreground hover:text-primary transition-colors">FAQ</a>
-              <a href="/contact" className="text-muted-foreground hover:text-primary transition-colors">Contacto</a>
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                Inicio
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/faq')}
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                FAQ
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/contact')}
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                Contacto
+              </button>
             </nav>
           </div>
         </div>
@@ -200,7 +220,7 @@ function Products() {
           <div className="max-w-4xl mx-auto">
             <div className="flex flex-col md:flex-row gap-4 mb-6">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
                 <Input
                   type="text"
                   placeholder="Buscar plantillas..."
@@ -276,7 +296,7 @@ function Products() {
                   onClick={() => navigate(`/product/${product.id}`)}
                 >
                   <div className="relative aspect-square">
-                    {/* IMG sin franjas: absoluta + object-cover + block */}
+                    {/* Imagen sin franjas: posición absoluta + object-cover */}
                     <img 
                       src={product.image} 
                       alt={product.name}
@@ -290,14 +310,6 @@ function Products() {
                         {product.badge}
                       </Badge>
                     )}
-                    <div className="absolute top-2 right-2 flex space-x-2">
-                      <Button size="sm" variant="secondary" className="w-8 h-8 p-0 bg-white/90" onClick={(e) => e.stopPropagation()}>
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button size="sm" variant="secondary" className="w-8 h-8 p-0 bg-white/90" onClick={(e) => e.stopPropagation()}>
-                        <Heart className="w-4 h-4" />
-                      </Button>
-                    </div>
                     <div className="absolute bottom-2 left-2 flex space-x-1">
                       <Badge variant="secondary" className="bg-black/70 text-white text-xs">
                         <Globe className="w-3 h-3 mr-1" />
@@ -332,10 +344,7 @@ function Products() {
                           </span>
                         )}
                       </div>
-                      <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground" onClick={(e) => e.stopPropagation()}>
-                        <Smartphone className="w-3 h-3 mr-1" />
-                        Ver
-                      </Button>
+                      {/* (se quitó el botón "Ver" para un look más minimalista) */}
                     </div>
                   </CardContent>
                 </Card>
@@ -352,7 +361,7 @@ function Products() {
                   <CardContent className="p-6">
                     <div className="flex gap-6">
                       <div className="relative w-48 h-32 rounded-lg overflow-hidden flex-shrink-0">
-                        {/* IMG sin franjas en vista lista */}
+                        {/* Imagen sin franjas en vista lista */}
                         <img 
                           src={product.image} 
                           alt={product.name}
@@ -382,7 +391,7 @@ function Products() {
                               </span>
                             </div>
                           </div>
-                          <Heart className="w-5 h-5 text-muted-foreground hover:text-primary cursor-pointer flex-shrink-0" />
+                          {/* (se quitaron iconos/acciones para un look más limpio) */}
                         </div>
                         
                         <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
@@ -406,16 +415,7 @@ function Products() {
                               </span>
                             )}
                           </div>
-                          <div className="flex space-x-2">
-                            <Button variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>
-                              <Eye className="w-4 h-4 mr-2" />
-                              Vista previa
-                            </Button>
-                            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" onClick={(e) => e.stopPropagation()}>
-                              <Smartphone className="w-4 h-4 mr-2" />
-                              Personalizar
-                            </Button>
-                          </div>
+                          {/* (se quitaron “Vista previa” y “Personalizar”) */}
                         </div>
                       </div>
                     </div>
@@ -511,6 +511,65 @@ function Products() {
           </div>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="bg-foreground text-background py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <h3 className="font-display text-xl font-medium mb-4">Venite</h3>
+              <p className="text-muted text-sm mb-4">invitaciones digitales que enamoran</p>
+              <div className="flex space-x-4">
+                <Instagram className="w-5 h-5 text-muted hover:text-background cursor-pointer transition-colors" />
+                <Facebook className="w-5 h-5 text-muted hover:text-background cursor-pointer transition-colors" />
+                <Twitter className="w-5 h-5 text-muted hover:text-background cursor-pointer transition-colors" />
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-medium mb-4">Nuestros Servicios</h4>
+              <ul className="space-y-2 text-sm text-muted">
+                <li><button type="button" onClick={() => navigate('/products?c=Bodas')} className="hover:text-background transition-colors">Invitaciones de Boda</button></li>
+                <li><button type="button" onClick={() => navigate('/products?c=Quinceañeras')} className="hover:text-background transition-colors">Quinceañeras</button></li>
+                <li><button type="button" onClick={() => navigate('/products?c=Cumpleaños')} className="hover:text-background transition-colors">Cumpleaños Infantiles</button></li>
+                <li><button type="button" onClick={() => navigate('/products?c=Baby%20Shower')} className="hover:text-background transition-colors">Baby Shower</button></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-medium mb-4">Soporte y Ayuda</h4>
+              <ul className="space-y-2 text-sm text-muted">
+                <li><button type="button" onClick={() => navigate('/faq')} className="hover:text-background transition-colors">Preguntas frecuentes</button></li>
+                <li><button type="button" onClick={() => navigate('/contact')} className="hover:text-background transition-colors">Contacto</button></li>
+                <li><button type="button" onClick={() => navigate('/support')} className="hover:text-background transition-colors">Soporte técnico</button></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-medium mb-4">Empresa</h4>
+              <ul className="space-y-2 text-sm text-muted">
+                <li><button type="button" onClick={() => navigate('/about')} className="hover:text-background transition-colors">Sobre nosotros</button></li>
+                <li><button type="button" onClick={() => navigate('/terms')} className="hover:text-background transition-colors">Términos de servicio</button></li>
+                <li><button type="button" onClick={() => navigate('/privacy')} className="hover:text-background transition-colors">Política de privacidad</button></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-muted mt-12 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <p className="text-sm text-muted">© 2024 Venite. Todos los derechos reservados.</p>
+              <div className="flex items-center space-x-4 mt-4 md:mt-0">
+                <span className="text-sm text-muted">Métodos de pago:</span>
+                <div className="flex space-x-2">
+                  <div className="w-8 h-5 bg-muted rounded text-xs flex items-center justify-center text-foreground">VISA</div>
+                  <div className="w-8 h-5 bg-muted rounded text-xs flex items-center justify-center text-foreground">MC</div>
+                  <div className="w-8 h-5 bg-muted rounded text-xs flex items-center justify-center text-foreground">PP</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
