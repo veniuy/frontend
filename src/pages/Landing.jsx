@@ -9,12 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { CartIcon, ShoppingCartSidebar } from '../components/ShoppingCart'
 import {
   Heart,
-  Send,
-  Edit,
-  Sparkles,
-  Smartphone,
-  Globe,
-  Zap,
   Search,
   User,
   Menu,
@@ -24,9 +18,6 @@ import {
   Twitter,
   X as CloseIcon,
   Trash2,
-  Crown,
-  ChevronLeft,
-  ChevronRight
 } from 'lucide-react'
 
 import { asset, onImgError } from '../utils/assets'
@@ -61,6 +52,31 @@ function Landing() {
   const toggleFav = useCallback((id) => {
     setWishlist((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
   }, [])
+
+  // -----------------------------
+  // Carrito: ocultar icono si no hay items
+  // -----------------------------
+  const [cartCount, setCartCount] = useState(0)
+  const readCartCount = useCallback(() => {
+    try {
+      const rawCount = localStorage.getItem('venite_cart_count')
+      const rawItems = localStorage.getItem('venite_cart_items')
+      if (rawCount != null) return Number(rawCount) || 0
+      if (rawItems) {
+        const arr = JSON.parse(rawItems)
+        return Array.isArray(arr) ? arr.length : 0
+      }
+      return 0
+    } catch {
+      return 0
+    }
+  }, [])
+  useEffect(() => {
+    setCartCount(readCartCount())
+    const onStorage = () => setCartCount(readCartCount())
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
+  }, [readCartCount])
 
   // -----------------------------
   // Datos
@@ -127,11 +143,11 @@ function Landing() {
     },
     {
       title: 'Diseños Responsivos',
-      description: 'Perfectas en cualquier dispositivo: móvil, tablet o computadora. Tus invitados las verán siempre perfectas.'
+      description: 'Perfectas en cualquier dispositivo: móvil, tablet o computadora.'
     },
     {
       title: 'Actualizaciones en Tiempo Real',
-      description: '¿Cambió algo? Actualiza la información y todos tus invitados verán los cambios automáticamente.'
+      description: '¿Cambió algo? Actualiza la información y todos verán los cambios automáticamente.'
     }
   ], [])
 
@@ -208,81 +224,59 @@ function Landing() {
   }
 
   // -----------------------------
-  // HERO SLIDER (nuevo)
+  // HERO SLIDER (2 paneles en desktop, 1 en móvil)
   // -----------------------------
   const heroPanels = useMemo(() => ([
     {
       key: 'boda',
       bg: asset('/src/assets/cotton_bird_images/categoria_boda_grid.webp'),
-      title: 'Invitaciones digitales para tu boda perfecta',
-      desc: 'Diseños elegantes, interactivos y completamente personalizables.',
-      cta: 'Ver Invitaciones de Boda',
+      headline: 'Una papelería de boda única',
+      sub: '› DESCUBRE LAS INVITACIONES',
       to: '/products?category=Bodas',
-      btnClass: 'bg-primary hover:bg-primary/90 text-primary-foreground',
-      icon: Smartphone
     },
     {
       key: 'quince',
       bg: asset('/src/assets/cotton_bird_images/categoria_bebes_ninos.webp'),
-      title: '¡Quinceañeras que brillan!',
-      desc: 'Celebra sus 15 con estilo y elegancia.',
-      cta: 'Descubrir Quinceañeras',
+      headline: '¡Quinceañeras que brillan!',
+      sub: '› DESCUBRE NUESTRA COLECCIÓN',
       to: '/products?category=Quinceañeras',
-      btnClass: 'bg-sage-400 hover:bg-sage-400/90 text-white',
-      icon: Sparkles
     },
     {
       key: 'infantiles',
       bg: asset('/src/assets/cotton_bird_images/categoria_cumpleanos.webp'),
-      title: 'Cumpleaños infantiles inolvidables',
-      desc: 'Invitaciones divertidas y animadas para los más peques.',
-      cta: 'Ver Infantiles',
+      headline: 'Cumpleaños infantiles inolvidables',
+      sub: '› VER DISEÑOS',
       to: '/products?category=Cumpleaños Infantiles',
-      btnClass: 'bg-amber-400 hover:bg-amber-400/90 text-black',
-      icon: Crown
     },
     {
       key: 'baby',
       bg: asset('/src/assets/cotton_bird_images/categoria_bautizo.webp'),
-      title: 'Baby shower con ternura',
-      desc: 'Detalles dulces para una bienvenida especial.',
-      cta: 'Ver Baby Shower',
+      headline: '¡Para el bautizo de tu peque!',
+      sub: '› DESCUBRE NUESTRA COLECCIÓN',
       to: '/products?category=Baby Shower',
-      btnClass: 'bg-pink-400 hover:bg-pink-400/90 text-white',
-      icon: Globe
     }
   ]), [])
 
-  // Desktop: 2 paneles por slide => [[0,1], [2,3]]
+  // Desktop: 2 paneles por slide
   const desktopSlides = useMemo(() => {
     const pairs = []
-    for (let i = 0; i < heroPanels.length; i += 2) {
-      pairs.push(heroPanels.slice(i, i + 2))
-    }
+    for (let i = 0; i < heroPanels.length; i += 2) pairs.push(heroPanels.slice(i, i + 2))
     return pairs
   }, [heroPanels])
 
-  // Carrusel estado
-  const [slide, setSlide] = useState(0) // índice desktop
+  const [slide, setSlide] = useState(0)
   const totalDesktopSlides = desktopSlides.length
+  const nextSlide = useCallback(() => setSlide((s) => (s + 1) % totalDesktopSlides), [totalDesktopSlides])
+  const prevSlide = useCallback(() => setSlide((s) => (s - 1 + totalDesktopSlides) % totalDesktopSlides), [totalDesktopSlides])
 
-  const nextSlide = useCallback(() => {
-    setSlide((s) => (s + 1) % totalDesktopSlides)
-  }, [totalDesktopSlides])
-
-  const prevSlide = useCallback(() => {
-    setSlide((s) => (s - 1 + totalDesktopSlides) % totalDesktopSlides)
-  }, [totalDesktopSlides])
-
-  // Autoplay con pausa al hover
   const [paused, setPaused] = useState(false)
   useEffect(() => {
     if (paused) return
-    const id = setInterval(() => nextSlide(), 6000)
+    const id = setInterval(nextSlide, 6000)
     return () => clearInterval(id)
   }, [paused, nextSlide])
 
-  // Mobile slider (1 panel por slide) con swipe
+  // Mobile (1 panel por slide) con swipe
   const [mSlide, setMSlide] = useState(0)
   const totalMobileSlides = heroPanels.length
   const mNext = () => setMSlide((s) => (s + 1) % totalMobileSlides)
@@ -290,20 +284,24 @@ function Landing() {
 
   const touchStartX = useRef(0)
   const touchDeltaX = useRef(0)
-  const onTouchStart = (e) => {
-    touchStartX.current = e.touches[0].clientX
-    touchDeltaX.current = 0
-  }
-  const onTouchMove = (e) => {
-    touchDeltaX.current = e.touches[0].clientX - touchStartX.current
-  }
+  const onTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; touchDeltaX.current = 0 }
+  const onTouchMove = (e) => { touchDeltaX.current = e.touches[0].clientX - touchStartX.current }
   const onTouchEnd = () => {
     const dx = touchDeltaX.current
-    if (Math.abs(dx) > 50) {
-      if (dx < 0) mNext()
-      else mPrev()
-    }
+    if (Math.abs(dx) > 50) { if (dx < 0) mNext(); else mPrev() }
   }
+
+  // -----------------------------
+  // Botón unificado (blanco/negro) para resto del sitio
+  // -----------------------------
+  const PrimaryButton = ({ className = '', children, ...props }) => (
+    <Button
+      {...props}
+      className={`bg-white text-black border border-black/10 hover:bg-white/90 ${className}`}
+    >
+      {children}
+    </Button>
+  )
 
   // -----------------------------
   // Render
@@ -332,13 +330,15 @@ function Landing() {
               +34 919 03 36 08
             </div>
 
-            {/* Logo */}
+            {/* Logo (más grueso) + slogan actualizado (oculto en móviles) */}
             <div
-              className="font-display text-2xl font-medium text-foreground tracking-wide cursor-pointer select-none"
+              className="font-display text-2xl md:text-3xl font-extrabold text-foreground tracking-wide cursor-pointer select-none"
               onClick={() => navigate('/')}
             >
               Venite
-              <span className="text-xs text-muted-foreground ml-2">invitaciones digitales que enamoran</span>
+              <span className="hidden md:inline text-[11px] md:text-xs text-muted-foreground ml-2 font-medium align-middle">
+                Invitaciones que enamoran
+              </span>
             </div>
 
             {/* User Actions */}
@@ -368,7 +368,8 @@ function Landing() {
                 onClick={() => navigate('/login')}
                 aria-label="Cuenta"
               />
-              <CartIcon />
+              {/* Carrito: solo se muestra si hay items */}
+              {cartCount > 0 && <CartIcon />}
               {/* Mobile menu toggle */}
               <Menu
                 className="w-6 h-6 text-muted-foreground cursor-pointer hover:text-foreground transition-colors md:hidden"
@@ -395,8 +396,7 @@ function Landing() {
         </div>
       </header>
 
-      {/* Hero Slider */}
-      {/* Desktop / Tablets grandes: 2 paneles por slide */}
+      {/* Hero Slider: desktop (2 paneles por slide) */}
       <section
         className="relative overflow-hidden hidden lg:block"
         onMouseEnter={() => setPaused(true)}
@@ -405,7 +405,6 @@ function Landing() {
         aria-label="Promociones principales"
       >
         <div className="relative">
-          {/* Track */}
           <div
             className="whitespace-nowrap transition-transform duration-700 ease-out"
             style={{ transform: `translateX(-${slide * 100}%)` }}
@@ -419,36 +418,35 @@ function Landing() {
                 aria-label={`${idx + 1} de ${totalDesktopSlides}`}
               >
                 <div className="grid lg:grid-cols-2 min-h-[520px]">
-                  {pair.map((p, i) => {
-                    const Icon = p.icon
-                    return (
-                      <div key={p.key} className="relative flex items-center justify-center p-10">
-                        <img
-                          src={p.bg}
-                          alt={p.title}
-                          className="absolute inset-0 w-full h-full object-cover"
-                          onError={(e) => onImgError(e, p.title)}
-                          loading="eager"
-                          decoding="async"
-                        />
-                        <div className="absolute inset-0 bg-black/20" />
-                        <div className="relative z-[1] text-center lg:text-left max-w-md">
-                          <h1 className="font-display text-4xl font-medium text-white leading-tight mb-4 drop-shadow">
-                            {p.title}
-                          </h1>
-                          <p className="text-white/90 mb-6 drop-shadow">{p.desc}</p>
-                          <Button
-                            size="lg"
-                            className={`${p.btnClass} px-8`}
-                            onClick={() => navigate(p.to)}
-                          >
-                            <Icon className="w-4 h-4 mr-2" />
-                            {p.cta}
-                          </Button>
+                  {pair.map((p) => (
+                    <div key={p.key} className="relative flex items-end justify-center">
+                      {/* IMG */}
+                      <img
+                        src={p.bg}
+                        alt={p.headline}
+                        className="absolute inset-0 w-full h-full object-cover"
+                        onError={(e) => onImgError(e, p.headline)}
+                        loading="eager"
+                        decoding="async"
+                      />
+                      <div className="absolute inset-0 bg-black/10" />
+                      {/* Tarjeta blanca clickeable al estilo de la referencia */}
+                      <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => navigate(p.to)}
+                        onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigate(p.to)}
+                        className="relative z-[1] mb-10 max-w-[620px] w-[82%] bg-white/95 backdrop-blur-[1px] text-center shadow-xl rounded-md px-6 py-5 cursor-pointer select-none border border-black/5"
+                      >
+                        <h2 className="font-display text-2xl md:text-[28px] leading-snug text-foreground">
+                          {p.headline}
+                        </h2>
+                        <div className="mt-2 text-[13px] tracking-[0.12em] text-muted-foreground">
+                          {p.sub}
                         </div>
                       </div>
-                    )
-                  })}
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
@@ -460,14 +458,14 @@ function Landing() {
             onClick={prevSlide}
             aria-label="Anterior"
           >
-            <ChevronLeft className="w-6 h-6" />
+            ‹
           </button>
           <button
             className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow"
             onClick={nextSlide}
             aria-label="Siguiente"
           >
-            <ChevronRight className="w-6 h-6" />
+            ›
           </button>
 
           {/* Bullets */}
@@ -484,7 +482,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* Mobile / Tablets chicas: 1 panel por slide */}
+      {/* Hero Slider: móvil/tablet chica (1 panel por slide) */}
       <section
         className="relative overflow-hidden lg:hidden"
         onTouchStart={onTouchStart}
@@ -497,44 +495,41 @@ function Landing() {
           className="whitespace-nowrap transition-transform duration-700 ease-out"
           style={{ transform: `translateX(-${mSlide * 100}%)` }}
         >
-          {heroPanels.map((p, idx) => {
-            const Icon = p.icon
-            return (
-              <div
-                key={`mob-${p.key}`}
-                className="inline-block align-top w-full"
-                role="group"
-                aria-roledescription="slide"
-                aria-label={`${idx + 1} de ${totalMobileSlides}`}
-              >
-                <div className="relative min-h-[520px] flex items-center justify-center p-8">
-                  <img
-                    src={p.bg}
-                    alt={p.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    onError={(e) => onImgError(e, p.title)}
-                    loading="eager"
-                    decoding="async"
-                  />
-                  <div className="absolute inset-0 bg-black/25" />
-                  <div className="relative z-[1] text-center max-w-sm">
-                    <h1 className="font-display text-3xl font-medium text-white leading-tight mb-4 drop-shadow">
-                      {p.title}
-                    </h1>
-                    <p className="text-white/90 mb-6 drop-shadow">{p.desc}</p>
-                    <Button
-                      size="lg"
-                      className={`${p.btnClass} px-8`}
-                      onClick={() => navigate(p.to)}
-                    >
-                      <Icon className="w-4 h-4 mr-2" />
-                      {p.cta}
-                    </Button>
+          {heroPanels.map((p, idx) => (
+            <div
+              key={`mob-${p.key}`}
+              className="inline-block align-top w-full"
+              role="group"
+              aria-roledescription="slide"
+              aria-label={`${idx + 1} de ${totalMobileSlides}`}
+            >
+              <div className="relative min-h-[520px] flex items-end justify-center">
+                <img
+                  src={p.bg}
+                  alt={p.headline}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  onError={(e) => onImgError(e, p.headline)}
+                  loading="eager"
+                  decoding="async"
+                />
+                <div className="absolute inset-0 bg-black/15" />
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => navigate(p.to)}
+                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && navigate(p.to)}
+                  className="relative z-[1] mb-8 w-[88%] bg-white/95 backdrop-blur-[1px] text-center shadow-xl rounded-md px-5 py-4 cursor-pointer select-none border border-black/5"
+                >
+                  <h2 className="font-display text-xl sm:text-2xl leading-snug text-foreground">
+                    {p.headline}
+                  </h2>
+                  <div className="mt-1.5 text-[12px] tracking-[0.12em] text-muted-foreground">
+                    {p.sub}
                   </div>
                 </div>
               </div>
-            )
-          })}
+            </div>
+          ))}
         </div>
 
         {/* Controles */}
@@ -543,14 +538,14 @@ function Landing() {
           onClick={mPrev}
           aria-label="Anterior"
         >
-          <ChevronLeft className="w-6 h-6" />
+          ‹
         </button>
         <button
           className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/80 hover:bg-white shadow"
           onClick={mNext}
           aria-label="Siguiente"
         >
-          <ChevronRight className="w-6 h-6" />
+          ›
         </button>
 
         {/* Bullets */}
@@ -574,7 +569,7 @@ function Landing() {
               Nuestras invitaciones más populares
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Diseños digitales que combinan elegancia, interactividad y personalización para hacer de tu evento algo inolvidable.
+              Diseños digitales que combinan elegancia, interactividad y personalización.
             </p>
           </div>
 
@@ -588,7 +583,6 @@ function Landing() {
                   onClick={() => navigate(`/product/${product.id}`)}
                 >
                   <div className="aspect-square relative">
-                    {/* IMG sin franjas */}
                     <img
                       src={product.image}
                       alt={product.name}
@@ -618,7 +612,6 @@ function Landing() {
 
                     <div className="absolute bottom-2 left-2">
                       <Badge variant="secondary" className="bg-black/70 text-white">
-                        <Globe className="w-3 h-3 mr-1" />
                         Digital
                       </Badge>
                     </div>
@@ -645,7 +638,7 @@ function Landing() {
               Invitaciones para cada ocasión especial
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Desde bodas elegantes hasta cumpleaños infantiles llenos de diversión. Tenemos el diseño perfecto para tu evento.
+              Desde bodas elegantes hasta cumpleaños infantiles llenos de diversión.
             </p>
           </div>
 
@@ -657,7 +650,6 @@ function Landing() {
                 onClick={() => navigate('/products')}
               >
                 <div className="aspect-[4/3] relative">
-                  {/* IMG sin bordes */}
                   <img
                     src={category.image}
                     alt={category.name}
@@ -671,10 +663,7 @@ function Landing() {
                     <h3 className="font-display text-xl font-medium text-white mb-2">
                       {category.name}
                     </h3>
-                    <Button variant="secondary" size="sm" className="bg-white/90 text-foreground hover:bg-white">
-                      <Globe className="w-3 h-3 mr-2" />
-                      Ver Diseños
-                    </Button>
+                    <PrimaryButton className="text-sm px-3 py-2">Ver Diseños</PrimaryButton>
                   </div>
                 </div>
               </Card>
@@ -691,21 +680,14 @@ function Landing() {
               ¿Por qué elegir invitaciones digitales?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              La evolución natural de las invitaciones tradicionales. Más interactivas, ecológicas y convenientes.
+              Más interactivas, ecológicas y convenientes.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { icon: Smartphone, title: '100% Digital y Ecológico', description: 'Invitaciones completamente digitales que cuidan el medio ambiente' },
-              { icon: Zap, title: 'Entrega Instantánea', description: 'Recibe tu invitación en minutos, no en días' },
-              { icon: Globe, title: 'Comparte en Cualquier Lugar', description: 'WhatsApp, email, redes sociales - llega a todos tus invitados' },
-              { icon: Edit, title: 'Personalización Total', description: 'Diseños únicos adaptados a tu estilo y evento especial' }
-            ].map((value, index) => (
+            {digitalFeatures.map((value, index) => (
               <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <value.icon className="w-8 h-8 text-sage-400" />
-                </div>
+                <div className="w-16 h-16 bg-sage-100 rounded-full mx-auto mb-4" />
                 <h3 className="font-medium text-foreground mb-2">{value.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{value.description}</p>
               </div>
@@ -719,8 +701,7 @@ function Landing() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="font-display text-3xl font-medium text-foreground mb-4">¡Únete a la revolución digital!</h2>
           <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Suscríbete y recibe plantillas exclusivas, descuentos especiales y las últimas tendencias en invitaciones digitales.
-            ¡Además obtén un 20% de descuento en tu primera invitación!
+            Suscríbete y recibe plantillas exclusivas, descuentos y tendencias.
           </p>
 
           <div className="max-w-md mx-auto space-y-4">
@@ -741,69 +722,12 @@ function Landing() {
               </SelectContent>
             </Select>
             <Input type="date" placeholder="Fecha del evento" className="border-border" />
-            <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-              <Send className="w-4 h-4 mr-2" />
-              Quiero mi descuento del 20%
-            </Button>
+            <PrimaryButton className="w-full py-5">Quiero mi descuento del 20%</PrimaryButton>
           </div>
 
           <p className="text-xs text-muted-foreground mt-4">
-            Al suscribirte aceptas recibir emails promocionales. Puedes darte de baja en cualquier momento.
+            Puedes darte de baja en cualquier momento.
           </p>
-        </div>
-      </section>
-
-      {/* Digital Features Section (con demos) */}
-      <section className="py-16 bg-secondary">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="relative overflow-hidden rounded-lg shadow-warm-lg">
-              {/* IMG sin gap por baseline */}
-              <img 
-                src={asset('/src/assets/cotton_bird_images/taller_produccion_cotton_bird.webp')} 
-                alt="Diseño de invitaciones digitales"
-                className="block w-full h-full object-cover"
-                onError={(e) => onImgError(e, 'Diseño de invitaciones digitales')}
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-            <div className="space-y-8">
-              <div className="mb-8">
-                <h2 className="font-display text-3xl font-medium text-foreground mb-4">
-                  Tecnología al servicio de tus eventos
-                </h2>
-                <p className="text-muted-foreground">
-                  Nuestras invitaciones digitales van más allá del diseño. Son experiencias interactivas que conectan con tus invitados.
-                </p>
-              </div>
-              
-              {digitalFeatures.map((feature, index) => (
-                <div key={index}>
-                  <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
-                </div>
-              ))}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  variant="outline" 
-                  className="border-primary text-primary hover:bg-primary/10"
-                  onClick={() => navigate('/demo/boda')}
-                >
-                  <Globe className="w-4 h-4 mr-2" />
-                  Demo Boda
-                </Button>
-                <Button 
-                  variant="outline" 
-                  className="border-sage-400 text-sage-400 hover:bg-sage-100"
-                  onClick={() => navigate('/demo/quinceanera')}
-                >
-                  <Crown className="w-4 h-4 mr-2" />
-                  Demo Quinceañera
-                </Button>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -814,7 +738,7 @@ function Landing() {
             {/* Company Info */}
             <div>
               <h3 className="font-display text-xl font-medium mb-4">Venite</h3>
-              <p className="text-muted text-sm mb-4">invitaciones digitales que enamoran</p>
+              <p className="text-muted text-sm mb-4">Invitaciones que enamoran</p>
               <div className="flex space-x-4">
                 <Instagram className="w-5 h-5 text-muted hover:text-background cursor-pointer transition-colors" />
                 <Facebook className="w-5 h-5 text-muted hover:text-background cursor-pointer transition-colors" />
@@ -937,9 +861,9 @@ function Landing() {
                         <p className="text-xs text-muted-foreground">{item.category}</p>
                         <p className="text-sm mt-1">{item.price}</p>
                         <div className="mt-2 flex gap-2">
-                          <Button size="sm" variant="outline" onClick={() => { setWishOpen(false); navigate(`/product/${item.id}`) }}>
+                          <PrimaryButton className="px-4 py-2" onClick={() => { setWishOpen(false); navigate(`/product/${item.id}`) }}>
                             Ver
-                          </Button>
+                          </PrimaryButton>
                           <Button size="sm" variant="ghost" onClick={() => removeFav(item.id)}>
                             Quitar
                           </Button>
@@ -952,9 +876,9 @@ function Landing() {
             </div>
 
             <div className="p-4 border-t border-border">
-              <Button className="w-full" onClick={() => { setWishOpen(false); navigate('/wishlist') }}>
+              <PrimaryButton className="w-full py-3" onClick={() => { setWishOpen(false); navigate('/wishlist') }}>
                 Ver lista completa
-              </Button>
+              </PrimaryButton>
             </div>
           </aside>
         </>
