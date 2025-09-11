@@ -23,7 +23,8 @@ import {
   Facebook,
   Twitter,
   X as CloseIcon,
-  Trash2
+  Trash2,
+  Crown
 } from 'lucide-react'
 
 import { asset, onImgError } from '../utils/assets'
@@ -112,6 +113,26 @@ function Landing() {
     []
   )
 
+  // --------- Ventajas digitales (faltaba en tu versión) ---------
+  const digitalFeatures = useMemo(() => [
+    {
+      title: 'Invitaciones Interactivas',
+      description: 'Incluye mapas, confirmación de asistencia, música de fondo y animaciones que sorprenderán a tus invitados.'
+    },
+    {
+      title: 'Gestión de Invitados',
+      description: 'Panel de control para ver quién ha visto la invitación, confirmaciones de asistencia y gestión completa de tu lista.'
+    },
+    {
+      title: 'Diseños Responsivos',
+      description: 'Perfectas en cualquier dispositivo: móvil, tablet o computadora. Tus invitados las verán siempre perfectas.'
+    },
+    {
+      title: 'Actualizaciones en Tiempo Real',
+      description: '¿Cambió algo? Actualiza la información y todos tus invitados verán los cambios automáticamente.'
+    }
+  ], [])
+
   // Para mapear IDs de wishlist a objetos
   const productById = useMemo(() => {
     const map = new Map()
@@ -127,12 +148,10 @@ function Landing() {
   const removeFav = (id) => setWishlist((prev) => prev.filter((x) => x !== id))
   const clearFavs = () => setWishlist([])
 
-  // Cerrar con Esc y click fuera
+  // Cerrar con Esc
   useEffect(() => {
     if (!wishOpen) return
-    const onKey = (e) => {
-      if (e.key === 'Escape') setWishOpen(false)
-    }
+    const onKey = (e) => { if (e.key === 'Escape') setWishOpen(false) }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [wishOpen])
@@ -150,20 +169,13 @@ function Landing() {
       if (el) el.focus()
     }, 0)
   }
-  const closeSearch = () => {
-    setSearchOpen(false)
-    setQuery('')
-  }
+  const closeSearch = () => { setSearchOpen(false); setQuery('') }
 
   // Abrir con tecla "/"
   useEffect(() => {
     const onKey = (e) => {
-      if (e.key === '/' && !searchOpen) {
-        e.preventDefault()
-        openSearch()
-      } else if (e.key === 'Escape' && searchOpen) {
-        closeSearch()
-      }
+      if (e.key === '/' && !searchOpen) { e.preventDefault(); openSearch() }
+      else if (e.key === 'Escape' && searchOpen) { closeSearch() }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -529,8 +541,9 @@ function Landing() {
             Al suscribirte aceptas recibir emails promocionales. Puedes darte de baja en cualquier momento.
           </p>
         </div>
-        
-      {/* Digital Features Section */}
+      </section>
+
+      {/* Digital Features Section (con demos) */}
       <section className="py-16 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -540,7 +553,9 @@ function Landing() {
                 src={asset('/src/assets/cotton_bird_images/taller_produccion_cotton_bird.webp')} 
                 alt="Diseño de invitaciones digitales"
                 className="block w-full h-full object-cover"
-                onError={(e) => onImgError(e, "Diseño de invitaciones digitales")}
+                onError={(e) => onImgError(e, 'Diseño de invitaciones digitales')}
+                loading="lazy"
+                decoding="async"
               />
             </div>
             <div className="space-y-8">
@@ -555,12 +570,8 @@ function Landing() {
               
               {digitalFeatures.map((feature, index) => (
                 <div key={index}>
-                  <h3 className="font-semibold text-foreground mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    {feature.description}
-                  </p>
+                  <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
                 </div>
               ))}
               <div className="flex flex-col sm:flex-row gap-4">
@@ -584,7 +595,8 @@ function Landing() {
             </div>
           </div>
         </div>
-      
+      </section>
+
       {/* Footer */}
       <footer className="bg-foreground text-background py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
