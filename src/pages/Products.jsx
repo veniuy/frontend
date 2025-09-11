@@ -270,13 +270,20 @@ function Products() {
           {viewMode === 'grid' ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {sortedProducts.map((product) => (
-                <Card key={product.id} className="group cursor-pointer hover-lift shadow-warm border-border" onClick={() => navigate(`/product/${product.id}`)}>
-                  <div className="aspect-square overflow-hidden rounded-t-lg relative">
+                <Card
+                  key={product.id}
+                  className="group cursor-pointer hover-lift shadow-warm border-border overflow-hidden rounded-lg p-0"
+                  onClick={() => navigate(`/product/${product.id}`)}
+                >
+                  <div className="relative aspect-square">
+                    {/* IMG sin franjas: absoluta + object-cover + block */}
                     <img 
                       src={product.image} 
                       alt={product.name}
-                      className="w-full h-full object-cover hover-scale"
+                      className="absolute inset-0 w-full h-full object-cover object-center block transition-transform duration-300 group-hover:scale-[1.03]"
                       onError={(e) => onImgError(e, product.name)}
+                      loading="lazy"
+                      decoding="async"
                     />
                     {product.badge && (
                       <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground">
@@ -284,10 +291,10 @@ function Products() {
                       </Badge>
                     )}
                     <div className="absolute top-2 right-2 flex space-x-2">
-                      <Button size="sm" variant="secondary" className="w-8 h-8 p-0 bg-white/90">
+                      <Button size="sm" variant="secondary" className="w-8 h-8 p-0 bg-white/90" onClick={(e) => e.stopPropagation()}>
                         <Eye className="w-4 h-4" />
                       </Button>
-                      <Button size="sm" variant="secondary" className="w-8 h-8 p-0 bg-white/90">
+                      <Button size="sm" variant="secondary" className="w-8 h-8 p-0 bg-white/90" onClick={(e) => e.stopPropagation()}>
                         <Heart className="w-4 h-4" />
                       </Button>
                     </div>
@@ -302,6 +309,7 @@ function Products() {
                       </Badge>
                     </div>
                   </div>
+
                   <CardContent className="p-4">
                     <div className="flex items-center mb-2">
                       <div className="flex items-center">
@@ -324,7 +332,7 @@ function Products() {
                           </span>
                         )}
                       </div>
-                      <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                      <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground" onClick={(e) => e.stopPropagation()}>
                         <Smartphone className="w-3 h-3 mr-1" />
                         Ver
                       </Button>
@@ -336,15 +344,22 @@ function Products() {
           ) : (
             <div className="space-y-4">
               {sortedProducts.map((product) => (
-                <Card key={product.id} className="group cursor-pointer hover:shadow-warm transition-shadow border-border" onClick={() => navigate(`/product/${product.id}`)}>
+                <Card
+                  key={product.id}
+                  className="group cursor-pointer hover:shadow-warm transition-shadow border-border overflow-hidden"
+                  onClick={() => navigate(`/product/${product.id}`)}
+                >
                   <CardContent className="p-6">
                     <div className="flex gap-6">
-                      <div className="w-48 h-32 overflow-hidden rounded-lg relative flex-shrink-0">
+                      <div className="relative w-48 h-32 rounded-lg overflow-hidden flex-shrink-0">
+                        {/* IMG sin franjas en vista lista */}
                         <img 
                           src={product.image} 
                           alt={product.name}
-                          className="w-full h-full object-cover hover-scale"
+                          className="absolute inset-0 w-full h-full object-cover object-center block transition-transform duration-300 group-hover:scale-[1.03]"
                           onError={(e) => onImgError(e, product.name)}
+                          loading="lazy"
+                          decoding="async"
                         />
                         {product.badge && (
                           <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs">
@@ -353,10 +368,10 @@ function Products() {
                         )}
                       </div>
                       
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between mb-2">
-                          <div>
-                            <h3 className="font-semibold text-foreground text-lg mb-1">
+                          <div className="min-w-0">
+                            <h3 className="font-semibold text-foreground text-lg mb-1 line-clamp-1">
                               {product.name}
                             </h3>
                             <p className="text-muted-foreground text-sm mb-2">{product.category}</p>
@@ -367,7 +382,7 @@ function Products() {
                               </span>
                             </div>
                           </div>
-                          <Heart className="w-5 h-5 text-muted-foreground hover:text-primary cursor-pointer" />
+                          <Heart className="w-5 h-5 text-muted-foreground hover:text-primary cursor-pointer flex-shrink-0" />
                         </div>
                         
                         <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
@@ -392,11 +407,11 @@ function Products() {
                             )}
                           </div>
                           <div className="flex space-x-2">
-                            <Button variant="outline" size="sm">
+                            <Button variant="outline" size="sm" onClick={(e) => e.stopPropagation()}>
                               <Eye className="w-4 h-4 mr-2" />
                               Vista previa
                             </Button>
-                            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground" onClick={(e) => e.stopPropagation()}>
                               <Smartphone className="w-4 h-4 mr-2" />
                               Personalizar
                             </Button>
