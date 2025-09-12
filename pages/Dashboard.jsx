@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
-import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -12,18 +11,8 @@ import { Slider } from '../components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import {
   Plus,
-  Calendar,
-  Users,
-  Eye,
-  MoreHorizontal,
-  Copy,
-  Edit,
-  Trash2,
-  CreditCard,
-  Clock,
   Type,
   Palette,
-  Image as ImageIcon,
   Layers,
   Download,
   Undo,
@@ -33,30 +22,17 @@ import {
   Grid,
   Save,
   Share,
-  Settings,
   Upload,
-  Heart,
-  Star,
-  Circle,
-  Square,
-  Triangle,
-  Smile,
-  Music,
-  Gift,
-  Camera,
-  MapPin,
-  Phone,
-  Mail,
-  Globe,
-  Move,
-  RotateCw,
+  Eye,
   Trash,
   AlignLeft,
   AlignCenter,
   AlignRight,
   Bold,
   Italic,
-  Underline
+  Underline,
+  RotateCw,
+  Move
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -64,7 +40,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
-import '../App.css';
 
 export function Dashboard() {
   const { user } = useAuth();
@@ -79,12 +54,12 @@ export function Dashboard() {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [zoom, setZoom] = useState(100);
   const [showGrid, setShowGrid] = useState(false);
-  const [canvasSize, setCanvasSize] = useState({ width: 600, height: 800 });
+  const [canvasSize] = useState({ width: 600, height: 800 });
   
   // Estados de la interfaz
   const [activeTab, setActiveTab] = useState('templates');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [showEditor, setShowEditor] = useState(false);
 
   // Plantillas disponibles
   const templates = [
@@ -92,7 +67,7 @@ export function Dashboard() {
       id: 1,
       name: 'Elegante Dorado',
       category: 'Bodas',
-      thumbnail: '/api/placeholder/200/280',
+      thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI4MCIgdmlld0JveD0iMCAwIDIwMCAyODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjgwIiBmaWxsPSIjZjhmNmYwIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZDRhZjM3IiBmb250LXNpemU9IjI0IiBmb250LWZhbWlseT0ic2VyaWYiPk1hcsOtYSAmIENhcmxvczwvdGV4dD4KPHR5cGUgeD0iMTAwIiB5PSIxNDAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM4YjczNTUiIGZvbnQtc2l6ZT0iMTQiPk5vcyBjYXNhbW9zPC90ZXh0Pgo8L3N2Zz4K',
       isPremium: true,
       elements: [
         {
@@ -113,7 +88,7 @@ export function Dashboard() {
           width: 500,
           height: 80,
           fontSize: 48,
-          fontFamily: 'Playfair Display',
+          fontFamily: 'Playfair Display, serif',
           color: '#d4af37',
           textAlign: 'center',
           fontWeight: 'bold'
@@ -127,7 +102,7 @@ export function Dashboard() {
           width: 500,
           height: 40,
           fontSize: 24,
-          fontFamily: 'Lato',
+          fontFamily: 'Lato, sans-serif',
           color: '#8b7355',
           textAlign: 'center'
         }
@@ -137,7 +112,7 @@ export function Dashboard() {
       id: 2,
       name: 'Moderno Minimalista',
       category: 'Cumpleaños',
-      thumbnail: '/api/placeholder/200/280',
+      thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI4MCIgdmlld0JveD0iMCAwIDIwMCAyODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjgwIiBmaWxsPSIjZmZmZmZmIi8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjMjU2M2ViIiBmb250LXNpemU9IjIwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+wqFDZWxlYnJlbW9zITwvdGV4dD4KPC9zdmc+',
       isPremium: false,
       elements: [
         {
@@ -158,7 +133,7 @@ export function Dashboard() {
           width: 500,
           height: 60,
           fontSize: 36,
-          fontFamily: 'Inter',
+          fontFamily: 'Inter, sans-serif',
           color: '#2563eb',
           textAlign: 'center',
           fontWeight: 'bold'
@@ -169,7 +144,7 @@ export function Dashboard() {
       id: 3,
       name: 'Floral Vintage',
       category: 'Quinceañeras',
-      thumbnail: '/api/placeholder/200/280',
+      thumbnail: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjI4MCIgdmlld0JveD0iMCAwIDIwMCAyODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyMDAiIGhlaWdodD0iMjgwIiBmaWxsPSIjZmRmMmY4Ii8+Cjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjYmUxODVkIiBmb250LXNpemU9IjE4IiBmb250LWZhbWlseT0iY3Vyc2l2ZSI+TWlzIFhWIEHDsW9zPC90ZXh0Pgo8L3N2Zz4K',
       isPremium: true,
       elements: [
         {
@@ -190,7 +165,7 @@ export function Dashboard() {
           width: 500,
           height: 70,
           fontSize: 42,
-          fontFamily: 'Dancing Script',
+          fontFamily: 'Dancing Script, cursive',
           color: '#be185d',
           textAlign: 'center',
           fontWeight: 'bold'
@@ -199,23 +174,19 @@ export function Dashboard() {
     }
   ];
 
-  // Fuentes disponibles (como en Paperless Post)
+  // Fuentes disponibles
   const fonts = [
-    { name: 'Inter', family: 'Inter, sans-serif', preview: 'Aa' },
-    { name: 'Playfair Display', family: 'Playfair Display, serif', preview: 'Aa' },
-    { name: 'Dancing Script', family: 'Dancing Script, cursive', preview: 'Aa' },
-    { name: 'Lato', family: 'Lato, sans-serif', preview: 'Aa' },
-    { name: 'Montserrat', family: 'Montserrat, sans-serif', preview: 'Aa' },
-    { name: 'Roboto', family: 'Roboto, sans-serif', preview: 'Aa' },
-    { name: 'Open Sans', family: 'Open Sans, sans-serif', preview: 'Aa' },
-    { name: 'Poppins', family: 'Poppins, sans-serif', preview: 'Aa' },
-    { name: 'Merriweather', family: 'Merriweather, serif', preview: 'Aa' },
-    { name: 'Oswald', family: 'Oswald, sans-serif', preview: 'Aa' },
-    { name: 'Source Sans Pro', family: 'Source Sans Pro, sans-serif', preview: 'Aa' },
-    { name: 'Raleway', family: 'Raleway, sans-serif', preview: 'Aa' }
+    { name: 'Inter', family: 'Inter, sans-serif' },
+    { name: 'Playfair Display', family: 'Playfair Display, serif' },
+    { name: 'Dancing Script', family: 'Dancing Script, cursive' },
+    { name: 'Lato', family: 'Lato, sans-serif' },
+    { name: 'Montserrat', family: 'Montserrat, sans-serif' },
+    { name: 'Roboto', family: 'Roboto, sans-serif' },
+    { name: 'Open Sans', family: 'Open Sans, sans-serif' },
+    { name: 'Poppins', family: 'Poppins, sans-serif' }
   ];
 
-  // Paleta de colores (como en Paperless Post)
+  // Paleta de colores
   const colorPalette = [
     '#000000', '#ffffff', '#f3f4f6', '#e5e7eb', '#d1d5db', '#9ca3af',
     '#6b7280', '#374151', '#1f2937', '#111827', '#fef2f2', '#fee2e2',
@@ -224,11 +195,10 @@ export function Dashboard() {
     '#b45309', '#92400e', '#78350f', '#f0fdf4', '#dcfce7', '#bbf7d0',
     '#86efac', '#4ade80', '#22c55e', '#16a34a', '#15803d', '#166534',
     '#eff6ff', '#dbeafe', '#bfdbfe', '#93c5fd', '#60a5fa', '#3b82f6',
-    '#2563eb', '#1d4ed8', '#1e40af', '#f3e8ff', '#e9d5ff', '#d8b4fe',
-    '#c084fc', '#a855f7', '#9333ea', '#7c3aed', '#6d28d9', '#5b21b6'
+    '#2563eb', '#1d4ed8', '#1e40af', '#f3e8ff', '#e9d5ff', '#d8b4fe'
   ];
 
-  // Stickers y elementos decorativos
+  // Stickers
   const stickers = [
     { id: 'heart', icon: '❤️', category: 'Amor' },
     { id: 'star', icon: '⭐', category: 'Celebración' },
@@ -244,19 +214,18 @@ export function Dashboard() {
     { id: 'fireworks', icon: '🎆', category: 'Celebración' }
   ];
 
-  // Blend modes disponibles
-  const blendModes = [
-    'normal', 'multiply', 'screen', 'overlay', 'darken', 'lighten',
-    'color-dodge', 'color-burn', 'hard-light', 'soft-light', 'difference',
-    'exclusion', 'hue', 'saturation', 'color', 'luminosity'
-  ];
-
   // Funciones del editor
+  const startNewInvitation = () => {
+    setShowEditor(true);
+    setActiveTab('templates');
+  };
+
   const selectTemplate = (template) => {
     setSelectedTemplate(template);
-    setCanvasElements(template.elements);
+    setCanvasElements([...template.elements]);
     setSelectedElement(null);
     addToHistory(template.elements);
+    setActiveTab('text');
   };
 
   const addToHistory = (elements) => {
@@ -347,50 +316,11 @@ export function Dashboard() {
     addToHistory(newElements);
   };
 
-  const moveElementUp = () => {
-    if (!selectedElement) return;
-    
-    const currentIndex = canvasElements.findIndex(el => el.id === selectedElement.id);
-    if (currentIndex < canvasElements.length - 1) {
-      const newElements = [...canvasElements];
-      [newElements[currentIndex], newElements[currentIndex + 1]] = 
-      [newElements[currentIndex + 1], newElements[currentIndex]];
-      setCanvasElements(newElements);
-      addToHistory(newElements);
-    }
-  };
-
-  const moveElementDown = () => {
-    if (!selectedElement) return;
-    
-    const currentIndex = canvasElements.findIndex(el => el.id === selectedElement.id);
-    if (currentIndex > 0) {
-      const newElements = [...canvasElements];
-      [newElements[currentIndex], newElements[currentIndex - 1]] = 
-      [newElements[currentIndex - 1], newElements[currentIndex]];
-      setCanvasElements(newElements);
-      addToHistory(newElements);
-    }
-  };
-
-  const exportDesign = async (format = 'pdf') => {
-    try {
-      setLoading(true);
-      // Aquí iría la lógica de exportación
-      console.log(`Exportando diseño en formato ${format}`);
-    } catch (error) {
-      setError('Error al exportar el diseño');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleCanvasClick = (e) => {
     const rect = canvasRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) * (canvasSize.width / rect.width);
     const y = (e.clientY - rect.top) * (canvasSize.height / rect.height);
     
-    // Buscar elemento clickeado (de arriba hacia abajo)
     const clickedElement = [...canvasElements].reverse().find(el => {
       return x >= el.x && x <= el.x + el.width &&
              y >= el.y && y <= el.y + el.height;
@@ -399,6 +329,109 @@ export function Dashboard() {
     setSelectedElement(clickedElement || null);
   };
 
+  const exportDesign = async (format = 'pdf') => {
+    try {
+      setLoading(true);
+      console.log(`Exportando diseño en formato ${format}`);
+      // Aquí iría la lógica de exportación real
+    } catch (error) {
+      console.error('Error al exportar:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Si no está en modo editor, mostrar vista inicial
+  if (!showEditor) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  ¡Hola, {user?.name || user?.username}!
+                </h1>
+                <p className="text-gray-600 mt-1">
+                  Crea invitaciones hermosas con nuestro editor visual
+                </p>
+              </div>
+              <Button onClick={startNewInvitation} className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Nueva Invitación
+              </Button>
+            </div>
+          </div>
+
+          {/* Tarjeta de bienvenida */}
+          <Card className="mb-8">
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <div className="text-6xl mb-4">🎨</div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Editor de Invitaciones
+              </h3>
+              <p className="text-gray-600 mb-6 text-center max-w-md">
+                Diseña invitaciones profesionales con nuestro editor visual. 
+                Elige plantillas, personaliza texto, colores y mucho más.
+              </p>
+              <Button onClick={startNewInvitation} size="lg">
+                <Plus className="h-5 w-5 mr-2" />
+                Comenzar a Diseñar
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Características */}
+          <div className="grid md:grid-cols-3 gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Type className="h-5 w-5 text-blue-500" />
+                  Texto Personalizable
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Múltiples fuentes, tamaños y estilos para crear el texto perfecto.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Palette className="h-5 w-5 text-green-500" />
+                  Colores y Diseño
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Paleta de colores completa y elementos decorativos para personalizar.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Download className="h-5 w-5 text-purple-500" />
+                  Exportación
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">
+                  Descarga en PDF, PNG o JPG en alta calidad para imprimir o compartir.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Vista del editor
   return (
     <div className="h-screen flex bg-gray-50">
       {/* Panel lateral izquierdo */}
@@ -413,6 +446,9 @@ export function Dashboard() {
               </Button>
               <Button variant="ghost" size="sm" onClick={redo} disabled={historyIndex >= history.length - 1}>
                 <Redo className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="sm" onClick={() => setShowEditor(false)}>
+                ←
               </Button>
             </div>
           </div>
@@ -432,7 +468,7 @@ export function Dashboard() {
             <TabsContent value="templates" className="p-4 space-y-4">
               <div className="space-y-3">
                 <h3 className="font-medium text-gray-900">Selecciona una plantilla</h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 gap-3">
                   {templates.map((template) => (
                     <div
                       key={template.id}
@@ -503,7 +539,7 @@ export function Dashboard() {
                             style={{ fontFamily: font.family }}
                             onClick={() => updateSelectedElement({ fontFamily: font.family })}
                           >
-                            <span className="text-lg">{font.preview}</span>
+                            <span className="text-lg">Aa</span>
                             <span className="ml-2 text-sm text-gray-600">{font.name}</span>
                           </button>
                         ))}
@@ -669,7 +705,11 @@ export function Dashboard() {
                         onClick={() => {
                           const bgElement = canvasElements.find(el => el.type === 'background');
                           if (bgElement) {
-                            updateSelectedElement({ color });
+                            const newElements = canvasElements.map(el => 
+                              el.type === 'background' ? { ...el, color } : el
+                            );
+                            setCanvasElements(newElements);
+                            addToHistory(newElements);
                           }
                         }}
                       />
@@ -680,7 +720,7 @@ export function Dashboard() {
                 {/* Propiedades del elemento seleccionado */}
                 {selectedElement && selectedElement.type !== 'background' && (
                   <div className="border-t pt-4 space-y-4">
-                    <h3 className="font-medium text-gray-900">Propiedades del Elemento</h3>
+                    <h3 className="font-medium text-gray-900">Propiedades</h3>
                     
                     {/* Posición */}
                     <div className="grid grid-cols-2 gap-2">
@@ -706,30 +746,6 @@ export function Dashboard() {
                       </div>
                     </div>
 
-                    {/* Tamaño */}
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <Label htmlFor="element-width">Ancho</Label>
-                        <Input
-                          id="element-width"
-                          type="number"
-                          value={selectedElement.width}
-                          onChange={(e) => updateSelectedElement({ width: parseInt(e.target.value) || 0 })}
-                          className="mt-1"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="element-height">Alto</Label>
-                        <Input
-                          id="element-height"
-                          type="number"
-                          value={selectedElement.height}
-                          onChange={(e) => updateSelectedElement({ height: parseInt(e.target.value) || 0 })}
-                          className="mt-1"
-                        />
-                      </div>
-                    </div>
-
                     {/* Opacidad */}
                     <div>
                       <Label>Opacidad: {Math.round((selectedElement.opacity || 1) * 100)}%</Label>
@@ -743,47 +759,8 @@ export function Dashboard() {
                       />
                     </div>
 
-                    {/* Rotación */}
-                    <div>
-                      <Label>Rotación: {selectedElement.rotation || 0}°</Label>
-                      <Slider
-                        value={[selectedElement.rotation || 0]}
-                        onValueChange={([value]) => updateSelectedElement({ rotation: value })}
-                        min={-180}
-                        max={180}
-                        step={5}
-                        className="mt-2"
-                      />
-                    </div>
-
-                    {/* Blend Mode */}
-                    <div>
-                      <Label htmlFor="blend-mode">Modo de Mezcla</Label>
-                      <Select
-                        value={selectedElement.blendMode || 'normal'}
-                        onValueChange={(value) => updateSelectedElement({ blendMode: value })}
-                      >
-                        <SelectTrigger className="mt-1">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {blendModes.map((mode) => (
-                            <SelectItem key={mode} value={mode}>
-                              {mode.charAt(0).toUpperCase() + mode.slice(1)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
                     {/* Acciones del elemento */}
                     <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={moveElementUp}>
-                        ↑
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={moveElementDown}>
-                        ↓
-                      </Button>
                       <Button variant="outline" size="sm" onClick={deleteSelectedElement}>
                         <Trash className="h-4 w-4" />
                       </Button>
@@ -798,7 +775,7 @@ export function Dashboard() {
               <div className="space-y-2">
                 <h3 className="font-medium text-gray-900">Capas</h3>
                 <div className="space-y-1">
-                  {[...canvasElements].reverse().map((element, index) => (
+                  {[...canvasElements].reverse().map((element) => (
                     <div
                       key={element.id}
                       className={`p-2 rounded border cursor-pointer transition-colors ${
@@ -811,28 +788,26 @@ export function Dashboard() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           {element.type === 'text' && <Type className="h-4 w-4" />}
-                          {element.type === 'sticker' && <Smile className="h-4 w-4" />}
-                          {element.type === 'background' && <Square className="h-4 w-4" />}
+                          {element.type === 'sticker' && <span className="text-sm">{element.content}</span>}
+                          {element.type === 'background' && <div className="w-4 h-4 rounded border" style={{ backgroundColor: element.color }} />}
                           <span className="text-sm">
                             {element.type === 'text' ? element.content.substring(0, 20) : 
-                             element.type === 'sticker' ? element.content :
+                             element.type === 'sticker' ? 'Sticker' :
                              'Fondo'}
                           </span>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              updateSelectedElement({ 
-                                opacity: element.opacity === 0 ? 1 : 0 
-                              });
-                            }}
-                          >
-                            <Eye className="h-3 w-3" />
-                          </Button>
-                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            updateSelectedElement({ 
+                              opacity: element.opacity === 0 ? 1 : 0 
+                            });
+                          }}
+                        >
+                          <Eye className="h-3 w-3" />
+                        </Button>
                       </div>
                     </div>
                   ))}
@@ -930,15 +905,13 @@ export function Dashboard() {
               className="relative bg-white shadow-lg"
               style={{
                 width: canvasSize.width * (zoom / 100),
-                height: canvasSize.height * (zoom / 100),
-                transform: `scale(${zoom / 100})`,
-                transformOrigin: 'top left'
+                height: canvasSize.height * (zoom / 100)
               }}
             >
               <svg
                 ref={canvasRef}
-                width={canvasSize.width}
-                height={canvasSize.height}
+                width={canvasSize.width * (zoom / 100)}
+                height={canvasSize.height * (zoom / 100)}
                 className="absolute inset-0 cursor-pointer"
                 onClick={handleCanvasClick}
                 style={{
@@ -946,6 +919,7 @@ export function Dashboard() {
                     'radial-gradient(circle, #e5e7eb 1px, transparent 1px)' : 'none',
                   backgroundSize: showGrid ? '20px 20px' : 'auto'
                 }}
+                viewBox={`0 0 ${canvasSize.width} ${canvasSize.height}`}
               >
                 {/* Renderizar elementos del canvas */}
                 {canvasElements.map((element) => {
@@ -983,8 +957,6 @@ export function Dashboard() {
                             fontStyle: element.fontStyle,
                             textDecoration: element.textDecoration,
                             opacity: element.opacity || 1,
-                            transform: `rotate(${element.rotation || 0}deg)`,
-                            mixBlendMode: element.blendMode || 'normal',
                             width: '100%',
                             height: '100%',
                             display: 'flex',
@@ -1013,8 +985,6 @@ export function Dashboard() {
                           style={{
                             fontSize: `${element.fontSize}px`,
                             opacity: element.opacity || 1,
-                            transform: `rotate(${element.rotation || 0}deg)`,
-                            mixBlendMode: element.blendMode || 'normal',
                             width: '100%',
                             height: '100%',
                             display: 'flex',
