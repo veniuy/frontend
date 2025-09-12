@@ -25,46 +25,17 @@ const CreateEvent = () => {
   });
   const [paymentMethod, setPaymentMethod] = useState('');
   const [loading, setLoading] = useState(false);
-  const [plansLoading, setPlansLoading] = useState(false);
-  const [plansError, setPlansError] = useState(null);
 
   useEffect(() => {
     fetchPlans();
   }, []);
 
   const fetchPlans = async () => {
-    setPlansLoading(true);
-    setPlansError(null);
     try {
       const response = await api.get('/plans');
-      
-      // SOLUCIÓN: Verificar la estructura de la respuesta y manejar diferentes formatos
-      let plansData = [];
-      
-      if (response && response.plans && Array.isArray(response.plans)) {
-        // Formato: { plans: [...] }
-        plansData = response.plans;
-      } else if (response && response.data && Array.isArray(response.data)) {
-        // Formato: { data: [...] }
-        plansData = response.data;
-      } else if (response && response.data && response.data.data && Array.isArray(response.data.data)) {
-        // Formato: { data: { data: [...] } }
-        plansData = response.data.data;
-      } else if (Array.isArray(response)) {
-        // Formato: [...]
-        plansData = response;
-      } else {
-        console.warn('Formato de respuesta inesperado para planes:', response);
-        plansData = [];
-      }
-      
-      setPlans(plansData);
+      setPlans(response.data.data);
     } catch (error) {
       console.error('Error fetching plans:', error);
-      setPlansError('Error al cargar los planes. Por favor, intenta nuevamente.');
-      setPlans([]); // Asegurar que plans sea siempre un array
-    } finally {
-      setPlansLoading(false);
     }
   };
 
@@ -233,78 +204,49 @@ const CreateEvent = () => {
         <CardTitle>Selecciona tu Plan</CardTitle>
       </CardHeader>
       <CardContent>
-        {plansLoading && (
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-            <p className="mt-2 text-gray-600">Cargando planes...</p>
-          </div>
-        )}
-        
-        {plansError && (
-          <div className="text-center py-8">
-            <p className="text-red-600 mb-4">{plansError}</p>
-            <Button onClick={fetchPlans} variant="outline">
-              Reintentar
-            </Button>
-          </div>
-        )}
-        
-        {!plansLoading && !plansError && (
-          <>
-            {plans.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-600">No hay planes disponibles en este momento.</p>
-                <Button onClick={fetchPlans} variant="outline" className="mt-4">
-                  Recargar
-                </Button>
-              </div>
-            ) : (
-              <div className="grid md:grid-cols-2 gap-6">
-                {plans.map((plan) => (
-                  <Card 
-                    key={plan.id} 
-                    className={`cursor-pointer transition-all ${
-                      selectedPlan?.id === plan.id ? 'ring-2 ring-blue-500' : ''
-                    }`}
-                    onClick={() => setSelectedPlan(plan)}
-                  >
-                    <CardHeader>
-                      <CardTitle className="flex justify-between items-center">
-                        {plan.name}
-                        <Badge variant={plan.name === 'Free' ? 'secondary' : 'default'}>
-                          ${plan.price} {plan.currency}
-                        </Badge>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-gray-600 mb-4">{plan.description}</p>
-                      <ul className="space-y-2 text-sm">
-                        <li className="flex items-center gap-2">
-                          <Users className="h-4 w-4" />
-                          Hasta {plan.max_guests} invitados
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
-                          {plan.max_images} imágenes
-                        </li>
-                        {plan.premium_templates && (
-                          <li className="flex items-center gap-2">
-                            <Badge variant="outline">Plantillas Premium</Badge>
-                          </li>
-                        )}
-                        {plan.remove_watermark && (
-                          <li className="flex items-center gap-2">
-                            <Badge variant="outline">Sin Marca de Agua</Badge>
-                          </li>
-                        )}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </>
-        )}
+        <div className="grid md:grid-cols-2 gap-6">
+          {plans.map((plan) => (
+            <Card 
+              key={plan.id} 
+              className={`cursor-pointer transition-all ${
+                selectedPlan?.id === plan.id ? 'ring-2 ring-blue-500' : ''
+              }`}
+              onClick={() => setSelectedPlan(plan)}
+            >
+              <CardHeader>
+                <CardTitle className="flex justify-between items-center">
+                  {plan.name}
+                  <Badge variant={plan.name === 'Free' ? 'secondary' : 'default'}>
+                    ${plan.price} {plan.currency}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600 mb-4">{plan.description}</p>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center gap-2">
+                    <Users className="h-4 w-4" />
+                    Hasta {plan.max_guests} invitados
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    {plan.max_images} imágenes
+                  </li>
+                  {plan.premium_templates && (
+                    <li className="flex items-center gap-2">
+                      <Badge variant="outline">Plantillas Premium</Badge>
+                    </li>
+                  )}
+                  {plan.remove_watermark && (
+                    <li className="flex items-center gap-2">
+                      <Badge variant="outline">Sin Marca de Agua</Badge>
+                    </li>
+                  )}
+                </ul>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
         
         <div className="flex gap-4 mt-6">
           <Button variant="outline" onClick={() => setStep(1)}>
@@ -312,7 +254,7 @@ const CreateEvent = () => {
           </Button>
           <Button 
             onClick={() => setStep(3)} 
-            disabled={!selectedPlan || plansLoading}
+            disabled={!selectedPlan}
             className="flex-1"
           >
             Continuar
@@ -440,3 +382,4 @@ const CreateEvent = () => {
 };
 
 export default CreateEvent;
+
