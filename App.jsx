@@ -1,3 +1,4 @@
+// src/App.jsx
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth.jsx';
@@ -27,6 +28,9 @@ import Corporativos from './pages/categories/Corporativos';
 import Graduaciones from './pages/categories/Graduaciones';
 import './utils/assets';
 
+// Admin
+import RequireAdmin from './components/RequireAdmin.jsx';
+import AdminDashboard from './pages/AdminDashboard.jsx';
 
 function App() {
   const { user, loading } = useAuth();
@@ -75,6 +79,16 @@ function App() {
         <Route path="events/create" element={<CreateEvent />} />
         <Route path="payment/transfer/:eventId" element={<PaymentTransfer />} />
         <Route path="payment/code/:eventId" element={<PaymentCode />} />
+
+        {/* Admin (protegido por rol) */}
+        <Route
+          path="admin"
+          element={
+            <RequireAdmin>
+              <AdminDashboard />
+            </RequireAdmin>
+          }
+        />
       </Route>
 
       {/* fallback */}
