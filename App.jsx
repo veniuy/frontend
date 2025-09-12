@@ -91,6 +91,9 @@ function App() {
         />
       </Route>
 
+      {/* Neutraliza /index.html si el host te lo redirige */}
+      <Route path="/index.html" element={<Navigate to="/" replace />} />
+
       {/* fallback */}
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
