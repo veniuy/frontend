@@ -1,4 +1,4 @@
-import { Button } from '../ui/button'
+import { Button } from '../../ui/button'
 import { Heart, Calendar } from 'lucide-react'
 
 const RSVPSection = ({ 
