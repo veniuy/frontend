@@ -12,6 +12,10 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import CreateEvent from './pages/CreateEvent';
+import EventWizard from './pages/EventWizard';
+import EventBuilder from './pages/EventBuilder';
+import EventPreview from './pages/EventPreview';
+import PublicEvent from './pages/PublicEvent';
 import PaymentTransfer from './pages/PaymentTransfer';
 import PaymentCode from './pages/PaymentCode';
 import DemoWedding from './pages/DemoWedding';
@@ -68,6 +72,9 @@ function App() {
       <Route path="/categorias/corporativos" element={<Corporativos />} />
       <Route path="/categorias/graduaciones" element={<Graduaciones />} />
       
+      {/* Public event route */}
+      <Route path="/p/:slug" element={<PublicEvent />} />
+      
       {/* Auth routes */}
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/app/dashboard" />} />
       <Route path="/register" element={!user ? <Register /> : <Navigate to="/app/dashboard" />} />
@@ -77,6 +84,9 @@ function App() {
         <Route index element={<Navigate to="/app/dashboard" />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="events/create" element={<CreateEvent />} />
+        <Route path="events/wizard" element={<EventWizard />} />
+        <Route path="events/:id/builder" element={<EventBuilder />} />
+        <Route path="events/:id/preview" element={<EventPreview />} />
         <Route path="payment/transfer/:eventId" element={<PaymentTransfer />} />
         <Route path="payment/code/:eventId" element={<PaymentCode />} />
 
