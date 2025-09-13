@@ -339,6 +339,11 @@ function Landing() {
         onClick={(e) => { e.preventDefault(); onClick?.(); navigate('/categorias/graduaciones') }}
       >Graduaciones</a>
       <a
+        className="block px-3 py-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors border border-primary/20 rounded-md bg-primary/5"
+        href="/editor"
+        onClick={(e) => { e.preventDefault(); onClick?.(); navigate('/editor') }}
+      >🎨 Editor de Invitaciones</a>
+      <a
         className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
         href="/products"
         onClick={(e) => { e.preventDefault(); onClick?.(); navigate('/products') }}
