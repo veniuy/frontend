@@ -1,6 +1,5 @@
 import { MapPin, Navigation } from 'lucide-react'
-import { Button } from '../ui/button'
-
+import { Button } from '../../ui/button'
 const VenueBlock = ({ 
   block, 
   theme, 
