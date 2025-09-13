@@ -3,16 +3,32 @@ import { apiClient } from '../lib/api';
 
 const AuthContext = createContext();
 
+// Verificar si estamos en modo desarrollo
+const DEV_MODE = import.meta.env.VITE_DEV_MODE === 'true';
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!DEV_MODE); // No loading en dev mode
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    checkAuthStatus();
+    if (!DEV_MODE) {
+      checkAuthStatus();
+    } else {
+      // En modo desarrollo, simular usuario autenticado
+      setUser({
+        id: 'dev-user',
+        email: 'dev@example.com',
+        name: 'Usuario de Desarrollo',
+        role: 'admin'
+      });
+      setLoading(false);
+    }
   }, []);
 
   const checkAuthStatus = async () => {
+    if (DEV_MODE) return;
+    
     try {
       setLoading(true);
       const response = await apiClient.getCurrentUser();
@@ -26,6 +42,18 @@ export function AuthProvider({ children }) {
   };
 
   const login = async (credentials) => {
+    if (DEV_MODE) {
+      // En modo desarrollo, simular login exitoso
+      const mockUser = {
+        id: 'dev-user',
+        email: credentials.email || 'dev@example.com',
+        name: 'Usuario de Desarrollo',
+        role: 'admin'
+      };
+      setUser(mockUser);
+      return { user: mockUser };
+    }
+
     try {
       setError(null);
       const response = await apiClient.login(credentials);
@@ -38,6 +66,18 @@ export function AuthProvider({ children }) {
   };
 
   const register = async (userData) => {
+    if (DEV_MODE) {
+      // En modo desarrollo, simular registro exitoso
+      const mockUser = {
+        id: 'dev-user',
+        email: userData.email || 'dev@example.com',
+        name: userData.name || 'Usuario de Desarrollo',
+        role: 'user'
+      };
+      setUser(mockUser);
+      return { user: mockUser };
+    }
+
     try {
       setError(null);
       const response = await apiClient.register(userData);
@@ -50,6 +90,11 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
+    if (DEV_MODE) {
+      setUser(null);
+      return;
+    }
+
     try {
       await apiClient.logout();
       setUser(null);
@@ -68,6 +113,7 @@ export function AuthProvider({ children }) {
     register,
     logout,
     isAuthenticated: !!user,
+    isDevMode: DEV_MODE,
   };
 
   return (
