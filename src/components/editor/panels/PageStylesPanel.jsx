@@ -1,7 +1,7 @@
 import { Button } from '../../ui/button'
 import { Card, CardContent } from '../ui/card'
 import { Badge } from '../ui/badge'
-import { FONT_FAMILIES } from '../../hooks/useInvitationEditor'
+import { FONT_FAMILIES } from '../../../hooks/useInvitationEditor'
 
 const PageStylesPanel = ({ invitation, updateInvitation, updateElement }) => {
   const currentStyle = invitation.style
