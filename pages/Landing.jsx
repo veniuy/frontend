@@ -340,6 +340,11 @@ function Landing() {
       >Graduaciones</a>
       <a
         className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+        href="/plantillas"
+        onClick={(e) => { e.preventDefault(); onClick?.(); navigate('/plantillas') }}
+      >Galería de Plantillas</a>
+      <a
+        className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
         href="/products"
         onClick={(e) => { e.preventDefault(); onClick?.(); navigate('/products') }}
       >Todas las Plantillas</a>
