@@ -18,7 +18,6 @@ import DemoQuinceanera from './pages/DemoQuinceanera';
 import DemoBlack from './pages/DemoBlack';
 import DemoPremium from './pages/DemoPremium';
 import DemoClassic from './pages/DemoClassic';
-import InvitationEditorV2 from './pages/InvitationEditorV2';
 // Category pages
 import Boda from './pages/categories/Boda';
 import Quinceaneras from './pages/categories/Quinceaneras';
@@ -77,10 +76,6 @@ function App() {
         <Route path="payment/transfer/:eventId" element={<PaymentTransfer />} />
         <Route path="payment/code/:eventId" element={<PaymentCode />} />
       </Route>
-      
-      {/* Editor routes (full screen) */}
-      <Route path="/editor" element={user ? <InvitationEditorV2 /> : <Navigate to="/login" />} />
-      <Route path="/editor/:designId" element={user ? <InvitationEditorV2 /> : <Navigate to="/login" />} />
 
       {/* fallback */}
       <Route path="*" element={<Navigate to="/" />} />
