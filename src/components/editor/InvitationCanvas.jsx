@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Card } from '../ui/card'
-import { Button } from '../ui/button'
+import { Button } from '../../ui/button'
 import { Badge } from '../ui/badge'
 import { FONT_FAMILIES } from '../../hooks/useInvitationEditor'
 import HeaderSection from './blocks/HeaderSection'
