@@ -1,4 +1,4 @@
-// DemoBlack.jsx
+// src/pages/DemoBlack.jsx
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button'
@@ -6,7 +6,7 @@ import { Card, CardContent } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Input } from '../components/ui/input'
 import { Textarea } from '../components/ui/textarea'
-import { 
+import {
   Heart,
   MapPin,
   Calendar,
@@ -34,6 +34,9 @@ import {
   CreditCard
 } from 'lucide-react'
 
+// 👉 util para mapear rutas a /src/assets/* (mismo helper que en Quinceañera)
+import { asset, onImgError } from '../utils/assets'
+
 // ------------------------------------
 // Paleta (elegante, consistente)
 // ------------------------------------
@@ -53,7 +56,7 @@ const PALETTE = {
   paper: '#F8F8F6'
 }
 
-// Helpers para clases de botones con la paleta
+// (quedan definidos por si luego los usás)
 const btnPrimary = `bg-[${PALETTE.sage}] hover:bg-[${PALETTE.sageDark}] text-white`
 const btnOutline = `border-[${PALETTE.sage}] text-[${PALETTE.sage}] hover:bg-[${PALETTE.sageLight}]`
 
@@ -61,8 +64,10 @@ const btnOutline = `border-[${PALETTE.sage}] text-[${PALETTE.sage}] hover:bg-[${
 function TimeCell({ value, label }) {
   return (
     <div className="flex flex-col items-center">
-      <div className="font-light leading-none"
-           style={{ fontSize: 'clamp(2.25rem, 7vw, 4.5rem)', color: PALETTE.white }}>
+      <div
+        className="font-light leading-none"
+        style={{ fontSize: 'clamp(2.25rem, 7vw, 4.5rem)', color: PALETTE.white }}
+      >
         {String(value).padStart(2, '0')}
       </div>
       <div className="opacity-90 text-sm sm:text-base" style={{ color: PALETTE.white }}>
@@ -93,13 +98,15 @@ function DemoBlack() {
   // -----------------------------
   const targetDate = new Date('2024-11-23T19:00:00') // ajusta según tu evento
   const getDiff = () => {
-    const now = new Date()
-    const diff = Math.max(0, targetDate.getTime() - now.getTime())
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24)
-    const minutes = Math.floor((diff / (1000 * 60)) % 60)
-    const seconds = Math.floor((diff / 1000) % 60)
-    return { days, hours, minutes, seconds }
+    the_now: {
+      const now = new Date()
+      const diff = Math.max(0, targetDate.getTime() - now.getTime())
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24)
+      const minutes = Math.floor((diff / (1000 * 60)) % 60)
+      const seconds = Math.floor((diff / 1000) % 60)
+      return { days, hours, minutes, seconds }
+    }
   }
   const [timeLeft, setTimeLeft] = useState(getDiff())
   useEffect(() => {
@@ -135,6 +142,11 @@ function DemoBlack() {
       setRsvpData({ name: '', email: '', attendance: '', guests: 1, message: '' })
     }, 2500)
   }
+
+  // Assets (resueltos con helper + fallback onError)
+  const paperTexture = asset('src/assets/portada.jpg')
+  const floralTop = asset('src/assets/hero_top.png')
+  const floralBottom = asset('src/assets/hero_bottom.png')
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: PALETTE.paper }}>
@@ -181,7 +193,8 @@ function DemoBlack() {
         {/* textura papel */}
         <div className="absolute inset-0">
           <img
-            src="/src/assets/portada.jpg" /* si no existe, reemplaza por tu textura */
+            src={paperTexture}
+            onError={(e) => onImgError(e, 'Textura papel')}
             alt="Textura papel"
             className="absolute inset-0 w-full h-full object-cover object-center block"
           />
@@ -190,14 +203,16 @@ function DemoBlack() {
         {/* florales decorativos (sin franjas) */}
         <div className="absolute top-0 left-0 w-[420px] h-[260px] opacity-80 pointer-events-none">
           <img
-            src="/src/assets/hero_top.png" /* usa tu PNG decorativo */
+            src={floralTop}
+            onError={(e) => onImgError(e, 'Decorativo superior')}
             alt="Decorativo superior"
             className="absolute inset-0 w-full h-full object-cover block"
           />
         </div>
         <div className="absolute bottom-0 right-0 w-[460px] h-[280px] opacity-80 pointer-events-none">
           <img
-            src="/src/assets/hero_bottom.png" /* usa tu PNG decorativo */
+            src={floralBottom}
+            onError={(e) => onImgError(e, 'Decorativo inferior')}
             alt="Decorativo inferior"
             className="absolute inset-0 w-full h-full object-cover block"
           />
@@ -215,8 +230,10 @@ function DemoBlack() {
 
             <div className="flex items-center justify-center my-6">
               <div className="h-px w-16" style={{ backgroundColor: '#CFCFCF' }} />
-              <div className="mx-4 font-light"
-                   style={{ color: PALETTE.sage, fontSize: 'clamp(1.75rem, 5vw, 3rem)' }}>
+              <div
+                className="mx-4 font-light"
+                style={{ color: PALETTE.sage, fontSize: 'clamp(1.75rem, 5vw, 3rem)' }}
+              >
                 ∞
               </div>
               <div className="h-px w-16" style={{ backgroundColor: '#CFCFCF' }} />
@@ -229,8 +246,10 @@ function DemoBlack() {
               {weddingData.couple.groom.toUpperCase()}
             </h1>
 
-            <p className="font-light mb-10 tracking-wide"
-               style={{ color: PALETTE.muted, fontSize: 'clamp(1.1rem, 3.5vw, 1.5rem)' }}>
+            <p
+              className="font-light mb-10 tracking-wide"
+              style={{ color: PALETTE.muted, fontSize: 'clamp(1.1rem, 3.5vw, 1.5rem)' }}
+            >
               ¡NOS CASAMOS!
             </p>
 
@@ -245,21 +264,35 @@ function DemoBlack() {
       {/* Countdown: grande, centrado, mobile-first */}
       <section className="py-12 sm:py-16" style={{ backgroundColor: PALETTE.sage }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="font-light mb-6 sm:mb-8 tracking-wide"
-              style={{ color: PALETTE.white, fontSize: 'clamp(1.25rem, 3.5vw, 1.875rem)' }}>
+          <h2
+            className="font-light mb-6 sm:mb-8 tracking-wide"
+            style={{ color: PALETTE.white, fontSize: 'clamp(1.25rem, 3.5vw, 1.875rem)' }}
+          >
             Bienvenidos a nuestra boda
           </h2>
 
           <div className="flex items-stretch justify-center gap-5 sm:gap-8">
             <TimeCell value={timeLeft.days} label="días" />
-            <div className="self-center font-light"
-                 style={{ color: PALETTE.white, fontSize: 'clamp(2rem, 7vw, 4rem)' }}>:</div>
+            <div
+              className="self-center font-light"
+              style={{ color: PALETTE.white, fontSize: 'clamp(2rem, 7vw, 4rem)' }}
+            >
+              :
+            </div>
             <TimeCell value={timeLeft.hours} label="hs" />
-            <div className="self-center font-light"
-                 style={{ color: PALETTE.white, fontSize: 'clamp(2rem, 7vw, 4rem)' }}>:</div>
+            <div
+              className="self-center font-light"
+              style={{ color: PALETTE.white, fontSize: 'clamp(2rem, 7vw, 4rem)' }}
+            >
+              :
+            </div>
             <TimeCell value={timeLeft.minutes} label="min" />
-            <div className="self-center font-light"
-                 style={{ color: PALETTE.white, fontSize: 'clamp(2rem, 7vw, 4rem)' }}>:</div>
+            <div
+              className="self-center font-light"
+              style={{ color: PALETTE.white, fontSize: 'clamp(2rem, 7vw, 4rem)' }}
+            >
+              :
+            </div>
             <TimeCell value={timeLeft.seconds} label="seg" />
           </div>
         </div>
@@ -277,7 +310,10 @@ function DemoBlack() {
               >
                 <Church className="w-8 h-8" style={{ color: PALETTE.sage }} />
               </div>
-              <h3 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ color: PALETTE.ink }}>
+              <h3
+                className="text-2xl font-display font-medium mb-6 tracking-wide"
+                style={{ color: PALETTE.ink }}
+              >
                 CEREMONIA
               </h3>
               <div className="space-y-3 mb-8" style={{ color: PALETTE.text }}>
@@ -285,12 +321,16 @@ function DemoBlack() {
                 <p className="text-lg">{weddingData.ceremony.time}</p>
                 <p className="font-medium">{weddingData.ceremony.venue}</p>
                 <p>{weddingData.ceremony.location}</p>
-                <p className="text-sm" style={{ color: PALETTE.muted }}>Recibí debajo las indicaciones para llegar.</p>
+                <p className="text-sm" style={{ color: PALETTE.muted }}>
+                  Recibí debajo las indicaciones para llegar.
+                </p>
               </div>
               <Button
                 className="px-8 py-3 rounded-full"
                 style={{ backgroundColor: PALETTE.sage, color: PALETTE.white }}
-                onClick={() => window.open(`https://maps.google.com/?q=${weddingData.ceremony.address}`, '_blank')}
+                onClick={() =>
+                  window.open(`https://maps.google.com/?q=${weddingData.ceremony.address}`, '_blank')
+                }
               >
                 LLEGAR A LA CEREMONIA
               </Button>
@@ -304,19 +344,26 @@ function DemoBlack() {
               >
                 <PartyPopper className="w-8 h-8" style={{ color: PALETTE.sage }} />
               </div>
-              <h3 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ color: PALETTE.ink }}>
+              <h3
+                className="text-2xl font-display font-medium mb-6 tracking-wide"
+                style={{ color: PALETTE.ink }}
+              >
                 FIESTA
               </h3>
               <div className="space-y-3 mb-8" style={{ color: PALETTE.text }}>
                 <p className="text-lg">{weddingData.reception.time}</p>
                 <p className="font-medium">{weddingData.reception.venue}</p>
                 <p>{weddingData.reception.location}</p>
-                <p className="text-lg font-medium" style={{ color: PALETTE.sage }}>¡Te esperamos!</p>
+                <p className="text-lg font-medium" style={{ color: PALETTE.sage }}>
+                  ¡Te esperamos!
+                </p>
               </div>
               <Button
                 className="px-8 py-3 rounded-full"
                 style={{ backgroundColor: PALETTE.sage, color: PALETTE.white }}
-                onClick={() => window.open(`https://maps.google.com/?q=${weddingData.reception.address}`, '_blank')}
+                onClick={() =>
+                  window.open(`https://maps.google.com/?q=${weddingData.reception.address}`, '_blank')
+                }
               >
                 LLEGAR A LA FIESTA
               </Button>
@@ -329,7 +376,10 @@ function DemoBlack() {
       <section className="py-16 text-center" style={{ backgroundColor: PALETTE.almond }}>
         <div className="max-w-3xl mx-auto px-4">
           <Gift className="w-10 h-10 mx-auto mb-6" style={{ color: PALETTE.white }} />
-          <p className="mb-8" style={{ color: PALETTE.white, fontSize: 'clamp(1rem, 2.5vw, 1.25rem)' }}>
+          <p
+            className="mb-8"
+            style={{ color: PALETTE.white, fontSize: 'clamp(1rem, 2.5vw, 1.25rem)' }}
+          >
             Si deseás realizarnos un regalo podés colaborar con nuestra Luna de Miel…
           </p>
           <Button
@@ -371,9 +421,7 @@ function DemoBlack() {
       {/* Dress Code */}
       <section className="py-16" style={{ backgroundColor: '#1F2937', color: PALETTE.white }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-display font-medium mb-4 tracking-wide">
-            DRESS CODE
-          </h2>
+          <h2 className="text-2xl font-display font-medium mb-4 tracking-wide">DRESS CODE</h2>
           <p className="text-lg">{weddingData.dressCode}</p>
         </div>
       </section>
@@ -411,7 +459,10 @@ function DemoBlack() {
       {/* Sugerencias musicales */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ color: PALETTE.ink }}>
+          <h2
+            className="text-2xl font-display font-medium mb-6 tracking-wide"
+            style={{ color: PALETTE.ink }}
+          >
             ¿QUÉ CANCIONES NO PUEDEN FALTAR?
           </h2>
           <p className="mb-8 max-w-2xl mx-auto" style={{ color: PALETTE.text }}>
@@ -430,7 +481,10 @@ function DemoBlack() {
       {/* Info útil */}
       <section className="py-16" style={{ backgroundColor: PALETTE.paper }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ color: PALETTE.ink }}>
+          <h2
+            className="text-2xl font-display font-medium mb-6 tracking-wide"
+            style={{ color: PALETTE.ink }}
+          >
             INFO ÚTIL
           </h2>
           <p className="mb-8 max-w-2xl mx-auto" style={{ color: PALETTE.text }}>
@@ -449,13 +503,14 @@ function DemoBlack() {
       {/* Footer */}
       <footer className="py-12" style={{ backgroundColor: '#1F2937', color: PALETTE.white }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <p className="text-lg mb-8">
-            ¡Gracias por acompañarnos en este momento tan importante!
-          </p>
+          <p className="text-lg mb-8">¡Gracias por acompañarnos en este momento tan importante!</p>
 
           <div className="pt-8" style={{ borderTop: '1px solid #4B5563' }}>
             <p className="text-sm opacity-70 mb-4">
-              Invitación digital creada con ❤️ por <span className="font-medium" style={{ color: PALETTE.sage }}>Venite</span>
+              Invitación digital creada con ❤️ por{' '}
+              <span className="font-medium" style={{ color: PALETTE.sage }}>
+                Venite
+              </span>
             </p>
             <div className="flex justify-center gap-3">
               <Button
@@ -487,7 +542,9 @@ function DemoBlack() {
           <Card className="w-full max-w-md">
             <CardContent className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-medium" style={{ color: PALETTE.ink }}>Confirmar Asistencia</h3>
+                <h3 className="text-xl font-medium" style={{ color: PALETTE.ink }}>
+                  Confirmar Asistencia
+                </h3>
                 <Button variant="ghost" size="sm" onClick={() => setShowRSVP(false)}>
                   <X className="w-4 h-4" />
                 </Button>
@@ -556,7 +613,9 @@ function DemoBlack() {
                         min="0"
                         max="5"
                         value={rsvpData.guests}
-                        onChange={(e) => setRsvpData({ ...rsvpData, guests: parseInt(e.target.value || '0', 10) })}
+                        onChange={(e) =>
+                          setRsvpData({ ...rsvpData, guests: parseInt(e.target.value || '0', 10) })
+                        }
                       />
                     </div>
                   )}
@@ -573,11 +632,7 @@ function DemoBlack() {
                     />
                   </div>
 
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    style={{ backgroundColor: PALETTE.sage, color: PALETTE.white }}
-                  >
+                  <Button type="submit" className="w-full" style={{ backgroundColor: PALETTE.sage, color: PALETTE.white }}>
                     <Heart className="w-4 h-4 mr-2" />
                     Confirmar Asistencia
                   </Button>
@@ -594,7 +649,9 @@ function DemoBlack() {
           <Card className="w-full max-w-md">
             <CardContent className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-medium" style={{ color: PALETTE.ink }}>Datos Bancarios</h3>
+                <h3 className="text-xl font-medium" style={{ color: PALETTE.ink }}>
+                  Datos Bancarios
+                </h3>
                 <Button variant="ghost" size="sm" onClick={() => setShowGifts(false)}>
                   <X className="w-4 h-4" />
                 </Button>
@@ -609,20 +666,36 @@ function DemoBlack() {
                 </div>
 
                 <div className="p-4 rounded-lg" style={{ backgroundColor: PALETTE.paper }}>
-                  <h4 className="font-medium mb-2" style={{ color: PALETTE.ink }}>Transferencia Bancaria</h4>
+                  <h4 className="font-medium mb-2" style={{ color: PALETTE.ink }}>
+                    Transferencia Bancaria
+                  </h4>
                   <div className="space-y-1 text-sm" style={{ color: PALETTE.text }}>
-                    <p><strong>Banco:</strong> Banco Nación</p>
-                    <p><strong>CBU:</strong> 0110599520000012345678</p>
-                    <p><strong>Alias:</strong> BELU.AMADEO.BODA</p>
-                    <p><strong>Titular:</strong> Belén García</p>
+                    <p>
+                      <strong>Banco:</strong> Banco Nación
+                    </p>
+                    <p>
+                      <strong>CBU:</strong> 0110599520000012345678
+                    </p>
+                    <p>
+                      <strong>Alias:</strong> BELU.AMADEO.BODA
+                    </p>
+                    <p>
+                      <strong>Titular:</strong> Belén García
+                    </p>
                   </div>
                 </div>
 
                 <div className="p-4 rounded-lg" style={{ backgroundColor: PALETTE.paper }}>
-                  <h4 className="font-medium mb-2" style={{ color: PALETTE.ink }}>Mercado Pago</h4>
+                  <h4 className="font-medium mb-2" style={{ color: PALETTE.ink }}>
+                    Mercado Pago
+                  </h4>
                   <div className="space-y-1 text-sm" style={{ color: PALETTE.text }}>
-                    <p><strong>CVU:</strong> 0000003100012345678901</p>
-                    <p><strong>Alias:</strong> BELU.MP</p>
+                    <p>
+                      <strong>CVU:</strong> 0000003100012345678901
+                    </p>
+                    <p>
+                      <strong>Alias:</strong> BELU.MP
+                    </p>
                   </div>
                 </div>
 
