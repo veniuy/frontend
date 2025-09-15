@@ -18,7 +18,7 @@ import EventWizard from './pages/EventWizard';
 import EventBuilder from './pages/EventBuilder';
 import EventPreview from './pages/EventPreview';
 import PublicEvent from './pages/PublicEvent';
-import VisualEditor from './pages/VisualEditorWithInvitation';
+import VisualEditor from './pages/VisualEditorComplete';
 import GuestManager from './pages/GuestManager';
 import PaymentTransfer from './pages/PaymentTransfer';
 import PaymentCode from './pages/PaymentCode';
