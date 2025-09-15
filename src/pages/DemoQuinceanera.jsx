@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+// src/pages/DemoQuinceanera.jsx
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
@@ -24,12 +25,14 @@ import {
   Phone,
   Mail,
   Instagram,
-  Facebook,
   CheckCircle,
   X,
   Sparkles,
   Star
 } from 'lucide-react'
+
+// 👉 util para mapear rutas a /src/assets/*
+import { asset, onImgError } from '../utils/assets'
 
 function DemoQuinceanera() {
   const navigate = useNavigate()
@@ -71,6 +74,12 @@ function DemoQuinceanera() {
     }, 3000)
   }
 
+  // Imagen principal y galería desde assets:
+  const heroImg = asset('src/assets/cotton_bird_images/categoria_bebes_ninos.webp')
+  const galleryImages = Array.from({ length: 8 }).map(() =>
+    asset('src/assets/cotton_bird_images/categoria_bebes_ninos.webp')
+  )
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-100 via-pink-100 to-yellow-100">
       {/* Header con controles */}
@@ -91,6 +100,7 @@ function DemoQuinceanera() {
             size="sm"
             onClick={() => setIsPlaying(!isPlaying)}
             className="bg-white/90 backdrop-blur-sm"
+            aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
           >
             {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
           </Button>
@@ -99,6 +109,7 @@ function DemoQuinceanera() {
             size="sm"
             onClick={() => setIsMuted(!isMuted)}
             className="bg-white/90 backdrop-blur-sm"
+            aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
           >
             {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
           </Button>
@@ -113,7 +124,8 @@ function DemoQuinceanera() {
         {/* Background con overlay */}
         <div className="absolute inset-0">
           <img 
-            src="/src/assets/cotton_bird_images/categoria_bebes_ninos.webp"
+            src={heroImg}
+            onError={(e) => onImgError(e, 'Quinceañera')}
             alt="Fondo de quinceañera"
             className="w-full h-full object-cover"
           />
@@ -125,7 +137,7 @@ function DemoQuinceanera() {
           {[...Array(20)].map((_, i) => (
             <Star 
               key={i}
-              className={`absolute text-yellow-300 animate-pulse`}
+              className="absolute text-yellow-300 animate-pulse"
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
@@ -367,11 +379,12 @@ function DemoQuinceanera() {
           </h2>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            {galleryImages.map((src, i) => (
               <div key={i} className="aspect-square bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg shadow-lg overflow-hidden hover:scale-105 transition-transform cursor-pointer relative">
                 <img 
-                  src={`/src/assets/cotton_bird_images/categoria_bebes_ninos.webp`}
-                  alt={`Foto ${i}`}
+                  src={src}
+                  onError={(e) => onImgError(e, `Foto ${i+1}`)}
+                  alt={`Foto ${i+1}`}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-purple-900/50 to-transparent"></div>
