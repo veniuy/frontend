@@ -1,3 +1,4 @@
+// src/App.jsx
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth.jsx';
@@ -10,7 +11,15 @@ import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import DashboardFixed from './pages/DashboardFixed';
+import DashboardEnhanced from './pages/DashboardEnhanced';
 import CreateEvent from './pages/CreateEvent';
+import EventWizard from './pages/EventWizard';
+import EventBuilder from './pages/EventBuilder';
+import EventPreview from './pages/EventPreview';
+import PublicEvent from './pages/PublicEvent';
+import VisualEditor from './pages/VisualEditor';
+import GuestManager from './pages/GuestManager';
 import PaymentTransfer from './pages/PaymentTransfer';
 import PaymentCode from './pages/PaymentCode';
 import DemoWedding from './pages/DemoWedding';
@@ -18,7 +27,6 @@ import DemoQuinceanera from './pages/DemoQuinceanera';
 import DemoBlack from './pages/DemoBlack';
 import DemoPremium from './pages/DemoPremium';
 import DemoClassic from './pages/DemoClassic';
-import InvitationEditorV2 from './pages/InvitationEditorV2';
 // Category pages
 import Boda from './pages/categories/Boda';
 import Quinceaneras from './pages/categories/Quinceaneras';
@@ -28,6 +36,9 @@ import Corporativos from './pages/categories/Corporativos';
 import Graduaciones from './pages/categories/Graduaciones';
 import './utils/assets';
 
+// Admin
+import RequireAdmin from './components/RequireAdmin.jsx';
+import AdminDashboard from './pages/AdminDashboard.jsx';
 
 function App() {
   const { user, loading } = useAuth();
@@ -65,6 +76,9 @@ function App() {
       <Route path="/categorias/corporativos" element={<Corporativos />} />
       <Route path="/categorias/graduaciones" element={<Graduaciones />} />
       
+      {/* Public event route */}
+      <Route path="/p/:slug" element={<PublicEvent />} />
+      
       {/* Auth routes */}
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/app/dashboard" />} />
       <Route path="/register" element={!user ? <Register /> : <Navigate to="/app/dashboard" />} />
@@ -72,15 +86,29 @@ function App() {
       {/* Protected app routes */}
       <Route path="/app" element={user ? <Layout /> : <Navigate to="/login" />}>
         <Route index element={<Navigate to="/app/dashboard" />} />
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="dashboard" element={<DashboardFixed />} />
         <Route path="events/create" element={<CreateEvent />} />
+        <Route path="events/wizard" element={<EventWizard />} />
+        <Route path="events/:id/builder" element={<EventBuilder />} />
+        <Route path="events/:id/editor" element={<VisualEditor />} />
+        <Route path="events/:id/preview" element={<EventPreview />} />
+        <Route path="events/:id/guests" element={<GuestManager />} />
         <Route path="payment/transfer/:eventId" element={<PaymentTransfer />} />
         <Route path="payment/code/:eventId" element={<PaymentCode />} />
+
+        {/* Admin (protegido por rol) */}
+        <Route
+          path="admin"
+          element={
+            <RequireAdmin>
+              <AdminDashboard />
+            </RequireAdmin>
+          }
+        />
       </Route>
-      
-      {/* Editor routes (full screen) */}
-      <Route path="/editor" element={user ? <InvitationEditorV2 /> : <Navigate to="/login" />} />
-      <Route path="/editor/:designId" element={user ? <InvitationEditorV2 /> : <Navigate to="/login" />} />
+
+      {/* Neutraliza /index.html si el host te lo redirige */}
+      <Route path="/index.html" element={<Navigate to="/" replace />} />
 
       {/* fallback */}
       <Route path="*" element={<Navigate to="/" />} />
