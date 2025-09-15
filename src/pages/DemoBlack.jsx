@@ -144,7 +144,7 @@ function DemoBlack() {
   }
 
   // Assets (resueltos con helper + fallback onError)
-  const paperTexture = asset('src/assets/portada.jpg')
+  const paperTexture = asset('src/assets/portada.webp')
   const floralTop = asset('src/assets/hero_top.png')
   const floralBottom = asset('src/assets/hero_bottom.png')
 
