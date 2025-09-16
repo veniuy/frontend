@@ -1,3 +1,4 @@
+// VisualEditorComplete.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
@@ -6,7 +7,6 @@ import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Badge } from '../components/ui/badge';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import {
   ArrowLeft,
@@ -16,150 +16,180 @@ import {
   Type,
   Image as ImageIcon,
   Layout,
-  Settings,
   Upload,
-  Download,
   Undo,
   Redo,
-  Copy,
-  Trash2,
-  Move,
-  RotateCw,
   ZoomIn,
   ZoomOut,
-  Grid,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  Bold,
-  Italic,
-  Underline,
-  Plus,
-  Minus,
-  Check,
-  X,
-  Wand2,
   Heart,
   MapPin,
-  Calendar,
-  Clock,
-  Music,
-  Camera,
-  Share2,
-  Users,
-  Gift,
-  Phone,
-  Mail,
-  Instagram,
-  Facebook,
-  CheckCircle,
-  ChevronDown,
   Church,
   PartyPopper,
-  CreditCard
+  Users,
+  Gift,
+  CreditCard,
+  Instagram,
+  Facebook,
+  Share2,
+  ChevronDown,
+  Pencil,
+  Check,
+  X
 } from 'lucide-react';
+
+/** Componente reutilizable para edición inline con ícono de lápiz */
+const EditableText = ({
+  value,
+  onChange,
+  as: Tag = 'p',
+  inputType = 'input', // 'input' | 'textarea'
+  className = '',
+  inputClassName = '',
+  placeholder = 'Toca para editar',
+  style
+}) => {
+  const [editing, setEditing] = useState(false);
+  const [hover, setHover] = useState(false);
+  const [temp, setTemp] = useState(value ?? '');
+  const ref = useRef(null);
+
+  useEffect(() => setTemp(value ?? ''), [value]);
+
+  useEffect(() => {
+    const onDocClick = (e) => {
+      if (!editing) return;
+      if (ref.current && !ref.current.contains(e.target)) {
+        setEditing(false);
+        setTemp(value ?? '');
+      }
+    };
+    document.addEventListener('mousedown', onDocClick);
+    return () => document.removeEventListener('mousedown', onDocClick);
+  }, [editing, value]);
+
+  const commit = () => {
+    onChange(temp);
+    setEditing(false);
+  };
+
+  return (
+    <div
+      ref={ref}
+      className="relative inline-block group"
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{ maxWidth: '100%' }}
+    >
+      {!editing ? (
+        <Tag
+          className={className}
+          style={style}
+          onClick={() => setEditing(true)}
+        >
+          {value && String(value).length ? value : (
+            <span className="opacity-50">{placeholder}</span>
+          )}
+        </Tag>
+      ) : (
+        inputType === 'textarea' ? (
+          <Textarea
+            className={`w-full px-3 py-2 text-base ${inputClassName}`}
+            value={temp}
+            autoFocus
+            onChange={(e) => setTemp(e.target.value)}
+          />
+        ) : (
+          <Input
+            className={`w-full px-3 py-2 text-base ${inputClassName}`}
+            value={temp}
+            autoFocus
+            onChange={(e) => setTemp(e.target.value)}
+          />
+        )
+      )}
+
+      {/* Lápiz visible al pasar/tocar */}
+      {!editing && (
+        <button
+          type="button"
+          onClick={() => setEditing(true)}
+          aria-label="Editar texto"
+          className={`absolute -top-3 -right-3 p-1 rounded-full bg-white shadow border transition-opacity ${hover ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+        >
+          <Pencil className="w-3.5 h-3.5" />
+        </button>
+      )}
+
+      {/* Controles confirmar / cancelar cuando edita */}
+      {editing && (
+        <div className="absolute -top-3 -right-3 flex gap-1">
+          <button
+            type="button"
+            onClick={commit}
+            className="p-1 rounded-full bg-white shadow border"
+            aria-label="Aplicar"
+          >
+            <Check className="w-3.5 h-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => { setEditing(false); setTemp(value ?? ''); }}
+            className="p-1 rounded-full bg-white shadow border"
+            aria-label="Cancelar"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const VisualEditorWithInvitation = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  
-  // Estado del evento (datos editables)
+
+  // Estado del evento
   const [event, setEvent] = useState({
     id: id || '1',
-    couple: {
-      bride: 'María',
-      groom: 'Juan'
-    },
+    couple: { bride: 'María', groom: 'Juan' },
     date: '15 de Marzo, 2024',
     time: '17:00',
-    ceremony: {
-      venue: 'Iglesia San Miguel',
-      address: 'Calle Mayor 123, Madrid',
-      time: '17:00'
-    },
-    reception: {
-      venue: 'Jardín Botánico',
-      address: 'Av. Libertador 456, Madrid',
-      time: '19:30'
-    },
-    description: 'Celebra con nosotros este día tan especial',
+    ceremony: { venue: 'Iglesia San Miguel', address: 'Calle Mayor 123, Madrid', time: '17:00' },
+    reception: { venue: 'Jardín Botánico', address: 'Av. Libertador 456, Madrid', time: '19:30' },
+    description: '¡Nos casamos!',
     hashtag: '#MariaYJuan2024',
     template: 'elegant',
-    colors: {
-      primary: '#e91e63',
-      secondary: '#ffc0cb',
-      background: '#ffffff',
-      text: '#333333',
-      accent: '#8e44ad'
-    },
-    fonts: {
-      primary: 'Playfair Display',
-      secondary: 'Inter'
-    }
+    colors: { primary: '#e91e63', secondary: '#ffc0cb', background: '#ffffff', text: '#333333', accent: '#8e44ad' },
+    fonts: { primary: 'Playfair Display', secondary: 'Inter' }
   });
-  
-  const [loading, setLoading] = useState(false);
+
+  const [loading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
-  
-  // Estado del editor
+
+  // Editor
   const [activeTab, setActiveTab] = useState('design');
-  const [selectedElement, setSelectedElement] = useState(null);
   const [zoom, setZoom] = useState(100);
-  const [showGrid, setShowGrid] = useState(false);
-  const [history, setHistory] = useState([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [history] = useState([]);
+  const [historyIndex] = useState(-1);
   const [selectedTemplate, setSelectedTemplate] = useState('elegant');
-  
+
   // Estados de la invitación
   const [showRSVP, setShowRSVP] = useState(false);
-  const [showGifts, setShowGifts] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  
-  // Referencias
-  const canvasRef = useRef(null);
+
   const fileInputRef = useRef(null);
-  
-  // Paletas de colores predefinidas
+
   const colorPalettes = [
-    {
-      name: 'Clásico',
-      colors: ['#1a1a1a', '#ffffff', '#f5f5f5', '#e5e5e5', '#cccccc']
-    },
-    {
-      name: 'Elegante',
-      colors: ['#2c3e50', '#ecf0f1', '#e74c3c', '#f39c12', '#9b59b6']
-    },
-    {
-      name: 'Moderno',
-      colors: ['#34495e', '#3498db', '#2ecc71', '#f1c40f', '#e67e22']
-    },
-    {
-      name: 'Romántico',
-      colors: ['#8e44ad', '#e91e63', '#ffc0cb', '#fff0f5', '#ffe4e1']
-    },
-    {
-      name: 'Natural',
-      colors: ['#27ae60', '#2ecc71', '#f39c12', '#e67e22', '#d35400']
-    }
-  ];
-  
-  // Fuentes disponibles
-  const fontFamilies = [
-    'Inter',
-    'Helvetica Neue',
-    'Arial',
-    'Georgia',
-    'Times New Roman',
-    'Playfair Display',
-    'Montserrat',
-    'Open Sans',
-    'Lato',
-    'Roboto'
+    { name: 'Clásico', colors: ['#1a1a1a', '#ffffff', '#f5f5f5', '#e5e5e5', '#cccccc'] },
+    { name: 'Elegante', colors: ['#2c3e50', '#ecf0f1', '#e74c3c', '#f39c12', '#9b59b6'] },
+    { name: 'Moderno', colors: ['#34495e', '#3498db', '#2ecc71', '#f1c40f', '#e67e22'] },
+    { name: 'Romántico', colors: ['#8e44ad', '#e91e63', '#ffc0cb', '#fff0f5', '#ffe4e1'] },
+    { name: 'Natural', colors: ['#27ae60', '#2ecc71', '#f39c12', '#e67e22', '#d35400'] }
   ];
 
-  // Templates disponibles
+  const fontFamilies = ['Inter','Helvetica Neue','Arial','Georgia','Times New Roman','Playfair Display','Montserrat','Open Sans','Lato','Roboto'];
+
   const templates = [
     { id: 'elegant', name: 'Elegante', description: 'Diseño sofisticado y minimalista' },
     { id: 'romantic', name: 'Romántico', description: 'Colores suaves y florales' },
@@ -167,32 +197,29 @@ const VisualEditorWithInvitation = () => {
     { id: 'classic', name: 'Clásico', description: 'Estilo tradicional y atemporal' }
   ];
 
-  // Countdown timer
+  // Countdown
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-
   useEffect(() => {
     const targetDate = new Date('2024-03-15T17:00:00');
-    const timer = setInterval(() => {
+    const t = setInterval(() => {
       const now = new Date().getTime();
-      const distance = targetDate.getTime() - now;
-      
-      if (distance > 0) {
+      const d = targetDate.getTime() - now;
+      if (d > 0) {
         setTimeLeft({
-          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-          seconds: Math.floor((distance % (1000 * 60)) / 1000)
+          days: Math.floor(d / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((d % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((d % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((d % (1000 * 60)) / 1000),
         });
       }
     }, 1000);
-
-    return () => clearInterval(timer);
+    return () => clearInterval(t);
   }, []);
 
   const saveEvent = async () => {
     try {
       setSaving(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(r => setTimeout(r, 800));
       console.log('Evento guardado:', event);
     } catch (err) {
       setError('Error guardando el evento');
@@ -203,23 +230,11 @@ const VisualEditorWithInvitation = () => {
   };
 
   const handleColorChange = (property, color) => {
-    setEvent(prev => ({
-      ...prev,
-      colors: {
-        ...prev.colors,
-        [property]: color
-      }
-    }));
+    setEvent(prev => ({ ...prev, colors: { ...prev.colors, [property]: color } }));
   };
 
   const handleFontChange = (type, fontFamily) => {
-    setEvent(prev => ({
-      ...prev,
-      fonts: {
-        ...prev.fonts,
-        [type]: fontFamily
-      }
-    }));
+    setEvent(prev => ({ ...prev, fonts: { ...prev.fonts, [type]: fontFamily } }));
   };
 
   const handleTemplateChange = (templateId) => {
@@ -227,205 +242,159 @@ const VisualEditorWithInvitation = () => {
     setEvent(prev => ({ ...prev, template: templateId }));
   };
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        console.log('Image uploaded:', e.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (x) => console.log('Image uploaded:', x.target?.result);
+    reader.readAsDataURL(file);
   };
 
-  const handleUndo = () => {
-    if (historyIndex > 0) {
-      setHistoryIndex(historyIndex - 1);
-    }
-  };
+  const handleZoomIn = () => setZoom(z => Math.min(z + 10, 200));
+  const handleZoomOut = () => setZoom(z => Math.max(z - 10, 50));
 
-  const handleRedo = () => {
-    if (historyIndex < history.length - 1) {
-      setHistoryIndex(historyIndex + 1);
-    }
-  };
+  const previewInvitation = () => window.open(`/p/${event.id}`, '_blank');
 
-  const handleZoomIn = () => {
-    setZoom(Math.min(zoom + 10, 200));
-  };
-
-  const handleZoomOut = () => {
-    setZoom(Math.max(zoom - 10, 50));
-  };
-
-  const previewInvitation = () => {
-    window.open(`/p/${event.id}`, '_blank');
-  };
-
-  // Componente TimeCell para el countdown
-  const TimeCell = ({ value, label }) => (
-    <div className="flex flex-col items-center">
-      <div 
-        className="font-light leading-none text-4xl md:text-6xl"
-        style={{ color: event.colors.primary }}
-      >
-        {String(value).padStart(2, '0')}
-      </div>
-      <div className="opacity-90 text-sm sm:text-base" style={{ color: event.colors.text }}>
-        {label}
-      </div>
-    </div>
-  );
-
-  // Renderizar la invitación según el template seleccionado
+  // Render de la invitación
   const renderInvitation = () => {
     const styles = {
       elegant: {
         background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-        primaryColor: event.colors.primary,
-        secondaryColor: event.colors.secondary,
-        textColor: event.colors.text,
-        fontFamily: event.fonts.primary
+        primaryColor: event.colors.primary, secondaryColor: event.colors.secondary,
+        textColor: event.colors.text, fontFamily: event.fonts.primary
       },
       romantic: {
         background: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
-        primaryColor: '#e91e63',
-        secondaryColor: '#ffc0cb',
-        textColor: '#333',
-        fontFamily: 'Playfair Display'
+        primaryColor: '#e91e63', secondaryColor: '#ffc0cb', textColor: '#333', fontFamily: 'Playfair Display'
       },
       modern: {
         background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        primaryColor: '#3498db',
-        secondaryColor: '#2ecc71',
-        textColor: '#fff',
-        fontFamily: 'Inter'
+        primaryColor: '#3498db', secondaryColor: '#2ecc71', textColor: '#fff', fontFamily: 'Inter'
       },
       classic: {
         background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-        primaryColor: '#8e44ad',
-        secondaryColor: '#e74c3c',
-        textColor: '#333',
-        fontFamily: 'Georgia'
+        primaryColor: '#8e44ad', secondaryColor: '#e74c3c', textColor: '#333', fontFamily: 'Georgia'
       }
     };
 
-    const currentStyle = styles[selectedTemplate] || styles.elegant;
+    const S = styles[selectedTemplate] || styles.elegant;
 
     return (
-      <div 
+      <div
         className="min-h-screen relative overflow-hidden"
-        style={{ 
-          background: currentStyle.background,
-          fontFamily: currentStyle.fontFamily,
-          color: currentStyle.textColor
-        }}
+        style={{ background: S.background, fontFamily: S.fontFamily, color: S.textColor }}
       >
-        {/* Hero Section */}
+        {/* Hero */}
         <section className="min-h-screen flex items-center justify-center relative px-4">
-          {/* Decorative elements */}
-          <div className="absolute top-10 left-10 w-20 h-20 rounded-full opacity-20"
-               style={{ backgroundColor: currentStyle.primaryColor }}></div>
-          <div className="absolute bottom-10 right-10 w-32 h-32 rounded-full opacity-10"
-               style={{ backgroundColor: currentStyle.secondaryColor }}></div>
-          
-          <div className="text-center max-w-4xl mx-auto relative z-10">
-            <h1 
-              className="text-6xl md:text-8xl font-light mb-4 tracking-wider"
-              style={{ color: currentStyle.primaryColor }}
-            >
-              {event.couple.bride.toUpperCase()}
-            </h1>
-            
-            <div className="flex items-center justify-center my-8">
+          <div className="absolute top-10 left-10 w-20 h-20 rounded-full opacity-20" style={{ backgroundColor: S.primaryColor }}></div>
+          <div className="absolute bottom-10 right-10 w-32 h-32 rounded-full opacity-10" style={{ backgroundColor: S.secondaryColor }}></div>
+
+          <div className="text-center max-w-4xl mx-auto relative z-10 space-y-4">
+            <EditableText
+              as="h1"
+              value={event.couple.bride}
+              onChange={(v) => setEvent(p => ({ ...p, couple: { ...p.couple, bride: v } }))}
+              className="text-6xl md:text-8xl font-light tracking-wider uppercase"
+              style={{ color: S.primaryColor }}
+              placeholder="Nombre 1"
+            />
+
+            <div className="flex items-center justify-center my-4">
               <div className="h-px w-16 bg-gray-400"></div>
-              <Heart 
-                className="mx-4 w-8 h-8" 
-                style={{ color: currentStyle.secondaryColor }}
-                fill="currentColor"
-              />
+              <Heart className="mx-4 w-8 h-8" style={{ color: S.secondaryColor }} fill="currentColor" />
               <div className="h-px w-16 bg-gray-400"></div>
             </div>
-            
-            <h1 
-              className="text-6xl md:text-8xl font-light mb-8 tracking-wider"
-              style={{ color: currentStyle.primaryColor }}
-            >
-              {event.couple.groom.toUpperCase()}
-            </h1>
-            
-            <p 
-              className="text-xl md:text-2xl font-light mb-12 tracking-wide"
-              style={{ color: currentStyle.textColor }}
-            >
-              ¡NOS CASAMOS!
-            </p>
-            
+
+            <EditableText
+              as="h1"
+              value={event.couple.groom}
+              onChange={(v) => setEvent(p => ({ ...p, couple: { ...p.couple, groom: v } }))}
+              className="text-6xl md:text-8xl font-light tracking-wider uppercase"
+              style={{ color: S.primaryColor }}
+              placeholder="Nombre 2"
+            />
+
+            <EditableText
+              as="p"
+              value={event.description}
+              onChange={(v) => setEvent(p => ({ ...p, description: v }))}
+              className="text-xl md:text-2xl font-light tracking-wide"
+              style={{ color: S.textColor }}
+              placeholder="Frase / anuncio"
+            />
+
             <div className="animate-bounce">
-              <ChevronDown 
-                className="w-8 h-8 mx-auto" 
-                style={{ color: currentStyle.primaryColor }} 
-              />
+              <ChevronDown className="w-8 h-8 mx-auto" style={{ color: S.primaryColor }} />
             </div>
           </div>
         </section>
 
-        {/* Countdown Section */}
-        <section 
-          className="py-16"
-          style={{ backgroundColor: currentStyle.primaryColor }}
-        >
+        {/* Countdown */}
+        <section className="py-16" style={{ backgroundColor: S.primaryColor }}>
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 
-              className="text-2xl md:text-3xl font-light mb-8 tracking-wide"
-              style={{ color: '#ffffff' }}
-            >
-              Faltan para nuestro gran día
-            </h2>
-            
+            <h2 className="text-2xl md:text-3xl font-light mb-8 tracking-wide text-white">Faltan para nuestro gran día</h2>
             <div className="flex items-center justify-center gap-8">
-              <TimeCell value={timeLeft.days} label="días" />
+              <div className="flex flex-col items-center">
+                <div className="font-light leading-none text-4xl md:text-6xl text-white">{String(timeLeft.days).padStart(2, '0')}</div>
+                <div className="opacity-90 text-sm sm:text-base text-white/90">días</div>
+              </div>
               <div className="text-4xl md:text-6xl font-light text-white">:</div>
-              <TimeCell value={timeLeft.hours} label="horas" />
+              <div className="flex flex-col items-center">
+                <div className="font-light leading-none text-4xl md:text-6xl text-white">{String(timeLeft.hours).padStart(2, '0')}</div>
+                <div className="opacity-90 text-sm sm:text-base text-white/90">horas</div>
+              </div>
               <div className="text-4xl md:text-6xl font-light text-white">:</div>
-              <TimeCell value={timeLeft.minutes} label="min" />
+              <div className="flex flex-col items-center">
+                <div className="font-light leading-none text-4xl md:text-6xl text-white">{String(timeLeft.minutes).padStart(2, '0')}</div>
+                <div className="opacity-90 text-sm sm:text-base text-white/90">min</div>
+              </div>
               <div className="text-4xl md:text-6xl font-light text-white">:</div>
-              <TimeCell value={timeLeft.seconds} label="seg" />
+              <div className="flex flex-col items-center">
+                <div className="font-light leading-none text-4xl md:text-6xl text-white">{String(timeLeft.seconds).padStart(2, '0')}</div>
+                <div className="opacity-90 text-sm sm:text-base text-white/90">seg</div>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Event Details */}
+        {/* Detalles */}
         <section className="py-16 bg-white">
           <div className="max-w-6xl mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-12">
               {/* Ceremonia */}
               <div className="text-center">
-                <div 
-                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                  style={{ backgroundColor: `${currentStyle.primaryColor}20` }}
-                >
-                  <Church 
-                    className="w-8 h-8" 
-                    style={{ color: currentStyle.primaryColor }} 
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{ backgroundColor: `${S.primaryColor}20` }}>
+                  <Church className="w-8 h-8" style={{ color: S.primaryColor }} />
+                </div>
+                <h3 className="text-2xl font-medium mb-6 tracking-wide" style={{ color: S.textColor }}>CEREMONIA</h3>
+
+                <div className="space-y-3 mb-8 text-gray-600">
+                  <EditableText
+                    value={event.date}
+                    onChange={(v) => setEvent(p => ({ ...p, date: v }))}
+                    className="text-lg"
+                    placeholder="Fecha"
+                  />
+                  <EditableText
+                    value={event.ceremony.time}
+                    onChange={(v) => setEvent(p => ({ ...p, ceremony: { ...p.ceremony, time: v } }))}
+                    className="text-lg"
+                    placeholder="Hora"
+                  />
+                  <EditableText
+                    value={event.ceremony.venue}
+                    onChange={(v) => setEvent(p => ({ ...p, ceremony: { ...p.ceremony, venue: v } }))}
+                    className="font-medium"
+                    placeholder="Lugar"
+                  />
+                  <EditableText
+                    value={event.ceremony.address}
+                    onChange={(v) => setEvent(p => ({ ...p, ceremony: { ...p.ceremony, address: v } }))}
+                    placeholder="Dirección"
                   />
                 </div>
-                <h3 
-                  className="text-2xl font-medium mb-6 tracking-wide"
-                  style={{ color: currentStyle.textColor }}
-                >
-                  CEREMONIA
-                </h3>
-                <div className="space-y-3 mb-8 text-gray-600">
-                  <p className="text-lg">{event.date}</p>
-                  <p className="text-lg">{event.ceremony.time}</p>
-                  <p className="font-medium">{event.ceremony.venue}</p>
-                  <p>{event.ceremony.address}</p>
-                </div>
-                <Button
-                  className="px-8 py-3 rounded-full text-white"
-                  style={{ backgroundColor: currentStyle.primaryColor }}
-                >
+
+                <Button className="px-8 py-3 rounded-full text-white" style={{ backgroundColor: S.primaryColor }}>
                   <MapPin className="w-4 h-4 mr-2" />
                   CÓMO LLEGAR
                 </Button>
@@ -433,31 +402,38 @@ const VisualEditorWithInvitation = () => {
 
               {/* Recepción */}
               <div className="text-center">
-                <div 
-                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                  style={{ backgroundColor: `${currentStyle.secondaryColor}20` }}
-                >
-                  <PartyPopper 
-                    className="w-8 h-8" 
-                    style={{ color: currentStyle.secondaryColor }} 
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{ backgroundColor: `${S.secondaryColor}20` }}>
+                  <PartyPopper className="w-8 h-8" style={{ color: S.secondaryColor }} />
+                </div>
+                <h3 className="text-2xl font-medium mb-6 tracking-wide" style={{ color: S.textColor }}>RECEPCIÓN</h3>
+
+                <div className="space-y-3 mb-8 text-gray-600">
+                  <EditableText
+                    value={event.date}
+                    onChange={(v) => setEvent(p => ({ ...p, date: v }))}
+                    className="text-lg"
+                    placeholder="Fecha"
+                  />
+                  <EditableText
+                    value={event.reception.time}
+                    onChange={(v) => setEvent(p => ({ ...p, reception: { ...p.reception, time: v } }))}
+                    className="text-lg"
+                    placeholder="Hora"
+                  />
+                  <EditableText
+                    value={event.reception.venue}
+                    onChange={(v) => setEvent(p => ({ ...p, reception: { ...p.reception, venue: v } }))}
+                    className="font-medium"
+                    placeholder="Lugar"
+                  />
+                  <EditableText
+                    value={event.reception.address}
+                    onChange={(v) => setEvent(p => ({ ...p, reception: { ...p.reception, address: v } }))}
+                    placeholder="Dirección"
                   />
                 </div>
-                <h3 
-                  className="text-2xl font-medium mb-6 tracking-wide"
-                  style={{ color: currentStyle.textColor }}
-                >
-                  RECEPCIÓN
-                </h3>
-                <div className="space-y-3 mb-8 text-gray-600">
-                  <p className="text-lg">{event.date}</p>
-                  <p className="text-lg">{event.reception.time}</p>
-                  <p className="font-medium">{event.reception.venue}</p>
-                  <p>{event.reception.address}</p>
-                </div>
-                <Button
-                  className="px-8 py-3 rounded-full text-white"
-                  style={{ backgroundColor: currentStyle.secondaryColor }}
-                >
+
+                <Button className="px-8 py-3 rounded-full text-white" style={{ backgroundColor: S.secondaryColor }}>
                   <MapPin className="w-4 h-4 mr-2" />
                   CÓMO LLEGAR
                 </Button>
@@ -466,25 +442,15 @@ const VisualEditorWithInvitation = () => {
           </div>
         </section>
 
-        {/* RSVP Section */}
-        <section 
-          className="py-16"
-          style={{ backgroundColor: `${currentStyle.primaryColor}10` }}
-        >
+        {/* RSVP */}
+        <section className="py-16" style={{ backgroundColor: `${S.primaryColor}10` }}>
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 
-              className="text-3xl md:text-4xl font-light mb-6"
-              style={{ color: currentStyle.primaryColor }}
-            >
-              Confirma tu Asistencia
-            </h2>
-            <p className="text-lg mb-8 text-gray-600">
-              Tu presencia es muy importante para nosotros
-            </p>
+            <h2 className="text-3xl md:text-4xl font-light mb-6" style={{ color: S.primaryColor }}>Confirma tu Asistencia</h2>
+            <p className="text-lg mb-8 text-gray-600">Tu presencia es muy importante para nosotros</p>
             <Button
               size="lg"
               className="px-12 py-4 text-lg rounded-full text-white"
-              style={{ backgroundColor: currentStyle.primaryColor }}
+              style={{ backgroundColor: S.primaryColor }}
               onClick={() => setShowRSVP(true)}
             >
               <Users className="w-5 h-5 mr-2" />
@@ -493,34 +459,17 @@ const VisualEditorWithInvitation = () => {
           </div>
         </section>
 
-        {/* Gift Registry */}
+        {/* Regalos */}
         <section className="py-16 bg-white">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 
-              className="text-3xl md:text-4xl font-light mb-6"
-              style={{ color: currentStyle.textColor }}
-            >
-              Mesa de Regalos
-            </h2>
-            <p className="text-lg mb-8 text-gray-600">
-              Si deseas hacernos un regalo, aquí tienes algunas opciones
-            </p>
+            <h2 className="text-3xl md:text-4xl font-light mb-6" style={{ color: S.textColor }}>Mesa de Regalos</h2>
+            <p className="text-lg mb-8 text-gray-600">Si deseas hacernos un regalo, aquí tienes algunas opciones</p>
             <div className="grid md:grid-cols-2 gap-6">
-              <Button
-                variant="outline"
-                size="lg"
-                className="p-6 h-auto flex-col"
-                style={{ borderColor: currentStyle.primaryColor, color: currentStyle.primaryColor }}
-              >
+              <Button variant="outline" size="lg" className="p-6 h-auto flex-col" style={{ borderColor: S.primaryColor, color: S.primaryColor }}>
                 <Gift className="w-8 h-8 mb-2" />
                 <span className="text-lg">Lista de Regalos</span>
               </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="p-6 h-auto flex-col"
-                style={{ borderColor: currentStyle.secondaryColor, color: currentStyle.secondaryColor }}
-              >
+              <Button variant="outline" size="lg" className="p-6 h-auto flex-col" style={{ borderColor: S.secondaryColor, color: S.secondaryColor }}>
                 <CreditCard className="w-8 h-8 mb-2" />
                 <span className="text-lg">Contribución</span>
               </Button>
@@ -529,27 +478,19 @@ const VisualEditorWithInvitation = () => {
         </section>
 
         {/* Footer */}
-        <footer 
-          className="py-12 text-center"
-          style={{ backgroundColor: currentStyle.primaryColor }}
-        >
+        <footer className="py-12 text-center" style={{ backgroundColor: S.primaryColor }}>
           <div className="max-w-4xl mx-auto px-4">
-            <h3 className="text-2xl font-light mb-4 text-white">
-              ¡Esperamos verte en nuestro gran día!
-            </h3>
-            <p className="text-white opacity-90 mb-6">
-              {event.hashtag}
-            </p>
+            <h3 className="text-2xl font-light mb-4 text-white">¡Esperamos verte en nuestro gran día!</h3>
+            <EditableText
+              value={event.hashtag}
+              onChange={(v) => setEvent(p => ({ ...p, hashtag: v }))}
+              className="text-white opacity-90 mb-6"
+              placeholder="#HashtagDelEvento"
+            />
             <div className="flex justify-center space-x-6">
-              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
-                <Instagram className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
-                <Facebook className="w-5 h-5" />
-              </Button>
-              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
-                <Share2 className="w-5 h-5" />
-              </Button>
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20"><Instagram className="w-5 h-5" /></Button>
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20"><Facebook className="w-5 h-5" /></Button>
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20"><Share2 className="w-5 h-5" /></Button>
             </div>
           </div>
         </footer>
@@ -585,15 +526,15 @@ const VisualEditorWithInvitation = () => {
               <p className="text-sm text-gray-600">Editor Visual</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3">
-            <Button variant="outline" onClick={handleUndo} disabled={historyIndex <= 0}>
+            <Button variant="outline" disabled={historyIndex <= 0}>
               <Undo className="h-4 w-4" />
             </Button>
-            <Button variant="outline" onClick={handleRedo} disabled={historyIndex >= history.length - 1}>
+            <Button variant="outline" disabled={historyIndex >= history.length - 1}>
               <Redo className="h-4 w-4" />
             </Button>
-            
+
             <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-lg">
               <Button variant="ghost" size="sm" onClick={handleZoomOut}>
                 <ZoomOut className="h-4 w-4" />
@@ -603,17 +544,14 @@ const VisualEditorWithInvitation = () => {
                 <ZoomIn className="h-4 w-4" />
               </Button>
             </div>
-            
-            <Button variant="outline" onClick={() => setShowGrid(!showGrid)}>
-              <Grid className="h-4 w-4 mr-2" />
-              {showGrid ? 'Ocultar' : 'Mostrar'} Grilla
-            </Button>
-            
+
+            {/* Botón de grilla eliminado como pediste */}
+
             <Button variant="outline" onClick={previewInvitation}>
               <Eye className="h-4 w-4 mr-2" />
               Vista Previa
             </Button>
-            
+
             <Button onClick={saveEvent} disabled={saving}>
               <Save className="h-4 w-4 mr-2" />
               {saving ? 'Guardando...' : 'Guardar'}
@@ -629,7 +567,7 @@ const VisualEditorWithInvitation = () => {
       )}
 
       <div className="flex h-[calc(100vh-80px)]">
-        {/* Panel Lateral */}
+        {/* Panel lateral */}
         <div className="w-80 bg-white border-r border-gray-200 overflow-y-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
             <TabsList className="grid w-full grid-cols-4 p-1 m-4">
@@ -651,7 +589,7 @@ const VisualEditorWithInvitation = () => {
               </TabsTrigger>
             </TabsList>
 
-            {/* Tab de Diseño */}
+            {/* Diseño */}
             <TabsContent value="design" className="p-4 space-y-6">
               <Card>
                 <CardHeader>
@@ -775,7 +713,7 @@ const VisualEditorWithInvitation = () => {
               </Card>
             </TabsContent>
 
-            {/* Tab de Contenido */}
+            {/* Contenido */}
             <TabsContent value="content" className="p-4 space-y-6">
               <Card>
                 <CardHeader>
@@ -787,10 +725,7 @@ const VisualEditorWithInvitation = () => {
                     <Input
                       id="bride"
                       value={event.couple.bride}
-                      onChange={(e) => setEvent(prev => ({ 
-                        ...prev, 
-                        couple: { ...prev.couple, bride: e.target.value }
-                      }))}
+                      onChange={(e) => setEvent(prev => ({ ...prev, couple: { ...prev.couple, bride: e.target.value } }))}
                       className="text-xs"
                     />
                   </div>
@@ -800,10 +735,7 @@ const VisualEditorWithInvitation = () => {
                     <Input
                       id="groom"
                       value={event.couple.groom}
-                      onChange={(e) => setEvent(prev => ({ 
-                        ...prev, 
-                        couple: { ...prev.couple, groom: e.target.value }
-                      }))}
+                      onChange={(e) => setEvent(prev => ({ ...prev, couple: { ...prev.couple, groom: e.target.value } }))}
                       className="text-xs"
                     />
                   </div>
@@ -840,10 +772,7 @@ const VisualEditorWithInvitation = () => {
                     <Input
                       id="ceremonyVenue"
                       value={event.ceremony.venue}
-                      onChange={(e) => setEvent(prev => ({ 
-                        ...prev, 
-                        ceremony: { ...prev.ceremony, venue: e.target.value }
-                      }))}
+                      onChange={(e) => setEvent(prev => ({ ...prev, ceremony: { ...prev.ceremony, venue: e.target.value } }))}
                       className="text-xs"
                     />
                   </div>
@@ -853,10 +782,7 @@ const VisualEditorWithInvitation = () => {
                     <Input
                       id="ceremonyAddress"
                       value={event.ceremony.address}
-                      onChange={(e) => setEvent(prev => ({ 
-                        ...prev, 
-                        ceremony: { ...prev.ceremony, address: e.target.value }
-                      }))}
+                      onChange={(e) => setEvent(prev => ({ ...prev, ceremony: { ...prev.ceremony, address: e.target.value } }))}
                       className="text-xs"
                     />
                   </div>
@@ -866,10 +792,7 @@ const VisualEditorWithInvitation = () => {
                     <Input
                       id="receptionVenue"
                       value={event.reception.venue}
-                      onChange={(e) => setEvent(prev => ({ 
-                        ...prev, 
-                        reception: { ...prev.reception, venue: e.target.value }
-                      }))}
+                      onChange={(e) => setEvent(prev => ({ ...prev, reception: { ...prev.reception, venue: e.target.value } }))}
                       className="text-xs"
                     />
                   </div>
@@ -879,10 +802,7 @@ const VisualEditorWithInvitation = () => {
                     <Input
                       id="receptionAddress"
                       value={event.reception.address}
-                      onChange={(e) => setEvent(prev => ({ 
-                        ...prev, 
-                        reception: { ...prev.reception, address: e.target.value }
-                      }))}
+                      onChange={(e) => setEvent(prev => ({ ...prev, reception: { ...prev.reception, address: e.target.value } }))}
                       className="text-xs"
                     />
                   </div>
@@ -890,25 +810,15 @@ const VisualEditorWithInvitation = () => {
               </Card>
             </TabsContent>
 
-            {/* Tab de Imágenes */}
+            {/* Imágenes */}
             <TabsContent value="images" className="p-4 space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-sm">Subir Imagen</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                  <Button
-                    variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full"
-                  >
+                  <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                  <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="w-full">
                     <Upload className="h-4 w-4 mr-2" />
                     Seleccionar Imagen
                   </Button>
@@ -929,7 +839,7 @@ const VisualEditorWithInvitation = () => {
               </Card>
             </TabsContent>
 
-            {/* Tab de Templates */}
+            {/* Templates */}
             <TabsContent value="layout" className="p-4 space-y-6">
               <Card>
                 <CardHeader>
@@ -937,18 +847,16 @@ const VisualEditorWithInvitation = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    {templates.map((template) => (
+                    {templates.map((t) => (
                       <div
-                        key={template.id}
+                        key={t.id}
                         className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                          selectedTemplate === template.id 
-                            ? 'border-blue-500 bg-blue-50' 
-                            : 'border-gray-200 hover:border-gray-300'
+                          selectedTemplate === t.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
                         }`}
-                        onClick={() => handleTemplateChange(template.id)}
+                        onClick={() => handleTemplateChange(t.id)}
                       >
-                        <div className="font-medium text-sm">{template.name}</div>
-                        <div className="text-xs text-gray-500 mt-1">{template.description}</div>
+                        <div className="font-medium text-sm">{t.name}</div>
+                        <div className="text-xs text-gray-500 mt-1">{t.description}</div>
                       </div>
                     ))}
                   </div>
@@ -958,26 +866,12 @@ const VisualEditorWithInvitation = () => {
           </Tabs>
         </div>
 
-        {/* Canvas Principal */}
+        {/* Canvas */}
         <div className="flex-1 overflow-auto bg-gray-100">
-          <div 
+          <div
             className="min-h-full"
-            style={{ 
-              transform: `scale(${zoom / 100})`,
-              transformOrigin: 'top center'
-            }}
+            style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center' }}
           >
-            {showGrid && (
-              <div 
-                className="absolute inset-0 opacity-20 pointer-events-none z-10"
-                style={{
-                  backgroundImage: 'linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)',
-                  backgroundSize: '20px 20px'
-                }}
-              />
-            )}
-            
-            {/* Renderizar la invitación completa */}
             {renderInvitation()}
           </div>
         </div>
