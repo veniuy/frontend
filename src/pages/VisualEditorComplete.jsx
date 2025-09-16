@@ -58,16 +58,16 @@ const EditableText = ({
     setEditing(true);
     requestAnimationFrame(() => {
       if (!ref.current) return;
-      const range = document.createRange();
-      range.selectNodeContents(ref.current);
-      const sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(range);
+      const r = document.createRange();
+      r.selectNodeContents(ref.current);
+      const s = window.getSelection();
+      s.removeAllRanges();
+      s.addRange(r);
     });
   };
 
   const endEdit = () => setEditing(false);
-  const handleInput = (e) => onChange(e.currentTarget.textContent);
+  const handleInput = (e) => onChange(e.currentTarget.textContent || '');
   const handleKeyDown = (e) => {
     if (singleLine && e.key === 'Enter') {
       e.preventDefault();
@@ -93,10 +93,11 @@ const EditableText = ({
       onKeyDown={handleKeyDown}
       onPaste={handlePaste}
       dir="ltr"
+      spellCheck={false}
       className={`${className} outline-none ${editing ? 'ring-2 ring-blue-300 rounded-sm' : ''}`}
       style={{
-        unicodeBidi: 'isolate',   // evita inversión por bidi
-        direction: 'ltr',          // fuerza izquierda→derecha
+        direction: 'ltr',
+        unicodeBidi: 'bidi-override',   // clave: muestra en el orden digitado
         whiteSpace: singleLine ? 'nowrap' : 'pre-wrap',
         ...style
       }}
@@ -105,6 +106,7 @@ const EditableText = ({
     </Tag>
   );
 };
+
 
 const VisualEditorWithInvitation = () => {
   const { id } = useParams();
