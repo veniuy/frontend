@@ -56,7 +56,6 @@ const EditableText = ({
   const beginEdit = (e) => {
     e.stopPropagation();
     setEditing(true);
-    // seleccionar todo al iniciar
     requestAnimationFrame(() => {
       if (!ref.current) return;
       const range = document.createRange();
@@ -68,16 +67,13 @@ const EditableText = ({
   };
 
   const endEdit = () => setEditing(false);
-
   const handleInput = (e) => onChange(e.currentTarget.textContent);
-
   const handleKeyDown = (e) => {
     if (singleLine && e.key === 'Enter') {
       e.preventDefault();
       ref.current?.blur();
     }
   };
-
   const handlePaste = (e) => {
     e.preventDefault();
     const text = (e.clipboardData || window.clipboardData).getData('text/plain');
@@ -96,8 +92,14 @@ const EditableText = ({
       onInput={handleInput}
       onKeyDown={handleKeyDown}
       onPaste={handlePaste}
+      dir="ltr"
       className={`${className} outline-none ${editing ? 'ring-2 ring-blue-300 rounded-sm' : ''}`}
-      style={{ ...style }}
+      style={{
+        unicodeBidi: 'isolate',   // evita inversión por bidi
+        direction: 'ltr',          // fuerza izquierda→derecha
+        whiteSpace: singleLine ? 'nowrap' : 'pre-wrap',
+        ...style
+      }}
     >
       {value}
     </Tag>
