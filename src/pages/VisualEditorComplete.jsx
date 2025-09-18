@@ -1,4 +1,4 @@
-// src/pages/VisualEditorComplete.jsx
+// src/pages/VisualEditorComplete.jsx - VERSIÓN CORREGIDA
 import React, { useState, useEffect, useRef, useCallback, useMemo, useReducer } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
@@ -211,7 +211,7 @@ const eventReducer = (state, action) => {
   }
 };
 
-/** Componente de texto editable optimizado para móviles con mejores gestos */
+/** Componente de texto editable CORREGIDO - Solucionado problema de texto al revés */
 const EditableTextOptimized = React.memo(({
   value,
   onChange,
@@ -338,10 +338,13 @@ const EditableTextOptimized = React.memo(({
     }, 0);
   }, []);
 
-  // Estilos optimizados para diferentes dispositivos
+  // CORRECCIÓN: Estilos forzados para evitar texto al revés
   const dynamicStyles = useMemo(() => ({
-    direction: 'ltr',
-    textAlign: 'inherit',
+    // SOLUCIÓN AL PROBLEMA DE TEXTO AL REVÉS: Forzar LTR explícitamente
+    direction: 'ltr !important',
+    textAlign: 'left', // Cambiar de 'inherit' a 'left' para evitar herencia RTL
+    unicodeBidi: 'embed', // Asegurar dirección de texto
+    writingMode: 'horizontal-tb', // Modo de escritura horizontal
     whiteSpace: singleLine ? 'nowrap' : 'pre-wrap',
     minWidth: editing ? (deviceInfo.isMobile ? '80px' : '100px') : 'auto',
     minHeight: editing ? '1.2em' : 'auto',
@@ -350,6 +353,9 @@ const EditableTextOptimized = React.memo(({
     WebkitUserSelect: editing ? 'text' : 'none',
     WebkitTouchCallout: 'none',
     WebkitTapHighlightColor: 'transparent',
+    // Prevenir reversión de texto en navegadores específicos
+    WebkitWritingMode: 'horizontal-tb',
+    msWritingMode: 'lr-tb',
     ...style
   }), [editing, deviceInfo.isMobile, singleLine, style]);
 
@@ -378,6 +384,9 @@ const EditableTextOptimized = React.memo(({
       spellCheck={false}
       className={dynamicClasses}
       style={dynamicStyles}
+      // ATRIBUTOS ADICIONALES PARA FORZAR LTR
+      dir="ltr"
+      lang="es"
     >
       {localValue}
     </Tag>
@@ -434,12 +443,28 @@ const VisualEditorComplete = () => {
     zoom: deviceInfo.isMobile ? 80 : 100,
     selectedTemplate: 'elegant',
     showMobilePanel: false,
-    viewMode: deviceInfo.isMobile ? 'mobile' : 'desktop'
+    viewMode: deviceInfo.isMobile ? 'mobile' : 'desktop',
+    // CORRECCIÓN: Estado para controlar edición
+    isCanvasEditing: false
   });
 
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
   const touchGesture = useTouchGestures(canvasRef);
+
+  // CORRECCIÓN: Hook para prevenir conflictos de edición
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (canvasRef.current && !canvasRef.current.contains(event.target)) {
+        setUiState(prev => ({ ...prev, isCanvasEditing: false }));
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Manejo de gestos táctiles
   useEffect(() => {
@@ -533,6 +558,27 @@ const VisualEditorComplete = () => {
   const setActiveTab = useCallback((tab) => {
     setUiState(prev => ({ ...prev, activeTab: tab }));
   }, []);
+
+  // CORRECCIÓN: Manejadores mejorados para los inputs del panel lateral
+  const handleInputChange = useCallback((type, field, value, subField = null) => {
+    // Prevenir conflictos durante edición en canvas
+    if (uiState.isCanvasEditing) return;
+    
+    switch (type) {
+      case 'couple':
+        dispatch({ type: 'UPDATE_COUPLE', field, value });
+        break;
+      case 'ceremony':
+        dispatch({ type: 'UPDATE_CEREMONY', field, value });
+        break;
+      case 'reception':
+        dispatch({ type: 'UPDATE_RECEPTION', field, value });
+        break;
+      default:
+        dispatch({ type: 'UPDATE_FIELD', field, value });
+        break;
+    }
+  }, [uiState.isCanvasEditing]);
 
   // Datos estáticos optimizados con useMemo
   const colorPalettes = useMemo(() => [
@@ -629,7 +675,10 @@ const VisualEditorComplete = () => {
         // Optimizaciones para rendimiento
         willChange: 'transform',
         backfaceVisibility: 'hidden',
-        perspective: '1000px'
+        perspective: '1000px',
+        // CORRECCIÓN: Asegurar dirección LTR en todo el canvas
+        direction: 'ltr',
+        unicodeBidi: 'embed'
       };
     };
 
@@ -644,6 +693,7 @@ const VisualEditorComplete = () => {
           color: currentStyle.textColor,
           overflow: 'hidden'
         }}
+        onClick={() => setUiState(prev => ({ ...prev, isCanvasEditing: true }))}
       >
         {/* Hero Section */}
         <section className={`min-h-screen flex items-center justify-center relative ${
@@ -1276,7 +1326,7 @@ const VisualEditorComplete = () => {
                   </Card>
                 </TabsContent>
 
-                {/* Tab Contenido */}
+                {/* Tab Contenido - CORREGIDO para funcionar correctamente */}
                 <TabsContent value="content" className="space-y-4 mt-0">
                   <Card>
                     <CardHeader className="pb-3">
@@ -1288,8 +1338,10 @@ const VisualEditorComplete = () => {
                         <Input
                           id="bride"
                           value={event.couple.bride}
-                          onChange={(e) => dispatch({ type: 'UPDATE_COUPLE', field: 'bride', value: e.target.value })}
+                          onChange={(e) => handleInputChange('couple', 'bride', e.target.value)}
                           className="text-xs mt-1"
+                          placeholder="Nombre de la novia"
+                          autoComplete="off"
                         />
                       </div>
 
@@ -1298,8 +1350,10 @@ const VisualEditorComplete = () => {
                         <Input
                           id="groom"
                           value={event.couple.groom}
-                          onChange={(e) => dispatch({ type: 'UPDATE_COUPLE', field: 'groom', value: e.target.value })}
+                          onChange={(e) => handleInputChange('couple', 'groom', e.target.value)}
                           className="text-xs mt-1"
+                          placeholder="Nombre del novio"
+                          autoComplete="off"
                         />
                       </div>
 
@@ -1308,8 +1362,10 @@ const VisualEditorComplete = () => {
                         <Input
                           id="hashtag"
                           value={event.hashtag}
-                          onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'hashtag', value: e.target.value })}
+                          onChange={(e) => handleInputChange('field', 'hashtag', e.target.value)}
                           className="text-xs mt-1"
+                          placeholder="#HashtagDelEvento"
+                          autoComplete="off"
                         />
                       </div>
                     </CardContent>
@@ -1325,8 +1381,10 @@ const VisualEditorComplete = () => {
                         <Input
                           id="eventDate"
                           value={event.date}
-                          onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'date', value: e.target.value })}
+                          onChange={(e) => handleInputChange('field', 'date', e.target.value)}
                           className="text-xs mt-1"
+                          placeholder="15 de Marzo, 2024"
+                          autoComplete="off"
                         />
                       </div>
 
@@ -1335,8 +1393,10 @@ const VisualEditorComplete = () => {
                         <Input
                           id="ceremonyVenue"
                           value={event.ceremony.venue}
-                          onChange={(e) => dispatch({ type: 'UPDATE_CEREMONY', field: 'venue', value: e.target.value })}
+                          onChange={(e) => handleInputChange('ceremony', 'venue', e.target.value)}
                           className="text-xs mt-1"
+                          placeholder="Iglesia San Miguel"
+                          autoComplete="off"
                         />
                       </div>
 
@@ -1345,8 +1405,9 @@ const VisualEditorComplete = () => {
                         <Textarea
                           id="ceremonyAddress"
                           value={event.ceremony.address}
-                          onChange={(e) => dispatch({ type: 'UPDATE_CEREMONY', field: 'address', value: e.target.value })}
+                          onChange={(e) => handleInputChange('ceremony', 'address', e.target.value)}
                           className="text-xs mt-1 min-h-[60px]"
+                          placeholder="Calle Mayor 123, Madrid"
                         />
                       </div>
 
@@ -1355,8 +1416,10 @@ const VisualEditorComplete = () => {
                         <Input
                           id="receptionVenue"
                           value={event.reception.venue}
-                          onChange={(e) => dispatch({ type: 'UPDATE_RECEPTION', field: 'venue', value: e.target.value })}
+                          onChange={(e) => handleInputChange('reception', 'venue', e.target.value)}
                           className="text-xs mt-1"
+                          placeholder="Jardín Botánico"
+                          autoComplete="off"
                         />
                       </div>
 
@@ -1365,8 +1428,9 @@ const VisualEditorComplete = () => {
                         <Textarea
                           id="receptionAddress"
                           value={event.reception.address}
-                          onChange={(e) => dispatch({ type: 'UPDATE_RECEPTION', field: 'address', value: e.target.value })}
+                          onChange={(e) => handleInputChange('reception', 'address', e.target.value)}
                           className="text-xs mt-1 min-h-[60px]"
+                          placeholder="Av. Libertador 456, Madrid"
                         />
                       </div>
                     </CardContent>
