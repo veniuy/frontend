@@ -1,4 +1,4 @@
-https://www.createdbymagic.com/// src/pages/VisualEditorComplete.jsx - VERSIÓN FINAL CORREGIDA
+// src/pages/VisualEditorComplete.jsx - VERSIÓN FINAL CORREGIDA
 import React, { useState, useEffect, useRef, useCallback, useMemo, useReducer } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
