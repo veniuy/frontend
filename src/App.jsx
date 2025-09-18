@@ -19,7 +19,7 @@ import EventBuilder from './pages/EventBuilder';
 import EventPreview from './pages/EventPreview';
 import PublicEvent from './pages/PublicEvent';
 // CAMBIADO: Usar el componente optimizado para móviles
-import VisualEditorOptimized from './pages/VisualEditorComplete';
+import VisualEditorComplete from './pages/VisualEditorComplete';
 import GuestManager from './pages/GuestManager';
 import PaymentTransfer from './pages/PaymentTransfer';
 import PaymentCode from './pages/PaymentCode';
@@ -37,7 +37,7 @@ import GuestSurveys from './pages/GuestSurveys';
 import Tracking from './pages/Tracking';
 
 // CORREGIDO: Rutas correctas para los hooks y componentes móviles
-import useDeviceDetection from './hooks/useMobileOptimizations';
+import { useDeviceDetection } from './hooks/useMobileOptimizations';
 import VirtualKeyboardHandler from './components/VirtualKeyboardHandler';
 
 // Category pages
