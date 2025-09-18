@@ -95,7 +95,7 @@ const useDebounce = (value, delay) => {
   return debouncedValue;
 };
 
-// Custom hook para touch gestures MEJORADO - Sin interferir con edición de texto
+// Custom hook para touch gestures
 const useTouchGestures = (ref) => {
   const [gesture, setGesture] = useState(null);
   
@@ -106,17 +106,8 @@ const useTouchGestures = (ref) => {
     let startY = 0;
     let startDistance = 0;
     let startZoom = 100;
-    let isEditing = false;
 
     const handleTouchStart = (e) => {
-      // ✅ FIX: No interferir si se está editando texto
-      const target = e.target;
-      if (target.contentEditable === 'true' || target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-        isEditing = true;
-        return;
-      }
-      isEditing = false;
-
       if (e.touches.length === 1) {
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
@@ -128,8 +119,7 @@ const useTouchGestures = (ref) => {
     };
 
     const handleTouchMove = (e) => {
-      // ✅ FIX: No prevenir eventos si se está editando
-      if (isEditing) return;
+      e.preventDefault();
       
       if (e.touches.length === 1) {
         const deltaX = e.touches[0].clientX - startX;
@@ -146,8 +136,6 @@ const useTouchGestures = (ref) => {
           });
         }
       } else if (e.touches.length === 2) {
-        // Solo prevenir para gestos de pinch, no para edición
-        e.preventDefault();
         const dx = e.touches[0].clientX - e.touches[1].clientX;
         const dy = e.touches[0].clientY - e.touches[1].clientY;
         const distance = Math.sqrt(dx * dx + dy * dy);
@@ -163,13 +151,12 @@ const useTouchGestures = (ref) => {
 
     const handleTouchEnd = () => {
       setGesture(null);
-      isEditing = false;
     };
 
     const element = ref.current;
-    element.addEventListener('touchstart', handleTouchStart, { passive: true });
+    element.addEventListener('touchstart', handleTouchStart, { passive: false });
     element.addEventListener('touchmove', handleTouchMove, { passive: false });
-    element.addEventListener('touchend', handleTouchEnd, { passive: true });
+    element.addEventListener('touchend', handleTouchEnd);
 
     return () => {
       element.removeEventListener('touchstart', handleTouchStart);
@@ -197,7 +184,7 @@ const eventReducer = (state, action) => {
     case 'UPDATE_FONTS':
       return {
         ...state,
-        fonts: { ...state.fonts, [action.type]: action.value }
+        fonts: { ...state.fonts, [action.fontType]: action.value }
       };
     case 'UPDATE_CEREMONY':
       return {
@@ -224,8 +211,8 @@ const eventReducer = (state, action) => {
   }
 };
 
-/** Componente de texto editable CORREGIDO - Sin problemas de escritura */
-const EditableTextFixed = React.memo(({
+/** Componente de texto editable optimizado para móviles con mejores gestos */
+const EditableTextOptimized = React.memo(({
   value,
   onChange,
   as = 'span',
@@ -257,25 +244,51 @@ const EditableTextFixed = React.memo(({
 
   const beginEdit = useCallback((e) => {
     e.stopPropagation();
+    e.preventDefault();
     
     setEditing(true);
     
-    // ✅ FIX: Lógica de foco simplificada sin interferencias
+    // Optimización para móviles - delay para mejor UX
+    const delay = deviceInfo.isMobile ? 100 : 50;
+    
     setTimeout(() => {
-      if (ref.current) {
-        ref.current.focus();
+      if (!ref.current) return;
+      
+      ref.current.focus();
+      
+      // Selección mejorada para móviles
+      if (deviceInfo.isMobile) {
+        // En móviles, crear un rango de selección más suave
+        const range = document.createRange();
+        range.selectNodeContents(ref.current);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
         
-        // ✅ FIX: Selección de texto más simple y confiable
-        if (document.createRange && window.getSelection) {
-          const range = document.createRange();
-          range.selectNodeContents(ref.current);
-          const selection = window.getSelection();
-          selection.removeAllRanges();
-          selection.addRange(range);
+        // Scroll optimizado para móviles
+        ref.current.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center',
+          inline: 'center'
+        });
+        
+        // Prevenir zoom en iOS
+        if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+          ref.current.setAttribute('readonly', 'readonly');
+          setTimeout(() => {
+            ref.current.removeAttribute('readonly');
+          }, 100);
         }
+      } else {
+        // Desktop - selección estándar
+        const range = document.createRange();
+        range.selectNodeContents(ref.current);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
       }
-    }, 10); // ✅ FIX: Delay reducido
-  }, []);
+    }, delay);
+  }, [deviceInfo.isMobile]);
 
   const endEdit = useCallback(() => {
     setEditing(false);
@@ -301,43 +314,54 @@ const EditableTextFixed = React.memo(({
     }
   }, [singleLine, value]);
 
-  // ✅ FIX: Función de pegado simplificada
   const handlePaste = useCallback((e) => {
     e.preventDefault();
     const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-    document.execCommand('insertText', false, text);
+    
+    // Insertar texto plano optimizado
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      range.deleteContents();
+      const textNode = document.createTextNode(text);
+      range.insertNode(textNode);
+      range.setStartAfter(textNode);
+      range.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+    
+    // Actualizar estado local
+    setTimeout(() => {
+      const newText = ref.current?.textContent || '';
+      setLocalValue(newText);
+    }, 0);
   }, []);
 
-  // ✅ FIX: Estilos corregidos sin problemas de dirección
+  // Estilos optimizados para diferentes dispositivos
   const dynamicStyles = useMemo(() => ({
-    // ✅ FIX: Dirección de texto corregida
     direction: 'ltr',
-    unicodeBidi: 'normal',
-    writingMode: 'horizontal-tb',
     textAlign: 'inherit',
     whiteSpace: singleLine ? 'nowrap' : 'pre-wrap',
     minWidth: editing ? (deviceInfo.isMobile ? '80px' : '100px') : 'auto',
     minHeight: editing ? '1.2em' : 'auto',
-    // ✅ FIX: Touch action mejorado
-    touchAction: 'manipulation',
+    touchAction: deviceInfo.isMobile ? 'manipulation' : 'auto',
     userSelect: editing ? 'text' : 'none',
     WebkitUserSelect: editing ? 'text' : 'none',
     WebkitTouchCallout: 'none',
     WebkitTapHighlightColor: 'transparent',
-    // ✅ FIX: Prevenir zoom en iOS
-    fontSize: deviceInfo.isMobile ? 'max(16px, 1em)' : 'inherit',
     ...style
   }), [editing, deviceInfo.isMobile, singleLine, style]);
 
   const dynamicClasses = useMemo(() => {
-    const baseClasses = `${className} outline-none transition-all duration-200`;
+    const baseClasses = `${className} outline-none transition-all duration-200 select-none`;
     const editingClasses = editing 
-      ? 'ring-2 ring-blue-400 bg-blue-50 bg-opacity-80 rounded-sm px-1' 
+      ? 'ring-2 ring-blue-400 bg-blue-50 rounded-sm px-1' 
       : 'hover:bg-gray-100 hover:bg-opacity-50 cursor-pointer';
-    const touchClasses = 'touch-manipulation';
+    const touchClasses = deviceInfo.isMobile ? 'touch-manipulation' : '';
     
-    return `${baseClasses} ${editingClasses} ${touchClasses}`.trim();
-  }, [className, editing]);
+    return `${baseClasses} ${editingClasses} ${touchClasses}`;
+  }, [className, editing, deviceInfo.isMobile]);
 
   return (
     <Tag
@@ -354,18 +378,13 @@ const EditableTextFixed = React.memo(({
       spellCheck={false}
       className={dynamicClasses}
       style={dynamicStyles}
-      // ✅ FIX: Atributos adicionales para mejor compatibilidad
-      autoCapitalize="off"
-      autoCorrect="off"
-      autoComplete="off"
-      inputMode="text"
     >
       {localValue}
     </Tag>
   );
 });
 
-EditableTextFixed.displayName = 'EditableTextFixed';
+EditableTextOptimized.displayName = 'EditableTextOptimized';
 
 const VisualEditorComplete = () => {
   const { id } = useParams();
@@ -482,7 +501,7 @@ const VisualEditorComplete = () => {
   }, []);
 
   const handleFontChange = useCallback((type, fontFamily) => {
-    dispatch({ type: 'UPDATE_FONTS', type, value: fontFamily });
+    dispatch({ type: 'UPDATE_FONTS', fontType: type, value: fontFamily });
   }, []);
 
   const handleTemplateChange = useCallback((templateId) => {
@@ -650,7 +669,7 @@ const VisualEditorComplete = () => {
               }`}
               style={{ color: currentStyle.primaryColor }}
             >
-              <EditableTextFixed
+              <EditableTextOptimized
                 value={event.couple.bride}
                 onChange={(val) => dispatch({ type: 'UPDATE_COUPLE', field: 'bride', value: val })}
                 as="span"
@@ -674,7 +693,7 @@ const VisualEditorComplete = () => {
               }`}
               style={{ color: currentStyle.primaryColor }}
             >
-              <EditableTextFixed
+              <EditableTextOptimized
                 value={event.couple.groom}
                 onChange={(val) => dispatch({ type: 'UPDATE_COUPLE', field: 'groom', value: val })}
                 as="span"
@@ -688,7 +707,7 @@ const VisualEditorComplete = () => {
               }`}
               style={{ color: currentStyle.textColor }}
             >
-              <EditableTextFixed
+              <EditableTextOptimized
                 value={event.description}
                 onChange={(val) => dispatch({ type: 'UPDATE_FIELD', field: 'description', value: val })}
                 as="span"
@@ -767,28 +786,28 @@ const VisualEditorComplete = () => {
                   deviceInfo.isMobile ? 'text-base' : ''
                 }`}>
                   <p className={deviceInfo.isMobile ? 'text-base' : 'text-lg'}>
-                    <EditableTextFixed
+                    <EditableTextOptimized
                       value={event.date}
                       onChange={(val) => dispatch({ type: 'UPDATE_FIELD', field: 'date', value: val })}
                       ariaLabel="Fecha"
                     />
                   </p>
                   <p className={deviceInfo.isMobile ? 'text-base' : 'text-lg'}>
-                    <EditableTextFixed
+                    <EditableTextOptimized
                       value={event.ceremony.time}
                       onChange={(val) => dispatch({ type: 'UPDATE_CEREMONY', field: 'time', value: val })}
                       ariaLabel="Hora de ceremonia"
                     />
                   </p>
                   <p className="font-medium">
-                    <EditableTextFixed
+                    <EditableTextOptimized
                       value={event.ceremony.venue}
                       onChange={(val) => dispatch({ type: 'UPDATE_CEREMONY', field: 'venue', value: val })}
                       ariaLabel="Lugar de ceremonia"
                     />
                   </p>
                   <p>
-                    <EditableTextFixed
+                    <EditableTextOptimized
                       value={event.ceremony.address}
                       onChange={(val) => dispatch({ type: 'UPDATE_CEREMONY', field: 'address', value: val })}
                       ariaLabel="Dirección de ceremonia"
@@ -832,28 +851,28 @@ const VisualEditorComplete = () => {
                   deviceInfo.isMobile ? 'text-base' : ''
                 }`}>
                   <p className={deviceInfo.isMobile ? 'text-base' : 'text-lg'}>
-                    <EditableTextFixed
+                    <EditableTextOptimized
                       value={event.date}
                       onChange={(val) => dispatch({ type: 'UPDATE_FIELD', field: 'date', value: val })}
                       ariaLabel="Fecha de recepción"
                     />
                   </p>
                   <p className={deviceInfo.isMobile ? 'text-base' : 'text-lg'}>
-                    <EditableTextFixed
+                    <EditableTextOptimized
                       value={event.reception.time}
                       onChange={(val) => dispatch({ type: 'UPDATE_RECEPTION', field: 'time', value: val })}
                       ariaLabel="Hora de recepción"
                     />
                   </p>
                   <p className="font-medium">
-                    <EditableTextFixed
+                    <EditableTextOptimized
                       value={event.reception.venue}
                       onChange={(val) => dispatch({ type: 'UPDATE_RECEPTION', field: 'venue', value: val })}
                       ariaLabel="Lugar de recepción"
                     />
                   </p>
                   <p>
-                    <EditableTextFixed
+                    <EditableTextOptimized
                       value={event.reception.address}
                       onChange={(val) => dispatch({ type: 'UPDATE_RECEPTION', field: 'address', value: val })}
                       ariaLabel="Dirección de recepción"
@@ -882,195 +901,101 @@ const VisualEditorComplete = () => {
             deviceInfo.isMobile ? 'px-4' : 'px-8'
           }`}>
             <h2 
-              className={`font-medium mb-8 tracking-wide ${
+              className={`font-light mb-6 ${
                 deviceInfo.isMobile ? 'text-2xl' : 'text-3xl md:text-4xl'
               }`}
-              style={{ color: currentStyle.textColor }}
+              style={{ color: currentStyle.primaryColor }}
             >
-              CONFIRMA TU ASISTENCIA
+              Confirma tu Asistencia
             </h2>
             <p className={`mb-8 text-gray-600 ${
               deviceInfo.isMobile ? 'text-base' : 'text-lg'
             }`}>
               Tu presencia es muy importante para nosotros
             </p>
-            <div className={`flex gap-4 justify-center ${
-              deviceInfo.isMobile ? 'flex-col' : 'flex-row'
-            }`}>
-              <Button 
-                className={`rounded-full ${
-                  deviceInfo.isMobile ? 'px-8 py-3' : 'px-12 py-4'
-                }`}
-                style={{ 
-                  backgroundColor: currentStyle.primaryColor,
-                  color: 'white'
-                }}
-              >
-                <Users className={`mr-2 ${deviceInfo.isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
-                SÍ, ASISTIRÉ
-              </Button>
-              <Button 
-                variant="outline"
-                className={`rounded-full border-2 ${
-                  deviceInfo.isMobile ? 'px-8 py-3' : 'px-12 py-4'
-                }`}
-                style={{ 
-                  borderColor: currentStyle.primaryColor,
-                  color: currentStyle.primaryColor
-                }}
-              >
-                NO PODRÉ ASISTIR
-              </Button>
-            </div>
+            <Button
+              size={deviceInfo.isMobile ? 'default' : 'lg'}
+              className={`rounded-full text-white ${
+                deviceInfo.isMobile ? 'px-8 py-3 text-base' : 'px-12 py-4 text-lg'
+              }`}
+              style={{ backgroundColor: currentStyle.primaryColor }}
+            >
+              <Users className={`mr-2 ${deviceInfo.isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
+              CONFIRMAR ASISTENCIA
+            </Button>
           </div>
         </section>
 
-        {/* Social Share Section */}
-        <section className={`${deviceInfo.isMobile ? 'py-8' : 'py-16'}`}
-                 style={{ backgroundColor: currentStyle.secondaryColor }}>
-          <div className={`max-w-4xl mx-auto text-center ${
-            deviceInfo.isMobile ? 'px-4' : 'px-8'
-          }`}>
-            <h2 className={`font-medium mb-4 tracking-wide text-white ${
-              deviceInfo.isMobile ? 'text-2xl' : 'text-3xl'
-            }`}>
-              ¡COMPARTE NUESTRA ALEGRÍA!
-            </h2>
-            <p className={`mb-8 text-white opacity-90 ${
-              deviceInfo.isMobile ? 'text-base' : 'text-lg'
-            }`}>
-              <EditableTextFixed
-                value={event.hashtag}
-                onChange={(val) => dispatch({ type: 'UPDATE_FIELD', field: 'hashtag', value: val })}
-                as="span"
-                ariaLabel="Hashtag del evento"
-                className="text-white"
-              />
-            </p>
-            <div className={`flex gap-4 justify-center ${
-              deviceInfo.isMobile ? 'flex-wrap' : ''
-            }`}>
-              <Button 
-                variant="outline" 
-                className={`rounded-full bg-white border-0 ${
-                  deviceInfo.isMobile ? 'px-6 py-3' : 'px-8 py-4'
-                }`}
-              >
-                <Instagram className={`mr-2 ${deviceInfo.isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
-                Instagram
-              </Button>
-              <Button 
-                variant="outline" 
-                className={`rounded-full bg-white border-0 ${
-                  deviceInfo.isMobile ? 'px-6 py-3' : 'px-8 py-4'
-                }`}
-              >
-                <Facebook className={`mr-2 ${deviceInfo.isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
-                Facebook
-              </Button>
-              <Button 
-                variant="outline" 
-                className={`rounded-full bg-white border-0 ${
-                  deviceInfo.isMobile ? 'px-6 py-3' : 'px-8 py-4'
-                }`}
-              >
-                <Share2 className={`mr-2 ${deviceInfo.isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
-                Compartir
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* Regalo Section */}
+        {/* Mesa de Regalos */}
         <section className={`bg-white ${deviceInfo.isMobile ? 'py-8' : 'py-16'}`}>
           <div className={`max-w-4xl mx-auto text-center ${
             deviceInfo.isMobile ? 'px-4' : 'px-8'
           }`}>
-            <div
-              className={`rounded-full flex items-center justify-center mx-auto mb-6 ${
-                deviceInfo.isMobile ? 'w-16 h-16' : 'w-20 h-20'
-              }`}
-              style={{ backgroundColor: `${currentStyle.primaryColor}10` }}
-            >
-              <Gift 
-                className={deviceInfo.isMobile ? 'w-8 h-8' : 'w-10 h-10'}
-                style={{ color: currentStyle.primaryColor }} 
-              />
-            </div>
             <h2 
-              className={`font-medium mb-4 tracking-wide ${
-                deviceInfo.isMobile ? 'text-2xl' : 'text-3xl'
+              className={`font-light mb-6 ${
+                deviceInfo.isMobile ? 'text-2xl' : 'text-3xl md:text-4xl'
               }`}
               style={{ color: currentStyle.textColor }}
             >
-              MESA DE REGALOS
+              Mesa de Regalos
             </h2>
-            <p className={`mb-8 text-gray-600 max-w-2xl mx-auto ${
+            <p className={`mb-8 text-gray-600 ${
               deviceInfo.isMobile ? 'text-base' : 'text-lg'
             }`}>
-              Tu presencia es el mejor regalo, pero si deseas obsequiarnos algo, 
-              aquí tienes algunas opciones
+              Si deseas hacernos un regalo, aquí tienes algunas opciones
             </p>
-            <div className={`flex gap-4 justify-center ${
-              deviceInfo.isMobile ? 'flex-col' : 'flex-row'
+            <div className={`grid gap-6 ${
+              deviceInfo.isMobile ? 'grid-cols-1' : 'md:grid-cols-2'
             }`}>
-              <Button 
-                className={`rounded-full ${
-                  deviceInfo.isMobile ? 'px-8 py-3' : 'px-12 py-4'
-                }`}
-                style={{ 
-                  backgroundColor: currentStyle.primaryColor,
-                  color: 'white'
-                }}
-              >
-                <Gift className={`mr-2 ${deviceInfo.isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
-                LIVERPOOL
-              </Button>
-              <Button 
+              <Button
                 variant="outline"
-                className={`rounded-full border-2 ${
-                  deviceInfo.isMobile ? 'px-8 py-3' : 'px-12 py-4'
-                }`}
-                style={{ 
-                  borderColor: currentStyle.primaryColor,
-                  color: currentStyle.primaryColor
-                }}
+                size={deviceInfo.isMobile ? 'default' : 'lg'}
+                className={`h-auto flex-col ${deviceInfo.isMobile ? 'p-4' : 'p-6'}`}
+                style={{ borderColor: currentStyle.primaryColor, color: currentStyle.primaryColor }}
               >
-                <CreditCard className={`mr-2 ${deviceInfo.isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
-                SOBRES
+                <Gift className={`mb-2 ${deviceInfo.isMobile ? 'w-6 h-6' : 'w-8 h-8'}`} />
+                <span className={deviceInfo.isMobile ? 'text-base' : 'text-lg'}>Lista de Regalos</span>
+              </Button>
+              <Button
+                variant="outline"
+                size={deviceInfo.isMobile ? 'default' : 'lg'}
+                className={`h-auto flex-col ${deviceInfo.isMobile ? 'p-4' : 'p-6'}`}
+                style={{ borderColor: currentStyle.secondaryColor, color: currentStyle.secondaryColor }}
+              >
+                <CreditCard className={`mb-2 ${deviceInfo.isMobile ? 'w-6 h-6' : 'w-8 h-8'}`} />
+                <span className={deviceInfo.isMobile ? 'text-base' : 'text-lg'}>Contribución</span>
               </Button>
             </div>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className={`text-center ${
-          deviceInfo.isMobile ? 'py-8' : 'py-16'
-        }`} 
+        <footer className={`text-center ${deviceInfo.isMobile ? 'py-8' : 'py-12'}`} 
                 style={{ backgroundColor: currentStyle.primaryColor }}>
-          <div className={`max-w-4xl mx-auto ${
-            deviceInfo.isMobile ? 'px-4' : 'px-8'
-          }`}>
-            <div className="mb-6">
-              <Heart 
-                className={`mx-auto ${deviceInfo.isMobile ? 'w-8 h-8' : 'w-12 h-12'}`}
-                style={{ color: 'white' }} 
-                fill="white" 
+          <div className={`max-w-4xl mx-auto ${deviceInfo.isMobile ? 'px-4' : 'px-8'}`}>
+            <h3 className={`font-light mb-4 text-white ${
+              deviceInfo.isMobile ? 'text-xl' : 'text-2xl'
+            }`}>
+              ¡Esperamos verte en nuestro gran día!
+            </h3>
+            <p className="text-white opacity-90 mb-6">
+              <EditableTextOptimized
+                value={event.hashtag}
+                onChange={(val) => dispatch({ type: 'UPDATE_FIELD', field: 'hashtag', value: val })}
+                ariaLabel="Hashtag"
               />
-            </div>
-            <h2 className={`font-light mb-4 tracking-wide text-white ${
-              deviceInfo.isMobile ? 'text-2xl' : 'text-3xl md:text-4xl'
-            }`}>
-              ¡Nos vemos pronto!
-            </h2>
-            <p className={`text-white opacity-90 ${
-              deviceInfo.isMobile ? 'text-base' : 'text-lg'
-            }`}>
-              Con amor,<br />
-              <span className="font-medium">
-                {event.couple.bride} & {event.couple.groom}
-              </span>
             </p>
+            <div className="flex justify-center space-x-6">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+                <Instagram className={deviceInfo.isMobile ? 'w-4 h-4' : 'w-5 h-5'} />
+              </Button>
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+                <Facebook className={deviceInfo.isMobile ? 'w-4 h-4' : 'w-5 h-5'} />
+              </Button>
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+                <Share2 className={deviceInfo.isMobile ? 'w-4 h-4' : 'w-5 h-5'} />
+              </Button>
+            </div>
           </div>
         </footer>
       </div>
@@ -1102,7 +1027,7 @@ const VisualEditorComplete = () => {
               <h1 className={`font-semibold ${deviceInfo.isMobile ? 'text-lg' : 'text-xl'}`}>
                 {event.couple.bride} & {event.couple.groom}
               </h1>
-              <p className="text-xs text-gray-600">Editor Visual - Versión Corregida</p>
+              <p className="text-xs text-gray-600">Editor Visual</p>
             </div>
           </div>
 
@@ -1274,7 +1199,7 @@ const VisualEditorComplete = () => {
                           />
                         </div>
                       </div>
-                      
+
                       <div>
                         <Label htmlFor="secondaryColor" className="text-xs">Color Secundario</Label>
                         <div className="flex gap-2 mt-1">
@@ -1292,6 +1217,24 @@ const VisualEditorComplete = () => {
                           />
                         </div>
                       </div>
+
+                      <div>
+                        <Label htmlFor="textColor" className="text-xs">Color de Texto</Label>
+                        <div className="flex gap-2 mt-1">
+                          <Input
+                            id="textColor"
+                            type="color"
+                            value={event.colors.text}
+                            onChange={(e) => handleColorChange('text', e.target.value)}
+                            className="w-12 h-8 p-0 border-0"
+                          />
+                          <Input
+                            value={event.colors.text}
+                            onChange={(e) => handleColorChange('text', e.target.value)}
+                            className="flex-1 text-xs"
+                          />
+                        </div>
+                      </div>
                     </CardContent>
                   </Card>
 
@@ -1305,7 +1248,7 @@ const VisualEditorComplete = () => {
                         <select
                           value={event.fonts.primary}
                           onChange={(e) => handleFontChange('primary', e.target.value)}
-                          className="w-full mt-1 p-2 text-xs border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full mt-1 p-2 border border-gray-300 rounded text-sm touch-manipulation"
                         >
                           {fontFamilies.map((font) => (
                             <option key={font} value={font} style={{ fontFamily: font }}>
@@ -1314,13 +1257,13 @@ const VisualEditorComplete = () => {
                           ))}
                         </select>
                       </div>
-                      
+
                       <div>
                         <Label className="text-xs">Fuente Secundaria</Label>
                         <select
                           value={event.fonts.secondary}
                           onChange={(e) => handleFontChange('secondary', e.target.value)}
-                          className="w-full mt-1 p-2 text-xs border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full mt-1 p-2 border border-gray-300 rounded text-sm touch-manipulation"
                         >
                           {fontFamilies.map((font) => (
                             <option key={font} value={font} style={{ fontFamily: font }}>
@@ -1337,43 +1280,36 @@ const VisualEditorComplete = () => {
                 <TabsContent value="content" className="space-y-4 mt-0">
                   <Card>
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-sm">Información de los Novios</CardTitle>
+                      <CardTitle className="text-sm">Información de la Pareja</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div>
-                        <Label htmlFor="brideName" className="text-xs">Nombre de la Novia</Label>
+                        <Label htmlFor="bride" className="text-xs">Novia</Label>
                         <Input
-                          id="brideName"
+                          id="bride"
                           value={event.couple.bride}
                           onChange={(e) => dispatch({ type: 'UPDATE_COUPLE', field: 'bride', value: e.target.value })}
-                          className="mt-1 text-sm"
+                          className="text-xs mt-1"
                         />
                       </div>
+
                       <div>
-                        <Label htmlFor="groomName" className="text-xs">Nombre del Novio</Label>
+                        <Label htmlFor="groom" className="text-xs">Novio</Label>
                         <Input
-                          id="groomName"
+                          id="groom"
                           value={event.couple.groom}
                           onChange={(e) => dispatch({ type: 'UPDATE_COUPLE', field: 'groom', value: e.target.value })}
-                          className="mt-1 text-sm"
+                          className="text-xs mt-1"
                         />
                       </div>
-                      <div>
-                        <Label htmlFor="description" className="text-xs">Descripción</Label>
-                        <Input
-                          id="description"
-                          value={event.description}
-                          onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'description', value: e.target.value })}
-                          className="mt-1 text-sm"
-                        />
-                      </div>
+
                       <div>
                         <Label htmlFor="hashtag" className="text-xs">Hashtag</Label>
                         <Input
                           id="hashtag"
                           value={event.hashtag}
                           onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'hashtag', value: e.target.value })}
-                          className="mt-1 text-sm"
+                          className="text-xs mt-1"
                         />
                       </div>
                     </CardContent>
@@ -1381,97 +1317,56 @@ const VisualEditorComplete = () => {
 
                   <Card>
                     <CardHeader className="pb-3">
-                      <CardTitle className="text-sm">Fecha y Hora</CardTitle>
+                      <CardTitle className="text-sm">Detalles del Evento</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div>
-                        <Label htmlFor="eventDate" className="text-xs">Fecha del Evento</Label>
+                        <Label htmlFor="eventDate" className="text-xs">Fecha</Label>
                         <Input
                           id="eventDate"
                           value={event.date}
                           onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'date', value: e.target.value })}
-                          className="mt-1 text-sm"
+                          className="text-xs mt-1"
                         />
                       </div>
-                      <div>
-                        <Label htmlFor="eventTime" className="text-xs">Hora del Evento</Label>
-                        <Input
-                          id="eventTime"
-                          value={event.time}
-                          onChange={(e) => dispatch({ type: 'UPDATE_FIELD', field: 'time', value: e.target.value })}
-                          className="mt-1 text-sm"
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
 
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm">Ceremonia</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
                       <div>
-                        <Label htmlFor="ceremonyVenue" className="text-xs">Lugar</Label>
+                        <Label htmlFor="ceremonyVenue" className="text-xs">Lugar de Ceremonia</Label>
                         <Input
                           id="ceremonyVenue"
                           value={event.ceremony.venue}
                           onChange={(e) => dispatch({ type: 'UPDATE_CEREMONY', field: 'venue', value: e.target.value })}
-                          className="mt-1 text-sm"
+                          className="text-xs mt-1"
                         />
                       </div>
+
                       <div>
-                        <Label htmlFor="ceremonyAddress" className="text-xs">Dirección</Label>
+                        <Label htmlFor="ceremonyAddress" className="text-xs">Dirección de Ceremonia</Label>
                         <Textarea
                           id="ceremonyAddress"
                           value={event.ceremony.address}
                           onChange={(e) => dispatch({ type: 'UPDATE_CEREMONY', field: 'address', value: e.target.value })}
-                          className="mt-1 text-sm"
-                          rows={2}
+                          className="text-xs mt-1 min-h-[60px]"
                         />
                       </div>
-                      <div>
-                        <Label htmlFor="ceremonyTime" className="text-xs">Hora</Label>
-                        <Input
-                          id="ceremonyTime"
-                          value={event.ceremony.time}
-                          onChange={(e) => dispatch({ type: 'UPDATE_CEREMONY', field: 'time', value: e.target.value })}
-                          className="mt-1 text-sm"
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
 
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <CardTitle className="text-sm">Recepción</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
                       <div>
-                        <Label htmlFor="receptionVenue" className="text-xs">Lugar</Label>
+                        <Label htmlFor="receptionVenue" className="text-xs">Lugar de Recepción</Label>
                         <Input
                           id="receptionVenue"
                           value={event.reception.venue}
                           onChange={(e) => dispatch({ type: 'UPDATE_RECEPTION', field: 'venue', value: e.target.value })}
-                          className="mt-1 text-sm"
+                          className="text-xs mt-1"
                         />
                       </div>
+
                       <div>
-                        <Label htmlFor="receptionAddress" className="text-xs">Dirección</Label>
+                        <Label htmlFor="receptionAddress" className="text-xs">Dirección de Recepción</Label>
                         <Textarea
                           id="receptionAddress"
                           value={event.reception.address}
                           onChange={(e) => dispatch({ type: 'UPDATE_RECEPTION', field: 'address', value: e.target.value })}
-                          className="mt-1 text-sm"
-                          rows={2}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="receptionTime" className="text-xs">Hora</Label>
-                        <Input
-                          id="receptionTime"
-                          value={event.reception.time}
-                          onChange={(e) => dispatch({ type: 'UPDATE_RECEPTION', field: 'time', value: e.target.value })}
-                          className="mt-1 text-sm"
+                          className="text-xs mt-1 min-h-[60px]"
                         />
                       </div>
                     </CardContent>
@@ -1485,13 +1380,13 @@ const VisualEditorComplete = () => {
                       <CardTitle className="text-sm">Subir Imágenes</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
-                        <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-                        <p className="text-sm text-gray-600 mb-2">
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center touch-manipulation">
+                        <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                        <p className="text-xs text-gray-600 mb-2">
                           Arrastra imágenes aquí o haz clic para seleccionar
                         </p>
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           size="sm"
                           onClick={() => fileInputRef.current?.click()}
                         >
@@ -1500,8 +1395,8 @@ const VisualEditorComplete = () => {
                         <input
                           ref={fileInputRef}
                           type="file"
-                          multiple
                           accept="image/*"
+                          multiple
                           className="hidden"
                           onChange={(e) => {
                             console.log('Archivos seleccionados:', e.target.files);
