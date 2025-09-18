@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo, useReducer } 
 
 
 // === Injected templateStyles ===
-const templateStyles = React.useMemo(() => ({
+const templateStyles = useMemo(() => ({
   elegant:  { background: '#ffffff' , primary: event?.colors?.primary,   secondary: event?.colors?.secondary, text: event?.colors?.text, fontA: event?.fonts?.primary,   fontB: event?.fonts?.secondary },
   romantic: { background: '#fff0f5', primary: '#e91e63',                  secondary: '#ffc0cb',                text: '#333333',            fontA: 'Playfair Display',      fontB: 'Inter' },
   modern:   { background: '#f5f7fa', primary: '#3498db',                  secondary: '#2ecc71',                text: '#111111',            fontA: 'Inter',                 fontB: 'Inter' },
@@ -11,7 +11,7 @@ const templateStyles = React.useMemo(() => ({
 }), [event?.colors, event?.fonts]);
 
 const tpl = templateStyles?.[event?.template] || templateStyles.elegant;
-const currentStyle = React.useMemo(() => ({
+const currentStyle = useMemo(() => ({
   primaryColor: tpl.primary,
   secondaryColor: tpl.secondary,
   textColor: tpl.text,
@@ -433,24 +433,7 @@ const EditableTextOptimized = React.memo(({
   }, [className, editing, deviceInfo.isMobile]);
 
   return (
-    <Tag
-      ref={ref}
-      role="textbox"
-      aria-label={ariaLabel}
-      key={editing ? "edit" : "view"} dir="ltr" lang="es" contentEditable={editing}
-      suppressContentEditableWarning
-      onClick={beginEdit}
-      onBlur={endEdit}
-      onInput={handleInput}
-      onKeyDown={handleKeyDown}
-      onPaste={handlePaste}
-      spellCheck={false}
-      className={dynamicClasses}
-      style={dynamicStyles}
-      // CORRECCIÓN: Solo atributos básicos LTR
-      dir="ltr"
-      lang="es"
-    >
+    <Tag ref={ref} role="textbox" aria-label={ariaLabel} key={editing ? "edit" : "view"} dir="ltr" lang="es" contentEditable={editing} suppressContentEditableWarning onClick={beginEdit} onBlur={endEdit} onInput={handleInput} onKeyDown={handleKeyDown} onPaste={handlePaste} spellCheck={false} className={dynamicClasses} style={dynamicStyles} // CORRECCIÓN: Solo atributos básicos LTR >
       {localValue}
     </Tag>
   );
@@ -651,14 +634,10 @@ const VisualEditorComplete = () => {
   // Componente optimizado para mostrar tiempo
   const TimeCell = React.memo(({ value, label }) => (
     <div className="text-center">
-      <div className={`font-bold text-white ${
-        deviceInfo.isMobile ? 'text-2xl' : 'text-4xl md:text-6xl'
-      }`}>
+      <div className={`font-bold text-white ${ deviceInfo.isMobile ? 'text-2xl' : 'text-4xl md:text-6xl' }`}>
         {value.toString().padStart(2, '0')}
       </div>
-      <div className={`text-white/80 ${
-        deviceInfo.isMobile ? 'text-xs' : 'text-sm'
-      }`}>
+      <div className={`text-white/80 ${ deviceInfo.isMobile ? 'text-xs' : 'text-sm' }`}>
         {label}
       </div>
     </div>
@@ -678,60 +657,28 @@ const VisualEditorComplete = () => {
     const scaleClass = `transform scale-${Math.floor(uiState.zoom / 10)}`;
     
     return (
-      <div 
-        ref={canvasRef}
-        className={`invitation-canvas ${scaleClass} origin-top-left transition-transform duration-200`}
-        style={{ 
-          width: uiState.viewMode === 'mobile' ? '375px' : '800px',
-          fontFamily: currentStyle.secondaryFont
-        }}
-      >
+      <div ref={canvasRef} className={`invitation-canvas ${scaleClass} origin-top-left transition-transform duration-200`} style={{ width: uiState.viewMode === 'mobile' ? '375px' : '800px', fontFamily: currentStyle.secondaryFont }} >
         {/* Header */}
-        <section className={`text-center ${deviceInfo.isMobile ? 'py-8' : 'py-16'}`} 
-                 style={{ backgroundColor: currentStyle.backgroundColor }}>
+        <section className={`text-center ${deviceInfo.isMobile ? 'py-8' : 'py-16'}`} style={{ backgroundColor: currentStyle.backgroundColor }}>
           <div className={`max-w-4xl mx-auto ${deviceInfo.isMobile ? 'px-4' : 'px-8'}`}>
             <div className="mb-8">
-              <Heart 
-                className={`mx-auto mb-4 ${deviceInfo.isMobile ? 'w-8 h-8' : 'w-12 h-12'}`}
-                style={{ color: currentStyle.primaryColor }} 
-              />
-              <h1 
-                className={`font-light tracking-wide ${
-                  deviceInfo.isMobile ? 'text-3xl' : 'text-5xl md:text-7xl'
-                }`}
-                style={{ 
-                  color: currentStyle.primaryColor,
-                  fontFamily: currentStyle.primaryFont 
-                }}
-              >
-                <EditableTextOptimized
-                  value={event.couple.bride}
-                  onChange={(val) => dispatch({ type: 'UPDATE_COUPLE', field: 'bride', value: val })}
+              <Heart className={`mx-auto mb-4 ${deviceInfo.isMobile ? 'w-8 h-8' : 'w-12 h-12'}`} style={{ color: currentStyle.primaryColor }} />
+              <h1 className={`font-light tracking-wide ${ deviceInfo.isMobile ? 'text-3xl' : 'text-5xl md:text-7xl' }`} style={{ color: currentStyle.primaryColor, fontFamily: currentStyle.primaryFont }} >
+                <EditableTextOptimized value={event.couple.bride} onChange={(val) => dispatch({ type: 'UPDATE_COUPLE', field: 'bride', value: val })}
                   ariaLabel="Nombre de la novia"
                 />
-                <span className={`block font-light ${
-                  deviceInfo.isMobile ? 'text-2xl my-2' : 'text-4xl md:text-6xl my-4'
-                }`}>
+                <span className={`block font-light ${ deviceInfo.isMobile ? 'text-2xl my-2' : 'text-4xl md:text-6xl my-4' }`}>
                   &
                 </span>
-                <EditableTextOptimized
-                  value={event.couple.groom}
-                  onChange={(val) => dispatch({ type: 'UPDATE_COUPLE', field: 'groom', value: val })}
+                <EditableTextOptimized value={event.couple.groom} onChange={(val) => dispatch({ type: 'UPDATE_COUPLE', field: 'groom', value: val })}
                   ariaLabel="Nombre del novio"
                 />
               </h1>
             </div>
             
             <div className="mb-8">
-              <p 
-                className={`font-medium tracking-wider ${
-                  deviceInfo.isMobile ? 'text-base' : 'text-xl'
-                }`}
-                style={{ color: currentStyle.textColor }}
-              >
-                <EditableTextOptimized
-                  value={event.description}
-                  onChange={(val) => dispatch({ type: 'UPDATE_FIELD', field: 'description', value: val })}
+              <p className={`font-medium tracking-wider ${ deviceInfo.isMobile ? 'text-base' : 'text-xl' }`} style={{ color: currentStyle.textColor }} >
+                <EditableTextOptimized value={event.description} onChange={(val) => dispatch({ type: 'UPDATE_FIELD', field: 'description', value: val })}
                   ariaLabel="Descripción del evento"
                 />
               </p>
@@ -740,29 +687,18 @@ const VisualEditorComplete = () => {
         </section>
 
         {/* Countdown */}
-        <section className={`text-center ${deviceInfo.isMobile ? 'py-8' : 'py-16'}`} 
-                 style={{ backgroundColor: currentStyle.backgroundColor }}>
+        <section className={`text-center ${deviceInfo.isMobile ? 'py-8' : 'py-16'}`} style={{ backgroundColor: currentStyle.backgroundColor }}>
           <div className={`max-w-4xl mx-auto ${deviceInfo.isMobile ? 'px-4' : 'px-8'}`}>
-            <h2 className={`font-light mb-8 text-white ${
-              deviceInfo.isMobile ? 'text-xl' : 'text-2xl md:text-3xl'
-            }`}>
+            <h2 className={`font-light mb-8 text-white ${ deviceInfo.isMobile ? 'text-xl' : 'text-2xl md:text-3xl' }`}>
               Faltan
             </h2>
-            <div className={`flex justify-center items-center space-x-2 ${
-              deviceInfo.isMobile ? 'text-2xl' : 'text-6xl'
-            }`}>
+            <div className={`flex justify-center items-center space-x-2 ${ deviceInfo.isMobile ? 'text-2xl' : 'text-6xl' }`}>
               <TimeCell value={timeLeft.days} label="días" />
-              <div className={`font-light text-white ${
-                deviceInfo.isMobile ? 'text-2xl' : 'text-4xl md:text-6xl'
-              }`}>:</div>
+              <div className={`font-light text-white ${ deviceInfo.isMobile ? 'text-2xl' : 'text-4xl md:text-6xl' }`}>:</div>
               <TimeCell value={timeLeft.hours} label="hrs" />
-              <div className={`font-light text-white ${
-                deviceInfo.isMobile ? 'text-2xl' : 'text-4xl md:text-6xl'
-              }`}>:</div>
+              <div className={`font-light text-white ${ deviceInfo.isMobile ? 'text-2xl' : 'text-4xl md:text-6xl' }`}>:</div>
               <TimeCell value={timeLeft.minutes} label="min" />
-              <div className={`font-light text-white ${
-                deviceInfo.isMobile ? 'text-2xl' : 'text-4xl md:text-6xl'
-              }`}>:</div>
+              <div className={`font-light text-white ${ deviceInfo.isMobile ? 'text-2xl' : 'text-4xl md:text-6xl' }`}>:</div>
               <TimeCell value={timeLeft.seconds} label="seg" />
             </div>
           </div>
@@ -771,69 +707,39 @@ const VisualEditorComplete = () => {
         {/* Detalles Section */}
         <section className={`bg-white ${deviceInfo.isMobile ? 'py-8' : 'py-16'}`}>
           <div className={`max-w-6xl mx-auto ${deviceInfo.isMobile ? 'px-4' : 'px-8'}`}>
-            <div className={`grid gap-12 ${
-              deviceInfo.isMobile ? 'grid-cols-1' : 'md:grid-cols-2'
-            }`}>
+            <div className={`grid gap-12 ${ deviceInfo.isMobile ? 'grid-cols-1' : 'md:grid-cols-2' }`}>
               {/* Ceremonia */}
               <div className="text-center">
-                <div
-                  className={`rounded-full flex items-center justify-center mx-auto mb-6 ${
-                    deviceInfo.isMobile ? 'w-12 h-12' : 'w-16 h-16'
-                  }`}
-                  style={{ backgroundColor: `${currentStyle.primaryColor}20` }}
-                >
-                  <Church 
-                    className={deviceInfo.isMobile ? 'w-6 h-6' : 'w-8 h-8'}
-                    style={{ color: currentStyle.primaryColor }} 
-                  />
+                <div className={`rounded-full flex items-center justify-center mx-auto mb-6 ${ deviceInfo.isMobile ? 'w-12 h-12' : 'w-16 h-16' }`} style={{ backgroundColor: `${currentStyle.primaryColor}20` }} >
+                  <Church className={deviceInfo.isMobile ? 'w-6 h-6' : 'w-8 h-8'} style={{ color: currentStyle.primaryColor }} />
                 </div>
-                <h3 
-                  className={`font-medium mb-6 tracking-wide ${
-                    deviceInfo.isMobile ? 'text-xl' : 'text-2xl'
-                  }`}
-                  style={{ color: currentStyle.textColor }}
-                >
+                <h3 className={`font-medium mb-6 tracking-wide ${ deviceInfo.isMobile ? 'text-xl' : 'text-2xl' }`} style={{ color: currentStyle.textColor }} >
                   CEREMONIA
                 </h3>
-                <div className={`space-y-3 mb-8 text-gray-600 ${
-                  deviceInfo.isMobile ? 'text-base' : ''
-                }`}>
+                <div className={`space-y-3 mb-8 text-gray-600 ${ deviceInfo.isMobile ? 'text-base' : '' }`}>
                   <p className={deviceInfo.isMobile ? 'text-base' : 'text-lg'}>
-                    <EditableTextOptimized
-                      value={event.date}
-                      onChange={(val) => dispatch({ type: 'UPDATE_FIELD', field: 'date', value: val })}
+                    <EditableTextOptimized value={event.date} onChange={(val) => dispatch({ type: 'UPDATE_FIELD', field: 'date', value: val })}
                       ariaLabel="Fecha"
                     />
                   </p>
                   <p className={deviceInfo.isMobile ? 'text-base' : 'text-lg'}>
-                    <EditableTextOptimized
-                      value={event.ceremony.time}
-                      onChange={(val) => dispatch({ type: 'UPDATE_CEREMONY', field: 'time', value: val })}
+                    <EditableTextOptimized value={event.ceremony.time} onChange={(val) => dispatch({ type: 'UPDATE_CEREMONY', field: 'time', value: val })}
                       ariaLabel="Hora de ceremonia"
                     />
                   </p>
                   <p className="font-medium">
-                    <EditableTextOptimized
-                      value={event.ceremony.venue}
-                      onChange={(val) => dispatch({ type: 'UPDATE_CEREMONY', field: 'venue', value: val })}
+                    <EditableTextOptimized value={event.ceremony.venue} onChange={(val) => dispatch({ type: 'UPDATE_CEREMONY', field: 'venue', value: val })}
                       ariaLabel="Lugar de ceremonia"
                     />
                   </p>
                   <p>
-                    <EditableTextOptimized
-                      value={event.ceremony.address}
-                      onChange={(val) => dispatch({ type: 'UPDATE_CEREMONY', field: 'address', value: val })}
+                    <EditableTextOptimized value={event.ceremony.address} onChange={(val) => dispatch({ type: 'UPDATE_CEREMONY', field: 'address', value: val })}
                       ariaLabel="Dirección de ceremonia"
                       singleLine={false}
                     />
                   </p>
                 </div>
-                <Button 
-                  className={`rounded-full text-white ${
-                    deviceInfo.isMobile ? 'px-6 py-2 text-sm' : 'px-8 py-3'
-                  }`}
-                  style={{ backgroundColor: currentStyle.backgroundColor }}
-                >
+                <Button className={`rounded-full text-white ${ deviceInfo.isMobile ? 'px-6 py-2 text-sm' : 'px-8 py-3' }`} style={{ backgroundColor: currentStyle.backgroundColor }} >
                   <MapPin className={`mr-2 ${deviceInfo.isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
                   CÓMO LLEGAR
                 </Button>
@@ -841,64 +747,36 @@ const VisualEditorComplete = () => {
 
               {/* Recepción */}
               <div className="text-center">
-                <div
-                  className={`rounded-full flex items-center justify-center mx-auto mb-6 ${
-                    deviceInfo.isMobile ? 'w-12 h-12' : 'w-16 h-16'
-                  }`}
-                  style={{ backgroundColor: `${currentStyle.secondaryColor}20` }}
-                >
-                  <PartyPopper 
-                    className={deviceInfo.isMobile ? 'w-6 h-6' : 'w-8 h-8'}
-                    style={{ color: currentStyle.secondaryColor }} 
-                  />
+                <div className={`rounded-full flex items-center justify-center mx-auto mb-6 ${ deviceInfo.isMobile ? 'w-12 h-12' : 'w-16 h-16' }`} style={{ backgroundColor: `${currentStyle.secondaryColor}20` }} >
+                  <PartyPopper className={deviceInfo.isMobile ? 'w-6 h-6' : 'w-8 h-8'} style={{ color: currentStyle.secondaryColor }} />
                 </div>
-                <h3 
-                  className={`font-medium mb-6 tracking-wide ${
-                    deviceInfo.isMobile ? 'text-xl' : 'text-2xl'
-                  }`}
-                  style={{ color: currentStyle.textColor }}
-                >
+                <h3 className={`font-medium mb-6 tracking-wide ${ deviceInfo.isMobile ? 'text-xl' : 'text-2xl' }`} style={{ color: currentStyle.textColor }} >
                   RECEPCIÓN
                 </h3>
-                <div className={`space-y-3 mb-8 text-gray-600 ${
-                  deviceInfo.isMobile ? 'text-base' : ''
-                }`}>
+                <div className={`space-y-3 mb-8 text-gray-600 ${ deviceInfo.isMobile ? 'text-base' : '' }`}>
                   <p className={deviceInfo.isMobile ? 'text-base' : 'text-lg'}>
-                    <EditableTextOptimized
-                      value={event.date}
-                      onChange={(val) => dispatch({ type: 'UPDATE_FIELD', field: 'date', value: val })}
+                    <EditableTextOptimized value={event.date} onChange={(val) => dispatch({ type: 'UPDATE_FIELD', field: 'date', value: val })}
                       ariaLabel="Fecha de recepción"
                     />
                   </p>
                   <p className={deviceInfo.isMobile ? 'text-base' : 'text-lg'}>
-                    <EditableTextOptimized
-                      value={event.reception.time}
-                      onChange={(val) => dispatch({ type: 'UPDATE_RECEPTION', field: 'time', value: val })}
+                    <EditableTextOptimized value={event.reception.time} onChange={(val) => dispatch({ type: 'UPDATE_RECEPTION', field: 'time', value: val })}
                       ariaLabel="Hora de recepción"
                     />
                   </p>
                   <p className="font-medium">
-                    <EditableTextOptimized
-                      value={event.reception.venue}
-                      onChange={(val) => dispatch({ type: 'UPDATE_RECEPTION', field: 'venue', value: val })}
+                    <EditableTextOptimized value={event.reception.venue} onChange={(val) => dispatch({ type: 'UPDATE_RECEPTION', field: 'venue', value: val })}
                       ariaLabel="Lugar de recepción"
                     />
                   </p>
                   <p>
-                    <EditableTextOptimized
-                      value={event.reception.address}
-                      onChange={(val) => dispatch({ type: 'UPDATE_RECEPTION', field: 'address', value: val })}
+                    <EditableTextOptimized value={event.reception.address} onChange={(val) => dispatch({ type: 'UPDATE_RECEPTION', field: 'address', value: val })}
                       ariaLabel="Dirección de recepción"
                       singleLine={false}
                     />
                   </p>
                 </div>
-                <Button 
-                  className={`rounded-full text-white ${
-                    deviceInfo.isMobile ? 'px-6 py-2 text-sm' : 'px-8 py-3'
-                  }`}
-                  style={{ backgroundColor: currentStyle.backgroundColor }}
-                >
+                <Button className={`rounded-full text-white ${ deviceInfo.isMobile ? 'px-6 py-2 text-sm' : 'px-8 py-3' }`} style={{ backgroundColor: currentStyle.backgroundColor }} >
                   <MapPin className={`mr-2 ${deviceInfo.isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
                   CÓMO LLEGAR
                 </Button>
@@ -908,31 +786,15 @@ const VisualEditorComplete = () => {
         </section>
 
         {/* RSVP Section */}
-        <section className={`${deviceInfo.isMobile ? 'py-8' : 'py-16'}`} 
-                 style={{ backgroundColor: currentStyle.backgroundColor }}>
-          <div className={`max-w-4xl mx-auto text-center ${
-            deviceInfo.isMobile ? 'px-4' : 'px-8'
-          }`}>
-            <h2 
-              className={`font-light mb-6 ${
-                deviceInfo.isMobile ? 'text-2xl' : 'text-3xl md:text-4xl'
-              }`}
-              style={{ color: currentStyle.primaryColor }}
-            >
+        <section className={`${deviceInfo.isMobile ? 'py-8' : 'py-16'}`} style={{ backgroundColor: currentStyle.backgroundColor }}>
+          <div className={`max-w-4xl mx-auto text-center ${ deviceInfo.isMobile ? 'px-4' : 'px-8' }`}>
+            <h2 className={`font-light mb-6 ${ deviceInfo.isMobile ? 'text-2xl' : 'text-3xl md:text-4xl' }`} style={{ color: currentStyle.primaryColor }} >
               Confirma tu Asistencia
             </h2>
-            <p className={`mb-8 text-gray-600 ${
-              deviceInfo.isMobile ? 'text-base' : 'text-lg'
-            }`}>
+            <p className={`mb-8 text-gray-600 ${ deviceInfo.isMobile ? 'text-base' : 'text-lg' }`}>
               Tu presencia es muy importante para nosotros
             </p>
-            <Button
-              size={deviceInfo.isMobile ? 'default' : 'lg'}
-              className={`rounded-full text-white ${
-                deviceInfo.isMobile ? 'px-8 py-3 text-base' : 'px-12 py-4 text-lg'
-              }`}
-              style={{ backgroundColor: currentStyle.backgroundColor }}
-            >
+            <Button size={deviceInfo.isMobile ? 'default' : 'lg'} className={`rounded-full text-white ${ deviceInfo.isMobile ? 'px-8 py-3 text-base' : 'px-12 py-4 text-lg' }`} style={{ backgroundColor: currentStyle.backgroundColor }} >
               <Users className={`mr-2 ${deviceInfo.isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
               CONFIRMAR ASISTENCIA
             </Button>
@@ -941,40 +803,19 @@ const VisualEditorComplete = () => {
 
         {/* Mesa de Regalos */}
         <section className={`bg-white ${deviceInfo.isMobile ? 'py-8' : 'py-16'}`}>
-          <div className={`max-w-4xl mx-auto text-center ${
-            deviceInfo.isMobile ? 'px-4' : 'px-8'
-          }`}>
-            <h2 
-              className={`font-light mb-6 ${
-                deviceInfo.isMobile ? 'text-2xl' : 'text-3xl md:text-4xl'
-              }`}
-              style={{ color: currentStyle.textColor }}
-            >
+          <div className={`max-w-4xl mx-auto text-center ${ deviceInfo.isMobile ? 'px-4' : 'px-8' }`}>
+            <h2 className={`font-light mb-6 ${ deviceInfo.isMobile ? 'text-2xl' : 'text-3xl md:text-4xl' }`} style={{ color: currentStyle.textColor }} >
               Mesa de Regalos
             </h2>
-            <p className={`mb-8 text-gray-600 ${
-              deviceInfo.isMobile ? 'text-base' : 'text-lg'
-            }`}>
+            <p className={`mb-8 text-gray-600 ${ deviceInfo.isMobile ? 'text-base' : 'text-lg' }`}>
               Si deseas hacernos un regalo, aquí tienes algunas opciones
             </p>
-            <div className={`grid gap-6 ${
-              deviceInfo.isMobile ? 'grid-cols-1' : 'md:grid-cols-2'
-            }`}>
-              <Button
-                variant="outline"
-                size={deviceInfo.isMobile ? 'default' : 'lg'}
-                className={`h-auto flex-col ${deviceInfo.isMobile ? 'p-4' : 'p-6'}`}
-                style={{ borderColor: currentStyle.primaryColor, color: currentStyle.primaryColor }}
-              >
+            <div className={`grid gap-6 ${ deviceInfo.isMobile ? 'grid-cols-1' : 'md:grid-cols-2' }`}>
+              <Button variant="outline" size={deviceInfo.isMobile ? 'default' : 'lg'} className={`h-auto flex-col ${deviceInfo.isMobile ? 'p-4' : 'p-6'}`} style={{ borderColor: currentStyle.primaryColor, color: currentStyle.primaryColor }} >
                 <Gift className={`mb-2 ${deviceInfo.isMobile ? 'w-6 h-6' : 'w-8 h-8'}`} />
                 <span className={deviceInfo.isMobile ? 'text-base' : 'text-lg'}>Lista de Regalos</span>
               </Button>
-              <Button
-                variant="outline"
-                size={deviceInfo.isMobile ? 'default' : 'lg'}
-                className={`h-auto flex-col ${deviceInfo.isMobile ? 'p-4' : 'p-6'}`}
-                style={{ borderColor: currentStyle.secondaryColor, color: currentStyle.secondaryColor }}
-              >
+              <Button variant="outline" size={deviceInfo.isMobile ? 'default' : 'lg'} className={`h-auto flex-col ${deviceInfo.isMobile ? 'p-4' : 'p-6'}`} style={{ borderColor: currentStyle.secondaryColor, color: currentStyle.secondaryColor }} >
                 <CreditCard className={`mb-2 ${deviceInfo.isMobile ? 'w-6 h-6' : 'w-8 h-8'}`} />
                 <span className={deviceInfo.isMobile ? 'text-base' : 'text-lg'}>Contribución</span>
               </Button>
@@ -983,18 +824,13 @@ const VisualEditorComplete = () => {
         </section>
 
         {/* Footer */}
-        <footer className={`text-center ${deviceInfo.isMobile ? 'py-8' : 'py-12'}`} 
-                style={{ backgroundColor: currentStyle.backgroundColor }}>
+        <footer className={`text-center ${deviceInfo.isMobile ? 'py-8' : 'py-12'}`} style={{ backgroundColor: currentStyle.backgroundColor }}>
           <div className={`max-w-4xl mx-auto ${deviceInfo.isMobile ? 'px-4' : 'px-8'}`}>
-            <h3 className={`font-light mb-4 text-white ${
-              deviceInfo.isMobile ? 'text-xl' : 'text-2xl'
-            }`}>
+            <h3 className={`font-light mb-4 text-white ${ deviceInfo.isMobile ? 'text-xl' : 'text-2xl' }`}>
               ¡Esperamos verte en nuestro gran día!
             </h3>
             <p className="text-white opacity-90 mb-6">
-              <EditableTextOptimized
-                value={event.hashtag}
-                onChange={(val) => dispatch({ type: 'UPDATE_FIELD', field: 'hashtag', value: val })}
+              <EditableTextOptimized value={event.hashtag} onChange={(val) => dispatch({ type: 'UPDATE_FIELD', field: 'hashtag', value: val })}
                 ariaLabel="Hashtag"
               />
             </p>
@@ -1049,24 +885,15 @@ const VisualEditorComplete = () => {
             {!deviceInfo.isMobile && (
               <>
                 <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-lg">
-                  <Button 
-                    variant={uiState.viewMode === 'desktop' ? 'default' : 'ghost'} 
-                    size="sm"
-                    onClick={() => setViewMode('desktop')}
+                  <Button variant={uiState.viewMode === 'desktop' ? 'default' : 'ghost'} size="sm" onClick={() => setViewMode('desktop')}
                   >
                     <Monitor className="h-3 w-3" />
                   </Button>
-                  <Button 
-                    variant={uiState.viewMode === 'tablet' ? 'default' : 'ghost'} 
-                    size="sm"
-                    onClick={() => setViewMode('tablet')}
+                  <Button variant={uiState.viewMode === 'tablet' ? 'default' : 'ghost'} size="sm" onClick={() => setViewMode('tablet')}
                   >
                     <Tablet className="h-3 w-3" />
                   </Button>
-                  <Button 
-                    variant={uiState.viewMode === 'mobile' ? 'default' : 'ghost'} 
-                    size="sm"
-                    onClick={() => setViewMode('mobile')}
+                  <Button variant={uiState.viewMode === 'mobile' ? 'default' : 'ghost'} size="sm" onClick={() => setViewMode('mobile')}
                   >
                     <Smartphone className="h-3 w-3" />
                   </Button>
@@ -1094,11 +921,7 @@ const VisualEditorComplete = () => {
 
             {/* Botón de panel en móviles */}
             {deviceInfo.isMobile && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={toggleMobilePanel}
-              >
+              <Button variant="outline" size="sm" onClick={toggleMobilePanel} >
                 {uiState.showMobilePanel ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
               </Button>
             )}
@@ -1124,21 +947,10 @@ const VisualEditorComplete = () => {
 
       <div className="flex h-[calc(100vh-80px)]">
         {/* Panel lateral - AGREGADO: Header con X para móviles */}
-        <div className={`
-          ${deviceInfo.isMobile 
-            ? `fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-gray-200 transform transition-transform duration-300 ${
-                uiState.showMobilePanel ? 'translate-x-0' : '-translate-x-full'
-              }`
-            : 'w-80 bg-white border-r border-gray-200'
-          } 
-          overflow-y-auto
-        `}>
+        <div className={` ${deviceInfo.isMobile ? `fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-gray-200 transform transition-transform duration-300 ${ uiState.showMobilePanel ? 'translate-x-0' : '-translate-x-full' }` : 'w-80 bg-white border-r border-gray-200' } overflow-y-auto `}>
           {/* Overlay para móviles */}
           {deviceInfo.isMobile && uiState.showMobilePanel && (
-            <div 
-              className="fixed inset-0 bg-black bg-opacity-50 z-40"
-              onClick={toggleMobilePanel}
-            />
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={toggleMobilePanel} />
           )}
           
           <div className="relative z-50 bg-white h-full">
@@ -1146,12 +958,7 @@ const VisualEditorComplete = () => {
             {deviceInfo.isMobile && (
               <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
                 <h2 className="text-lg font-semibold text-gray-800">Panel de Edición</h2>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={toggleMobilePanel}
-                  className="h-8 w-8 p-0 hover:bg-gray-100"
-                >
+                <Button variant="ghost" size="sm" onClick={toggleMobilePanel} className="h-8 w-8 p-0 hover:bg-gray-100" >
                   <X className="h-5 w-5 text-gray-600" />
                 </Button>
               </div>
@@ -1192,11 +999,7 @@ const VisualEditorComplete = () => {
                           <Label className="text-xs font-medium">{palette.name}</Label>
                           <div className="flex gap-2 mt-1">
                             {palette.colors.map((color) => (
-                              <button
-                                key={color}
-                                className="w-8 h-8 rounded border-2 border-gray-200 hover:border-gray-400 transition-colors touch-manipulation"
-                                style={{ backgroundColor: currentStyle.backgroundColor }}
-                                onClick={() => applyPalette(palette.colors)}
+                              <button key={color} className="w-8 h-8 rounded border-2 border-gray-200 hover:border-gray-400 transition-colors touch-manipulation" style={{ backgroundColor: currentStyle.backgroundColor }} onClick={() => applyPalette(palette.colors)}
                               />
                             ))}
                           </div>
@@ -1213,16 +1016,10 @@ const VisualEditorComplete = () => {
                       <div>
                         <Label htmlFor="primaryColor" className="text-xs">Color Principal</Label>
                         <div className="flex gap-2 mt-1">
-                          <Input
-                            id="primaryColor"
-                            type="color"
-                            value={event.colors.primary}
-                            onChange={(e) => handleColorChange('primary', e.target.value)}
+                          <Input id="primaryColor" type="color" value={event.colors.primary} onChange={(e) => handleColorChange('primary', e.target.value)}
                             className="w-12 h-8 p-0 border-0"
                           />
-                          <Input
-                            value={event.colors.primary}
-                            onChange={(e) => handleColorChange('primary', e.target.value)}
+                          <Input value={event.colors.primary} onChange={(e) => handleColorChange('primary', e.target.value)}
                             className="flex-1 text-xs"
                           />
                         </div>
@@ -1231,16 +1028,10 @@ const VisualEditorComplete = () => {
                       <div>
                         <Label htmlFor="secondaryColor" className="text-xs">Color Secundario</Label>
                         <div className="flex gap-2 mt-1">
-                          <Input
-                            id="secondaryColor"
-                            type="color"
-                            value={event.colors.secondary}
-                            onChange={(e) => handleColorChange('secondary', e.target.value)}
+                          <Input id="secondaryColor" type="color" value={event.colors.secondary} onChange={(e) => handleColorChange('secondary', e.target.value)}
                             className="w-12 h-8 p-0 border-0"
                           />
-                          <Input
-                            value={event.colors.secondary}
-                            onChange={(e) => handleColorChange('secondary', e.target.value)}
+                          <Input value={event.colors.secondary} onChange={(e) => handleColorChange('secondary', e.target.value)}
                             className="flex-1 text-xs"
                           />
                         </div>
@@ -1249,16 +1040,10 @@ const VisualEditorComplete = () => {
                       <div>
                         <Label htmlFor="textColor" className="text-xs">Color de Texto</Label>
                         <div className="flex gap-2 mt-1">
-                          <Input
-                            id="textColor"
-                            type="color"
-                            value={event.colors.text}
-                            onChange={(e) => handleColorChange('text', e.target.value)}
+                          <Input id="textColor" type="color" value={event.colors.text} onChange={(e) => handleColorChange('text', e.target.value)}
                             className="w-12 h-8 p-0 border-0"
                           />
-                          <Input
-                            value={event.colors.text}
-                            onChange={(e) => handleColorChange('text', e.target.value)}
+                          <Input value={event.colors.text} onChange={(e) => handleColorChange('text', e.target.value)}
                             className="flex-1 text-xs"
                           />
                         </div>
@@ -1273,9 +1058,7 @@ const VisualEditorComplete = () => {
                     <CardContent className="space-y-3">
                       <div>
                         <Label className="text-xs">Fuente Principal</Label>
-                        <select
-                          value={event.fonts.primary}
-                          onChange={(e) => handleFontChange('primary', e.target.value)}
+                        <select value={event.fonts.primary} onChange={(e) => handleFontChange('primary', e.target.value)}
                           className="w-full mt-1 p-2 border border-gray-300 rounded text-sm touch-manipulation"
                         >
                           {fontFamilies.map((font) => (
@@ -1288,9 +1071,7 @@ const VisualEditorComplete = () => {
 
                       <div>
                         <Label className="text-xs">Fuente Secundaria</Label>
-                        <select
-                          value={event.fonts.secondary}
-                          onChange={(e) => handleFontChange('secondary', e.target.value)}
+                        <select value={event.fonts.secondary} onChange={(e) => handleFontChange('secondary', e.target.value)}
                           className="w-full mt-1 p-2 border border-gray-300 rounded text-sm touch-manipulation"
                         >
                           {fontFamilies.map((font) => (
@@ -1313,10 +1094,7 @@ const VisualEditorComplete = () => {
                     <CardContent className="space-y-3">
                       <div>
                         <Label htmlFor="bride" className="text-xs">Novia</Label>
-                        <Input
-                          id="bride"
-                          value={event.couple.bride}
-                          onChange={(e) => handleInputChange('couple', 'bride', e.target.value)}
+                        <Input id="bride" value={event.couple.bride} onChange={(e) => handleInputChange('couple', 'bride', e.target.value)}
                           className="text-xs mt-1"
                           placeholder="Nombre de la novia"
                           autoComplete="off"
@@ -1325,10 +1103,7 @@ const VisualEditorComplete = () => {
 
                       <div>
                         <Label htmlFor="groom" className="text-xs">Novio</Label>
-                        <Input
-                          id="groom"
-                          value={event.couple.groom}
-                          onChange={(e) => handleInputChange('couple', 'groom', e.target.value)}
+                        <Input id="groom" value={event.couple.groom} onChange={(e) => handleInputChange('couple', 'groom', e.target.value)}
                           className="text-xs mt-1"
                           placeholder="Nombre del novio"
                           autoComplete="off"
@@ -1337,10 +1112,7 @@ const VisualEditorComplete = () => {
 
                       <div>
                         <Label htmlFor="hashtag" className="text-xs">Hashtag</Label>
-                        <Input
-                          id="hashtag"
-                          value={event.hashtag}
-                          onChange={(e) => handleInputChange('field', 'hashtag', e.target.value)}
+                        <Input id="hashtag" value={event.hashtag} onChange={(e) => handleInputChange('field', 'hashtag', e.target.value)}
                           className="text-xs mt-1"
                           placeholder="#HashtagDelEvento"
                           autoComplete="off"
@@ -1356,10 +1128,7 @@ const VisualEditorComplete = () => {
                     <CardContent className="space-y-3">
                       <div>
                         <Label htmlFor="eventDate" className="text-xs">Fecha</Label>
-                        <Input
-                          id="eventDate"
-                          value={event.date}
-                          onChange={(e) => handleInputChange('field', 'date', e.target.value)}
+                        <Input id="eventDate" value={event.date} onChange={(e) => handleInputChange('field', 'date', e.target.value)}
                           className="text-xs mt-1"
                           placeholder="15 de Marzo, 2024"
                           autoComplete="off"
@@ -1368,10 +1137,7 @@ const VisualEditorComplete = () => {
 
                       <div>
                         <Label htmlFor="ceremonyVenue" className="text-xs">Lugar de Ceremonia</Label>
-                        <Input
-                          id="ceremonyVenue"
-                          value={event.ceremony.venue}
-                          onChange={(e) => handleInputChange('ceremony', 'venue', e.target.value)}
+                        <Input id="ceremonyVenue" value={event.ceremony.venue} onChange={(e) => handleInputChange('ceremony', 'venue', e.target.value)}
                           className="text-xs mt-1"
                           placeholder="Iglesia San Miguel"
                           autoComplete="off"
@@ -1380,10 +1146,7 @@ const VisualEditorComplete = () => {
 
                       <div>
                         <Label htmlFor="ceremonyAddress" className="text-xs">Dirección de Ceremonia</Label>
-                        <Textarea
-                          id="ceremonyAddress"
-                          value={event.ceremony.address}
-                          onChange={(e) => handleInputChange('ceremony', 'address', e.target.value)}
+                        <Textarea id="ceremonyAddress" value={event.ceremony.address} onChange={(e) => handleInputChange('ceremony', 'address', e.target.value)}
                           className="text-xs mt-1 min-h-[60px]"
                           placeholder="Calle Mayor 123, Madrid"
                         />
@@ -1391,10 +1154,7 @@ const VisualEditorComplete = () => {
 
                       <div>
                         <Label htmlFor="receptionVenue" className="text-xs">Lugar de Recepción</Label>
-                        <Input
-                          id="receptionVenue"
-                          value={event.reception.venue}
-                          onChange={(e) => handleInputChange('reception', 'venue', e.target.value)}
+                        <Input id="receptionVenue" value={event.reception.venue} onChange={(e) => handleInputChange('reception', 'venue', e.target.value)}
                           className="text-xs mt-1"
                           placeholder="Jardín Botánico"
                           autoComplete="off"
@@ -1403,10 +1163,7 @@ const VisualEditorComplete = () => {
 
                       <div>
                         <Label htmlFor="receptionAddress" className="text-xs">Dirección de Recepción</Label>
-                        <Textarea
-                          id="receptionAddress"
-                          value={event.reception.address}
-                          onChange={(e) => handleInputChange('reception', 'address', e.target.value)}
+                        <Textarea id="receptionAddress" value={event.reception.address} onChange={(e) => handleInputChange('reception', 'address', e.target.value)}
                           className="text-xs mt-1 min-h-[60px]"
                           placeholder="Av. Libertador 456, Madrid"
                         />
@@ -1427,20 +1184,11 @@ const VisualEditorComplete = () => {
                         <p className="text-xs text-gray-600 mb-2">
                           Arrastra imágenes aquí o haz clic para seleccionar
                         </p>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => fileInputRef.current?.click()}
+                        <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}
                         >
                           Seleccionar Archivos
                         </Button>
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          className="hidden"
-                          onChange={(e) => {
+                        <input ref={fileInputRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => {
                             console.log('Archivos seleccionados:', e.target.files);
                           }}
                         />
@@ -1457,14 +1205,7 @@ const VisualEditorComplete = () => {
                     </CardHeader>
                     <CardContent className="space-y-3">
                       {templates.map((template) => (
-                        <div
-                          key={template.id}
-                          className={`p-3 border-2 rounded-lg cursor-pointer transition-colors touch-manipulation ${
-                            uiState.selectedTemplate === template.id
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-200 hover:border-gray-300'
-                          }`}
-                          onClick={() => handleTemplateChange(template.id)}
+                        <div key={template.id} className={`p-3 border-2 rounded-lg cursor-pointer transition-colors touch-manipulation ${ uiState.selectedTemplate === template.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300' }`} onClick={() => handleTemplateChange(template.id)}
                         >
                           <h4 className="font-medium text-sm">{template.name}</h4>
                           <p className="text-xs text-gray-600 mt-1">{template.description}</p>
