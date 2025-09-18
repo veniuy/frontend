@@ -19,7 +19,7 @@ import EventBuilder from './pages/EventBuilder';
 import EventPreview from './pages/EventPreview';
 import PublicEvent from './pages/PublicEvent';
 // CAMBIADO: Usar el componente optimizado para móviles
-import VisualEditorComplete from './pages/VisualEditorComplete';
+import VisualEditorOptimized from './pages/VisualEditorOptimized';
 import GuestManager from './pages/GuestManager';
 import PaymentTransfer from './pages/PaymentTransfer';
 import PaymentCode from './pages/PaymentCode';
