@@ -37,8 +37,6 @@ import GuestSurveys from './pages/GuestSurveys';
 import Tracking from './pages/Tracking';
 
 // CORREGIDO: Rutas correctas para los hooks y componentes móviles
-import { useDeviceDetection } from './hooks/useMobileOptimizations';
-import VirtualKeyboardHandler from './components/VirtualKeyboardHandler';
 
 // Category pages
 import Boda from './pages/categories/Boda';
@@ -54,7 +52,6 @@ import RequireAdmin from './components/RequireAdmin.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
 
 function App() {
-  const deviceInfo = useDeviceDetection();
   const { user, loading } = useAuth();
 
   if (loading) {
