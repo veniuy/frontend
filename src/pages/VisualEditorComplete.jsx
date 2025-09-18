@@ -1,5 +1,72 @@
 // src/pages/VisualEditorComplete.jsx - CORRECCIÓN MÍNIMA NECESARIA
 import React, { useState, useEffect, useRef, useCallback, useMemo, useReducer } from 'react';
+
+
+// === Injected templateStyles ===
+const templateStyles = React.useMemo(() => ({
+  elegant:  { background: '#ffffff' , primary: event?.colors?.primary,   secondary: event?.colors?.secondary, text: event?.colors?.text, fontA: event?.fonts?.primary,   fontB: event?.fonts?.secondary },
+  romantic: { background: '#fff0f5', primary: '#e91e63',                  secondary: '#ffc0cb',                text: '#333333',            fontA: 'Playfair Display',      fontB: 'Inter' },
+  modern:   { background: '#f5f7fa', primary: '#3498db',                  secondary: '#2ecc71',                text: '#111111',            fontA: 'Inter',                 fontB: 'Inter' },
+  classic:  { background: '#ffffff' , primary: '#8e44ad',                 secondary: '#e74c3c',                text: '#333333',            fontA: 'Georgia',               fontB: 'Georgia' }
+}), [event?.colors, event?.fonts]);
+
+const tpl = templateStyles?.[event?.template] || templateStyles.elegant;
+const currentStyle = React.useMemo(() => ({
+  primaryColor: tpl.primary,
+  secondaryColor: tpl.secondary,
+  textColor: tpl.text,
+  backgroundColor: tpl.background,
+  primaryFont: tpl.fontA,
+  secondaryFont: tpl.fontB
+}), [tpl]);
+
+// === Injected COLOR_PALETTES (swatches sin nombres) ===
+const COLOR_PALETTES = [
+  { colors: ['#8D6E63','#F8BBD0','#D7CCC8','#607D8B','#33691E'] }, // Rustic Elegance
+  { colors: ['#FFF8E1','#FFDAB9','#F5DEB3','#D2B48C','#C19A6B'] }, // Champagne
+  { colors: ['#FFE0B2','#FFB6C1','#DDA0DD','#C0C0C0','#F4A460'] }, // Boho Chic
+  { colors: ['#A5A58D','#F08080','#CD5C5C','#D2B48C','#BC8F8F'] }, // Sage & Terracotta
+  { colors: ['#F8BBD0','#E6E6FA','#B0BEC5','#6D6D6D'] },           // Blush and Gray (4)
+  { colors: ['#FFDAB9','#F4A460','#FA8072','#FFE4E1','#C3B091'] }, // Just Peachy
+  { colors: ['#800020','#F5F5F5','#FFFFFF','#2F4F4F'] },           // Classic Romance (4)
+  { colors: ['#FADADD','#E6E6FA','#C0C0C0','#000000'] },           // Black & Blush (4)
+  { colors: ['#FFFFFF','#E0E0E0','#BDBDBD','#212121'] },           // Modern Minimalism (4)
+  { colors: ['#E6B0AA','#D7BDE2','#A9CCE3','#AEB6BF'] },           // Muted Hues (4)
+  { colors: ['#B0C4DE','#A9A9A9','#778899','#2F4F4F'] },           // Dusty Blue & Gray (4)
+  { colors: ['#D2B48C','#FFE4E1','#F5F5DC','#C0C0C0'] },           // Simple Romance (4)
+  { colors: ['#E0FFFF','#4682B4','#708090','#004953'] },           // Frosted Winter (4)
+  { colors: ['#B87333','#D2B48C','#A9A9A9','#696969'] },           // Rustic Steel (4)
+];
+// === Injected helpers ===
+const applyPalette = (colors) => {
+  if (!colors || !colors.length) return;
+  const [c0,c1,c2,c3,c4] = colors;
+  try {
+    dispatch({ type:'UPDATE_COLORS', property:'primary',   value: c0 || '#000000' });
+    dispatch({ type:'UPDATE_COLORS', property:'secondary', value: c1 || c0 || '#000000' });
+    dispatch({ type:'UPDATE_COLORS', property:'background',value: c2 || '#FFFFFF' });
+    dispatch({ type:'UPDATE_COLORS', property:'text',      value: c3 || '#111111' });
+    if (c4) dispatch({ type:'UPDATE_COLORS', property:'accent',    value: c4 });
+  } catch(e) {
+    // fallback si no hay reducer: intenta mutar event.colors si existe
+    if (typeof setEvent === 'function') {
+      setEvent(prev => ({
+        ...prev,
+        colors: {
+          ...(prev?.colors||{}),
+          primary:   c0 || prev?.colors?.primary   || '#000000',
+          secondary: c1 || prev?.colors?.secondary || c0 || '#000000',
+          background:c2 || prev?.colors?.background|| '#FFFFFF',
+          text:      c3 || prev?.colors?.text      || '#111111',
+          accent:    c4 || prev?.colors?.accent    || c1 || c0 || '#555555',
+        }
+      }));
+    }
+  }
+};
+
+// Render: mostrar solo los "dots" de cada color sin nombres
+
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -343,7 +410,7 @@ const EditableTextOptimized = React.memo(({
     // SOLUCIÓN SIMPLE AL PROBLEMA DE TEXTO AL REVÉS
     direction: 'ltr',
     textAlign: 'left',
-    unicodeBidi: 'isolate', // Mejor que 'embed' para aislar el contexto
+    unicodeBidi: 'plaintext', // Mejor que 'embed' para aislar el contexto
     whiteSpace: singleLine ? 'nowrap' : 'pre-wrap',
     minWidth: editing ? (deviceInfo.isMobile ? '80px' : '100px') : 'auto',
     minHeight: editing ? '1.2em' : 'auto',
@@ -370,7 +437,7 @@ const EditableTextOptimized = React.memo(({
       ref={ref}
       role="textbox"
       aria-label={ariaLabel}
-      contentEditable={editing}
+      key={editing ? "edit" : "view"} dir="ltr" lang="es" contentEditable={editing}
       suppressContentEditableWarning
       onClick={beginEdit}
       onBlur={endEdit}
@@ -674,7 +741,7 @@ const VisualEditorComplete = () => {
 
         {/* Countdown */}
         <section className={`text-center ${deviceInfo.isMobile ? 'py-8' : 'py-16'}`} 
-                 style={{ backgroundColor: currentStyle.primaryColor }}>
+                 style={{ backgroundColor: currentStyle.backgroundColor }}>
           <div className={`max-w-4xl mx-auto ${deviceInfo.isMobile ? 'px-4' : 'px-8'}`}>
             <h2 className={`font-light mb-8 text-white ${
               deviceInfo.isMobile ? 'text-xl' : 'text-2xl md:text-3xl'
@@ -765,7 +832,7 @@ const VisualEditorComplete = () => {
                   className={`rounded-full text-white ${
                     deviceInfo.isMobile ? 'px-6 py-2 text-sm' : 'px-8 py-3'
                   }`}
-                  style={{ backgroundColor: currentStyle.primaryColor }}
+                  style={{ backgroundColor: currentStyle.backgroundColor }}
                 >
                   <MapPin className={`mr-2 ${deviceInfo.isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
                   CÓMO LLEGAR
@@ -830,7 +897,7 @@ const VisualEditorComplete = () => {
                   className={`rounded-full text-white ${
                     deviceInfo.isMobile ? 'px-6 py-2 text-sm' : 'px-8 py-3'
                   }`}
-                  style={{ backgroundColor: currentStyle.secondaryColor }}
+                  style={{ backgroundColor: currentStyle.backgroundColor }}
                 >
                   <MapPin className={`mr-2 ${deviceInfo.isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
                   CÓMO LLEGAR
@@ -842,7 +909,7 @@ const VisualEditorComplete = () => {
 
         {/* RSVP Section */}
         <section className={`${deviceInfo.isMobile ? 'py-8' : 'py-16'}`} 
-                 style={{ backgroundColor: '#f8f9fa' }}>
+                 style={{ backgroundColor: currentStyle.backgroundColor }}>
           <div className={`max-w-4xl mx-auto text-center ${
             deviceInfo.isMobile ? 'px-4' : 'px-8'
           }`}>
@@ -864,7 +931,7 @@ const VisualEditorComplete = () => {
               className={`rounded-full text-white ${
                 deviceInfo.isMobile ? 'px-8 py-3 text-base' : 'px-12 py-4 text-lg'
               }`}
-              style={{ backgroundColor: currentStyle.primaryColor }}
+              style={{ backgroundColor: currentStyle.backgroundColor }}
             >
               <Users className={`mr-2 ${deviceInfo.isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
               CONFIRMAR ASISTENCIA
@@ -917,7 +984,7 @@ const VisualEditorComplete = () => {
 
         {/* Footer */}
         <footer className={`text-center ${deviceInfo.isMobile ? 'py-8' : 'py-12'}`} 
-                style={{ backgroundColor: currentStyle.primaryColor }}>
+                style={{ backgroundColor: currentStyle.backgroundColor }}>
           <div className={`max-w-4xl mx-auto ${deviceInfo.isMobile ? 'px-4' : 'px-8'}`}>
             <h3 className={`font-light mb-4 text-white ${
               deviceInfo.isMobile ? 'text-xl' : 'text-2xl'
@@ -1128,8 +1195,8 @@ const VisualEditorComplete = () => {
                               <button
                                 key={color}
                                 className="w-8 h-8 rounded border-2 border-gray-200 hover:border-gray-400 transition-colors touch-manipulation"
-                                style={{ backgroundColor: color }}
-                                onClick={() => handleColorChange('primary', color)}
+                                style={{ backgroundColor: currentStyle.backgroundColor }}
+                                onClick={() => applyPalette(palette.colors)}
                               />
                             ))}
                           </div>
