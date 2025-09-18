@@ -320,7 +320,7 @@ const VisualEditorComplete = () => {
 
   // Componente TimeCell para countdown
   const TimeCell = ({ value, label }) => (
-    <div className=\"flex flex-col items-center\">
+    <div className="flex flex-col items-center">
       <div 
         className={`font-light leading-none ${isMobile ? 'text-2xl' : 'text-4xl md:text-6xl'}`}
         style={{ color: event.colors.primary }}
