@@ -2,7 +2,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './hooks/useAuth.jsx';
-import Layout from './components/Layout';
+import LayoutImproved from './components/LayoutImproved';
 import Landing from './pages/Landing';
 import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
@@ -12,13 +12,13 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import DashboardFixed from './pages/DashboardFixed';
-import DashboardEnhanced from './pages/DashboardEnhanced';
+import DashboardImproved from './pages/DashboardImproved';
 import CreateEvent from './pages/CreateEvent';
 import EventWizard from './pages/EventWizard';
 import EventBuilder from './pages/EventBuilder';
 import EventPreview from './pages/EventPreview';
 import PublicEvent from './pages/PublicEvent';
-import VisualEditor from './pages/VisualEditor';
+import VisualEditor from './pages/VisualEditorComplete';
 import GuestManager from './pages/GuestManager';
 import PaymentTransfer from './pages/PaymentTransfer';
 import PaymentCode from './pages/PaymentCode';
@@ -27,6 +27,14 @@ import DemoQuinceanera from './pages/DemoQuinceanera';
 import DemoBlack from './pages/DemoBlack';
 import DemoPremium from './pages/DemoPremium';
 import DemoClassic from './pages/DemoClassic';
+
+// New pages
+import Registry from './pages/Registry';
+import Accommodations from './pages/Accommodations';
+import ShareableLink from './pages/ShareableLink';
+import GuestSurveys from './pages/GuestSurveys';
+import Tracking from './pages/Tracking';
+
 // Category pages
 import Boda from './pages/categories/Boda';
 import Quinceaneras from './pages/categories/Quinceaneras';
@@ -40,7 +48,7 @@ import './utils/assets';
 import RequireAdmin from './components/RequireAdmin.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
 
-function App() {
+function AppImproved() {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -84,15 +92,49 @@ function App() {
       <Route path="/register" element={!user ? <Register /> : <Navigate to="/app/dashboard" />} />
 
       {/* Protected app routes */}
-      <Route path="/app" element={user ? <Layout /> : <Navigate to="/login" />}>
+      <Route path="/app" element={user ? <LayoutImproved /> : <Navigate to="/login" />}>
         <Route index element={<Navigate to="/app/dashboard" />} />
-        <Route path="dashboard" element={<DashboardFixed />} />
+        
+        {/* Main dashboard - using improved version */}
+        <Route path="dashboard" element={<DashboardImproved />} />
+        
+        {/* Event management */}
         <Route path="events/create" element={<CreateEvent />} />
         <Route path="events/wizard" element={<EventWizard />} />
         <Route path="events/:id/builder" element={<EventBuilder />} />
         <Route path="events/:id/editor" element={<VisualEditor />} />
         <Route path="events/:id/preview" element={<EventPreview />} />
         <Route path="events/:id/guests" element={<GuestManager />} />
+        
+        {/* New feature pages */}
+        <Route path="registry" element={<Registry />} />
+        <Route path="accommodations" element={<Accommodations />} />
+        <Route path="shareable-link" element={<ShareableLink />} />
+        
+        {/* Guest management */}
+        <Route path="guest-manager" element={<GuestManager />} />
+        <Route path="guest-surveys" element={<GuestSurveys />} />
+        
+        {/* Customization tools */}
+        <Route path="visual-editor" element={<VisualEditor />} />
+        <Route path="color-palette" element={<div className="p-8"><h1 className="text-2xl font-bold">Paletas de Colores - Próximamente</h1></div>} />
+        <Route path="typography" element={<div className="p-8"><h1 className="text-2xl font-bold">Tipografías - Próximamente</h1></div>} />
+        <Route path="gallery" element={<div className="p-8"><h1 className="text-2xl font-bold">Galería de Imágenes - Próximamente</h1></div>} />
+        
+        {/* Communication */}
+        <Route path="custom-emails" element={<div className="p-8"><h1 className="text-2xl font-bold">Emails Personalizados - Próximamente</h1></div>} />
+        
+        {/* Analytics and tracking */}
+        <Route path="tracking" element={<Tracking />} />
+        
+        {/* User management */}
+        <Route path="profile" element={<div className="p-8"><h1 className="text-2xl font-bold">Perfil de Usuario - Próximamente</h1></div>} />
+        <Route path="settings" element={<div className="p-8"><h1 className="text-2xl font-bold">Configuración - Próximamente</h1></div>} />
+        
+        {/* Preview functionality */}
+        <Route path="preview" element={<div className="p-8"><h1 className="text-2xl font-bold">Vista Previa - Próximamente</h1></div>} />
+        
+        {/* Payment routes */}
         <Route path="payment/transfer/:eventId" element={<PaymentTransfer />} />
         <Route path="payment/code/:eventId" element={<PaymentCode />} />
 
