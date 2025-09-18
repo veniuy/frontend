@@ -387,7 +387,7 @@ const VisualEditorComplete = () => {
 
     return (
       <div
-        className=\"invitation-canvas\"
+        className="invitation-canvas"
         style={{
           ...getCanvasStyle(),
           background: currentStyle.background,
