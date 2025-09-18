@@ -138,7 +138,7 @@ const EditableText = ({
   return (
     <Tag
       ref={ref}
-      role=\"textbox\"
+      role="textbox"
       aria-label={ariaLabel}
       contentEditable={editing}
       suppressContentEditableWarning
