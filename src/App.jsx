@@ -37,7 +37,7 @@ import GuestSurveys from './pages/GuestSurveys';
 import Tracking from './pages/Tracking';
 
 // CORREGIDO: Rutas correctas para los hooks y componentes móviles
-import { useDeviceDetection } from './hooks/useMobileOptimizations';
+import useDeviceDetection from './hooks/useMobileOptimizations';
 import VirtualKeyboardHandler from './components/VirtualKeyboardHandler';
 
 // Category pages
