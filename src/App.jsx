@@ -18,7 +18,7 @@ import EventWizard from './pages/EventWizard';
 import EventBuilder from './pages/EventBuilder';
 import EventPreview from './pages/EventPreview';
 import PublicEvent from './pages/PublicEvent';
-import VisualEditorComplete from './pages/VisualEditorComplete';
+import VisualEditor from './pages/VisualEditorComplete';
 import GuestManager from './pages/GuestManager';
 import PaymentTransfer from './pages/PaymentTransfer';
 import PaymentCode from './pages/PaymentCode';
@@ -48,7 +48,7 @@ import './utils/assets';
 import RequireAdmin from './components/RequireAdmin.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
 
-function App() {
+function AppImproved() {
   const { user, loading } = useAuth();
 
   if (loading) {
