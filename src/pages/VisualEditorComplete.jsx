@@ -1,4 +1,4 @@
-// src/pages/VisualEditorComplete.jsx - VERSIÓN FINAL CORREGIDA
+// src/pages/VisualEditorComplete.jsx - CORRECCIÓN MÍNIMA NECESARIA
 import React, { useState, useEffect, useRef, useCallback, useMemo, useReducer } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
@@ -211,10 +211,7 @@ const eventReducer = (state, action) => {
   }
 };
 
-/** 
- * NUEVA SOLUCIÓN PARA TEXTO AL REVÉS:
- * Componente híbrido que usa input regular cuando detecta problemas
- */
+/** Componente de texto editable CORREGIDO - SOLUCIÓN SIMPLE para texto al revés */
 const EditableTextOptimized = React.memo(({
   value,
   onChange,
@@ -227,35 +224,11 @@ const EditableTextOptimized = React.memo(({
 }) => {
   const Tag = as;
   const ref = useRef(null);
-  const inputRef = useRef(null);
   const [editing, setEditing] = useState(false);
   const [localValue, setLocalValue] = useState(value);
-  const [useInputFallback, setUseInputFallback] = useState(false);
   const deviceInfo = useDeviceDetection();
   
   const debouncedValue = useDebounce(localValue, debounceMs);
-
-  // Detectar si hay problemas de dirección RTL
-  useEffect(() => {
-    const detectRTLIssue = () => {
-      const testElement = document.createElement('div');
-      testElement.contentEditable = true;
-      testElement.textContent = 'test';
-      testElement.style.position = 'absolute';
-      testElement.style.visibility = 'hidden';
-      document.body.appendChild(testElement);
-      
-      const computedStyle = window.getComputedStyle(testElement);
-      const hasRTLIssue = computedStyle.direction === 'rtl' || 
-                         computedStyle.textAlign === 'right' ||
-                         computedStyle.unicodeBidi === 'bidi-override';
-      
-      document.body.removeChild(testElement);
-      setUseInputFallback(hasRTLIssue || deviceInfo.isMobile);
-    };
-
-    detectRTLIssue();
-  }, [deviceInfo.isMobile]);
 
   // Efecto para sincronizar el valor debounced con el prop onChange
   useEffect(() => {
@@ -275,20 +248,47 @@ const EditableTextOptimized = React.memo(({
     
     setEditing(true);
     
+    // Optimización para móviles - delay para mejor UX
+    const delay = deviceInfo.isMobile ? 100 : 50;
+    
     setTimeout(() => {
-      if (useInputFallback && inputRef.current) {
-        inputRef.current.focus();
-        inputRef.current.select();
-      } else if (ref.current) {
-        ref.current.focus();
+      if (!ref.current) return;
+      
+      ref.current.focus();
+      
+      // Selección mejorada para móviles
+      if (deviceInfo.isMobile) {
+        // En móviles, crear un rango de selección más suave
+        const range = document.createRange();
+        range.selectNodeContents(ref.current);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        // Scroll optimizado para móviles
+        ref.current.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center',
+          inline: 'center'
+        });
+        
+        // Prevenir zoom en iOS
+        if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+          ref.current.setAttribute('readonly', 'readonly');
+          setTimeout(() => {
+            ref.current.removeAttribute('readonly');
+          }, 100);
+        }
+      } else {
+        // Desktop - selección estándar
         const range = document.createRange();
         range.selectNodeContents(ref.current);
         const selection = window.getSelection();
         selection.removeAllRanges();
         selection.addRange(range);
       }
-    }, 50);
-  }, [useInputFallback]);
+    }, delay);
+  }, [deviceInfo.isMobile]);
 
   const endEdit = useCallback(() => {
     setEditing(false);
@@ -302,71 +302,69 @@ const EditableTextOptimized = React.memo(({
     setLocalValue(text);
   }, []);
 
-  const handleInputChange = useCallback((e) => {
-    setLocalValue(e.target.value);
-  }, []);
-
   const handleKeyDown = useCallback((e) => {
     if (singleLine && e.key === 'Enter') {
       e.preventDefault();
-      if (useInputFallback) {
-        inputRef.current?.blur();
-      } else {
-        ref.current?.blur();
-      }
+      ref.current?.blur();
     }
     if (e.key === 'Escape') {
       e.preventDefault();
-      setLocalValue(value);
-      if (useInputFallback) {
-        inputRef.current?.blur();
-      } else {
-        ref.current?.blur();
-      }
+      setLocalValue(value); // Revertir cambios
+      ref.current?.blur();
     }
-  }, [singleLine, value, useInputFallback]);
+  }, [singleLine, value]);
 
-  // Estilos base siempre LTR
-  const baseStyles = useMemo(() => ({
+  const handlePaste = useCallback((e) => {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+    
+    // Insertar texto plano optimizado
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      range.deleteContents();
+      const textNode = document.createTextNode(text);
+      range.insertNode(textNode);
+      range.setStartAfter(textNode);
+      range.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+    
+    // Actualizar estado local
+    setTimeout(() => {
+      const newText = ref.current?.textContent || '';
+      setLocalValue(newText);
+    }, 0);
+  }, []);
+
+  // CORRECCIÓN SIMPLE: Solo forzar LTR, sin complejidad adicional
+  const dynamicStyles = useMemo(() => ({
+    // SOLUCIÓN SIMPLE AL PROBLEMA DE TEXTO AL REVÉS
     direction: 'ltr',
     textAlign: 'left',
-    unicodeBidi: 'normal',
-    writingMode: 'horizontal-tb',
+    unicodeBidi: 'isolate', // Mejor que 'embed' para aislar el contexto
     whiteSpace: singleLine ? 'nowrap' : 'pre-wrap',
-    minWidth: editing ? '80px' : 'auto',
+    minWidth: editing ? (deviceInfo.isMobile ? '80px' : '100px') : 'auto',
     minHeight: editing ? '1.2em' : 'auto',
+    touchAction: deviceInfo.isMobile ? 'manipulation' : 'auto',
+    userSelect: editing ? 'text' : 'none',
+    WebkitUserSelect: editing ? 'text' : 'none',
+    WebkitTouchCallout: 'none',
+    WebkitTapHighlightColor: 'transparent',
     ...style
-  }), [editing, singleLine, style]);
+  }), [editing, deviceInfo.isMobile, singleLine, style]);
 
   const dynamicClasses = useMemo(() => {
-    const baseClasses = `${className} outline-none transition-all duration-200`;
+    const baseClasses = `${className} outline-none transition-all duration-200 select-none`;
     const editingClasses = editing 
       ? 'ring-2 ring-blue-400 bg-blue-50 rounded-sm px-1' 
       : 'hover:bg-gray-100 hover:bg-opacity-50 cursor-pointer';
+    const touchClasses = deviceInfo.isMobile ? 'touch-manipulation' : '';
     
-    return `${baseClasses} ${editingClasses}`;
-  }, [className, editing]);
+    return `${baseClasses} ${editingClasses} ${touchClasses}`;
+  }, [className, editing, deviceInfo.isMobile]);
 
-  // Renderizar input regular como fallback
-  if (useInputFallback && editing) {
-    return (
-      <input
-        ref={inputRef}
-        type="text"
-        value={localValue}
-        onChange={handleInputChange}
-        onBlur={endEdit}
-        onKeyDown={handleKeyDown}
-        className={`${dynamicClasses} border-none bg-transparent p-0 m-0`}
-        style={baseStyles}
-        dir="ltr"
-        autoComplete="off"
-        spellCheck={false}
-      />
-    );
-  }
-
-  // Renderizar contentEditable normal
   return (
     <Tag
       ref={ref}
@@ -378,9 +376,11 @@ const EditableTextOptimized = React.memo(({
       onBlur={endEdit}
       onInput={handleInput}
       onKeyDown={handleKeyDown}
+      onPaste={handlePaste}
       spellCheck={false}
       className={dynamicClasses}
-      style={baseStyles}
+      style={dynamicStyles}
+      // CORRECCIÓN: Solo atributos básicos LTR
       dir="ltr"
       lang="es"
     >
@@ -440,6 +440,7 @@ const VisualEditorComplete = () => {
     selectedTemplate: 'elegant',
     showMobilePanel: false,
     viewMode: deviceInfo.isMobile ? 'mobile' : 'desktop'
+    // REMOVIDO: isCanvasEditing - causa el bloqueo de inputs
   });
 
   const canvasRef = useRef(null);
@@ -539,9 +540,9 @@ const VisualEditorComplete = () => {
     setUiState(prev => ({ ...prev, activeTab: tab }));
   }, []);
 
-  // CORREGIDO: Manejadores simplificados para los inputs
+  // CORREGIDO: Manejadores SIMPLIFICADOS para los inputs - SIN bloqueo
   const handleInputChange = useCallback((type, field, value) => {
-    console.log(`Actualizando ${type}.${field}:`, value); // Debug
+    // REMOVIDO: if (uiState.isCanvasEditing) return; <- Esto causaba el bloqueo
     
     switch (type) {
       case 'couple':
@@ -557,7 +558,7 @@ const VisualEditorComplete = () => {
         dispatch({ type: 'UPDATE_FIELD', field, value });
         break;
     }
-  }, []);
+  }, []); // Sin dependencias problemáticas
 
   // Datos estáticos optimizados con useMemo
   const colorPalettes = useMemo(() => [
@@ -1055,7 +1056,7 @@ const VisualEditorComplete = () => {
       )}
 
       <div className="flex h-[calc(100vh-80px)]">
-        {/* Panel lateral - CORREGIDO con botón X en móviles */}
+        {/* Panel lateral - AGREGADO: Header con X para móviles */}
         <div className={`
           ${deviceInfo.isMobile 
             ? `fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-gray-200 transform transition-transform duration-300 ${
@@ -1076,15 +1077,15 @@ const VisualEditorComplete = () => {
           <div className="relative z-50 bg-white h-full">
             {/* NUEVO: Header del panel con botón X en móviles */}
             {deviceInfo.isMobile && (
-              <div className="flex items-center justify-between p-4 border-b border-gray-200">
-                <h2 className="text-lg font-semibold">Panel de Edición</h2>
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+                <h2 className="text-lg font-semibold text-gray-800">Panel de Edición</h2>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={toggleMobilePanel}
-                  className="h-8 w-8 p-0"
+                  className="h-8 w-8 p-0 hover:bg-gray-100"
                 >
-                  <X className="h-4 w-4" />
+                  <X className="h-5 w-5 text-gray-600" />
                 </Button>
               </div>
             )}
@@ -1236,7 +1237,7 @@ const VisualEditorComplete = () => {
                   </Card>
                 </TabsContent>
 
-                {/* Tab Contenido - CORREGIDO completamente */}
+                {/* Tab Contenido - CORREGIDO: SIN preventDefault que bloquea */}
                 <TabsContent value="content" className="space-y-4 mt-0">
                   <Card>
                     <CardHeader className="pb-3">
@@ -1247,17 +1248,11 @@ const VisualEditorComplete = () => {
                         <Label htmlFor="bride" className="text-xs">Novia</Label>
                         <Input
                           id="bride"
-                          type="text"
                           value={event.couple.bride}
-                          onChange={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleInputChange('couple', 'bride', e.target.value);
-                          }}
+                          onChange={(e) => handleInputChange('couple', 'bride', e.target.value)}
                           className="text-xs mt-1"
                           placeholder="Nombre de la novia"
                           autoComplete="off"
-                          dir="ltr"
                         />
                       </div>
 
@@ -1265,17 +1260,11 @@ const VisualEditorComplete = () => {
                         <Label htmlFor="groom" className="text-xs">Novio</Label>
                         <Input
                           id="groom"
-                          type="text"
                           value={event.couple.groom}
-                          onChange={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleInputChange('couple', 'groom', e.target.value);
-                          }}
+                          onChange={(e) => handleInputChange('couple', 'groom', e.target.value)}
                           className="text-xs mt-1"
                           placeholder="Nombre del novio"
                           autoComplete="off"
-                          dir="ltr"
                         />
                       </div>
 
@@ -1283,17 +1272,11 @@ const VisualEditorComplete = () => {
                         <Label htmlFor="hashtag" className="text-xs">Hashtag</Label>
                         <Input
                           id="hashtag"
-                          type="text"
                           value={event.hashtag}
-                          onChange={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleInputChange('field', 'hashtag', e.target.value);
-                          }}
+                          onChange={(e) => handleInputChange('field', 'hashtag', e.target.value)}
                           className="text-xs mt-1"
                           placeholder="#HashtagDelEvento"
                           autoComplete="off"
-                          dir="ltr"
                         />
                       </div>
                     </CardContent>
@@ -1308,17 +1291,11 @@ const VisualEditorComplete = () => {
                         <Label htmlFor="eventDate" className="text-xs">Fecha</Label>
                         <Input
                           id="eventDate"
-                          type="text"
                           value={event.date}
-                          onChange={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleInputChange('field', 'date', e.target.value);
-                          }}
+                          onChange={(e) => handleInputChange('field', 'date', e.target.value)}
                           className="text-xs mt-1"
                           placeholder="15 de Marzo, 2024"
                           autoComplete="off"
-                          dir="ltr"
                         />
                       </div>
 
@@ -1326,17 +1303,11 @@ const VisualEditorComplete = () => {
                         <Label htmlFor="ceremonyVenue" className="text-xs">Lugar de Ceremonia</Label>
                         <Input
                           id="ceremonyVenue"
-                          type="text"
                           value={event.ceremony.venue}
-                          onChange={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleInputChange('ceremony', 'venue', e.target.value);
-                          }}
+                          onChange={(e) => handleInputChange('ceremony', 'venue', e.target.value)}
                           className="text-xs mt-1"
                           placeholder="Iglesia San Miguel"
                           autoComplete="off"
-                          dir="ltr"
                         />
                       </div>
 
@@ -1345,14 +1316,9 @@ const VisualEditorComplete = () => {
                         <Textarea
                           id="ceremonyAddress"
                           value={event.ceremony.address}
-                          onChange={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleInputChange('ceremony', 'address', e.target.value);
-                          }}
+                          onChange={(e) => handleInputChange('ceremony', 'address', e.target.value)}
                           className="text-xs mt-1 min-h-[60px]"
                           placeholder="Calle Mayor 123, Madrid"
-                          dir="ltr"
                         />
                       </div>
 
@@ -1360,17 +1326,11 @@ const VisualEditorComplete = () => {
                         <Label htmlFor="receptionVenue" className="text-xs">Lugar de Recepción</Label>
                         <Input
                           id="receptionVenue"
-                          type="text"
                           value={event.reception.venue}
-                          onChange={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleInputChange('reception', 'venue', e.target.value);
-                          }}
+                          onChange={(e) => handleInputChange('reception', 'venue', e.target.value)}
                           className="text-xs mt-1"
                           placeholder="Jardín Botánico"
                           autoComplete="off"
-                          dir="ltr"
                         />
                       </div>
 
@@ -1379,14 +1339,9 @@ const VisualEditorComplete = () => {
                         <Textarea
                           id="receptionAddress"
                           value={event.reception.address}
-                          onChange={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            handleInputChange('reception', 'address', e.target.value);
-                          }}
+                          onChange={(e) => handleInputChange('reception', 'address', e.target.value)}
                           className="text-xs mt-1 min-h-[60px]"
                           placeholder="Av. Libertador 456, Madrid"
-                          dir="ltr"
                         />
                       </div>
                     </CardContent>
