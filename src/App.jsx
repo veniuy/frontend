@@ -48,7 +48,6 @@ import Bautizo from './pages/categories/Bautizo';
 import Corporativos from './pages/categories/Corporativos';
 import Graduaciones from './pages/categories/Graduaciones';
 import './utils/assets';
-import './mobile-optimizations.css';
 
 // Admin
 import RequireAdmin from './components/RequireAdmin.jsx';
