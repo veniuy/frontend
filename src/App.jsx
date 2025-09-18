@@ -48,7 +48,7 @@ import './utils/assets';
 import RequireAdmin from './components/RequireAdmin.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
 
-function AppImproved() {
+function App() {
   const { user, loading } = useAuth();
 
   if (loading) {
