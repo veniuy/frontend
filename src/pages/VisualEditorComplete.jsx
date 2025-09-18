@@ -407,7 +407,7 @@ const VisualEditorComplete = () => {
             style={{ backgroundColor: currentStyle.secondaryColor }}
           />
 
-          <div className=\"text-center max-w-4xl mx-auto relative z-10\">
+          <div className="text-center max-w-4xl mx-auto relative z-10">
             <h1
               className={`font-light mb-4 tracking-wider uppercase ${
                 isMobile ? 'text-4xl' : 'text-6xl md:text-8xl'
@@ -417,19 +417,19 @@ const VisualEditorComplete = () => {
               <EditableText
                 value={event.couple.bride}
                 onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: val } }))}
-                as=\"span\"
-                ariaLabel=\"Nombre de la novia\"
+                as="span"
+                ariaLabel="Nombre de la novia"
               />
             </h1>
 
-            <div className=\"flex items-center justify-center my-8\">
-              <div className=\"h-px w-16 bg-gray-400\" />
+            <div className="flex items-center justify-center my-8">
+              <div className="h-px w-16 bg-gray-400" />
               <Heart 
                 className={`mx-4 ${isMobile ? 'w-6 h-6' : 'w-8 h-8'}`}
                 style={{ color: currentStyle.secondaryColor }} 
-                fill=\"currentColor\" 
+                fill="currentColor" 
               />
-              <div className=\"h-px w-16 bg-gray-400\" />
+              <div className="h-px w-16 bg-gray-400" />
             </div>
 
             <h1
@@ -441,8 +441,8 @@ const VisualEditorComplete = () => {
               <EditableText
                 value={event.couple.groom}
                 onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: val } }))}
-                as=\"span\"
-                ariaLabel=\"Nombre del novio\"
+                as="span"
+                ariaLabel="Nombre del novio"
               />
             </h1>
 
@@ -455,12 +455,12 @@ const VisualEditorComplete = () => {
               <EditableText
                 value={event.description}
                 onChange={(val) => setEvent((p) => ({ ...p, description: val }))}
-                as=\"span\"
-                ariaLabel=\"Descripción principal\"
+                as="span"
+                ariaLabel="Descripción principal"
               />
             </p>
 
-            <div className=\"animate-bounce\">
+            <div className="animate-bounce">
               <ChevronDown 
                 className={`mx-auto ${isMobile ? 'w-6 h-6' : 'w-8 h-8'}`}
                 style={{ color: currentStyle.primaryColor }} 
@@ -478,13 +478,13 @@ const VisualEditorComplete = () => {
               Faltan para nuestro gran día
             </h2>
             <div className={`flex items-center justify-center ${isMobile ? 'gap-4' : 'gap-8'}`}>
-              <TimeCell value={timeLeft.days} label=\"días\" />
+              <TimeCell value={timeLeft.days} label="días" />
               <div className={`font-light text-white ${isMobile ? 'text-2xl' : 'text-4xl md:text-6xl'}`}>:</div>
-              <TimeCell value={timeLeft.hours} label=\"horas\" />
+              <TimeCell value={timeLeft.hours} label="horas" />
               <div className={`font-light text-white ${isMobile ? 'text-2xl' : 'text-4xl md:text-6xl'}`}>:</div>
-              <TimeCell value={timeLeft.minutes} label=\"min\" />
+              <TimeCell value={timeLeft.minutes} label="min" />
               <div className={`font-light text-white ${isMobile ? 'text-2xl' : 'text-4xl md:text-6xl'}`}>:</div>
-              <TimeCell value={timeLeft.seconds} label=\"seg\" />
+              <TimeCell value={timeLeft.seconds} label="seg" />
             </div>
           </div>
         </section>
@@ -494,7 +494,7 @@ const VisualEditorComplete = () => {
           <div className={`max-w-6xl mx-auto ${isMobile ? 'px-4' : 'px-8'}`}>
             <div className={`grid gap-12 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2'}`}>
               {/* Ceremonia */}
-              <div className=\"text-center\">
+              <div className="text-center">
                 <div
                   className={`rounded-full flex items-center justify-center mx-auto mb-6 ${
                     isMobile ? 'w-12 h-12' : 'w-16 h-16'
@@ -519,28 +519,28 @@ const VisualEditorComplete = () => {
                     <EditableText
                       value={event.date}
                       onChange={(val) => setEvent((p) => ({ ...p, date: val }))}
-                      ariaLabel=\"Fecha\"
+                      ariaLabel="Fecha"
                     />
                   </p>
                   <p className={isMobile ? 'text-base' : 'text-lg'}>
                     <EditableText
                       value={event.ceremony.time}
                       onChange={(val) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, time: val } }))}
-                      ariaLabel=\"Hora de ceremonia\"
+                      ariaLabel="Hora de ceremonia"
                     />
                   </p>
-                  <p className=\"font-medium\">
+                  <p className="font-medium">
                     <EditableText
                       value={event.ceremony.venue}
                       onChange={(val) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, venue: val } }))}
-                      ariaLabel=\"Lugar de ceremonia\"
+                      ariaLabel="Lugar de ceremonia"
                     />
                   </p>
                   <p>
                     <EditableText
                       value={event.ceremony.address}
                       onChange={(val) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, address: val } }))}
-                      ariaLabel=\"Dirección de ceremonia\"
+                      ariaLabel="Dirección de ceremonia"
                       singleLine={false}
                     />
                   </p>
@@ -557,7 +557,7 @@ const VisualEditorComplete = () => {
               </div>
 
               {/* Recepción */}
-              <div className=\"text-center\">
+              <div className="text-center">
                 <div
                   className={`rounded-full flex items-center justify-center mx-auto mb-6 ${
                     isMobile ? 'w-12 h-12' : 'w-16 h-16'
@@ -582,28 +582,28 @@ const VisualEditorComplete = () => {
                     <EditableText
                       value={event.date}
                       onChange={(val) => setEvent((p) => ({ ...p, date: val }))}
-                      ariaLabel=\"Fecha de recepción\"
+                      ariaLabel="Fecha de recepción"
                     />
                   </p>
                   <p className={isMobile ? 'text-base' : 'text-lg'}>
                     <EditableText
                       value={event.reception.time}
                       onChange={(val) => setEvent((p) => ({ ...p, reception: { ...p.reception, time: val } }))}
-                      ariaLabel=\"Hora de recepción\"
+                      ariaLabel="Hora de recepción"
                     />
                   </p>
-                  <p className=\"font-medium\">
+                  <p className="font-medium">
                     <EditableText
                       value={event.reception.venue}
                       onChange={(val) => setEvent((p) => ({ ...p, reception: { ...p.reception, venue: val } }))}
-                      ariaLabel=\"Lugar de recepción\"
+                      ariaLabel="Lugar de recepción"
                     />
                   </p>
                   <p>
                     <EditableText
                       value={event.reception.address}
                       onChange={(val) => setEvent((p) => ({ ...p, reception: { ...p.reception, address: val } }))}
-                      ariaLabel=\"Dirección de recepción\"
+                      ariaLabel="Dirección de recepción"
                       singleLine={false}
                     />
                   </p>
@@ -665,7 +665,7 @@ const VisualEditorComplete = () => {
             </p>
             <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'md:grid-cols-2'}`}>
               <Button
-                variant=\"outline\"
+                variant="outline"
                 size={isMobile ? 'default' : 'lg'}
                 className={`h-auto flex-col ${isMobile ? 'p-4' : 'p-6'}`}
                 style={{ borderColor: currentStyle.primaryColor, color: currentStyle.primaryColor }}
@@ -674,7 +674,7 @@ const VisualEditorComplete = () => {
                 <span className={isMobile ? 'text-base' : 'text-lg'}>Lista de Regalos</span>
               </Button>
               <Button
-                variant=\"outline\"
+                variant="outline"
                 size={isMobile ? 'default' : 'lg'}
                 className={`h-auto flex-col ${isMobile ? 'p-4' : 'p-6'}`}
                 style={{ borderColor: currentStyle.secondaryColor, color: currentStyle.secondaryColor }}
@@ -692,21 +692,21 @@ const VisualEditorComplete = () => {
             <h3 className={`font-light mb-4 text-white ${isMobile ? 'text-xl' : 'text-2xl'}`}>
               ¡Esperamos verte en nuestro gran día!
             </h3>
-            <p className=\"text-white opacity-90 mb-6\">
+            <p className="text-white opacity-90 mb-6">
               <EditableText
                 value={event.hashtag}
                 onChange={(val) => setEvent((p) => ({ ...p, hashtag: val }))}
-                ariaLabel=\"Hashtag\"
+                ariaLabel="Hashtag"
               />
             </p>
-            <div className=\"flex justify-center space-x-6\">
-              <Button variant=\"ghost\" size=\"sm\" className=\"text-white hover:bg-white/20\">
+            <div className="flex justify-center space-x-6">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
                 <Instagram className={isMobile ? 'w-4 h-4' : 'w-5 h-5'} />
               </Button>
-              <Button variant=\"ghost\" size=\"sm\" className=\"text-white hover:bg-white/20\">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
                 <Facebook className={isMobile ? 'w-4 h-4' : 'w-5 h-5'} />
               </Button>
-              <Button variant=\"ghost\" size=\"sm\" className=\"text-white hover:bg-white/20\">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
                 <Share2 className={isMobile ? 'w-4 h-4' : 'w-5 h-5'} />
               </Button>
             </div>
@@ -718,68 +718,68 @@ const VisualEditorComplete = () => {
 
   if (loading) {
     return (
-      <div className=\"min-h-screen flex items-center justify-center\">
-        <div className=\"text-center\">
-          <div className=\"animate-spin rounded-full h-32 w-32 border-b-2 border-pink-500 mx-auto\"></div>
-          <p className=\"mt-4 text-gray-600\">Cargando editor...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-pink-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Cargando editor...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className=\"min-h-screen bg-gray-50\">
+    <div className="min-h-screen bg-gray-50">
       {/* Header optimizado para móviles */}
-      <div className=\"bg-white border-b border-gray-200 px-4 py-3\">
-        <div className=\"flex items-center justify-between\">
-          <div className=\"flex items-center gap-3\">
-            <Button variant=\"ghost\" size=\"sm\" onClick={() => navigate('/app/dashboard')}>
-              <ArrowLeft className=\"h-4 w-4 mr-1\" />
+      <div className="bg-white border-b border-gray-200 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/app/dashboard')}>
+              <ArrowLeft className="h-4 w-4 mr-1" />
               {!isMobile && 'Volver'}
             </Button>
             <div>
               <h1 className={`font-semibold ${isMobile ? 'text-lg' : 'text-xl'}`}>
                 {event.couple.bride} & {event.couple.groom}
               </h1>
-              <p className=\"text-xs text-gray-600\">Editor Visual</p>
+              <p className="text-xs text-gray-600">Editor Visual</p>
             </div>
           </div>
 
-          <div className=\"flex items-center gap-2\">
+          <div className="flex items-center gap-2">
             {/* Controles de vista en desktop */}
             {!isMobile && (
               <>
-                <div className=\"flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-lg\">
+                <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-lg">
                   <Button 
                     variant={viewMode === 'desktop' ? 'default' : 'ghost'} 
-                    size=\"sm\"
+                    size="sm"
                     onClick={() => setViewMode('desktop')}
                   >
-                    <Monitor className=\"h-3 w-3\" />
+                    <Monitor className="h-3 w-3" />
                   </Button>
                   <Button 
                     variant={viewMode === 'tablet' ? 'default' : 'ghost'} 
-                    size=\"sm\"
+                    size="sm"
                     onClick={() => setViewMode('tablet')}
                   >
-                    <Tablet className=\"h-3 w-3\" />
+                    <Tablet className="h-3 w-3" />
                   </Button>
                   <Button 
                     variant={viewMode === 'mobile' ? 'default' : 'ghost'} 
-                    size=\"sm\"
+                    size="sm"
                     onClick={() => setViewMode('mobile')}
                   >
-                    <Smartphone className=\"h-3 w-3\" />
+                    <Smartphone className="h-3 w-3" />
                   </Button>
                 </div>
 
-                <div className=\"flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-lg\">
-                  <Button variant=\"ghost\" size=\"sm\" onClick={handleZoomOut}>
-                    <ZoomOut className=\"h-3 w-3\" />
+                <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-lg">
+                  <Button variant="ghost" size="sm" onClick={handleZoomOut}>
+                    <ZoomOut className="h-3 w-3" />
                   </Button>
-                  <span className=\"text-xs font-medium px-2\">{zoom}%</span>
-                  <Button variant=\"ghost\" size=\"sm\" onClick={handleZoomIn}>
-                    <ZoomIn className=\"h-3 w-3\" />
+                  <span className="text-xs font-medium px-2">{zoom}%</span>
+                  <Button variant="ghost" size="sm" onClick={handleZoomIn}>
+                    <ZoomIn className="h-3 w-3" />
                   </Button>
                 </div>
               </>
@@ -788,21 +788,21 @@ const VisualEditorComplete = () => {
             {/* Botón de panel en móviles */}
             {isMobile && (
               <Button 
-                variant=\"outline\" 
-                size=\"sm\"
+                variant="outline" 
+                size="sm"
                 onClick={() => setShowMobilePanel(!showMobilePanel)}
               >
-                {showMobilePanel ? <X className=\"h-4 w-4\" /> : <Menu className=\"h-4 w-4\" />}
+                {showMobilePanel ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
               </Button>
             )}
 
-            <Button variant=\"outline\" size=\"sm\" onClick={previewInvitation}>
-              <Eye className=\"h-4 w-4 mr-1\" />
+            <Button variant="outline" size="sm" onClick={previewInvitation}>
+              <Eye className="h-4 w-4 mr-1" />
               {!isMobile && 'Vista Previa'}
             </Button>
 
-            <Button size=\"sm\" onClick={saveEvent} disabled={saving}>
-              <Save className=\"h-4 w-4 mr-1\" />
+            <Button size="sm" onClick={saveEvent} disabled={saving}>
+              <Save className="h-4 w-4 mr-1" />
               {saving ? 'Guardando...' : !isMobile ? 'Guardar' : ''}
             </Button>
           </div>
@@ -810,12 +810,12 @@ const VisualEditorComplete = () => {
       </div>
 
       {error && (
-        <Alert className=\"mx-4 mt-4\">
+        <Alert className="mx-4 mt-4">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      <div className=\"flex h-[calc(100vh-80px)]\">
+      <div className="flex h-[calc(100vh-80px)]">
         {/* Panel lateral - Responsive */}
         <div className={`
           ${isMobile 
@@ -829,50 +829,50 @@ const VisualEditorComplete = () => {
           {/* Overlay para móviles */}
           {isMobile && showMobilePanel && (
             <div 
-              className=\"fixed inset-0 bg-black bg-opacity-50 z-40\"
+              className="fixed inset-0 bg-black bg-opacity-50 z-40"
               onClick={() => setShowMobilePanel(false)}
             />
           )}
           
-          <div className=\"relative z-50 bg-white h-full\">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className=\"h-full\">
+          <div className="relative z-50 bg-white h-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
               {/* Tabs optimizadas para móviles */}
-              <TabsList className=\"grid w-full grid-cols-4 p-1 m-4\">
-                <TabsTrigger value=\"design\" className=\"flex flex-col items-center gap-1 p-2\">
-                  <Palette className=\"h-4 w-4\" />
-                  <span className=\"text-xs\">Diseño</span>
+              <TabsList className="grid w-full grid-cols-4 p-1 m-4">
+                <TabsTrigger value="design" className="flex flex-col items-center gap-1 p-2">
+                  <Palette className="h-4 w-4" />
+                  <span className="text-xs">Diseño</span>
                 </TabsTrigger>
-                <TabsTrigger value=\"content\" className=\"flex flex-col items-center gap-1 p-2\">
-                  <Type className=\"h-4 w-4\" />
-                  <span className=\"text-xs\">Contenido</span>
+                <TabsTrigger value="content" className="flex flex-col items-center gap-1 p-2">
+                  <Type className="h-4 w-4" />
+                  <span className="text-xs">Contenido</span>
                 </TabsTrigger>
-                <TabsTrigger value=\"images\" className=\"flex flex-col items-center gap-1 p-2\">
-                  <ImageIcon className=\"h-4 w-4\" />
-                  <span className=\"text-xs\">Imágenes</span>
+                <TabsTrigger value="images" className="flex flex-col items-center gap-1 p-2">
+                  <ImageIcon className="h-4 w-4" />
+                  <span className="text-xs">Imágenes</span>
                 </TabsTrigger>
-                <TabsTrigger value=\"layout\" className=\"flex flex-col items-center gap-1 p-2\">
-                  <Layout className=\"h-4 w-4\" />
-                  <span className=\"text-xs\">Templates</span>
+                <TabsTrigger value="layout" className="flex flex-col items-center gap-1 p-2">
+                  <Layout className="h-4 w-4" />
+                  <span className="text-xs">Templates</span>
                 </TabsTrigger>
               </TabsList>
 
               {/* Contenido de tabs */}
-              <div className=\"px-4 pb-4\">
+              <div className="px-4 pb-4">
                 {/* Tab Diseño */}
-                <TabsContent value=\"design\" className=\"space-y-4 mt-0\">
+                <TabsContent value="design" className="space-y-4 mt-0">
                   <Card>
-                    <CardHeader className=\"pb-3\">
-                      <CardTitle className=\"text-sm\">Paletas de Colores</CardTitle>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">Paletas de Colores</CardTitle>
                     </CardHeader>
-                    <CardContent className=\"space-y-3\">
+                    <CardContent className="space-y-3">
                       {colorPalettes.map((palette) => (
                         <div key={palette.name}>
-                          <Label className=\"text-xs font-medium\">{palette.name}</Label>
-                          <div className=\"flex gap-2 mt-1\">
+                          <Label className="text-xs font-medium">{palette.name}</Label>
+                          <div className="flex gap-2 mt-1">
                             {palette.colors.map((color) => (
                               <button
                                 key={color}
-                                className=\"w-8 h-8 rounded border-2 border-gray-200 hover:border-gray-400 transition-colors\"
+                                className="w-8 h-8 rounded border-2 border-gray-200 hover:border-gray-400 transition-colors"
                                 style={{ backgroundColor: color }}
                                 onClick={() => handleColorChange('primary', color)}
                               />
@@ -884,60 +884,60 @@ const VisualEditorComplete = () => {
                   </Card>
 
                   <Card>
-                    <CardHeader className=\"pb-3\">
-                      <CardTitle className=\"text-sm\">Colores Personalizados</CardTitle>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">Colores Personalizados</CardTitle>
                     </CardHeader>
-                    <CardContent className=\"space-y-3\">
+                    <CardContent className="space-y-3">
                       <div>
-                        <Label htmlFor=\"primaryColor\" className=\"text-xs\">Color Principal</Label>
-                        <div className=\"flex gap-2 mt-1\">
+                        <Label htmlFor="primaryColor" className="text-xs">Color Principal</Label>
+                        <div className="flex gap-2 mt-1">
                           <Input
-                            id=\"primaryColor\"
-                            type=\"color\"
+                            id="primaryColor"
+                            type="color"
                             value={event.colors.primary}
                             onChange={(e) => handleColorChange('primary', e.target.value)}
-                            className=\"w-12 h-8 p-0 border-0\"
+                            className="w-12 h-8 p-0 border-0"
                           />
                           <Input
                             value={event.colors.primary}
                             onChange={(e) => handleColorChange('primary', e.target.value)}
-                            className=\"flex-1 text-xs\"
+                            className="flex-1 text-xs"
                           />
                         </div>
                       </div>
 
                       <div>
-                        <Label htmlFor=\"secondaryColor\" className=\"text-xs\">Color Secundario</Label>
-                        <div className=\"flex gap-2 mt-1\">
+                        <Label htmlFor="secondaryColor" className="text-xs">Color Secundario</Label>
+                        <div className="flex gap-2 mt-1">
                           <Input
-                            id=\"secondaryColor\"
-                            type=\"color\"
+                            id="secondaryColor"
+                            type="color"
                             value={event.colors.secondary}
                             onChange={(e) => handleColorChange('secondary', e.target.value)}
-                            className=\"w-12 h-8 p-0 border-0\"
+                            className="w-12 h-8 p-0 border-0"
                           />
                           <Input
                             value={event.colors.secondary}
                             onChange={(e) => handleColorChange('secondary', e.target.value)}
-                            className=\"flex-1 text-xs\"
+                            className="flex-1 text-xs"
                           />
                         </div>
                       </div>
 
                       <div>
-                        <Label htmlFor=\"textColor\" className=\"text-xs\">Color de Texto</Label>
-                        <div className=\"flex gap-2 mt-1\">
+                        <Label htmlFor="textColor" className="text-xs">Color de Texto</Label>
+                        <div className="flex gap-2 mt-1">
                           <Input
-                            id=\"textColor\"
-                            type=\"color\"
+                            id="textColor"
+                            type="color"
                             value={event.colors.text}
                             onChange={(e) => handleColorChange('text', e.target.value)}
-                            className=\"w-12 h-8 p-0 border-0\"
+                            className="w-12 h-8 p-0 border-0"
                           />
                           <Input
                             value={event.colors.text}
                             onChange={(e) => handleColorChange('text', e.target.value)}
-                            className=\"flex-1 text-xs\"
+                            className="flex-1 text-xs"
                           />
                         </div>
                       </div>
@@ -945,16 +945,16 @@ const VisualEditorComplete = () => {
                   </Card>
 
                   <Card>
-                    <CardHeader className=\"pb-3\">
-                      <CardTitle className=\"text-sm\">Tipografía</CardTitle>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">Tipografía</CardTitle>
                     </CardHeader>
-                    <CardContent className=\"space-y-3\">
+                    <CardContent className="space-y-3">
                       <div>
-                        <Label className=\"text-xs\">Fuente Principal</Label>
+                        <Label className="text-xs">Fuente Principal</Label>
                         <select
                           value={event.fonts.primary}
                           onChange={(e) => handleFontChange('primary', e.target.value)}
-                          className=\"w-full mt-1 p-2 border border-gray-300 rounded text-sm\"
+                          className="w-full mt-1 p-2 border border-gray-300 rounded text-sm"
                         >
                           {fontFamilies.map((font) => (
                             <option key={font} value={font} style={{ fontFamily: font }}>
@@ -965,11 +965,11 @@ const VisualEditorComplete = () => {
                       </div>
 
                       <div>
-                        <Label className=\"text-xs\">Fuente Secundaria</Label>
+                        <Label className="text-xs">Fuente Secundaria</Label>
                         <select
                           value={event.fonts.secondary}
                           onChange={(e) => handleFontChange('secondary', e.target.value)}
-                          className=\"w-full mt-1 p-2 border border-gray-300 rounded text-sm\"
+                          className="w-full mt-1 p-2 border border-gray-300 rounded text-sm"
                         >
                           {fontFamilies.map((font) => (
                             <option key={font} value={font} style={{ fontFamily: font }}>
@@ -983,108 +983,108 @@ const VisualEditorComplete = () => {
                 </TabsContent>
 
                 {/* Tab Contenido */}
-                <TabsContent value=\"content\" className=\"space-y-4 mt-0\">
+                <TabsContent value="content" className="space-y-4 mt-0">
                   <Card>
-                    <CardHeader className=\"pb-3\">
-                      <CardTitle className=\"text-sm\">Información de la Pareja</CardTitle>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">Información de la Pareja</CardTitle>
                     </CardHeader>
-                    <CardContent className=\"space-y-3\">
+                    <CardContent className="space-y-3">
                       <div>
-                        <Label htmlFor=\"bride\" className=\"text-xs\">Novia</Label>
+                        <Label htmlFor="bride" className="text-xs">Novia</Label>
                         <Input
-                          id=\"bride\"
+                          id="bride"
                           value={event.couple.bride}
                           onChange={(e) =>
                             setEvent((prev) => ({ ...prev, couple: { ...prev.couple, bride: e.target.value } }))
                           }
-                          className=\"text-xs mt-1\"
+                          className="text-xs mt-1"
                         />
                       </div>
 
                       <div>
-                        <Label htmlFor=\"groom\" className=\"text-xs\">Novio</Label>
+                        <Label htmlFor="groom" className="text-xs">Novio</Label>
                         <Input
-                          id=\"groom\"
+                          id="groom"
                           value={event.couple.groom}
                           onChange={(e) =>
                             setEvent((prev) => ({ ...prev, couple: { ...prev.couple, groom: e.target.value } }))
                           }
-                          className=\"text-xs mt-1\"
+                          className="text-xs mt-1"
                         />
                       </div>
 
                       <div>
-                        <Label htmlFor=\"hashtag\" className=\"text-xs\">Hashtag</Label>
+                        <Label htmlFor="hashtag" className="text-xs">Hashtag</Label>
                         <Input
-                          id=\"hashtag\"
+                          id="hashtag"
                           value={event.hashtag}
                           onChange={(e) => setEvent((prev) => ({ ...prev, hashtag: e.target.value }))}
-                          className=\"text-xs mt-1\"
+                          className="text-xs mt-1"
                         />
                       </div>
                     </CardContent>
                   </Card>
 
                   <Card>
-                    <CardHeader className=\"pb-3\">
-                      <CardTitle className=\"text-sm\">Detalles del Evento</CardTitle>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">Detalles del Evento</CardTitle>
                     </CardHeader>
-                    <CardContent className=\"space-y-3\">
+                    <CardContent className="space-y-3">
                       <div>
-                        <Label htmlFor=\"eventDate\" className=\"text-xs\">Fecha</Label>
+                        <Label htmlFor="eventDate" className="text-xs">Fecha</Label>
                         <Input
-                          id=\"eventDate\"
+                          id="eventDate"
                           value={event.date}
                           onChange={(e) => setEvent((prev) => ({ ...prev, date: e.target.value }))}
-                          className=\"text-xs mt-1\"
+                          className="text-xs mt-1"
                         />
                       </div>
 
                       <div>
-                        <Label htmlFor=\"ceremonyVenue\" className=\"text-xs\">Lugar de Ceremonia</Label>
+                        <Label htmlFor="ceremonyVenue" className="text-xs">Lugar de Ceremonia</Label>
                         <Input
-                          id=\"ceremonyVenue\"
+                          id="ceremonyVenue"
                           value={event.ceremony.venue}
                           onChange={(e) =>
                             setEvent((prev) => ({ ...prev, ceremony: { ...prev.ceremony, venue: e.target.value } }))
                           }
-                          className=\"text-xs mt-1\"
+                          className="text-xs mt-1"
                         />
                       </div>
 
                       <div>
-                        <Label htmlFor=\"ceremonyAddress\" className=\"text-xs\">Dirección de Ceremonia</Label>
+                        <Label htmlFor="ceremonyAddress" className="text-xs">Dirección de Ceremonia</Label>
                         <Textarea
-                          id=\"ceremonyAddress\"
+                          id="ceremonyAddress"
                           value={event.ceremony.address}
                           onChange={(e) =>
                             setEvent((prev) => ({ ...prev, ceremony: { ...prev.ceremony, address: e.target.value } }))
                           }
-                          className=\"text-xs mt-1 min-h-[60px]\"
+                          className="text-xs mt-1 min-h-[60px]"
                         />
                       </div>
 
                       <div>
-                        <Label htmlFor=\"receptionVenue\" className=\"text-xs\">Lugar de Recepción</Label>
+                        <Label htmlFor="receptionVenue" className="text-xs">Lugar de Recepción</Label>
                         <Input
-                          id=\"receptionVenue\"
+                          id="receptionVenue"
                           value={event.reception.venue}
                           onChange={(e) =>
                             setEvent((prev) => ({ ...prev, reception: { ...prev.reception, venue: e.target.value } }))
                           }
-                          className=\"text-xs mt-1\"
+                          className="text-xs mt-1"
                         />
                       </div>
 
                       <div>
-                        <Label htmlFor=\"receptionAddress\" className=\"text-xs\">Dirección de Recepción</Label>
+                        <Label htmlFor="receptionAddress" className="text-xs">Dirección de Recepción</Label>
                         <Textarea
-                          id=\"receptionAddress\"
+                          id="receptionAddress"
                           value={event.reception.address}
                           onChange={(e) =>
                             setEvent((prev) => ({ ...prev, reception: { ...prev.reception, address: e.target.value } }))
                           }
-                          className=\"text-xs mt-1 min-h-[60px]\"
+                          className="text-xs mt-1 min-h-[60px]"
                         />
                       </div>
                     </CardContent>
@@ -1092,30 +1092,30 @@ const VisualEditorComplete = () => {
                 </TabsContent>
 
                 {/* Tab Imágenes */}
-                <TabsContent value=\"images\" className=\"space-y-4 mt-0\">
+                <TabsContent value="images" className="space-y-4 mt-0">
                   <Card>
-                    <CardHeader className=\"pb-3\">
-                      <CardTitle className=\"text-sm\">Subir Imágenes</CardTitle>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">Subir Imágenes</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className=\"border-2 border-dashed border-gray-300 rounded-lg p-6 text-center\">
-                        <Upload className=\"w-8 h-8 mx-auto mb-2 text-gray-400\" />
-                        <p className=\"text-xs text-gray-600 mb-2\">
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                        <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
+                        <p className="text-xs text-gray-600 mb-2">
                           Arrastra imágenes aquí o haz clic para seleccionar
                         </p>
                         <Button
-                          variant=\"outline\"
-                          size=\"sm\"
+                          variant="outline"
+                          size="sm"
                           onClick={() => fileInputRef.current?.click()}
                         >
                           Seleccionar Archivos
                         </Button>
                         <input
                           ref={fileInputRef}
-                          type=\"file\"
-                          accept=\"image/*\"
+                          type="file"
+                          accept="image/*"
                           multiple
-                          className=\"hidden\"
+                          className="hidden"
                           onChange={(e) => {
                             // Manejar subida de archivos
                             console.log('Archivos seleccionados:', e.target.files);
@@ -1127,12 +1127,12 @@ const VisualEditorComplete = () => {
                 </TabsContent>
 
                 {/* Tab Templates */}
-                <TabsContent value=\"layout\" className=\"space-y-4 mt-0\">
+                <TabsContent value="layout" className="space-y-4 mt-0">
                   <Card>
-                    <CardHeader className=\"pb-3\">
-                      <CardTitle className=\"text-sm\">Plantillas</CardTitle>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-sm">Plantillas</CardTitle>
                     </CardHeader>
-                    <CardContent className=\"space-y-3\">
+                    <CardContent className="space-y-3">
                       {templates.map((template) => (
                         <div
                           key={template.id}
@@ -1143,8 +1143,8 @@ const VisualEditorComplete = () => {
                           }`}
                           onClick={() => handleTemplateChange(template.id)}
                         >
-                          <h4 className=\"font-medium text-sm\">{template.name}</h4>
-                          <p className=\"text-xs text-gray-600 mt-1\">{template.description}</p>
+                          <h4 className="font-medium text-sm">{template.name}</h4>
+                          <p className="text-xs text-gray-600 mt-1">{template.description}</p>
                         </div>
                       ))}
                     </CardContent>
@@ -1156,9 +1156,9 @@ const VisualEditorComplete = () => {
         </div>
 
         {/* Canvas principal */}
-        <div className=\"flex-1 overflow-auto bg-gray-100\">
+        <div className="flex-1 overflow-auto bg-gray-100">
           <div className={`${isMobile ? 'p-2' : 'p-8'} flex justify-center`}>
-            <div className=\"bg-white shadow-lg rounded-lg overflow-hidden\">
+            <div className="bg-white shadow-lg rounded-lg overflow-hidden">
               {renderInvitation()}
             </div>
           </div>
