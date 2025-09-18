@@ -1,11 +1,12 @@
-// src/pages/VisualEditorComplete.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Input } from '../components/ui/input';
+import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Badge } from '../components/ui/badge';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import {
   ArrowLeft,
@@ -15,122 +16,73 @@ import {
   Type,
   Image as ImageIcon,
   Layout,
+  Settings,
   Upload,
+  Download,
   Undo,
   Redo,
+  Copy,
+  Trash2,
+  Move,
+  RotateCw,
   ZoomIn,
   ZoomOut,
+  Grid,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  Bold,
+  Italic,
+  Underline,
+  Plus,
+  Minus,
+  Check,
+  X,
+  Wand2,
   Heart,
   MapPin,
+  Calendar,
+  Clock,
+  Music,
+  Camera,
+  Share2,
+  Users,
+  Gift,
+  Phone,
+  Mail,
+  Instagram,
+  Facebook,
+  CheckCircle,
   ChevronDown,
   Church,
   PartyPopper,
-  Users,
-  Instagram,
-  Facebook,
-  Share2,
-  Gift,
-  CreditCard,
-  X
+  CreditCard
 } from 'lucide-react';
-
-/** Editable in-place:
- * - click/tap para editar, blur para finalizar
- * - corrige escritura invertida (LTR + bidi-override)
- * - foco y selección automática
- * - Enter confirma en singleLine
- */
-const EditableText = ({
-  value,
-  onChange,
-  as = 'span',
-  className = '',
-  style = {},
-  singleLine = true,
-  ariaLabel = 'Editar texto'
-}) => {
-  const Tag = as;
-  const ref = useRef(null);
-  const [editing, setEditing] = useState(false);
-
-  const beginEdit = (e) => {
-    e.stopPropagation();
-    setEditing(true);
-    requestAnimationFrame(() => {
-      if (!ref.current) return;
-      ref.current.focus();
-      const r = document.createRange();
-      r.selectNodeContents(ref.current);
-      const s = window.getSelection();
-      s.removeAllRanges();
-      s.addRange(r);
-    });
-  };
-
-  const endEdit = () => setEditing(false);
-  const handleInput = (e) => onChange(e.currentTarget.textContent || '');
-  const handleKeyDown = (e) => {
-    if (singleLine && e.key === 'Enter') {
-      e.preventDefault();
-      ref.current?.blur();
-    }
-  };
-  const handlePaste = (e) => {
-    e.preventDefault();
-    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-    document.execCommand('insertText', false, text);
-  };
-
-  return (
-    <Tag
-      ref={ref}
-      role="textbox"
-      aria-label={ariaLabel}
-      contentEditable={editing}
-      suppressContentEditableWarning
-      onClick={beginEdit}
-      onBlur={endEdit}
-      onInput={handleInput}
-      onKeyDown={handleKeyDown}
-      onPaste={handlePaste}
-      dir="ltr"
-      spellCheck={false}
-      tabIndex={0}
-      className={`${className} outline-none ${editing ? 'ring-2 ring-blue-300 rounded-sm' : ''}`}
-      style={{
-        direction: 'ltr',
-        unicodeBidi: 'bidi-override',
-        whiteSpace: singleLine ? 'nowrap' : 'pre-wrap',
-        ...style
-      }}
-    >
-      {value}
-    </Tag>
-  );
-};
 
 const VisualEditorComplete = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
+  
+  // Estado del evento (datos editables)
   const [event, setEvent] = useState({
     id: id || '1',
-    couple: { bride: 'María', groom: 'Juan' },
+    couple: {
+      bride: 'María',
+      groom: 'Juan'
+    },
     date: '15 de Marzo, 2024',
     time: '17:00',
     ceremony: {
       venue: 'Iglesia San Miguel',
       address: 'Calle Mayor 123, Madrid',
-      time: '17:00',
-      maps: 'https://maps.google.com/?q=Iglesia+San+Miguel'
+      time: '17:00'
     },
     reception: {
       venue: 'Jardín Botánico',
       address: 'Av. Libertador 456, Madrid',
-      time: '19:30',
-      maps: 'https://maps.google.com/?q=Jardin+Botanico'
+      time: '19:30'
     },
-    description: '¡NOS CASAMOS!',
+    description: 'Celebra con nosotros este día tan especial',
     hashtag: '#MariaYJuan2024',
     template: 'elegant',
     colors: {
@@ -145,66 +97,69 @@ const VisualEditorComplete = () => {
       secondary: 'Inter'
     }
   });
-
-  const [loading] = useState(false);
+  
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
-
-  // UI
-  const [activeTab, setActiveTab] = useState('colors'); // 🔸 unificamos en "colors"
+  
+  // Estado del editor
+  const [activeTab, setActiveTab] = useState('design');
+  const [selectedElement, setSelectedElement] = useState(null);
   const [zoom, setZoom] = useState(100);
+  const [showGrid, setShowGrid] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
   const [selectedTemplate, setSelectedTemplate] = useState('elegant');
-
-  // Drawer/Panel responsive
-  const [panelOpen, setPanelOpen] = useState(() => (typeof window !== 'undefined' ? window.innerWidth >= 1024 : true));
-  useEffect(() => {
-    const onResize = () => setPanelOpen(window.innerWidth >= 1024);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
-
-  // Modal RSVP
+  
+  // Estados de la invitación
   const [showRSVP, setShowRSVP] = useState(false);
-
+  const [showGifts, setShowGifts] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  
+  // Referencias
+  const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
-
-  // 🔹 Paletas EXACTAS que pediste (solo array de colores, sin nombres visibles)
+  
+  // Paletas de colores predefinidas
   const colorPalettes = [
-    // 🌿 Rustic Elegance
-    ['#8D6E63', '#F8BBD0', '#D7CCC8', '#607D8B', '#33691E'],
-    // 🥂 Champagne
-    ['#FFF8E1', '#FFDAB9', '#F5DEB3', '#D2B48C', '#C19A6B'],
-    // 🌸 Boho Chic
-    ['#FFE0B2', '#FFB6C1', '#DDA0DD', '#C0C0C0', '#F4A460'],
-    // 🌿 Sage & Terracotta
-    ['#A5A58D', '#F08080', '#CD5C5C', '#D2B48C', '#BC8F8F'],
-    // 🌺 Blush and Gray
-    ['#F8BBD0', '#E6E6FA', '#B0BEC5', '#6D6D6D'],
-    // 🍑 Just Peachy
-    ['#FFDAB9', '#F4A460', '#FA8072', '#FFE4E1', '#C3B091'],
-    // ❤️ Classic Romance
-    ['#800020', '#F5F5F5', '#FFFFFF', '#2F4F4F'],
-    // 🖤 Black & Blush
-    ['#FADADD', '#E6E6FA', '#C0C0C0', '#000000'],
-    // ⚪ Modern Minimalism
-    ['#FFFFFF', '#E0E0E0', '#BDBDBD', '#212121'],
-    // 🎨 Muted Hues
-    ['#E6B0AA', '#D7BDE2', '#A9CCE3', '#AEB6BF'],
-    // 🔵 Dusty Blue & Gray
-    ['#B0C4DE', '#A9A9A9', '#778899', '#2F4F4F'],
-    // 🤍 Simple Romance
-    ['#D2B48C', '#FFE4E1', '#F5F5DC', '#C0C0C0'],
-    // ❄️ Frosted Winter
-    ['#E0FFFF', '#4682B4', '#708090', '#004953'],
-    // 🛠 Rustic Steel
-    ['#B87333', '#D2B48C', '#A9A9A9', '#696969']
+    {
+      name: 'Clásico',
+      colors: ['#1a1a1a', '#ffffff', '#f5f5f5', '#e5e5e5', '#cccccc']
+    },
+    {
+      name: 'Elegante',
+      colors: ['#2c3e50', '#ecf0f1', '#e74c3c', '#f39c12', '#9b59b6']
+    },
+    {
+      name: 'Moderno',
+      colors: ['#34495e', '#3498db', '#2ecc71', '#f1c40f', '#e67e22']
+    },
+    {
+      name: 'Romántico',
+      colors: ['#8e44ad', '#e91e63', '#ffc0cb', '#fff0f5', '#ffe4e1']
+    },
+    {
+      name: 'Natural',
+      colors: ['#27ae60', '#2ecc71', '#f39c12', '#e67e22', '#d35400']
+    }
   ];
-
+  
+  // Fuentes disponibles
   const fontFamilies = [
-    'Inter','Helvetica Neue','Arial','Georgia','Times New Roman',
-    'Playfair Display','Montserrat','Open Sans','Lato','Roboto'
+    'Inter',
+    'Helvetica Neue',
+    'Arial',
+    'Georgia',
+    'Times New Roman',
+    'Playfair Display',
+    'Montserrat',
+    'Open Sans',
+    'Lato',
+    'Roboto'
   ];
 
+  // Templates disponibles
   const templates = [
     { id: 'elegant', name: 'Elegante', description: 'Diseño sofisticado y minimalista' },
     { id: 'romantic', name: 'Romántico', description: 'Colores suaves y florales' },
@@ -212,58 +167,15 @@ const VisualEditorComplete = () => {
     { id: 'classic', name: 'Clásico', description: 'Estilo tradicional y atemporal' }
   ];
 
-  const saveEvent = async () => {
-    try {
-      setSaving(true);
-      await new Promise((r) => setTimeout(r, 600));
-      console.log('Evento guardado:', event);
-    } catch (err) {
-      setError('Error guardando el evento');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleColorChange = (property, color) =>
-    setEvent((prev) => ({ ...prev, colors: { ...prev.colors, [property]: color } }));
-
-  const handleFontChange = (type, fontFamily) =>
-    setEvent((prev) => ({ ...prev, fonts: { ...prev.fonts, [type]: fontFamily } }));
-
-  const handleTemplateChange = (templateId) => {
-    setSelectedTemplate(templateId);
-    setEvent((prev) => ({ ...prev, template: templateId }));
-  };
-
-  const handleImageUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => console.log('Image uploaded:', ev.target.result);
-    reader.readAsDataURL(file);
-  };
-
-  const handleZoomIn = () => setZoom((z) => Math.min(z + 10, 200));
-  const handleZoomOut = () => setZoom((z) => Math.max(z - 10, 50));
-  const previewInvitation = () => window.open(`/p/${event.id}`, '_blank');
-
-  const TimeCell = ({ value, label }) => (
-    <div className="flex flex-col items-center">
-      <div className="font-light leading-none text-4xl md:text-6xl" style={{ color: event.colors.primary }}>
-        {String(value).padStart(2, '0')}
-      </div>
-      <div className="opacity-90 text-sm sm:text-base" style={{ color: event.colors.text }}>
-        {label}
-      </div>
-    </div>
-  );
-
+  // Countdown timer
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
   useEffect(() => {
     const targetDate = new Date('2024-03-15T17:00:00');
     const timer = setInterval(() => {
-      const now = Date.now();
+      const now = new Date().getTime();
       const distance = targetDate.getTime() - now;
+      
       if (distance > 0) {
         setTimeLeft({
           days: Math.floor(distance / (1000 * 60 * 60 * 24)),
@@ -273,177 +185,246 @@ const VisualEditorComplete = () => {
         });
       }
     }, 1000);
+
     return () => clearInterval(timer);
   }, []);
 
-  const styles = {
-    elegant: {
-      background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-      primaryColor: event.colors.primary,
-      secondaryColor: event.colors.secondary,
-      textColor: event.colors.text,
-      fontFamily: event.fonts.primary
-    },
-    romantic: {
-      background: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
-      primaryColor: '#e91e63',
-      secondaryColor: '#ffc0cb',
-      textColor: '#333',
-      fontFamily: 'Playfair Display'
-    },
-    modern: {
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      primaryColor: '#3498db',
-      secondaryColor: '#2ecc71',
-      textColor: '#fff',
-      fontFamily: 'Inter'
-    },
-    classic: {
-      background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-      primaryColor: '#8e44ad',
-      secondaryColor: '#e74c3c',
-      textColor: '#333',
-      fontFamily: 'Georgia'
+  const saveEvent = async () => {
+    try {
+      setSaving(true);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('Evento guardado:', event);
+    } catch (err) {
+      setError('Error guardando el evento');
+      console.error(err);
+    } finally {
+      setSaving(false);
     }
   };
 
+  const handleColorChange = (property, color) => {
+    setEvent(prev => ({
+      ...prev,
+      colors: {
+        ...prev.colors,
+        [property]: color
+      }
+    }));
+  };
+
+  const handleFontChange = (type, fontFamily) => {
+    setEvent(prev => ({
+      ...prev,
+      fonts: {
+        ...prev.fonts,
+        [type]: fontFamily
+      }
+    }));
+  };
+
+  const handleTemplateChange = (templateId) => {
+    setSelectedTemplate(templateId);
+    setEvent(prev => ({ ...prev, template: templateId }));
+  };
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        console.log('Image uploaded:', e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      setHistoryIndex(historyIndex - 1);
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1) {
+      setHistoryIndex(historyIndex + 1);
+    }
+  };
+
+  const handleZoomIn = () => {
+    setZoom(Math.min(zoom + 10, 200));
+  };
+
+  const handleZoomOut = () => {
+    setZoom(Math.max(zoom - 10, 50));
+  };
+
+  const previewInvitation = () => {
+    window.open(`/p/${event.id}`, '_blank');
+  };
+
+  // Componente TimeCell para el countdown
+  const TimeCell = ({ value, label }) => (
+    <div className="flex flex-col items-center">
+      <div 
+        className="font-light leading-none text-4xl md:text-6xl"
+        style={{ color: event.colors.primary }}
+      >
+        {String(value).padStart(2, '0')}
+      </div>
+      <div className="opacity-90 text-sm sm:text-base" style={{ color: event.colors.text }}>
+        {label}
+      </div>
+    </div>
+  );
+
+  // Renderizar la invitación según el template seleccionado
   const renderInvitation = () => {
+    const styles = {
+      elegant: {
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        primaryColor: event.colors.primary,
+        secondaryColor: event.colors.secondary,
+        textColor: event.colors.text,
+        fontFamily: event.fonts.primary
+      },
+      romantic: {
+        background: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+        primaryColor: '#e91e63',
+        secondaryColor: '#ffc0cb',
+        textColor: '#333',
+        fontFamily: 'Playfair Display'
+      },
+      modern: {
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        primaryColor: '#3498db',
+        secondaryColor: '#2ecc71',
+        textColor: '#fff',
+        fontFamily: 'Inter'
+      },
+      classic: {
+        background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        primaryColor: '#8e44ad',
+        secondaryColor: '#e74c3c',
+        textColor: '#333',
+        fontFamily: 'Georgia'
+      }
+    };
+
     const currentStyle = styles[selectedTemplate] || styles.elegant;
 
     return (
-      <div
+      <div 
         className="min-h-screen relative overflow-hidden"
-        style={{
+        style={{ 
           background: currentStyle.background,
           fontFamily: currentStyle.fontFamily,
           color: currentStyle.textColor
         }}
       >
-        {/* Hero */}
+        {/* Hero Section */}
         <section className="min-h-screen flex items-center justify-center relative px-4">
-          <div
-            className="absolute top-10 left-10 w-16 h-16 md:w-20 md:h-20 rounded-full opacity-20"
-            style={{ backgroundColor: currentStyle.primaryColor }}
-          />
-          <div
-            className="absolute bottom-10 right-10 w-24 h-24 md:w-32 md:h-32 rounded-full opacity-10"
-            style={{ backgroundColor: currentStyle.secondaryColor }}
-          />
-
+          {/* Decorative elements */}
+          <div className="absolute top-10 left-10 w-20 h-20 rounded-full opacity-20"
+               style={{ backgroundColor: currentStyle.primaryColor }}></div>
+          <div className="absolute bottom-10 right-10 w-32 h-32 rounded-full opacity-10"
+               style={{ backgroundColor: currentStyle.secondaryColor }}></div>
+          
           <div className="text-center max-w-4xl mx-auto relative z-10">
-            <h1
-              className="text-5xl md:text-8xl font-light mb-4 tracking-wider uppercase"
+            <h1 
+              className="text-6xl md:text-8xl font-light mb-4 tracking-wider"
               style={{ color: currentStyle.primaryColor }}
             >
-              <EditableText
-                value={event.couple.bride}
-                onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: val } }))}
-                as="span"
-                ariaLabel="Nombre de la novia"
-              />
+              {event.couple.bride.toUpperCase()}
             </h1>
-
+            
             <div className="flex items-center justify-center my-8">
-              <div className="h-px w-12 md:w-16 bg-gray-400" />
-              <Heart className="mx-4 w-6 h-6 md:w-8 md:h-8" style={{ color: currentStyle.secondaryColor }} fill="currentColor" />
-              <div className="h-px w-12 md:w-16 bg-gray-400" />
+              <div className="h-px w-16 bg-gray-400"></div>
+              <Heart 
+                className="mx-4 w-8 h-8" 
+                style={{ color: currentStyle.secondaryColor }}
+                fill="currentColor"
+              />
+              <div className="h-px w-16 bg-gray-400"></div>
             </div>
-
-            <h1
-              className="text-5xl md:text-8xl font-light mb-8 tracking-wider uppercase"
+            
+            <h1 
+              className="text-6xl md:text-8xl font-light mb-8 tracking-wider"
               style={{ color: currentStyle.primaryColor }}
             >
-              <EditableText
-                value={event.couple.groom}
-                onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: val } }))}
-                as="span"
-                ariaLabel="Nombre del novio"
-              />
+              {event.couple.groom.toUpperCase()}
             </h1>
-
-            <p className="text-lg md:text-2xl font-light mb-12 tracking-wide" style={{ color: currentStyle.textColor }}>
-              <EditableText
-                value={event.description}
-                onChange={(val) => setEvent((p) => ({ ...p, description: val }))}
-                as="span"
-                ariaLabel="Descripción principal"
-              />
+            
+            <p 
+              className="text-xl md:text-2xl font-light mb-12 tracking-wide"
+              style={{ color: currentStyle.textColor }}
+            >
+              ¡NOS CASAMOS!
             </p>
-
+            
             <div className="animate-bounce">
-              <ChevronDown className="w-6 h-6 md:w-8 md:h-8 mx-auto" style={{ color: currentStyle.primaryColor }} />
+              <ChevronDown 
+                className="w-8 h-8 mx-auto" 
+                style={{ color: currentStyle.primaryColor }} 
+              />
             </div>
           </div>
         </section>
 
-        {/* Countdown */}
-        <section className="py-12 md:py-16" style={{ backgroundColor: currentStyle.primaryColor }}>
+        {/* Countdown Section */}
+        <section 
+          className="py-16"
+          style={{ backgroundColor: currentStyle.primaryColor }}
+        >
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="text-xl md:text-3xl font-light mb-6 md:mb-8 tracking-wide text-white">
+            <h2 
+              className="text-2xl md:text-3xl font-light mb-8 tracking-wide"
+              style={{ color: '#ffffff' }}
+            >
               Faltan para nuestro gran día
             </h2>
-            <div className="flex items-center justify-center gap-4 md:gap-8">
+            
+            <div className="flex items-center justify-center gap-8">
               <TimeCell value={timeLeft.days} label="días" />
-              <div className="text-3xl md:text-6xl font-light text-white">:</div>
+              <div className="text-4xl md:text-6xl font-light text-white">:</div>
               <TimeCell value={timeLeft.hours} label="horas" />
-              <div className="text-3xl md:text-6xl font-light text-white">:</div>
+              <div className="text-4xl md:text-6xl font-light text-white">:</div>
               <TimeCell value={timeLeft.minutes} label="min" />
-              <div className="text-3xl md:text-6xl font-light text-white">:</div>
+              <div className="text-4xl md:text-6xl font-light text-white">:</div>
               <TimeCell value={timeLeft.seconds} label="seg" />
             </div>
           </div>
         </section>
 
-        {/* Detalles */}
-        <section className="py-12 md:py-16 bg-white">
+        {/* Event Details */}
+        <section className="py-16 bg-white">
           <div className="max-w-6xl mx-auto px-4">
-            <div className="grid md:grid-cols-2 gap-8 md:gap-12">
+            <div className="grid md:grid-cols-2 gap-12">
               {/* Ceremonia */}
               <div className="text-center">
-                <div
-                  className="w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+                <div 
+                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
                   style={{ backgroundColor: `${currentStyle.primaryColor}20` }}
                 >
-                  <Church className="w-7 h-7 md:w-8 md:h-8" style={{ color: currentStyle.primaryColor }} />
+                  <Church 
+                    className="w-8 h-8" 
+                    style={{ color: currentStyle.primaryColor }} 
+                  />
                 </div>
-                <h3 className="text-xl md:text-2xl font-medium mb-6 tracking-wide" style={{ color: currentStyle.textColor }}>
+                <h3 
+                  className="text-2xl font-medium mb-6 tracking-wide"
+                  style={{ color: currentStyle.textColor }}
+                >
                   CEREMONIA
                 </h3>
                 <div className="space-y-3 mb-8 text-gray-600">
-                  <p className="text-base md:text-lg">
-                    <EditableText
-                      value={event.date}
-                      onChange={(val) => setEvent((p) => ({ ...p, date: val }))}
-                      ariaLabel="Fecha"
-                    />
-                  </p>
-                  <p className="text-base md:text-lg">
-                    <EditableText
-                      value={event.ceremony.time}
-                      onChange={(val) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, time: val } }))}
-                      ariaLabel="Hora de ceremonia"
-                    />
-                  </p>
-                  <p className="font-medium">
-                    <EditableText
-                      value={event.ceremony.venue}
-                      onChange={(val) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, venue: val } }))}
-                      ariaLabel="Lugar de ceremonia"
-                    />
-                  </p>
-                  <p>
-                    <EditableText
-                      value={event.ceremony.address}
-                      onChange={(val) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, address: val } }))}
-                      ariaLabel="Dirección de ceremonia"
-                      singleLine={false}
-                    />
-                  </p>
+                  <p className="text-lg">{event.date}</p>
+                  <p className="text-lg">{event.ceremony.time}</p>
+                  <p className="font-medium">{event.ceremony.venue}</p>
+                  <p>{event.ceremony.address}</p>
                 </div>
                 <Button
-                  className="px-6 md:px-8 py-3 rounded-full text-white"
+                  className="px-8 py-3 rounded-full text-white"
                   style={{ backgroundColor: currentStyle.primaryColor }}
-                  onClick={() => window.open(event.ceremony.maps, '_blank', 'noopener,noreferrer')}
                 >
                   <MapPin className="w-4 h-4 mr-2" />
                   CÓMO LLEGAR
@@ -452,50 +433,30 @@ const VisualEditorComplete = () => {
 
               {/* Recepción */}
               <div className="text-center">
-                <div
-                  className="w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+                <div 
+                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
                   style={{ backgroundColor: `${currentStyle.secondaryColor}20` }}
                 >
-                  <PartyPopper className="w-7 h-7 md:w-8 md:h-8" style={{ color: currentStyle.secondaryColor }} />
+                  <PartyPopper 
+                    className="w-8 h-8" 
+                    style={{ color: currentStyle.secondaryColor }} 
+                  />
                 </div>
-                <h3 className="text-xl md:text-2xl font-medium mb-6 tracking-wide" style={{ color: currentStyle.textColor }}>
+                <h3 
+                  className="text-2xl font-medium mb-6 tracking-wide"
+                  style={{ color: currentStyle.textColor }}
+                >
                   RECEPCIÓN
                 </h3>
                 <div className="space-y-3 mb-8 text-gray-600">
-                  <p className="text-base md:text-lg">
-                    <EditableText
-                      value={event.date}
-                      onChange={(val) => setEvent((p) => ({ ...p, date: val }))}
-                      ariaLabel="Fecha de recepción"
-                    />
-                  </p>
-                  <p className="text-base md:text-lg">
-                    <EditableText
-                      value={event.reception.time}
-                      onChange={(val) => setEvent((p) => ({ ...p, reception: { ...p.reception, time: val } }))}
-                      ariaLabel="Hora de recepción"
-                    />
-                  </p>
-                  <p className="font-medium">
-                    <EditableText
-                      value={event.reception.venue}
-                      onChange={(val) => setEvent((p) => ({ ...p, reception: { ...p.reception, venue: val } }))}
-                      ariaLabel="Lugar de recepción"
-                    />
-                  </p>
-                  <p>
-                    <EditableText
-                      value={event.reception.address}
-                      onChange={(val) => setEvent((p) => ({ ...p, reception: { ...p.reception, address: val } }))}
-                      ariaLabel="Dirección de recepción"
-                      singleLine={false}
-                    />
-                  </p>
+                  <p className="text-lg">{event.date}</p>
+                  <p className="text-lg">{event.reception.time}</p>
+                  <p className="font-medium">{event.reception.venue}</p>
+                  <p>{event.reception.address}</p>
                 </div>
                 <Button
-                  className="px-6 md:px-8 py-3 rounded-full text-white"
+                  className="px-8 py-3 rounded-full text-white"
                   style={{ backgroundColor: currentStyle.secondaryColor }}
-                  onClick={() => window.open(event.reception.maps, '_blank', 'noopener,noreferrer')}
                 >
                   <MapPin className="w-4 h-4 mr-2" />
                   CÓMO LLEGAR
@@ -505,16 +466,24 @@ const VisualEditorComplete = () => {
           </div>
         </section>
 
-        {/* RSVP */}
-        <section className="py-12 md:py-16" style={{ backgroundColor: `${currentStyle.primaryColor}10` }}>
+        {/* RSVP Section */}
+        <section 
+          className="py-16"
+          style={{ backgroundColor: `${currentStyle.primaryColor}10` }}
+        >
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="text-2xl md:text-4xl font-light mb-6" style={{ color: currentStyle.primaryColor }}>
+            <h2 
+              className="text-3xl md:text-4xl font-light mb-6"
+              style={{ color: currentStyle.primaryColor }}
+            >
               Confirma tu Asistencia
             </h2>
-            <p className="text-base md:text-lg mb-8 text-gray-600">Tu presencia es muy importante para nosotros</p>
+            <p className="text-lg mb-8 text-gray-600">
+              Tu presencia es muy importante para nosotros
+            </p>
             <Button
               size="lg"
-              className="px-10 md:px-12 py-4 text-lg rounded-full text-white"
+              className="px-12 py-4 text-lg rounded-full text-white"
               style={{ backgroundColor: currentStyle.primaryColor }}
               onClick={() => setShowRSVP(true)}
             >
@@ -524,48 +493,52 @@ const VisualEditorComplete = () => {
           </div>
         </section>
 
-        {/* Regalos */}
-        <section className="py-12 md:py-16 bg-white">
+        {/* Gift Registry */}
+        <section className="py-16 bg-white">
           <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="text-2xl md:text-4xl font-light mb-6" style={{ color: currentStyle.textColor }}>
+            <h2 
+              className="text-3xl md:text-4xl font-light mb-6"
+              style={{ color: currentStyle.textColor }}
+            >
               Mesa de Regalos
             </h2>
-            <p className="text-base md:text-lg mb-8 text-gray-600">Si deseas hacernos un regalo, aquí tienes algunas opciones</p>
-            <div className="grid md:grid-cols-2 gap-4 md:gap-6">
+            <p className="text-lg mb-8 text-gray-600">
+              Si deseas hacernos un regalo, aquí tienes algunas opciones
+            </p>
+            <div className="grid md:grid-cols-2 gap-6">
               <Button
                 variant="outline"
                 size="lg"
-                className="p-5 md:p-6 h-auto flex-col"
+                className="p-6 h-auto flex-col"
                 style={{ borderColor: currentStyle.primaryColor, color: currentStyle.primaryColor }}
-                onClick={() => alert('Lista de regalos (placeholder)')}
               >
-                <Gift className="w-7 h-7 md:w-8 md:h-8 mb-2" />
-                <span className="text-base md:text-lg">Lista de Regalos</span>
+                <Gift className="w-8 h-8 mb-2" />
+                <span className="text-lg">Lista de Regalos</span>
               </Button>
               <Button
                 variant="outline"
                 size="lg"
-                className="p-5 md:p-6 h-auto flex-col"
+                className="p-6 h-auto flex-col"
                 style={{ borderColor: currentStyle.secondaryColor, color: currentStyle.secondaryColor }}
-                onClick={() => alert('Contribución (placeholder)')}
               >
-                <CreditCard className="w-7 h-7 md:w-8 md:h-8 mb-2" />
-                <span className="text-base md:text-lg">Contribución</span>
+                <CreditCard className="w-8 h-8 mb-2" />
+                <span className="text-lg">Contribución</span>
               </Button>
             </div>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="py-10 md:py-12 text-center" style={{ backgroundColor: currentStyle.primaryColor }}>
+        <footer 
+          className="py-12 text-center"
+          style={{ backgroundColor: currentStyle.primaryColor }}
+        >
           <div className="max-w-4xl mx-auto px-4">
-            <h3 className="text-xl md:text-2xl font-light mb-4 text-white">¡Esperamos verte en nuestro gran día!</h3>
+            <h3 className="text-2xl font-light mb-4 text-white">
+              ¡Esperamos verte en nuestro gran día!
+            </h3>
             <p className="text-white opacity-90 mb-6">
-              <EditableText
-                value={event.hashtag}
-                onChange={(val) => setEvent((p) => ({ ...p, hashtag: val }))}
-                ariaLabel="Hashtag"
-              />
+              {event.hashtag}
             </p>
             <div className="flex justify-center space-x-6">
               <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
@@ -588,7 +561,7 @@ const VisualEditorComplete = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-24 w-24 border-b-2 border-pink-500 mx-auto"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-pink-500 mx-auto"></div>
           <p className="mt-4 text-gray-600">Cargando editor...</p>
         </div>
       </div>
@@ -598,40 +571,49 @@ const VisualEditorComplete = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4">
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 md:gap-4">
+          <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate('/app/dashboard')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Volver
             </Button>
             <div>
-              <h1 className="text-lg md:text-xl font-semibold">
+              <h1 className="text-xl font-semibold">
                 {event.couple.bride} & {event.couple.groom}
               </h1>
-              <p className="text-xs md:text-sm text-gray-600">Editor Visual</p>
+              <p className="text-sm text-gray-600">Editor Visual</p>
             </div>
           </div>
-
-          <div className="flex items-center gap-2 md:gap-3">
-            {/* Abrir panel en móvil */}
-            <Button variant="outline" className="lg:hidden" onClick={() => setPanelOpen(true)} title="Abrir opciones">
-              <Palette className="h-4 w-4" />
+          
+          <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={handleUndo} disabled={historyIndex <= 0}>
+              <Undo className="h-4 w-4" />
             </Button>
-
-            <Button variant="outline" onClick={() => setZoom((z) => Math.max(z - 10, 50))}>
-              <ZoomOut className="h-4 w-4" />
+            <Button variant="outline" onClick={handleRedo} disabled={historyIndex >= history.length - 1}>
+              <Redo className="h-4 w-4" />
             </Button>
-            <span className="text-sm font-medium hidden sm:inline">{zoom}%</span>
-            <Button variant="outline" onClick={() => setZoom((z) => Math.min(z + 10, 200))}>
-              <ZoomIn className="h-4 w-4" />
+            
+            <div className="flex items-center gap-2 px-3 py-1 bg-gray-100 rounded-lg">
+              <Button variant="ghost" size="sm" onClick={handleZoomOut}>
+                <ZoomOut className="h-4 w-4" />
+              </Button>
+              <span className="text-sm font-medium">{zoom}%</span>
+              <Button variant="ghost" size="sm" onClick={handleZoomIn}>
+                <ZoomIn className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <Button variant="outline" onClick={() => setShowGrid(!showGrid)}>
+              <Grid className="h-4 w-4 mr-2" />
+              {showGrid ? 'Ocultar' : 'Mostrar'} Grilla
             </Button>
-
+            
             <Button variant="outline" onClick={previewInvitation}>
               <Eye className="h-4 w-4 mr-2" />
               Vista Previa
             </Button>
-
+            
             <Button onClick={saveEvent} disabled={saving}>
               <Save className="h-4 w-4 mr-2" />
               {saving ? 'Guardando...' : 'Guardar'}
@@ -641,64 +623,51 @@ const VisualEditorComplete = () => {
       </div>
 
       {error && (
-        <Alert className="mx-4 md:mx-6 mt-4">
+        <Alert className="mx-6 mt-4">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
 
-      <div className="flex h-[calc(100vh-72px)] md:h-[calc(100vh-80px)] relative">
-        {/* Panel lateral / Drawer */}
-        <div
-          className={`
-            fixed lg:static z-40 top-0 left-0 h-full bg-white border-r border-gray-200
-            transition-transform duration-300 ease-in-out
-            w-72 md:w-80
-            ${panelOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-          `}
-          aria-hidden={!panelOpen && typeof window !== 'undefined' && window.innerWidth < 1024}
-        >
-          {/* Header del panel (X en móvil) */}
-          <div className="flex items-center justify-between p-3 border-b border-gray-200 lg:hidden">
-            <div className="text-sm font-medium">Opciones</div>
-            <Button variant="ghost" onClick={() => setPanelOpen(false)} aria-label="Cerrar panel">
-              <X className="h-5 w-5" />
-            </Button>
-          </div>
-
+      <div className="flex h-[calc(100vh-80px)]">
+        {/* Panel Lateral */}
+        <div className="w-80 bg-white border-r border-gray-200 overflow-y-auto">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full">
-            {/* Tabs SOLO iconos */}
-            <TabsList className="grid w-full grid-cols-3 p-1 m-4">
-              <TabsTrigger value="colors" aria-label="Colores" title="Colores">
-                <Palette className="h-4 w-4" />
-                <span className="sr-only">Colores</span>
+            <TabsList className="grid w-full grid-cols-4 p-1 m-4">
+              <TabsTrigger value="design" className="text-xs">
+                <Palette className="h-4 w-4 mr-1" />
+                Diseño
               </TabsTrigger>
-              <TabsTrigger value="content" aria-label="Contenido" title="Contenido">
-                <Type className="h-4 w-4" />
-                <span className="sr-only">Contenido</span>
+              <TabsTrigger value="content" className="text-xs">
+                <Type className="h-4 w-4 mr-1" />
+                Contenido
               </TabsTrigger>
-              <TabsTrigger value="layout" aria-label="Templates" title="Templates">
-                <Layout className="h-4 w-4" />
-                <span className="sr-only">Templates</span>
+              <TabsTrigger value="images" className="text-xs">
+                <ImageIcon className="h-4 w-4 mr-1" />
+                Imágenes
+              </TabsTrigger>
+              <TabsTrigger value="layout" className="text-xs">
+                <Layout className="h-4 w-4 mr-1" />
+                Templates
               </TabsTrigger>
             </TabsList>
 
-            {/* 🔸 SOLO COLORES (sin nombres de paletas) */}
-            <TabsContent value="colors" className="p-4 space-y-6 pb-24">
+            {/* Tab de Diseño */}
+            <TabsContent value="design" className="p-4 space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-sm">Paletas</CardTitle>
+                  <CardTitle className="text-sm">Paletas de Colores</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {colorPalettes.map((palette, idx) => (
-                    <div key={idx} className="mb-1">
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {palette.map((color) => (
+                  {colorPalettes.map((palette) => (
+                    <div key={palette.name}>
+                      <Label className="text-xs font-medium">{palette.name}</Label>
+                      <div className="flex gap-2 mt-1">
+                        {palette.colors.map((color) => (
                           <button
                             key={color}
                             className="w-8 h-8 rounded border-2 border-gray-200 hover:border-gray-400"
                             style={{ backgroundColor: color }}
                             onClick={() => handleColorChange('primary', color)}
-                            title={color}
                           />
                         ))}
                       </div>
@@ -709,42 +678,60 @@ const VisualEditorComplete = () => {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-sm">Personalizados</CardTitle>
+                  <CardTitle className="text-sm">Colores Personalizados</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <Label htmlFor="primaryColor" className="text-xs">Color Principal</Label>
                     <div className="flex gap-2 mt-1">
-                      <Input id="primaryColor" type="color" value={event.colors.primary}
+                      <Input
+                        id="primaryColor"
+                        type="color"
+                        value={event.colors.primary}
                         onChange={(e) => handleColorChange('primary', e.target.value)}
-                        className="w-12 h-8 p-0 border-0" />
-                      <Input value={event.colors.primary}
+                        className="w-12 h-8 p-0 border-0"
+                      />
+                      <Input
+                        value={event.colors.primary}
                         onChange={(e) => handleColorChange('primary', e.target.value)}
-                        className="flex-1 text-xs" />
+                        className="flex-1 text-xs"
+                      />
                     </div>
                   </div>
 
                   <div>
                     <Label htmlFor="secondaryColor" className="text-xs">Color Secundario</Label>
                     <div className="flex gap-2 mt-1">
-                      <Input id="secondaryColor" type="color" value={event.colors.secondary}
+                      <Input
+                        id="secondaryColor"
+                        type="color"
+                        value={event.colors.secondary}
                         onChange={(e) => handleColorChange('secondary', e.target.value)}
-                        className="w-12 h-8 p-0 border-0" />
-                      <Input value={event.colors.secondary}
+                        className="w-12 h-8 p-0 border-0"
+                      />
+                      <Input
+                        value={event.colors.secondary}
                         onChange={(e) => handleColorChange('secondary', e.target.value)}
-                        className="flex-1 text-xs" />
+                        className="flex-1 text-xs"
+                      />
                     </div>
                   </div>
 
                   <div>
                     <Label htmlFor="textColor" className="text-xs">Color de Texto</Label>
                     <div className="flex gap-2 mt-1">
-                      <Input id="textColor" type="color" value={event.colors.text}
+                      <Input
+                        id="textColor"
+                        type="color"
+                        value={event.colors.text}
                         onChange={(e) => handleColorChange('text', e.target.value)}
-                        className="w-12 h-8 p-0 border-0" />
-                      <Input value={event.colors.text}
+                        className="w-12 h-8 p-0 border-0"
+                      />
+                      <Input
+                        value={event.colors.text}
                         onChange={(e) => handleColorChange('text', e.target.value)}
-                        className="flex-1 text-xs" />
+                        className="flex-1 text-xs"
+                      />
                     </div>
                   </div>
                 </CardContent>
@@ -769,6 +756,7 @@ const VisualEditorComplete = () => {
                       ))}
                     </select>
                   </div>
+
                   <div>
                     <Label className="text-xs">Fuente Secundaria</Label>
                     <select
@@ -787,141 +775,213 @@ const VisualEditorComplete = () => {
               </Card>
             </TabsContent>
 
-            {/* Contenido */}
-            <TabsContent value="content" className="p-4 space-y-6 pb-24">
+            {/* Tab de Contenido */}
+            <TabsContent value="content" className="p-4 space-y-6">
               <Card>
-                <CardHeader><CardTitle className="text-sm">Pareja</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="text-sm">Información de la Pareja</CardTitle>
+                </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <Label htmlFor="bride" className="text-xs">Novia</Label>
-                    <Input id="bride" value={event.couple.bride}
-                      onChange={(e) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: e.target.value } }))} className="text-xs" />
+                    <Input
+                      id="bride"
+                      value={event.couple.bride}
+                      onChange={(e) => setEvent(prev => ({ 
+                        ...prev, 
+                        couple: { ...prev.couple, bride: e.target.value }
+                      }))}
+                      className="text-xs"
+                    />
                   </div>
+
                   <div>
                     <Label htmlFor="groom" className="text-xs">Novio</Label>
-                    <Input id="groom" value={event.couple.groom}
-                      onChange={(e) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: e.target.value } }))} className="text-xs" />
+                    <Input
+                      id="groom"
+                      value={event.couple.groom}
+                      onChange={(e) => setEvent(prev => ({ 
+                        ...prev, 
+                        couple: { ...prev.couple, groom: e.target.value }
+                      }))}
+                      className="text-xs"
+                    />
                   </div>
+
                   <div>
                     <Label htmlFor="hashtag" className="text-xs">Hashtag</Label>
-                    <Input id="hashtag" value={event.hashtag}
-                      onChange={(e) => setEvent((p) => ({ ...p, hashtag: e.target.value }))} className="text-xs" />
+                    <Input
+                      id="hashtag"
+                      value={event.hashtag}
+                      onChange={(e) => setEvent(prev => ({ ...prev, hashtag: e.target.value }))}
+                      className="text-xs"
+                    />
                   </div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader><CardTitle className="text-sm">Evento</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="text-sm">Detalles del Evento</CardTitle>
+                </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <Label htmlFor="eventDate" className="text-xs">Fecha</Label>
-                    <Input id="eventDate" value={event.date}
-                      onChange={(e) => setEvent((p) => ({ ...p, date: e.target.value }))} className="text-xs" />
+                    <Input
+                      id="eventDate"
+                      value={event.date}
+                      onChange={(e) => setEvent(prev => ({ ...prev, date: e.target.value }))}
+                      className="text-xs"
+                    />
                   </div>
+
                   <div>
-                    <Label htmlFor="ceremonyVenue" className="text-xs">Lugar Ceremonia</Label>
-                    <Input id="ceremonyVenue" value={event.ceremony.venue}
-                      onChange={(e) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, venue: e.target.value } }))} className="text-xs" />
+                    <Label htmlFor="ceremonyVenue" className="text-xs">Lugar de Ceremonia</Label>
+                    <Input
+                      id="ceremonyVenue"
+                      value={event.ceremony.venue}
+                      onChange={(e) => setEvent(prev => ({ 
+                        ...prev, 
+                        ceremony: { ...prev.ceremony, venue: e.target.value }
+                      }))}
+                      className="text-xs"
+                    />
                   </div>
+
                   <div>
-                    <Label htmlFor="ceremonyAddress" className="text-xs">Dirección Ceremonia</Label>
-                    <Input id="ceremonyAddress" value={event.ceremony.address}
-                      onChange={(e) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, address: e.target.value } }))} className="text-xs" />
+                    <Label htmlFor="ceremonyAddress" className="text-xs">Dirección de Ceremonia</Label>
+                    <Input
+                      id="ceremonyAddress"
+                      value={event.ceremony.address}
+                      onChange={(e) => setEvent(prev => ({ 
+                        ...prev, 
+                        ceremony: { ...prev.ceremony, address: e.target.value }
+                      }))}
+                      className="text-xs"
+                    />
                   </div>
+
                   <div>
-                    <Label htmlFor="receptionVenue" className="text-xs">Lugar Recepción</Label>
-                    <Input id="receptionVenue" value={event.reception.venue}
-                      onChange={(e) => setEvent((p) => ({ ...p, reception: { ...p.reception, venue: e.target.value } }))} className="text-xs" />
+                    <Label htmlFor="receptionVenue" className="text-xs">Lugar de Recepción</Label>
+                    <Input
+                      id="receptionVenue"
+                      value={event.reception.venue}
+                      onChange={(e) => setEvent(prev => ({ 
+                        ...prev, 
+                        reception: { ...prev.reception, venue: e.target.value }
+                      }))}
+                      className="text-xs"
+                    />
                   </div>
+
                   <div>
-                    <Label htmlFor="receptionAddress" className="text-xs">Dirección Recepción</Label>
-                    <Input id="receptionAddress" value={event.reception.address}
-                      onChange={(e) => setEvent((p) => ({ ...p, reception: { ...p.reception, address: e.target.value } }))} className="text-xs" />
+                    <Label htmlFor="receptionAddress" className="text-xs">Dirección de Recepción</Label>
+                    <Input
+                      id="receptionAddress"
+                      value={event.reception.address}
+                      onChange={(e) => setEvent(prev => ({ 
+                        ...prev, 
+                        reception: { ...prev.reception, address: e.target.value }
+                      }))}
+                      className="text-xs"
+                    />
                   </div>
                 </CardContent>
               </Card>
             </TabsContent>
 
-            {/* Templates */}
-            <TabsContent value="layout" className="p-4 space-y-6 pb-24">
+            {/* Tab de Imágenes */}
+            <TabsContent value="images" className="p-4 space-y-6">
               <Card>
-                <CardHeader><CardTitle className="text-sm">Templates</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="text-sm">Subir Imagen</CardTitle>
+                </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    {templates.map((t) => (
-                      <div
-                        key={t.id}
-                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${
-                          selectedTemplate === t.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                        onClick={() => handleTemplateChange(t.id)}
-                      >
-                        <div className="font-medium text-sm">{t.name}</div>
-                        <div className="text-xs text-gray-500 mt-1">{t.description}</div>
-                      </div>
-                    ))}
-                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Seleccionar Imagen
+                  </Button>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader><CardTitle className="text-sm">Imagen</CardTitle></CardHeader>
+                <CardHeader>
+                  <CardTitle className="text-sm">Galería</CardTitle>
+                </CardHeader>
                 <CardContent>
-                  <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                  <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="w-full">
-                    <Upload className="h-4 w-4 mr-2" />
-                    Subir Imagen
-                  </Button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="aspect-square bg-gray-100 rounded border-2 border-dashed border-gray-300 flex items-center justify-center">
+                      <ImageIcon className="h-8 w-8 text-gray-400" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Tab de Templates */}
+            <TabsContent value="layout" className="p-4 space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-sm">Templates</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {templates.map((template) => (
+                      <div
+                        key={template.id}
+                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                          selectedTemplate === template.id 
+                            ? 'border-blue-500 bg-blue-50' 
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                        onClick={() => handleTemplateChange(template.id)}
+                      >
+                        <div className="font-medium text-sm">{template.name}</div>
+                        <div className="text-xs text-gray-500 mt-1">{template.description}</div>
+                      </div>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
         </div>
 
-        {/* Overlay para cerrar Drawer en móvil */}
-        {panelOpen && (
-          <div className="fixed inset-0 bg-black/30 lg:hidden z-30" onClick={() => setPanelOpen(false)} />
-        )}
-
-        {/* Canvas */}
-        <div className="flex-1 overflow-auto bg-gray-100 relative">
-          {/* Zoom móvil */}
-          <div className="sm:hidden fixed bottom-4 right-4 z-20 flex gap-2">
-            <Button size="icon" variant="secondary" onClick={handleZoomOut} aria-label="Alejar">
-              <ZoomOut className="h-4 w-4" />
-            </Button>
-            <Button size="icon" variant="secondary" onClick={handleZoomIn} aria-label="Acercar">
-              <ZoomIn className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <div className="min-h-full p-2 md:p-4" style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top center' }}>
+        {/* Canvas Principal */}
+        <div className="flex-1 overflow-auto bg-gray-100">
+          <div 
+            className="min-h-full"
+            style={{ 
+              transform: `scale(${zoom / 100})`,
+              transformOrigin: 'top center'
+            }}
+          >
+            {showGrid && (
+              <div 
+                className="absolute inset-0 opacity-20 pointer-events-none z-10"
+                style={{
+                  backgroundImage: 'linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)',
+                  backgroundSize: '20px 20px'
+                }}
+              />
+            )}
+            
+            {/* Renderizar la invitación completa */}
             {renderInvitation()}
           </div>
         </div>
       </div>
-
-      {/* Modal RSVP */}
-      {showRSVP && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setShowRSVP(false)} />
-          <div className="relative bg-white rounded-2xl shadow-xl w-[92%] max-w-md p-6">
-            <button className="absolute top-3 right-3" onClick={() => setShowRSVP(false)} aria-label="Cerrar">
-              <X className="w-5 h-5" />
-            </button>
-            <h3 className="text-lg font-semibold mb-2">Confirmar asistencia</h3>
-            <p className="text-sm text-gray-600 mb-4">Déjanos tu nombre y cuántas personas asistirán.</p>
-            <div className="space-y-3">
-              <Input placeholder="Nombre y Apellido" />
-              <Input type="number" min={1} max={10} placeholder="Cantidad" />
-            </div>
-            <div className="mt-5 flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowRSVP(false)}>Cancelar</Button>
-              <Button onClick={() => { alert('¡Gracias por confirmar!'); setShowRSVP(false); }}>Confirmar</Button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
