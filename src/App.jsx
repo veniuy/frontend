@@ -18,7 +18,8 @@ import EventWizard from './pages/EventWizard';
 import EventBuilder from './pages/EventBuilder';
 import EventPreview from './pages/EventPreview';
 import PublicEvent from './pages/PublicEvent';
-import VisualEditor from './pages/VisualEditorComplete';
+// CAMBIADO: Usar el componente optimizado para móviles
+import VisualEditorOptimized from './pages/VisualEditorOptimized';
 import GuestManager from './pages/GuestManager';
 import PaymentTransfer from './pages/PaymentTransfer';
 import PaymentCode from './pages/PaymentCode';
@@ -34,8 +35,10 @@ import Accommodations from './pages/Accommodations';
 import ShareableLink from './pages/ShareableLink';
 import GuestSurveys from './pages/GuestSurveys';
 import Tracking from './pages/Tracking';
-import { useDeviceDetection } from './useMobileOptimizations';
-import VirtualKeyboardHandler from './VirtualKeyboardHandler';
+
+// CORREGIDO: Rutas correctas para los hooks y componentes móviles
+import { useDeviceDetection } from './hooks/useMobileOptimizations';
+import VirtualKeyboardHandler from './components/VirtualKeyboardHandler';
 
 // Category pages
 import Boda from './pages/categories/Boda';
@@ -54,7 +57,6 @@ import AdminDashboard from './pages/AdminDashboard.jsx';
 function App() {
   const deviceInfo = useDeviceDetection();
   const { user, loading } = useAuth();
-  
 
   if (loading) {
     return (
@@ -67,7 +69,8 @@ function App() {
     );
   }
 
-  return (
+  // AGREGADO: Wrapper para optimizaciones móviles
+  const AppContent = () => (
     <Routes>
       {/* Public routes */}
       <Route path="/" element={<Landing />} />
@@ -107,7 +110,8 @@ function App() {
         <Route path="events/create" element={<CreateEvent />} />
         <Route path="events/wizard" element={<EventWizard />} />
         <Route path="events/:id/builder" element={<EventBuilder />} />
-        <Route path="events/:id/editor" element={<VisualEditor />} />
+        {/* CAMBIADO: Usar el editor optimizado */}
+        <Route path="events/:id/editor" element={<VisualEditorOptimized />} />
         <Route path="events/:id/preview" element={<EventPreview />} />
         <Route path="events/:id/guests" element={<GuestManager />} />
         
@@ -121,7 +125,8 @@ function App() {
         <Route path="guest-surveys" element={<GuestSurveys />} />
         
         {/* Customization tools */}
-        <Route path="visual-editor" element={<VisualEditor />} />
+        {/* CAMBIADO: Usar el editor optimizado */}
+        <Route path="visual-editor" element={<VisualEditorOptimized />} />
         <Route path="color-palette" element={<div className="p-8"><h1 className="text-2xl font-bold">Paletas de Colores - Próximamente</h1></div>} />
         <Route path="typography" element={<div className="p-8"><h1 className="text-2xl font-bold">Tipografías - Próximamente</h1></div>} />
         <Route path="gallery" element={<div className="p-8"><h1 className="text-2xl font-bold">Galería de Imágenes - Próximamente</h1></div>} />
@@ -160,6 +165,15 @@ function App() {
       {/* fallback */}
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
+  );
+
+  // AGREGADO: Condicional para usar VirtualKeyboardHandler solo en móviles
+  return deviceInfo.isMobile ? (
+    <VirtualKeyboardHandler>
+      <AppContent />
+    </VirtualKeyboardHandler>
+  ) : (
+    <AppContent />
   );
 }
 
