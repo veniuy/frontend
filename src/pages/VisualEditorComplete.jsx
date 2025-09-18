@@ -1,4 +1,4 @@
-// src/pages/VisualEditorComplete.jsx - VERSIÓN CORREGIDA
+https://www.createdbymagic.com/// src/pages/VisualEditorComplete.jsx - VERSIÓN FINAL CORREGIDA
 import React, { useState, useEffect, useRef, useCallback, useMemo, useReducer } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
@@ -211,7 +211,10 @@ const eventReducer = (state, action) => {
   }
 };
 
-/** Componente de texto editable CORREGIDO - Solucionado problema de texto al revés */
+/** 
+ * NUEVA SOLUCIÓN PARA TEXTO AL REVÉS:
+ * Componente híbrido que usa input regular cuando detecta problemas
+ */
 const EditableTextOptimized = React.memo(({
   value,
   onChange,
@@ -224,11 +227,35 @@ const EditableTextOptimized = React.memo(({
 }) => {
   const Tag = as;
   const ref = useRef(null);
+  const inputRef = useRef(null);
   const [editing, setEditing] = useState(false);
   const [localValue, setLocalValue] = useState(value);
+  const [useInputFallback, setUseInputFallback] = useState(false);
   const deviceInfo = useDeviceDetection();
   
   const debouncedValue = useDebounce(localValue, debounceMs);
+
+  // Detectar si hay problemas de dirección RTL
+  useEffect(() => {
+    const detectRTLIssue = () => {
+      const testElement = document.createElement('div');
+      testElement.contentEditable = true;
+      testElement.textContent = 'test';
+      testElement.style.position = 'absolute';
+      testElement.style.visibility = 'hidden';
+      document.body.appendChild(testElement);
+      
+      const computedStyle = window.getComputedStyle(testElement);
+      const hasRTLIssue = computedStyle.direction === 'rtl' || 
+                         computedStyle.textAlign === 'right' ||
+                         computedStyle.unicodeBidi === 'bidi-override';
+      
+      document.body.removeChild(testElement);
+      setUseInputFallback(hasRTLIssue || deviceInfo.isMobile);
+    };
+
+    detectRTLIssue();
+  }, [deviceInfo.isMobile]);
 
   // Efecto para sincronizar el valor debounced con el prop onChange
   useEffect(() => {
@@ -248,47 +275,20 @@ const EditableTextOptimized = React.memo(({
     
     setEditing(true);
     
-    // Optimización para móviles - delay para mejor UX
-    const delay = deviceInfo.isMobile ? 100 : 50;
-    
     setTimeout(() => {
-      if (!ref.current) return;
-      
-      ref.current.focus();
-      
-      // Selección mejorada para móviles
-      if (deviceInfo.isMobile) {
-        // En móviles, crear un rango de selección más suave
-        const range = document.createRange();
-        range.selectNodeContents(ref.current);
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-        
-        // Scroll optimizado para móviles
-        ref.current.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center',
-          inline: 'center'
-        });
-        
-        // Prevenir zoom en iOS
-        if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-          ref.current.setAttribute('readonly', 'readonly');
-          setTimeout(() => {
-            ref.current.removeAttribute('readonly');
-          }, 100);
-        }
-      } else {
-        // Desktop - selección estándar
+      if (useInputFallback && inputRef.current) {
+        inputRef.current.focus();
+        inputRef.current.select();
+      } else if (ref.current) {
+        ref.current.focus();
         const range = document.createRange();
         range.selectNodeContents(ref.current);
         const selection = window.getSelection();
         selection.removeAllRanges();
         selection.addRange(range);
       }
-    }, delay);
-  }, [deviceInfo.isMobile]);
+    }, 50);
+  }, [useInputFallback]);
 
   const endEdit = useCallback(() => {
     setEditing(false);
@@ -302,73 +302,71 @@ const EditableTextOptimized = React.memo(({
     setLocalValue(text);
   }, []);
 
+  const handleInputChange = useCallback((e) => {
+    setLocalValue(e.target.value);
+  }, []);
+
   const handleKeyDown = useCallback((e) => {
     if (singleLine && e.key === 'Enter') {
       e.preventDefault();
-      ref.current?.blur();
+      if (useInputFallback) {
+        inputRef.current?.blur();
+      } else {
+        ref.current?.blur();
+      }
     }
     if (e.key === 'Escape') {
       e.preventDefault();
-      setLocalValue(value); // Revertir cambios
-      ref.current?.blur();
+      setLocalValue(value);
+      if (useInputFallback) {
+        inputRef.current?.blur();
+      } else {
+        ref.current?.blur();
+      }
     }
-  }, [singleLine, value]);
+  }, [singleLine, value, useInputFallback]);
 
-  const handlePaste = useCallback((e) => {
-    e.preventDefault();
-    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
-    
-    // Insertar texto plano optimizado
-    const selection = window.getSelection();
-    if (selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      range.deleteContents();
-      const textNode = document.createTextNode(text);
-      range.insertNode(textNode);
-      range.setStartAfter(textNode);
-      range.collapse(true);
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }
-    
-    // Actualizar estado local
-    setTimeout(() => {
-      const newText = ref.current?.textContent || '';
-      setLocalValue(newText);
-    }, 0);
-  }, []);
-
-  // CORRECCIÓN: Estilos forzados para evitar texto al revés
-  const dynamicStyles = useMemo(() => ({
-    // SOLUCIÓN AL PROBLEMA DE TEXTO AL REVÉS: Forzar LTR explícitamente
-    direction: 'ltr !important',
-    textAlign: 'left', // Cambiar de 'inherit' a 'left' para evitar herencia RTL
-    unicodeBidi: 'embed', // Asegurar dirección de texto
-    writingMode: 'horizontal-tb', // Modo de escritura horizontal
+  // Estilos base siempre LTR
+  const baseStyles = useMemo(() => ({
+    direction: 'ltr',
+    textAlign: 'left',
+    unicodeBidi: 'normal',
+    writingMode: 'horizontal-tb',
     whiteSpace: singleLine ? 'nowrap' : 'pre-wrap',
-    minWidth: editing ? (deviceInfo.isMobile ? '80px' : '100px') : 'auto',
+    minWidth: editing ? '80px' : 'auto',
     minHeight: editing ? '1.2em' : 'auto',
-    touchAction: deviceInfo.isMobile ? 'manipulation' : 'auto',
-    userSelect: editing ? 'text' : 'none',
-    WebkitUserSelect: editing ? 'text' : 'none',
-    WebkitTouchCallout: 'none',
-    WebkitTapHighlightColor: 'transparent',
-    // Prevenir reversión de texto en navegadores específicos
-    WebkitWritingMode: 'horizontal-tb',
-    msWritingMode: 'lr-tb',
     ...style
-  }), [editing, deviceInfo.isMobile, singleLine, style]);
+  }), [editing, singleLine, style]);
 
   const dynamicClasses = useMemo(() => {
-    const baseClasses = `${className} outline-none transition-all duration-200 select-none`;
+    const baseClasses = `${className} outline-none transition-all duration-200`;
     const editingClasses = editing 
       ? 'ring-2 ring-blue-400 bg-blue-50 rounded-sm px-1' 
       : 'hover:bg-gray-100 hover:bg-opacity-50 cursor-pointer';
-    const touchClasses = deviceInfo.isMobile ? 'touch-manipulation' : '';
     
-    return `${baseClasses} ${editingClasses} ${touchClasses}`;
-  }, [className, editing, deviceInfo.isMobile]);
+    return `${baseClasses} ${editingClasses}`;
+  }, [className, editing]);
 
+  // Renderizar input regular como fallback
+  if (useInputFallback && editing) {
+    return (
+      <input
+        ref={inputRef}
+        type="text"
+        value={localValue}
+        onChange={handleInputChange}
+        onBlur={endEdit}
+        onKeyDown={handleKeyDown}
+        className={`${dynamicClasses} border-none bg-transparent p-0 m-0`}
+        style={baseStyles}
+        dir="ltr"
+        autoComplete="off"
+        spellCheck={false}
+      />
+    );
+  }
+
+  // Renderizar contentEditable normal
   return (
     <Tag
       ref={ref}
@@ -380,11 +378,9 @@ const EditableTextOptimized = React.memo(({
       onBlur={endEdit}
       onInput={handleInput}
       onKeyDown={handleKeyDown}
-      onPaste={handlePaste}
       spellCheck={false}
       className={dynamicClasses}
-      style={dynamicStyles}
-      // ATRIBUTOS ADICIONALES PARA FORZAR LTR
+      style={baseStyles}
       dir="ltr"
       lang="es"
     >
@@ -443,28 +439,12 @@ const VisualEditorComplete = () => {
     zoom: deviceInfo.isMobile ? 80 : 100,
     selectedTemplate: 'elegant',
     showMobilePanel: false,
-    viewMode: deviceInfo.isMobile ? 'mobile' : 'desktop',
-    // CORRECCIÓN: Estado para controlar edición
-    isCanvasEditing: false
+    viewMode: deviceInfo.isMobile ? 'mobile' : 'desktop'
   });
 
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
   const touchGesture = useTouchGestures(canvasRef);
-
-  // CORRECCIÓN: Hook para prevenir conflictos de edición
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (canvasRef.current && !canvasRef.current.contains(event.target)) {
-        setUiState(prev => ({ ...prev, isCanvasEditing: false }));
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   // Manejo de gestos táctiles
   useEffect(() => {
@@ -559,10 +539,9 @@ const VisualEditorComplete = () => {
     setUiState(prev => ({ ...prev, activeTab: tab }));
   }, []);
 
-  // CORRECCIÓN: Manejadores mejorados para los inputs del panel lateral
-  const handleInputChange = useCallback((type, field, value, subField = null) => {
-    // Prevenir conflictos durante edición en canvas
-    if (uiState.isCanvasEditing) return;
+  // CORREGIDO: Manejadores simplificados para los inputs
+  const handleInputChange = useCallback((type, field, value) => {
+    console.log(`Actualizando ${type}.${field}:`, value); // Debug
     
     switch (type) {
       case 'couple':
@@ -578,7 +557,7 @@ const VisualEditorComplete = () => {
         dispatch({ type: 'UPDATE_FIELD', field, value });
         break;
     }
-  }, [uiState.isCanvasEditing]);
+  }, []);
 
   // Datos estáticos optimizados con useMemo
   const colorPalettes = useMemo(() => [
@@ -597,202 +576,118 @@ const VisualEditorComplete = () => {
   const templates = useMemo(() => [
     { id: 'elegant', name: 'Elegante', description: 'Diseño sofisticado y minimalista' },
     { id: 'romantic', name: 'Romántico', description: 'Colores suaves y florales' },
-    { id: 'modern', name: 'Moderno', description: 'Diseño contemporáneo y vibrante' },
-    { id: 'classic', name: 'Clásico', description: 'Estilo tradicional y atemporal' }
+    { id: 'modern', name: 'Moderno', description: 'Líneas limpias y contemporáneo' },
+    { id: 'classic', name: 'Clásico', description: 'Tradicional y elegante' }
   ], []);
 
-  // Componente TimeCell optimizado
+  // Componente optimizado para mostrar tiempo
   const TimeCell = React.memo(({ value, label }) => (
-    <div className="flex flex-col items-center">
-      <div 
-        className={`font-light leading-none ${
-          deviceInfo.isMobile ? 'text-2xl' : 'text-4xl md:text-6xl'
-        }`}
-        style={{ color: event.colors.primary }}
-      >
-        {String(value).padStart(2, '0')}
+    <div className="text-center">
+      <div className={`font-bold text-white ${
+        deviceInfo.isMobile ? 'text-2xl' : 'text-4xl md:text-6xl'
+      }`}>
+        {value.toString().padStart(2, '0')}
       </div>
-      <div 
-        className={`opacity-90 ${
-          deviceInfo.isMobile ? 'text-xs' : 'text-sm sm:text-base'
-        }`}
-        style={{ color: event.colors.text }}
-      >
+      <div className={`text-white/80 ${
+        deviceInfo.isMobile ? 'text-xs' : 'text-sm'
+      }`}>
         {label}
       </div>
     </div>
   ));
 
-  TimeCell.displayName = 'TimeCell';
+  const currentStyle = useMemo(() => ({
+    primaryColor: event.colors.primary,
+    secondaryColor: event.colors.secondary,
+    textColor: event.colors.text,
+    backgroundColor: event.colors.background,
+    primaryFont: event.fonts.primary,
+    secondaryFont: event.fonts.secondary
+  }), [event.colors, event.fonts]);
 
-  // Renderizado de la invitación optimizado
+  // Renderizado principal de la invitación
   const renderInvitation = useCallback(() => {
-    const styles = {
-      elegant: {
-        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-        primaryColor: event.colors.primary,
-        secondaryColor: event.colors.secondary,
-        textColor: event.colors.text,
-        fontFamily: event.fonts.primary
-      },
-      romantic: {
-        background: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
-        primaryColor: '#e91e63',
-        secondaryColor: '#ffc0cb',
-        textColor: '#333',
-        fontFamily: 'Playfair Display'
-      },
-      modern: {
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        primaryColor: '#3498db',
-        secondaryColor: '#2ecc71',
-        textColor: '#fff',
-        fontFamily: 'Inter'
-      },
-      classic: {
-        background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-        primaryColor: '#8e44ad',
-        secondaryColor: '#e74c3c',
-        textColor: '#333',
-        fontFamily: 'Georgia'
-      }
-    };
+    const scaleClass = `transform scale-${Math.floor(uiState.zoom / 10)}`;
     
-    const currentStyle = styles[uiState.selectedTemplate] || styles.elegant;
-
-    // Calcular dimensiones según el modo de vista
-    const getCanvasStyle = () => {
-      const baseWidth = uiState.viewMode === 'mobile' ? 375 : 
-                       uiState.viewMode === 'tablet' ? 768 : 1200;
-      const scaledWidth = (baseWidth * uiState.zoom) / 100;
-      
-      return {
-        width: `${scaledWidth}px`,
-        minHeight: uiState.viewMode === 'mobile' ? 'auto' : '100vh',
-        transform: `scale(${uiState.zoom / 100})`,
-        transformOrigin: 'top left',
-        margin: deviceInfo.isMobile ? '0' : '0 auto',
-        // Optimizaciones para rendimiento
-        willChange: 'transform',
-        backfaceVisibility: 'hidden',
-        perspective: '1000px',
-        // CORRECCIÓN: Asegurar dirección LTR en todo el canvas
-        direction: 'ltr',
-        unicodeBidi: 'embed'
-      };
-    };
-
     return (
-      <div
+      <div 
         ref={canvasRef}
-        className="invitation-canvas"
-        style={{
-          ...getCanvasStyle(),
-          background: currentStyle.background,
-          fontFamily: currentStyle.fontFamily,
-          color: currentStyle.textColor,
-          overflow: 'hidden'
+        className={`invitation-canvas ${scaleClass} origin-top-left transition-transform duration-200`}
+        style={{ 
+          width: uiState.viewMode === 'mobile' ? '375px' : '800px',
+          fontFamily: currentStyle.secondaryFont
         }}
-        onClick={() => setUiState(prev => ({ ...prev, isCanvasEditing: true }))}
       >
-        {/* Hero Section */}
-        <section className={`min-h-screen flex items-center justify-center relative ${
-          deviceInfo.isMobile ? 'px-4 py-8' : 'px-8'
-        }`}>
-          <div
-            className={`absolute ${
-              deviceInfo.isMobile ? 'top-4 left-4 w-12 h-12' : 'top-10 left-10 w-20 h-20'
-            } rounded-full opacity-20`}
-            style={{ backgroundColor: currentStyle.primaryColor }}
-          />
-          <div
-            className={`absolute ${
-              deviceInfo.isMobile ? 'bottom-4 right-4 w-16 h-16' : 'bottom-10 right-10 w-32 h-32'
-            } rounded-full opacity-10`}
-            style={{ backgroundColor: currentStyle.secondaryColor }}
-          />
-
-          <div className="text-center max-w-4xl mx-auto relative z-10">
-            <h1
-              className={`font-light mb-4 tracking-wider uppercase ${
-                deviceInfo.isMobile ? 'text-4xl' : 'text-6xl md:text-8xl'
-              }`}
-              style={{ color: currentStyle.primaryColor }}
-            >
-              <EditableTextOptimized
-                value={event.couple.bride}
-                onChange={(val) => dispatch({ type: 'UPDATE_COUPLE', field: 'bride', value: val })}
-                as="span"
-                ariaLabel="Nombre de la novia"
-              />
-            </h1>
-
-            <div className="flex items-center justify-center my-8">
-              <div className="h-px w-16 bg-gray-400" />
+        {/* Header */}
+        <section className={`text-center ${deviceInfo.isMobile ? 'py-8' : 'py-16'}`} 
+                 style={{ backgroundColor: currentStyle.backgroundColor }}>
+          <div className={`max-w-4xl mx-auto ${deviceInfo.isMobile ? 'px-4' : 'px-8'}`}>
+            <div className="mb-8">
               <Heart 
-                className={`mx-4 ${deviceInfo.isMobile ? 'w-6 h-6' : 'w-8 h-8'}`}
-                style={{ color: currentStyle.secondaryColor }} 
-                fill="currentColor" 
-              />
-              <div className="h-px w-16 bg-gray-400" />
-            </div>
-
-            <h1
-              className={`font-light mb-8 tracking-wider uppercase ${
-                deviceInfo.isMobile ? 'text-4xl' : 'text-6xl md:text-8xl'
-              }`}
-              style={{ color: currentStyle.primaryColor }}
-            >
-              <EditableTextOptimized
-                value={event.couple.groom}
-                onChange={(val) => dispatch({ type: 'UPDATE_COUPLE', field: 'groom', value: val })}
-                as="span"
-                ariaLabel="Nombre del novio"
-              />
-            </h1>
-
-            <p 
-              className={`font-light mb-12 tracking-wide ${
-                deviceInfo.isMobile ? 'text-lg' : 'text-xl md:text-2xl'
-              }`}
-              style={{ color: currentStyle.textColor }}
-            >
-              <EditableTextOptimized
-                value={event.description}
-                onChange={(val) => dispatch({ type: 'UPDATE_FIELD', field: 'description', value: val })}
-                as="span"
-                ariaLabel="Descripción principal"
-              />
-            </p>
-
-            <div className="animate-bounce">
-              <ChevronDown 
-                className={`mx-auto ${deviceInfo.isMobile ? 'w-6 h-6' : 'w-8 h-8'}`}
+                className={`mx-auto mb-4 ${deviceInfo.isMobile ? 'w-8 h-8' : 'w-12 h-12'}`}
                 style={{ color: currentStyle.primaryColor }} 
               />
+              <h1 
+                className={`font-light tracking-wide ${
+                  deviceInfo.isMobile ? 'text-3xl' : 'text-5xl md:text-7xl'
+                }`}
+                style={{ 
+                  color: currentStyle.primaryColor,
+                  fontFamily: currentStyle.primaryFont 
+                }}
+              >
+                <EditableTextOptimized
+                  value={event.couple.bride}
+                  onChange={(val) => dispatch({ type: 'UPDATE_COUPLE', field: 'bride', value: val })}
+                  ariaLabel="Nombre de la novia"
+                />
+                <span className={`block font-light ${
+                  deviceInfo.isMobile ? 'text-2xl my-2' : 'text-4xl md:text-6xl my-4'
+                }`}>
+                  &
+                </span>
+                <EditableTextOptimized
+                  value={event.couple.groom}
+                  onChange={(val) => dispatch({ type: 'UPDATE_COUPLE', field: 'groom', value: val })}
+                  ariaLabel="Nombre del novio"
+                />
+              </h1>
+            </div>
+            
+            <div className="mb-8">
+              <p 
+                className={`font-medium tracking-wider ${
+                  deviceInfo.isMobile ? 'text-base' : 'text-xl'
+                }`}
+                style={{ color: currentStyle.textColor }}
+              >
+                <EditableTextOptimized
+                  value={event.description}
+                  onChange={(val) => dispatch({ type: 'UPDATE_FIELD', field: 'description', value: val })}
+                  ariaLabel="Descripción del evento"
+                />
+              </p>
             </div>
           </div>
         </section>
 
-        {/* Countdown Section */}
-        <section className={`${deviceInfo.isMobile ? 'py-8' : 'py-16'}`} 
+        {/* Countdown */}
+        <section className={`text-center ${deviceInfo.isMobile ? 'py-8' : 'py-16'}`} 
                  style={{ backgroundColor: currentStyle.primaryColor }}>
-          <div className={`max-w-4xl mx-auto text-center ${
-            deviceInfo.isMobile ? 'px-4' : 'px-8'
-          }`}>
-            <h2 className={`font-light mb-8 tracking-wide text-white ${
+          <div className={`max-w-4xl mx-auto ${deviceInfo.isMobile ? 'px-4' : 'px-8'}`}>
+            <h2 className={`font-light mb-8 text-white ${
               deviceInfo.isMobile ? 'text-xl' : 'text-2xl md:text-3xl'
             }`}>
-              Faltan para nuestro gran día
+              Faltan
             </h2>
-            <div className={`flex items-center justify-center ${
-              deviceInfo.isMobile ? 'gap-4' : 'gap-8'
+            <div className={`flex justify-center items-center space-x-2 ${
+              deviceInfo.isMobile ? 'text-2xl' : 'text-6xl'
             }`}>
               <TimeCell value={timeLeft.days} label="días" />
               <div className={`font-light text-white ${
                 deviceInfo.isMobile ? 'text-2xl' : 'text-4xl md:text-6xl'
               }`}>:</div>
-              <TimeCell value={timeLeft.hours} label="horas" />
+              <TimeCell value={timeLeft.hours} label="hrs" />
               <div className={`font-light text-white ${
                 deviceInfo.isMobile ? 'text-2xl' : 'text-4xl md:text-6xl'
               }`}>:</div>
@@ -1050,7 +945,7 @@ const VisualEditorComplete = () => {
         </footer>
       </div>
     );
-  }, [event, uiState, deviceInfo, timeLeft, dispatch]);
+  }, [event, uiState, deviceInfo, timeLeft, dispatch, currentStyle]);
 
   if (uiState.loading) {
     return (
@@ -1160,7 +1055,7 @@ const VisualEditorComplete = () => {
       )}
 
       <div className="flex h-[calc(100vh-80px)]">
-        {/* Panel lateral - Responsive */}
+        {/* Panel lateral - CORREGIDO con botón X en móviles */}
         <div className={`
           ${deviceInfo.isMobile 
             ? `fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-gray-200 transform transition-transform duration-300 ${
@@ -1179,6 +1074,21 @@ const VisualEditorComplete = () => {
           )}
           
           <div className="relative z-50 bg-white h-full">
+            {/* NUEVO: Header del panel con botón X en móviles */}
+            {deviceInfo.isMobile && (
+              <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                <h2 className="text-lg font-semibold">Panel de Edición</h2>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleMobilePanel}
+                  className="h-8 w-8 p-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+
             <Tabs value={uiState.activeTab} onValueChange={setActiveTab} className="h-full">
               {/* Tabs optimizadas para móviles */}
               <TabsList className="grid w-full grid-cols-4 p-1 m-4">
@@ -1326,7 +1236,7 @@ const VisualEditorComplete = () => {
                   </Card>
                 </TabsContent>
 
-                {/* Tab Contenido - CORREGIDO para funcionar correctamente */}
+                {/* Tab Contenido - CORREGIDO completamente */}
                 <TabsContent value="content" className="space-y-4 mt-0">
                   <Card>
                     <CardHeader className="pb-3">
@@ -1337,11 +1247,17 @@ const VisualEditorComplete = () => {
                         <Label htmlFor="bride" className="text-xs">Novia</Label>
                         <Input
                           id="bride"
+                          type="text"
                           value={event.couple.bride}
-                          onChange={(e) => handleInputChange('couple', 'bride', e.target.value)}
+                          onChange={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleInputChange('couple', 'bride', e.target.value);
+                          }}
                           className="text-xs mt-1"
                           placeholder="Nombre de la novia"
                           autoComplete="off"
+                          dir="ltr"
                         />
                       </div>
 
@@ -1349,11 +1265,17 @@ const VisualEditorComplete = () => {
                         <Label htmlFor="groom" className="text-xs">Novio</Label>
                         <Input
                           id="groom"
+                          type="text"
                           value={event.couple.groom}
-                          onChange={(e) => handleInputChange('couple', 'groom', e.target.value)}
+                          onChange={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleInputChange('couple', 'groom', e.target.value);
+                          }}
                           className="text-xs mt-1"
                           placeholder="Nombre del novio"
                           autoComplete="off"
+                          dir="ltr"
                         />
                       </div>
 
@@ -1361,11 +1283,17 @@ const VisualEditorComplete = () => {
                         <Label htmlFor="hashtag" className="text-xs">Hashtag</Label>
                         <Input
                           id="hashtag"
+                          type="text"
                           value={event.hashtag}
-                          onChange={(e) => handleInputChange('field', 'hashtag', e.target.value)}
+                          onChange={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleInputChange('field', 'hashtag', e.target.value);
+                          }}
                           className="text-xs mt-1"
                           placeholder="#HashtagDelEvento"
                           autoComplete="off"
+                          dir="ltr"
                         />
                       </div>
                     </CardContent>
@@ -1380,11 +1308,17 @@ const VisualEditorComplete = () => {
                         <Label htmlFor="eventDate" className="text-xs">Fecha</Label>
                         <Input
                           id="eventDate"
+                          type="text"
                           value={event.date}
-                          onChange={(e) => handleInputChange('field', 'date', e.target.value)}
+                          onChange={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleInputChange('field', 'date', e.target.value);
+                          }}
                           className="text-xs mt-1"
                           placeholder="15 de Marzo, 2024"
                           autoComplete="off"
+                          dir="ltr"
                         />
                       </div>
 
@@ -1392,11 +1326,17 @@ const VisualEditorComplete = () => {
                         <Label htmlFor="ceremonyVenue" className="text-xs">Lugar de Ceremonia</Label>
                         <Input
                           id="ceremonyVenue"
+                          type="text"
                           value={event.ceremony.venue}
-                          onChange={(e) => handleInputChange('ceremony', 'venue', e.target.value)}
+                          onChange={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleInputChange('ceremony', 'venue', e.target.value);
+                          }}
                           className="text-xs mt-1"
                           placeholder="Iglesia San Miguel"
                           autoComplete="off"
+                          dir="ltr"
                         />
                       </div>
 
@@ -1405,9 +1345,14 @@ const VisualEditorComplete = () => {
                         <Textarea
                           id="ceremonyAddress"
                           value={event.ceremony.address}
-                          onChange={(e) => handleInputChange('ceremony', 'address', e.target.value)}
+                          onChange={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleInputChange('ceremony', 'address', e.target.value);
+                          }}
                           className="text-xs mt-1 min-h-[60px]"
                           placeholder="Calle Mayor 123, Madrid"
+                          dir="ltr"
                         />
                       </div>
 
@@ -1415,11 +1360,17 @@ const VisualEditorComplete = () => {
                         <Label htmlFor="receptionVenue" className="text-xs">Lugar de Recepción</Label>
                         <Input
                           id="receptionVenue"
+                          type="text"
                           value={event.reception.venue}
-                          onChange={(e) => handleInputChange('reception', 'venue', e.target.value)}
+                          onChange={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleInputChange('reception', 'venue', e.target.value);
+                          }}
                           className="text-xs mt-1"
                           placeholder="Jardín Botánico"
                           autoComplete="off"
+                          dir="ltr"
                         />
                       </div>
 
@@ -1428,9 +1379,14 @@ const VisualEditorComplete = () => {
                         <Textarea
                           id="receptionAddress"
                           value={event.reception.address}
-                          onChange={(e) => handleInputChange('reception', 'address', e.target.value)}
+                          onChange={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleInputChange('reception', 'address', e.target.value);
+                          }}
                           className="text-xs mt-1 min-h-[60px]"
                           placeholder="Av. Libertador 456, Madrid"
+                          dir="ltr"
                         />
                       </div>
                     </CardContent>
