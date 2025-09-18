@@ -34,6 +34,8 @@ import Accommodations from './pages/Accommodations';
 import ShareableLink from './pages/ShareableLink';
 import GuestSurveys from './pages/GuestSurveys';
 import Tracking from './pages/Tracking';
+import { useDeviceDetection } from './useMobileOptimizations';
+import VirtualKeyboardHandler from './VirtualKeyboardHandler';
 
 // Category pages
 import Boda from './pages/categories/Boda';
@@ -43,13 +45,16 @@ import Bautizo from './pages/categories/Bautizo';
 import Corporativos from './pages/categories/Corporativos';
 import Graduaciones from './pages/categories/Graduaciones';
 import './utils/assets';
+import './mobile-optimizations.css';
 
 // Admin
 import RequireAdmin from './components/RequireAdmin.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
 
 function App() {
+  const deviceInfo = useDeviceDetection();
   const { user, loading } = useAuth();
+  
 
   if (loading) {
     return (
