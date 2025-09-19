@@ -1,7 +1,7 @@
 // src/components/InvitationCanvas.jsx
 import React, { useEffect, useState } from "react";
 import { Heart, ChevronDown, Church, PartyPopper, MapPin, Users, Instagram, Facebook, Share2 } from "lucide-react";
-import EditableText from "./EditableText";
+import EditableText from "./EditableText.jsx";
 
 export default function InvitationCanvas({ event, ui, setEvent }) {
   const [timeLeft, setTimeLeft] = useState({ days:0, hours:0, minutes:0, seconds:0 });
