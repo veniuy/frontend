@@ -1,596 +1,1008 @@
 // src/components/InvitationCanvas.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import EditableText from "./EditableText.jsx";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Heart,
+  ChevronDown,
+  Church,
+  PartyPopper,
+  Gift,
+  Instagram,
+  Share2,
+  Download,
+  CreditCard,
+  Music,
+  X,
+  CheckCircle,
+} from "lucide-react";
+// mismo helper que usan las demos
+import { asset, onImgError } from "../utils/assets"; // ajusta la ruta si tu utils está en otro lugar
 
 /**
- * Landing "DemoBlack" editable
- * - Hero oscuro con nombres/fecha/hora/lugar (editable)
- * - Countdown
- * - Agenda (Ceremonia / Recepción)
- * - Botones y modales: RSVP, Preferencias (comida/alojamiento), Transferencias/Regalos
- * - Respeta event.colors, event.fonts, ui.selectedTemplate
+ * InvitationCanvas (Landing estilo DemoBlack, editable)
+ * - Franjas/secciones iguales a los demos (hero, countdown, detalles, regalos, instagram, dress code, rsvp, música, info útil, footer)
+ * - Textos editables con EditableText (click para editar)
+ * - Colores base tomados de la demo con override desde event.colors
+ * - Modales: RSVP y Datos Bancarios
  *
- * Props esperadas:
- *  event: {
- *    couple:{ bride, groom },
- *    date, time,
- *    location?: string, // ubicación general (ej: "Melo, Uruguay")
- *    ceremony:{ venue, address, time },
- *    reception:{ venue, address, time },
- *    hashtag, template,
- *    colors:{ primary, secondary, background, text, accent },
- *    fonts:{ primary, secondary },
- *    bank?:{ titular, banco, cuenta, alias, cbu, nota },
- *    gifts?: [{ label, url }]
- *  }
- *  ui:{ isMobile, viewMode, zoom, selectedTemplate }
- *  setEvent: fn
+ * Props:
+ *  - event: {
+ *      couple:{ bride, groom },
+ *      date, time, hashtag, location?,
+ *      ceremony:{ time, venue, location, address },
+ *      reception:{ time, venue, location, address },
+ *      info?: { dresscode, parking, kids },
+ *      bank?: { banco, cbu, alias, titular, cuenta, nota },
+ *      gifts?: [{label, url}],
+ *      colors?: { ink, text, muted, sage, sageDark, sageLight, almond, almondDark, almondLight, white, paper },
+ *      fonts?: { primary, secondary }
+ *    }
+ *  - ui (no imprescindible aquí, pero lo respetamos si lo pasás)
+ *  - setEvent: fn
  */
 
 export default function InvitationCanvas({ event, ui, setEvent }) {
   if (!event) return null;
 
-  // ======== Estado de modales ========
-  const [showRSVP, setShowRSVP] = useState(false);
-  const [showPrefs, setShowPrefs] = useState(false);
-  const [showGifts, setShowGifts] = useState(false);
+  // ===== Paleta base DemoBlack con override desde event.colors =====
+  const PALETTE = useMemo(() => {
+    const c = event.colors || {};
+    return {
+      ink: c.ink || "#222222",
+      text: c.text || "#2E2E2E",
+      muted: c.muted || "#6B7280",
+      sage: c.sage || "#8FAF86",
+      sageDark: c.sageDark || "#789B70",
+      sageLight: c.sageLight || "#E8F0E5",
+      almond: c.almond || "#D4B28A",
+      almondDark: c.almondDark || "#C59A6A",
+      almondLight: c.almondLight || "#F4E7D8",
+      white: c.white || "#FFFFFF",
+      paper: c.paper || "#F8F8F6",
+    };
+  }, [event.colors]);
 
-  // ======== Cuenta regresiva ========
-  const [timeLeft, setTimeLeft] = useState({ days:0, hours:0, minutes:0, seconds:0 });
+  const fontPrimary = event.fonts?.primary || "Inter, system-ui, sans-serif";
+  const fontSecondary =
+    event.fonts?.secondary || "Playfair Display, Georgia, serif";
+
+  // ===== Countdown =====
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
   useEffect(() => {
-    const iso = buildTargetISO(event.date, event.time);
-    const target = new Date(iso || "2026-03-15T17:00:00");
-    const id = setInterval(() => {
-      const d = target.getTime() - Date.now();
-      if (d > 0) {
-        setTimeLeft({
-          days: Math.floor(d / 86400000),
-          hours: Math.floor((d % 86400000) / 3600000),
-          minutes: Math.floor((d % 3600000) / 60000),
-          seconds: Math.floor((d % 60000) / 1000),
-        });
-      } else setTimeLeft({ days:0, hours:0, minutes:0, seconds:0 });
-    }, 1000);
-    return () => clearInterval(id);
+    const targetISO = buildTargetISO(event.date, event.time);
+    const targetDate = new Date(targetISO || "2026-11-23T19:00:00");
+    const getDiff = () => {
+      const now = new Date();
+      const diff = Math.max(0, targetDate.getTime() - now.getTime());
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+      return { days, hours, minutes, seconds };
+    };
+    setTimeLeft(getDiff());
+    const t = setInterval(() => setTimeLeft(getDiff()), 1000);
+    return () => clearInterval(t);
   }, [event.date, event.time]);
 
-  // ======== Tema tipo DemoBlack (fondo oscuro con acentos) ========
-  const theme = useMemo(() => {
-    const c = event.colors || {};
-    const t = ui?.selectedTemplate || event.template || "black";
-    const base = {
-      black:   { bg:"linear-gradient(180deg,#0B0B0B 0%,#171717 100%)", ring:c.accent || c.primary || "#6366f1" },
-      rose:    { bg:"linear-gradient(180deg,#0B0B0B 0%,#1a0f14 100%)", ring:c.accent || "#e91e63" },
-      emerald: { bg:"linear-gradient(180deg,#0B0B0B 0%,#0f1a14 100%)", ring:c.accent || "#10b981" },
-      gold:    { bg:"linear-gradient(180deg,#0B0B0B 0%,#1a140f 100%)", ring:c.accent || "#f59e0b" },
-    };
-    return base[t] || base.black;
-  }, [ui?.selectedTemplate, event.template, event.colors]);
+  // ===== Estado de modales =====
+  const [showRSVP, setShowRSVP] = useState(false);
+  const [showGifts, setShowGifts] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [rsvpData, setRsvpData] = useState({
+    name: "",
+    email: "",
+    attendance: "",
+    guests: 1,
+    message: "",
+  });
 
-  const colorPrimary   = event.colors?.primary   || "#ffffff"; // títulos/acentos claros
-  const colorSecondary = event.colors?.secondary || "#c7c7c7"; // textos secundarios
-  const colorText      = event.colors?.text      || "#e5e5e5"; // textos generales
-  const fontPrimary    = event.fonts?.primary    || "Inter, system-ui, sans-serif";
-  const fontSecondary  = event.fonts?.secondary  || "Playfair Display, Georgia, serif";
-
-  // ======== Utilidades de edición ========
-  const setCoupleFromString = (val) => {
-    const [bride="", groom=""] = val.split("&").map(s => s.trim());
-    setEvent(p => ({ ...p, couple:{ bride, groom: groom || p.couple?.groom || "" }}));
+  const handleRSVPSubmit = (e) => {
+    e.preventDefault();
+    setShowSuccess(true);
+    setTimeout(() => {
+      setShowSuccess(false);
+      setShowRSVP(false);
+      setRsvpData({
+        name: "",
+        email: "",
+        attendance: "",
+        guests: 1,
+        message: "",
+      });
+    }, 2500);
   };
 
+  // ===== Helpers de edición =====
+  const setCoupleFromString = (val) => {
+    const [bride = "", groom = ""] = val.split("&").map((s) => s.trim());
+    setEvent((p) => ({
+      ...p,
+      couple: { bride, groom: groom || p.couple?.groom || "" },
+    }));
+  };
   const addGift = () =>
-    setEvent(p => ({ ...p, gifts:[...(p.gifts || []), { label:"Mesa de regalos", url:"" }] }));
-
-  const updateGift = (i, key, v) =>
-    setEvent(p => {
+    setEvent((p) => ({
+      ...p,
+      gifts: [...(p.gifts || []), { label: "Mesa de Regalos", url: "" }],
+    }));
+  const updateGift = (idx, key, v) =>
+    setEvent((p) => {
       const arr = [...(p.gifts || [])];
-      arr[i] = { ...arr[i], [key]: v };
+      arr[idx] = { ...arr[idx], [key]: v };
+      return { ...p, gifts: arr };
+    });
+  const removeGift = (idx) =>
+    setEvent((p) => {
+      const arr = [...(p.gifts || [])];
+      arr.splice(idx, 1);
       return { ...p, gifts: arr };
     });
 
-  const removeGift = (i) =>
-    setEvent(p => {
-      const arr = [...(p.gifts || [])];
-      arr.splice(i, 1);
-      return { ...p, gifts: arr };
-    });
-
-  // ======== Layout / zoom ========
-  const baseWidth = ui?.viewMode === "mobile" ? 380 : ui?.viewMode === "tablet" ? 760 : 1100;
-  const zoom = Math.max(60, Math.min(180, ui?.zoom ?? 100));
+  // ===== Assets como en DemoBlack =====
+  const paperTexture = asset("src/assets/portada.webp");
+  const floralTop = asset("src/assets/hero_top.png");
+  const floralBottom = asset("src/assets/hero_bottom.png");
 
   return (
-    <div className={`${ui?.isMobile ? "p-2":"p-8"} flex justify-center`}>
-      <div className="w-full max-w-[1280px] rounded-2xl shadow-2xl overflow-hidden" style={{ background: theme.bg }}>
-        {/* ===== HERO ===== */}
-        <section className="px-6 sm:px-12 pt-12 pb-10 text-center" dir="ltr" lang="es" style={{ color: colorText }}>
-          <div className="text-[11px] tracking-[0.28em] opacity-80" style={{ fontFamily: fontPrimary }}>
-            INVITACIÓN WEB
-          </div>
+    <div className="min-h-screen" style={{ backgroundColor: PALETTE.paper }}>
+      {/* ===== HERO con textura + florales ===== */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* textura papel */}
+        <div className="absolute inset-0">
+          <img
+            src={paperTexture}
+            onError={(e) => onImgError(e, "Textura papel")}
+            alt="Textura papel"
+            className="absolute inset-0 w-full h-full object-cover object-center block"
+          />
+        </div>
 
-          <h1 className="mt-3 sm:mt-4 text-4xl sm:text-6xl font-light" style={{ color: colorPrimary, fontFamily: fontSecondary }}>
+        {/* florales decorativos */}
+        <div className="absolute top-0 left-0 w-[420px] h-[260px] opacity-80 pointer-events-none">
+          <img
+            src={floralTop}
+            onError={(e) => onImgError(e, "Decorativo superior")}
+            alt="Decorativo superior"
+            className="absolute inset-0 w-full h-full object-cover block"
+          />
+        </div>
+        <div className="absolute bottom-0 right-0 w-[460px] h-[280px] opacity-80 pointer-events-none">
+          <img
+            src={floralBottom}
+            onError={(e) => onImgError(e, "Decorativo inferior")}
+            alt="Decorativo inferior"
+            className="absolute inset-0 w-full h-full object-cover block"
+          />
+        </div>
+
+        {/* Contenido principal */}
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto" dir="ltr">
+          {/* Nombre 1 */}
+          <h1
+            className="font-display font-light mb-3 tracking-wider"
+            style={{
+              color: PALETTE.ink,
+              fontSize: "clamp(2.75rem, 8vw, 6rem)",
+              fontFamily: fontSecondary,
+            }}
+          >
             <EditableText
-              value={`${event.couple?.bride || "María"} & ${event.couple?.groom || "Juan"}`}
-              onChange={setCoupleFromString}
-              ariaLabel="Nombres de la pareja"
+              value={(event.couple?.bride || "Belén").toUpperCase()}
+              onChange={(val) =>
+                setEvent((p) => ({
+                  ...p,
+                  couple: { ...p.couple, bride: val },
+                }))
+              }
+              ariaLabel="Nombre de la novia"
               className="px-1"
               singleLine
-              style={{ color: colorPrimary }}
+              style={{ color: PALETTE.ink }}
             />
           </h1>
 
-          <div className="mt-3 text-base sm:text-lg" style={{ fontFamily: fontPrimary }}>
+          {/* separador infinito */}
+          <div className="flex items-center justify-center my-6">
+            <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
+            <div
+              className="mx-4 font-light"
+              style={{
+                color: PALETTE.sage,
+                fontSize: "clamp(1.75rem, 5vw, 3rem)",
+                fontFamily: fontSecondary,
+              }}
+            >
+              ∞
+            </div>
+            <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
+          </div>
+
+          {/* Nombre 2 */}
+          <h1
+            className="font-display font-light mb-8 tracking-wider"
+            style={{
+              color: PALETTE.ink,
+              fontSize: "clamp(2.75rem, 8vw, 6rem)",
+              fontFamily: fontSecondary,
+            }}
+          >
             <EditableText
-              value={event.date || "15 de Marzo, 2026"}
-              onChange={v => setEvent(p => ({ ...p, date:v }))}
-              ariaLabel="Fecha"
+              value={(event.couple?.groom || "Amadeo").toUpperCase()}
+              onChange={(val) =>
+                setEvent((p) => ({
+                  ...p,
+                  couple: { ...p.couple, groom: val },
+                }))
+              }
+              ariaLabel="Nombre del novio"
               className="px-1"
               singleLine
+              style={{ color: PALETTE.ink }}
             />
-            {" · "}
-            <EditableText
-              value={event.time || "17:00"}
-              onChange={v => setEvent(p => ({ ...p, time:v }))}
-              ariaLabel="Hora"
-              className="px-1"
-              singleLine
+          </h1>
+
+          {/* Subtítulo */}
+          <p
+            className="font-light mb-10 tracking-wide"
+            style={{
+              color: PALETTE.muted,
+              fontSize: "clamp(1.1rem, 3.5vw, 1.5rem)",
+              fontFamily: fontPrimary,
+            }}
+          >
+            ¡NOS CASAMOS!
+          </p>
+
+          {/* Indicador scroll */}
+          <div className="animate-bounce">
+            <ChevronDown
+              className="w-8 h-8 mx-auto"
+              style={{ color: PALETTE.sage }}
             />
-            {event.location ? (
-              <>
-                {" · "}
-                <EditableText
-                  value={event.location}
-                  onChange={v => setEvent(p => ({ ...p, location:v }))}
-                  ariaLabel="Ubicación general"
-                  className="px-1"
-                  singleLine
+          </div>
+        </div>
+      </section>
+
+      {/* ===== COUNTDOWN (franja color sage) ===== */}
+      <section className="py-12 sm:py-16" style={{ backgroundColor: PALETTE.sage }}>
+        <div className="max-w-4xl mx-auto px-4 text-center" dir="ltr">
+          <h2
+            className="font-light mb-6 sm:mb-8 tracking-wide"
+            style={{
+              color: PALETTE.white,
+              fontSize: "clamp(1.25rem, 3.5vw, 1.875rem)",
+              fontFamily: fontPrimary,
+            }}
+          >
+            Bienvenidos a nuestra boda
+          </h2>
+
+          <div className="flex items-stretch justify-center gap-5 sm:gap-8 select-none">
+            <TimeCell value={timeLeft.days} label="días" />
+            <SeparatorDot color={PALETTE.white} />
+            <TimeCell value={timeLeft.hours} label="hs" />
+            <SeparatorDot color={PALETTE.white} />
+            <TimeCell value={timeLeft.minutes} label="min" />
+            <SeparatorDot color={PALETTE.white} />
+            <TimeCell value={timeLeft.seconds} label="seg" />
+          </div>
+        </div>
+      </section>
+
+      {/* ===== DETALLES (blanco) ===== */}
+      <section className="py-16 bg-white" dir="ltr">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-12">
+            {/* Ceremonia */}
+            <DetailIconCard
+              icon={<Church className="w-8 h-8" style={{ color: PALETTE.sage }} />}
+              iconBg={PALETTE.sageLight}
+              title="CEREMONIA"
+              titleColor={PALETTE.ink}
+              textColor={PALETTE.text}
+              muted={PALETTE.muted}
+            >
+              <div className="space-y-3 mb-8">
+                <p className="text-lg" style={{ color: PALETTE.text }}>
+                  <EditableText
+                    value={event.date || "23 de Noviembre, 2026"}
+                    onChange={(v) => setEvent((p) => ({ ...p, date: v }))}
+                    className="px-1"
+                    singleLine
+                  />
+                </p>
+                <p className="text-lg" style={{ color: PALETTE.text }}>
+                  <EditableText
+                    value={event.ceremony?.time || event.time || "19:00 hs"}
+                    onChange={(v) =>
+                      setEvent((p) => ({
+                        ...p,
+                        ceremony: { ...p.ceremony, time: v },
+                      }))
+                    }
+                    className="px-1"
+                    singleLine
+                  />
+                </p>
+                <p className="font-medium" style={{ color: PALETTE.text }}>
+                  <EditableText
+                    value={event.ceremony?.venue || "Iglesia Nuestra Señora del Carmen"}
+                    onChange={(v) =>
+                      setEvent((p) => ({
+                        ...p,
+                        ceremony: { ...p.ceremony, venue: v },
+                      }))
+                    }
+                    className="px-1"
+                    singleLine
+                  />
+                </p>
+                <p style={{ color: PALETTE.text }}>
+                  <EditableText
+                    value={event.ceremony?.location || "Villa Allende, Córdoba"}
+                    onChange={(v) =>
+                      setEvent((p) => ({
+                        ...p,
+                        ceremony: { ...p.ceremony, location: v },
+                      }))
+                    }
+                    className="px-1"
+                    singleLine
+                  />
+                </p>
+                <p className="text-sm" style={{ color: PALETTE.muted }}>
+                  Recibí debajo las indicaciones para llegar.
+                </p>
+              </div>
+              <Button
+                className="px-8 py-3 rounded-full"
+                style={{ backgroundColor: PALETTE.sage, color: PALETTE.white }}
+                onClick={() =>
+                  window.open(
+                    `https://maps.google.com/?q=${
+                      event.ceremony?.address ||
+                      "Av. San Martín 456, Villa Allende"
+                    }`,
+                    "_blank"
+                  )
+                }
+              >
+                LLEGAR A LA CEREMONIA
+              </Button>
+            </DetailIconCard>
+
+            {/* Fiesta */}
+            <DetailIconCard
+              icon={
+                <PartyPopper
+                  className="w-8 h-8"
+                  style={{ color: PALETTE.sage }}
                 />
-              </>
-            ) : null}
-          </div>
-
-          {/* Countdown */}
-          <div className="mt-8 flex items-center justify-center gap-6 sm:gap-10 text-center select-none">
-            {[
-              ["DÍAS", timeLeft.days],
-              ["HORAS", timeLeft.hours],
-              ["MIN", timeLeft.minutes],
-              ["SEG", timeLeft.seconds],
-            ].map(([label, val]) => (
-              <div key={label}>
-                <div className="text-3xl sm:text-5xl font-light leading-none" style={{ color: colorPrimary, fontFamily: fontSecondary }}>
-                  {String(val ?? 0).padStart(2,"0")}
-                </div>
-                <div className="text-[10px] sm:text-xs opacity-80 tracking-widest mt-1" style={{ fontFamily: fontPrimary }}>
-                  {label}
-                </div>
+              }
+              iconBg={PALETTE.sageLight}
+              title="FIESTA"
+              titleColor={PALETTE.ink}
+              textColor={PALETTE.text}
+              muted={PALETTE.muted}
+            >
+              <div className="space-y-3 mb-8">
+                <p className="text-lg" style={{ color: PALETTE.text }}>
+                  <EditableText
+                    value={event.reception?.time || "Después de la ceremonia"}
+                    onChange={(v) =>
+                      setEvent((p) => ({
+                        ...p,
+                        reception: { ...p.reception, time: v },
+                      }))
+                    }
+                    className="px-1"
+                    singleLine
+                  />
+                </p>
+                <p className="font-medium" style={{ color: PALETTE.text }}>
+                  <EditableText
+                    value={event.reception?.venue || "Rincón Calina"}
+                    onChange={(v) =>
+                      setEvent((p) => ({
+                        ...p,
+                        reception: { ...p.reception, venue: v },
+                      }))
+                    }
+                    className="px-1"
+                    singleLine
+                  />
+                </p>
+                <p style={{ color: PALETTE.text }}>
+                  <EditableText
+                    value={event.reception?.location || "Unquillo, Córdoba"}
+                    onChange={(v) =>
+                      setEvent((p) => ({
+                        ...p,
+                        reception: { ...p.reception, location: v },
+                      }))
+                    }
+                    className="px-1"
+                    singleLine
+                  />
+                </p>
+                <p className="text-lg font-medium" style={{ color: PALETTE.sage }}>
+                  ¡Te esperamos!
+                </p>
               </div>
-            ))}
+              <Button
+                className="px-8 py-3 rounded-full"
+                style={{ backgroundColor: PALETTE.sage, color: PALETTE.white }}
+                onClick={() =>
+                  window.open(
+                    `https://maps.google.com/?q=${
+                      event.reception?.address || "Ruta Provincial E-53 Km 8, Unquillo"
+                    }`,
+                    "_blank"
+                  )
+                }
+              >
+                LLEGAR A LA FIESTA
+              </Button>
+            </DetailIconCard>
           </div>
+        </div>
+      </section>
 
-          {/* CTA principal */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <button
-              className="px-5 py-2 rounded-md text-sm font-medium shadow-sm hover:opacity-90"
-              style={{ background: colorPrimary, color: "#0b0b0b" }}
-              onClick={() => setShowRSVP(true)}
-            >
-              Confirmar asistencia
-            </button>
-            <button
-              className="px-5 py-2 rounded-md text-sm font-medium border border-white/30 hover:border-white/60"
-              onClick={() => setShowPrefs(true)}
-            >
-              Preferencias (comida • alojamiento)
-            </button>
-            <button
-              className="px-5 py-2 rounded-md text-sm font-medium border border-white/30 hover:border-white/60"
-              onClick={() => setShowGifts(true)}
-            >
-              Transferencias / Regalos
-            </button>
-          </div>
-
-          {/* Hashtag */}
-          <div className="mt-3 text-xs opacity-80" style={{ fontFamily: fontPrimary }}>
-            Hashtag:{" "}
+      {/* ===== REGALOS (almond) ===== */}
+      <section
+        className="py-16 text-center"
+        style={{ backgroundColor: PALETTE.almond }}
+        dir="ltr"
+      >
+        <div className="max-w-3xl mx-auto px-4">
+          <Gift className="w-10 h-10 mx-auto mb-6" style={{ color: PALETTE.white }} />
+          <p
+            className="mb-8"
+            style={{
+              color: PALETTE.white,
+              fontSize: "clamp(1rem, 2.5vw, 1.25rem)",
+              fontFamily: fontPrimary,
+            }}
+          >
             <EditableText
-              value={event.hashtag || "#MariaYJuan2026"}
-              onChange={v => setEvent(p => ({ ...p, hashtag:v }))}
+              value={
+                event.giftsNote ||
+                "Si deseás realizarnos un regalo podés colaborar con nuestra Luna de Miel…"
+              }
+              onChange={(v) => setEvent((p) => ({ ...p, giftsNote: v }))}
               className="px-1"
-              ariaLabel="Hashtag"
-              singleLine
-              style={{ color: colorPrimary }}
+              singleLine={false}
+              style={{ color: PALETTE.white }}
             />
+          </p>
+          <Button
+            className="rounded-full px-8 py-3"
+            style={{ backgroundColor: PALETTE.white, color: PALETTE.almondDark }}
+            onClick={() => setShowGifts(true)}
+          >
+            VER DATOS BANCARIOS
+          </Button>
+        </div>
+      </section>
+
+      {/* ===== INSTAGRAM (blanco) ===== */}
+      <section className="py-16 bg-white" dir="ltr">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+            style={{ backgroundColor: PALETTE.sageLight }}
+          >
+            <Instagram className="w-8 h-8" style={{ color: PALETTE.sage }} />
           </div>
-        </section>
+          <h2
+            className="text-2xl font-display font-medium mb-4"
+            style={{ color: PALETTE.ink, fontFamily: fontSecondary }}
+          >
+            @{(event.hashtag || "#beluyamador").replace("#", "")}
+          </h2>
+          <p
+            className="mb-6 max-w-2xl mx-auto"
+            style={{ color: PALETTE.text, fontFamily: fontPrimary }}
+          >
+            ¡Preparate para nuestro gran día! Seguinos y etiquetanos en tus fotos y videos.
+          </p>
+          <Button
+            className="px-8 py-3 rounded-full"
+            style={{ backgroundColor: PALETTE.sage, color: PALETTE.white }}
+            onClick={() => window.open("https://instagram.com", "_blank")}
+          >
+            Ver en Instagram
+          </Button>
+        </div>
+      </section>
 
-        {/* ===== CONTENIDO ESCALADO (para vista previa en editor) ===== */}
-        <div className="flex justify-center">
-          <div style={{ width: baseWidth, transform: `scale(${zoom/100})`, transformOrigin: "top center" }}>
-            {/* ===== AGENDA / DETALLES ===== */}
-            <section className="px-6 sm:px-12 pb-12">
-              <div className="grid sm:grid-cols-2 gap-6">
-                <CardSection title="Ceremonia" colorPrimary={colorPrimary} colorText={colorText}>
-                  <Field label="Lugar">
-                    <EditableText
-                      value={event.ceremony?.venue || "Iglesia San Miguel"}
-                      onChange={v => setEvent(p => ({ ...p, ceremony:{ ...p.ceremony, venue:v } }))}
-                      ariaLabel="Lugar ceremonia"
-                      className="px-1"
-                      singleLine
-                    />
-                  </Field>
-                  <Field label="Dirección" small>
-                    <EditableText
-                      value={event.ceremony?.address || "Calle Mayor 123"}
-                      onChange={v => setEvent(p => ({ ...p, ceremony:{ ...p.ceremony, address:v } }))}
-                      ariaLabel="Dirección ceremonia"
-                      className="px-1"
-                      singleLine={false}
-                    />
-                  </Field>
-                  <Field label="Hora" small>
-                    <EditableText
-                      value={event.ceremony?.time || event.time || "17:00"}
-                      onChange={v => setEvent(p => ({ ...p, ceremony:{ ...p.ceremony, time:v } }))}
-                      ariaLabel="Hora ceremonia"
-                      className="px-1"
-                      singleLine
-                    />
-                  </Field>
-                </CardSection>
+      {/* ===== DRESS CODE (oscuro) ===== */}
+      <section
+        className="py-16"
+        style={{ backgroundColor: "#1F2937", color: PALETTE.white }}
+        dir="ltr"
+      >
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2
+            className="text-2xl font-display font-medium mb-4 tracking-wide"
+            style={{ fontFamily: fontSecondary }}
+          >
+            DRESS CODE
+          </h2>
+          <p className="text-lg">
+            <EditableText
+              value={event.info?.dresscode || "Vestimenta formal, elegante"}
+              onChange={(v) =>
+                setEvent((p) => ({ ...p, info: { ...(p.info || {}), dresscode: v } }))
+              }
+              className="px-1"
+              singleLine
+              style={{ color: PALETTE.white }}
+            />
+          </p>
+        </div>
+      </section>
 
-                <CardSection title="Recepción" colorPrimary={colorPrimary} colorText={colorText}>
-                  <Field label="Lugar">
-                    <EditableText
-                      value={event.reception?.venue || "Salón / Jardín Botánico"}
-                      onChange={v => setEvent(p => ({ ...p, reception:{ ...p.reception, venue:v } }))}
-                      ariaLabel="Lugar recepción"
-                      className="px-1"
-                      singleLine
-                    />
-                  </Field>
-                  <Field label="Dirección" small>
-                    <EditableText
-                      value={event.reception?.address || "Av. Libertador 456"}
-                      onChange={v => setEvent(p => ({ ...p, reception:{ ...p.reception, address:v } }))}
-                      ariaLabel="Dirección recepción"
-                      className="px-1"
-                      singleLine={false}
-                    />
-                  </Field>
-                  <Field label="Hora" small>
-                    <EditableText
-                      value={event.reception?.time || "19:30"}
-                      onChange={v => setEvent(p => ({ ...p, reception:{ ...p.reception, time:v } }))}
-                      ariaLabel="Hora recepción"
-                      className="px-1"
-                      singleLine
-                    />
-                  </Field>
-                </CardSection>
-              </div>
-            </section>
+      {/* ===== RSVP (franja sage) ===== */}
+      <section
+        className="py-16"
+        style={{ backgroundColor: PALETTE.sage, color: PALETTE.white }}
+        dir="ltr"
+      >
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2
+            className="text-2xl font-display font-medium mb-6 tracking-wide"
+            style={{ fontFamily: fontSecondary }}
+          >
+            CONFIRMACIÓN DE ASISTENCIA
+          </h2>
+        </div>
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <p
+            className="text-lg mb-8 max-w-2xl mx-auto"
+            style={{ fontFamily: fontPrimary }}
+          >
+            <EditableText
+              value={
+                event.rsvpNote ||
+                "Esperamos que seas parte de esta gran celebración. ¡Confirmanos tu asistencia!"
+              }
+              onChange={(v) => setEvent((p) => ({ ...p, rsvpNote: v }))}
+              className="px-1"
+              singleLine={false}
+              style={{ color: PALETTE.white }}
+            />
+          </p>
+          <Button
+            className="px-8 py-3 rounded-full font-medium"
+            style={{ backgroundColor: PALETTE.white, color: PALETTE.sage }}
+            onClick={() => setShowRSVP(true)}
+          >
+            Confirmar asistencia
+          </Button>
 
-            {/* ===== MESA DE REGALOS / TRANSFERENCIAS (preview editable inline) ===== */}
-            <section className="px-6 sm:px-12 pb-12">
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Regalos: lista de links */}
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                  <h3 className="text-lg font-medium mb-2" style={{ color: colorPrimary, fontFamily: fontSecondary }} dir="ltr">
-                    Mesa de Regalos
-                  </h3>
-                  <p className="text-xs opacity-80 mb-3" style={{ color: colorText, fontFamily: fontPrimary }}>
-                    Agregá enlaces a listas o regalos sugeridos.
-                  </p>
-                  <div className="space-y-2">
-                    {(event.gifts || []).map((g, idx) => (
-                      <div key={idx} className="flex items-center gap-2 bg-white/60 rounded-md p-2">
-                        <input
-                          className="flex-1 text-xs border rounded px-2 py-1"
-                          placeholder="Nombre (Amazon, Falabella...)"
-                          value={g.label || ""}
-                          onChange={(e) => updateGift(idx, "label", e.target.value)}
-                          dir="ltr"
-                        />
-                        <input
-                          className="flex-1 text-xs border rounded px-2 py-1"
-                          placeholder="URL"
-                          value={g.url || ""}
-                          onChange={(e) => updateGift(idx, "url", e.target.value)}
-                          dir="ltr"
-                        />
-                        <button
-                          className="text-xs px-2 py-1 rounded border border-red-300 text-red-700 hover:bg-red-50"
-                          onClick={() => removeGift(idx)}
-                          title="Quitar"
-                        >
-                          X
-                        </button>
-                      </div>
-                    ))}
-                    <button className="text-xs px-3 py-1 rounded border border-white/30 hover:border-white/60 text-white" onClick={addGift}>
-                      + Agregar enlace
-                    </button>
-                  </div>
-                </div>
+          <div
+            className="mt-8 pt-8"
+            style={{ borderTop: `1px solid ${PALETTE.sageLight}` }}
+          >
+            <p className="text-lg">¡Agendá la fecha en tu calendario!</p>
+            <Button
+              variant="outline"
+              className="mt-4 rounded-full px-8 py-3"
+              style={{ borderColor: PALETTE.white, color: PALETTE.white }}
+              onClick={() => {
+                // aquí podrías generar archivo .ics
+              }}
+            >
+              AGENDAR EVENTO
+            </Button>
+          </div>
+        </div>
+      </section>
 
-                {/* Transferencias: datos bancarios */}
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                  <h3 className="text-lg font-medium mb-2" style={{ color: colorPrimary, fontFamily: fontSecondary }} dir="ltr">
-                    Transferencias
-                  </h3>
-                  <p className="text-xs opacity-80 mb-3" style={{ color: colorText, fontFamily: fontPrimary }}>
-                    Editá los datos. Los invitados verán esto en el modal.
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {renderBankField("Titular", "titular", event, setEvent)}
-                    {renderBankField("Banco", "banco", event, setEvent)}
-                    {renderBankField("Cuenta", "cuenta", event, setEvent)}
-                    {renderBankField("Alias", "alias", event, setEvent)}
-                    {renderBankField("CBU/IBAN", "cbu", event, setEvent)}
-                  </div>
-                  <div className="mt-2">
-                    {renderBankField("Nota", "nota", event, setEvent, true)}
-                  </div>
-                </div>
-              </div>
-            </section>
+      {/* ===== SUGERENCIAS MUSICALES (blanco) ===== */}
+      <section className="py-16 bg-white" dir="ltr">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2
+            className="text-2xl font-display font-medium mb-6 tracking-wide"
+            style={{ color: PALETTE.ink, fontFamily: fontSecondary }}
+          >
+            ¿QUÉ CANCIONES NO PUEDEN FALTAR?
+          </h2>
+          <p className="mb-8 max-w-2xl mx-auto" style={{ color: PALETTE.text }}>
+            ¡Ayudanos sugiriendo las canciones que pensás que no pueden faltar!
+          </p>
+          <Button
+            className="px-8 py-3 rounded-full"
+            style={{ backgroundColor: PALETTE.sage, color: PALETTE.white }}
+            onClick={() => {
+              // acá abrirías un modal de sugerencias o link a formulario
+              alert("Abrir formulario de canciones (pendiente)");
+            }}
+          >
+            <Music className="w-4 h-4 mr-2" />
+            Sugerir canción
+          </Button>
+        </div>
+      </section>
 
-            {/* ===== INFO ÚTIL / DRESS CODE (editable) ===== */}
-            <section className="px-6 sm:px-12 pb-12">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                <h3 className="text-lg font-medium mb-2" style={{ color: colorPrimary, fontFamily: fontSecondary }} dir="ltr">
-                  Información útil
+      {/* ===== INFO ÚTIL (paper) ===== */}
+      <section className="py-16" style={{ backgroundColor: PALETTE.paper }} dir="ltr">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2
+            className="text-2xl font-display font-medium mb-6 tracking-wide"
+            style={{ color: PALETTE.ink, fontFamily: fontSecondary }}
+          >
+            INFO ÚTIL
+          </h2>
+          <p className="mb-8 max-w-2xl mx-auto" style={{ color: PALETTE.text }}>
+            <EditableText
+              value={
+                event.info?.help ||
+                "Te dejamos sugerencias de alojamientos y traslados para ese fin de semana."
+              }
+              onChange={(v) =>
+                setEvent((p) => ({ ...p, info: { ...(p.info || {}), help: v } }))
+              }
+              className="px-1"
+              singleLine={false}
+              style={{ color: PALETTE.text }}
+            />
+          </p>
+          <Button
+            variant="outline"
+            className="px-8 py-3 rounded-full"
+            style={{ borderColor: PALETTE.sage, color: PALETTE.sage }}
+            onClick={() => {
+              // abrir modal/info ampliada
+              alert("Ver más (pendiente)");
+            }}
+          >
+            VER MÁS
+          </Button>
+        </div>
+      </section>
+
+      {/* ===== FOOTER ===== */}
+      <footer
+        className="py-12"
+        style={{ backgroundColor: "#1F2937", color: PALETTE.white }}
+      >
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <p className="text-lg mb-8">
+            ¡Gracias por acompañarnos en este momento tan importante!
+          </p>
+
+          <div className="pt-8" style={{ borderTop: "1px solid #4B5563" }}>
+            <p className="text-sm opacity-70 mb-4">
+              Invitación digital creada con ❤️ por{" "}
+              <span className="font-medium" style={{ color: PALETTE.sage }}>
+                Venite
+              </span>
+            </p>
+            <div className="flex justify-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full"
+                style={{ borderColor: PALETTE.white, color: PALETTE.white }}
+                onClick={() => {
+                  navigator.clipboard
+                    ?.writeText(window.location.href)
+                    .catch(() => {});
+                }}
+              >
+                <Share2 className="w-4 h-4 mr-2" />
+                Compartir
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full"
+                style={{ borderColor: PALETTE.white, color: PALETTE.white }}
+                onClick={() => {
+                  // aquí podrías disparar descarga de screenshot/pdf
+                }}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Guardar
+              </Button>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      {/* ===== MODAL RSVP ===== */}
+      {showRSVP && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md">
+            <CardContent className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-medium" style={{ color: PALETTE.ink }}>
+                  Confirmar Asistencia
                 </h3>
-                <ul className="space-y-2 text-sm" style={{ color: colorText, fontFamily: fontPrimary }}>
-                  <li>
-                    Dress code:{" "}
-                    <EditableText
-                      value={event.info?.dresscode || "Formal (sugerimos tonos neutros)"}
-                      onChange={v => setEvent(p => ({ ...p, info:{ ...(p.info||{}), dresscode:v } }))}
-                      className="px-1"
-                      singleLine
-                    />
-                  </li>
-                  <li>
-                    Estacionamiento:{" "}
-                    <EditableText
-                      value={event.info?.parking || "Disponible en el lugar de la recepción"}
-                      onChange={v => setEvent(p => ({ ...p, info:{ ...(p.info||{}), parking:v } }))}
-                      className="px-1"
-                      singleLine
-                    />
-                  </li>
-                  <li>
-                    Niños:{" "}
-                    <EditableText
-                      value={event.info?.kids || "Bienvenidos"}
-                      onChange={v => setEvent(p => ({ ...p, info:{ ...(p.info||{}), kids:v } }))}
-                      className="px-1"
-                      singleLine
-                    />
-                  </li>
-                </ul>
+                <Button variant="ghost" size="sm" onClick={() => setShowRSVP(false)}>
+                  <X className="w-4 h-4" />
+                </Button>
               </div>
-            </section>
 
-            {/* ===== FOOTER ===== */}
-            <footer className="px-6 sm:px-12 pb-14 text-center" style={{ color: colorSecondary, fontFamily: fontPrimary }}>
-              <div className="text-xs opacity-80" dir="ltr">
-                Gracias por acompañarnos • {event.hashtag || "#MariaYJuan2026"}
+              {showSuccess ? (
+                <div className="text-center py-8">
+                  <CheckCircle
+                    className="w-16 h-16 mx-auto mb-4"
+                    style={{ color: PALETTE.sage }}
+                  />
+                  <h4 className="text-lg font-medium mb-2" style={{ color: PALETTE.ink }}>
+                    ¡Confirmación Recibida!
+                  </h4>
+                  <p style={{ color: PALETTE.text }}>
+                    Gracias por confirmar tu asistencia. ¡Te esperamos!
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleRSVPSubmit} className="space-y-4" dir="ltr">
+                  <div>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: PALETTE.ink }}
+                    >
+                      Nombre completo *
+                    </label>
+                    <Input
+                      required
+                      value={rsvpData.name}
+                      onChange={(e) =>
+                        setRsvpData({ ...rsvpData, name: e.target.value })
+                      }
+                      placeholder="Tu nombre completo"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: PALETTE.ink }}
+                    >
+                      Email *
+                    </label>
+                    <Input
+                      type="email"
+                      required
+                      value={rsvpData.email}
+                      onChange={(e) =>
+                        setRsvpData({ ...rsvpData, email: e.target.value })
+                      }
+                      placeholder="tu@email.com"
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: PALETTE.ink }}
+                    >
+                      ¿Asistirás? *
+                    </label>
+                    <select
+                      required
+                      value={rsvpData.attendance}
+                      onChange={(e) =>
+                        setRsvpData({ ...rsvpData, attendance: e.target.value })
+                      }
+                      className="w-full p-2 border border-gray-300 rounded-md"
+                    >
+                      <option value="">Selecciona una opción</option>
+                      <option value="yes">Sí, asistiré</option>
+                      <option value="no">No podré asistir</option>
+                    </select>
+                  </div>
+
+                  {rsvpData.attendance === "yes" && (
+                    <div>
+                      <label
+                        className="block text-sm font-medium mb-1"
+                        style={{ color: PALETTE.ink }}
+                      >
+                        Número de acompañantes
+                      </label>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="5"
+                        value={rsvpData.guests}
+                        onChange={(e) =>
+                          setRsvpData({
+                            ...rsvpData,
+                            guests: parseInt(e.target.value || "0", 10),
+                          })
+                        }
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <label
+                      className="block text-sm font-medium mb-1"
+                      style={{ color: PALETTE.ink }}
+                    >
+                      Mensaje (opcional)
+                    </label>
+                    <Textarea
+                      value={rsvpData.message}
+                      onChange={(e) =>
+                        setRsvpData({ ...rsvpData, message: e.target.value })
+                      }
+                      placeholder="Déjanos un mensaje..."
+                      rows={3}
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    style={{ backgroundColor: PALETTE.sage, color: PALETTE.white }}
+                  >
+                    <Heart className="w-4 h-4 mr-2" />
+                    Confirmar Asistencia
+                  </Button>
+                </form>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* ===== MODAL DATOS BANCARIOS ===== */}
+      {showGifts && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md">
+            <CardContent className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-medium" style={{ color: PALETTE.ink }}>
+                  Datos Bancarios
+                </h3>
+                <Button variant="ghost" size="sm" onClick={() => setShowGifts(false)}>
+                  <X className="w-4 h-4" />
+                </Button>
               </div>
-            </footer>
-          </div>
+
+              <div className="space-y-4 text-sm" dir="ltr">
+                <div className="text-center mb-2">
+                  <CreditCard
+                    className="w-12 h-12 mx-auto mb-4"
+                    style={{ color: PALETTE.sage }}
+                  />
+                  <p style={{ color: PALETTE.text }}>
+                    Si deseás colaborar con nuestra Luna de Miel:
+                  </p>
+                </div>
+
+                {/* Transferencia */}
+                <div className="p-4 rounded-lg" style={{ backgroundColor: PALETTE.paper }}>
+                  <h4 className="font-medium mb-2" style={{ color: PALETTE.ink }}>
+                    Transferencia Bancaria
+                  </h4>
+                  <div className="space-y-1 text-sm" style={{ color: PALETTE.text }}>
+                    {renderBankLine("Banco", event.bank?.banco)}
+                    {renderBankLine("CBU/IBAN", event.bank?.cbu)}
+                    {renderBankLine("Alias", event.bank?.alias)}
+                    {renderBankLine("Titular", event.bank?.titular)}
+                    {renderBankLine("Cuenta", event.bank?.cuenta)}
+                    {event.bank?.nota ? (
+                      <p className="text-xs" style={{ color: PALETTE.muted }}>
+                        {event.bank?.nota}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+
+                {/* Mesa de regalos: links si los hay */}
+                {(event.gifts || []).length > 0 && (
+                  <div className="p-4 rounded-lg" style={{ backgroundColor: PALETTE.paper }}>
+                    <h4 className="font-medium mb-2" style={{ color: PALETTE.ink }}>
+                      Mesas de Regalos
+                    </h4>
+                    <ul className="list-disc pl-5 space-y-1">
+                      {event.gifts.map((g, i) => (
+                        <li key={i}>
+                          {g.url ? (
+                            <a
+                              href={g.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="underline hover:opacity-80"
+                              style={{ color: PALETTE.sage }}
+                            >
+                              {g.label || g.url}
+                            </a>
+                          ) : (
+                            <span>{g.label || "Enlace"}</span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      </div>
-
-      {/* ===== MODALES ===== */}
-      <Modal open={showRSVP} onClose={() => setShowRSVP(false)} ring={theme.ring}>
-        <ModalHeader title="Confirmar asistencia" ring={theme.ring} />
-        <form
-          className="space-y-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            setShowRSVP(false);
-            alert("¡Gracias! Recibimos tu confirmación.");
-          }}
-        >
-          <div className="grid sm:grid-cols-2 gap-2">
-            <InputLabeled label="Nombre y apellido" required />
-            <InputLabeled label="Email" type="email" required />
-          </div>
-          <div className="grid sm:grid-cols-3 gap-2">
-            <InputLabeled label="Asistentes" type="number" min="1" defaultValue={1} required />
-            <InputLabeled label="Niños" type="number" min="0" defaultValue={0} />
-            <InputLabeled label="Restricciones alim." placeholder="Vegetariano, celíaco..." />
-          </div>
-          <TextAreaLabeled label="Mensaje" placeholder="Escribe un saludo o consulta..." />
-          <div className="flex justify-end gap-2 pt-2">
-            <button type="button" className="btn-secondary" onClick={() => setShowRSVP(false)}>Cancelar</button>
-            <button type="submit" className="btn-primary" style={{ background: theme.ring }}>Enviar</button>
-          </div>
-        </form>
-      </Modal>
-
-      <Modal open={showPrefs} onClose={() => setShowPrefs(false)} ring={theme.ring}>
-        <ModalHeader title="Preferencias: comida y alojamiento" ring={theme.ring} />
-        <form
-          className="space-y-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            setShowPrefs(false);
-            alert("¡Gracias! Registramos tus preferencias.");
-          }}
-        >
-          <div className="grid sm:grid-cols-2 gap-2">
-            <InputLabeled label="Nombre y apellido" required />
-            <InputLabeled label="Email" type="email" required />
-          </div>
-          <div className="grid sm:grid-cols-2 gap-2">
-            <SelectLabeled label="Preferencia de comida" options={["Sin preferencia","Vegetariano/a","Vegano/a","Celíaco/a","Kosher","Halal"]} />
-            <SelectLabeled label="Alojamiento" options={["No necesito","Hotel sugerido","Familia/Amigos","Otro"]} />
-          </div>
-          <TextAreaLabeled label="Observaciones" placeholder="Horarios, movilidad, otras necesidades..." />
-          <div className="flex justify-end gap-2 pt-2">
-            <button type="button" className="btn-secondary" onClick={() => setShowPrefs(false)}>Cancelar</button>
-            <button type="submit" className="btn-primary" style={{ background: theme.ring }}>Enviar</button>
-          </div>
-        </form>
-      </Modal>
-
-      <Modal open={showGifts} onClose={() => setShowGifts(false)} ring={theme.ring}>
-        <ModalHeader title="Transferencias / Regalos" ring={theme.ring} />
-        <div className="space-y-3 text-sm">
-          <BankRow label="Titular" value={event.bank?.titular} />
-          <BankRow label="Banco" value={event.bank?.banco} />
-          <BankRow label="Cuenta" value={event.bank?.cuenta} />
-          <BankRow label="Alias" value={event.bank?.alias} />
-          <BankRow label="CBU/IBAN" value={event.bank?.cbu} />
-          {event.bank?.nota ? <div className="text-xs opacity-80">{event.bank?.nota}</div> : null}
-
-          {(event.gifts || []).length > 0 && (
-            <>
-              <div className="mt-4 text-sm font-medium">Enlaces a mesas de regalos</div>
-              <ul className="list-disc pl-5 space-y-1">
-                {event.gifts.map((g, i) => (
-                  <li key={i}>
-                    {g.url ? (
-                      <a href={g.url} target="_blank" rel="noreferrer" className="underline hover:opacity-80" style={{ color: theme.ring }}>
-                        {g.label || g.url}
-                      </a>
-                    ) : (
-                      <span>{g.label || "Enlace"}</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-        </div>
-        <div className="flex justify-end gap-2 pt-4">
-          <button className="btn-primary" style={{ background: theme.ring }} onClick={() => setShowGifts(false)}>
-            Cerrar
-          </button>
-        </div>
-      </Modal>
+      )}
     </div>
   );
 }
 
-/* ====================== Subcomponentes ====================== */
+/* =================== Subcomponentes / helpers =================== */
 
-function CardSection({ title, children, colorPrimary, colorText }) {
+function TimeCell({ value, label }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-      <h3 className="text-lg font-medium mb-2" style={{ color: colorPrimary }} dir="ltr">
+    <div className="flex flex-col items-center">
+      <div
+        className="font-light leading-none"
+        style={{
+          fontSize: "clamp(2.25rem, 7vw, 4.5rem)",
+          color: "#FFFFFF",
+        }}
+      >
+        {String(value).padStart(2, "0")}
+      </div>
+      <div className="opacity-90 text-sm sm:text-base" style={{ color: "#FFFFFF" }}>
+        {label}
+      </div>
+    </div>
+  );
+}
+
+function SeparatorDot({ color = "#fff" }) {
+  return (
+    <div className="self-center font-light" style={{ color, fontSize: "clamp(2rem, 7vw, 4rem)" }}>
+      :
+    </div>
+  );
+}
+
+function DetailIconCard({ icon, iconBg, title, titleColor, textColor, muted, children }) {
+  return (
+    <div className="text-center">
+      <div
+        className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+        style={{ backgroundColor: iconBg }}
+      >
+        {icon}
+      </div>
+      <h3
+        className="text-2xl font-display font-medium mb-6 tracking-wide"
+        style={{ color: titleColor }}
+      >
         {title}
       </h3>
-      <div className="text-sm" style={{ color: colorText }} dir="ltr">{children}</div>
-    </div>
-  );
-}
-
-function Field({ label, small=false, children }) {
-  return (
-    <div className={`${small ? "mt-2":"mt-1"}`}>
-      <div className={`mb-1 ${small ? "text-xs opacity-80":"text-sm"} text-gray-200`} dir="ltr">{label}</div>
-      {children}
-    </div>
-  );
-}
-
-function Modal({ open, onClose, children, ring }) {
-  if (!open) return null;
-  return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4" aria-modal="true" role="dialog">
-      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative w-full max-w-xl bg-white rounded-xl shadow-2xl p-5">
-        <div className="absolute -inset-[2px] rounded-[14px] pointer-events-none" style={{ boxShadow: `0 0 0 1px ${ring} inset` }} />
+      <div className="text-base" style={{ color: textColor }}>
         {children}
       </div>
     </div>
   );
 }
 
-function ModalHeader({ title, ring }) {
-  return (
-    <div className="mb-4">
-      <h2 className="text-lg font-semibold text-gray-900" dir="ltr">{title}</h2>
-      <div className="h-px w-full mt-2" style={{ background: ring, opacity: 0.3 }} />
-    </div>
-  );
-}
-
-function InputLabeled({ label, type="text", required=false, min, defaultValue, placeholder }) {
-  return (
-    <label className="block text-xs" dir="ltr">
-      <span className="mb-1 block text-gray-600">{label}</span>
-      <input
-        type={type}
-        required={required}
-        min={min}
-        defaultValue={defaultValue}
-        placeholder={placeholder}
-        className="w-full text-sm border rounded px-3 py-2 outline-none focus:ring"
-        dir="ltr"
-      />
-    </label>
-  );
-}
-
-function TextAreaLabeled({ label, placeholder }) {
-  return (
-    <label className="block text-xs" dir="ltr">
-      <span className="mb-1 block text-gray-600">{label}</span>
-      <textarea
-        placeholder={placeholder}
-        className="w-full text-sm border rounded px-3 py-2 min-h-[90px] outline-none focus:ring"
-        dir="ltr"
-      />
-    </label>
-  );
-}
-
-function SelectLabeled({ label, options=[] }) {
-  return (
-    <label className="block text-xs" dir="ltr">
-      <span className="mb-1 block text-gray-600">{label}</span>
-      <select className="w-full text-sm border rounded px-3 py-2 outline-none focus:ring" dir="ltr">
-        {options.map(o => <option key={o} value={o}>{o}</option>)}
-      </select>
-    </label>
-  );
-}
-
-function BankRow({ label, value }) {
+function renderBankLine(label, value) {
   if (!value) return null;
   return (
-    <div className="flex items-center justify-between gap-3 text-sm">
-      <div className="text-gray-500">{label}</div>
-      <div className="font-medium" dir="ltr">{value}</div>
-    </div>
+    <p>
+      <strong>{label}:</strong> {value}
+    </p>
   );
 }
 
-function renderBankField(label, key, event, setEvent, multiline=false) {
-  const val = event.bank?.[key] || "";
-  const setVal = (v) => setEvent(p => ({ ...p, bank:{ ...(p.bank||{}), [key]: v } }));
-  return (
-    <label key={key} className="block text-xs" dir="ltr">
-      <span className="mb-1 block text-gray-200">{label}</span>
-      {multiline ? (
-        <textarea className="w-full text-sm border rounded px-3 py-2 min-h-[80px] bg-white" value={val} onChange={(e)=>setVal(e.target.value)} dir="ltr" />
-      ) : (
-        <input className="w-full text-sm border rounded px-3 py-2 bg-white" value={val} onChange={(e)=>setVal(e.target.value)} dir="ltr" />
-      )}
-    </label>
-  );
-}
-
-/* ====================== Utilidades ====================== */
+/** Construye ISO a partir de fecha en español y hora "HH:mm" */
 function buildTargetISO(dateStr, timeStr) {
   if (!dateStr) return null;
   try {
@@ -599,25 +1011,26 @@ function buildTargetISO(dateStr, timeStr) {
       const [, d, m, y] = dateStr.trim().match(re);
       return `${y}-${pad(m)}-${pad(d)}T${padTime(timeStr || "00:00")}`;
     }
-    const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-    const mIdx = meses.findIndex(m => dateStr.toLowerCase().includes(m));
-    const dMatch = dateStr.match(/\d{1,2}/);
-    const yMatch = dateStr.match(/\d{4}/);
+    const meses = [
+      "enero", "febrero", "marzo", "abril", "mayo", "junio",
+      "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre",
+    ];
+    const ds = dateStr.toLowerCase();
+    const mIdx = meses.findIndex((m) => ds.includes(m));
+    const dMatch = ds.match(/\d{1,2}/);
+    const yMatch = ds.match(/\d{4}/);
     if (mIdx >= 0 && dMatch && yMatch) {
-      const d = Number(dMatch[0]), y = Number(yMatch[0]);
-      return `${y}-${pad(mIdx+1)}-${pad(d)}T${padTime(timeStr || "00:00")}`;
+      const d = Number(dMatch[0]);
+      const y = Number(yMatch[0]);
+      return `${y}-${pad(mIdx + 1)}-${pad(d)}T${padTime(timeStr || "00:00")}`;
     }
-  } catch { return null; }
+  } catch {
+    return null;
+  }
   return null;
 }
-function pad(n){ return String(n).padStart(2,"0"); }
-function padTime(hhmm){ const [h="00",m="00"]=hhmm.split(":"); return `${pad(h)}:${pad(m)}:00`; }
-
-/* ====================== Helpers de botones (clases) ====================== */
-const baseBtn = "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
-const primaryBtn = `${baseBtn} text-white px-4 py-2 bg-black`;
-const secondaryBtn = `${baseBtn} px-4 py-2 border border-gray-300 bg-white`;
-const cssHelpers = `.btn-primary{/*${primaryBtn}*/}.btn-secondary{/*${secondaryBtn}*/}`;
-if (typeof document!=="undefined" && !document.getElementById("inv-helpers")) {
-  const style = document.createElement("style"); style.id="inv-helpers"; style.innerHTML=cssHelpers; document.head.appendChild(style);
+function pad(n) { return String(n).padStart(2, "0"); }
+function padTime(hhmm) {
+  const [h = "00", m = "00"] = (hhmm || "").split(":");
+  return `${pad(h)}:${pad(m)}:00`;
 }
