@@ -18,7 +18,7 @@ import EventWizard from './pages/EventWizard';
 import EventBuilder from './pages/EventBuilder';
 import EventPreview from './pages/EventPreview';
 import PublicEvent from './pages/PublicEvent';
-import VisualEditor from './pages/VisualEditorComplete';
+import VisualEditorPage from './pages/VisualEditorPage';
 import GuestManager from './pages/GuestManager';
 import PaymentTransfer from './pages/PaymentTransfer';
 import PaymentCode from './pages/PaymentCode';
@@ -102,7 +102,7 @@ function App() {
         <Route path="events/create" element={<CreateEvent />} />
         <Route path="events/wizard" element={<EventWizard />} />
         <Route path="events/:id/builder" element={<EventBuilder />} />
-        <Route path="events/:id/editor" element={<VisualEditor />} />
+        <Route path="events/:id/editor" element={<VisualEditorPage />} />
         <Route path="events/:id/preview" element={<EventPreview />} />
         <Route path="events/:id/guests" element={<GuestManager />} />
         
@@ -116,7 +116,7 @@ function App() {
         <Route path="guest-surveys" element={<GuestSurveys />} />
         
         {/* Customization tools */}
-        <Route path="visual-editor" element={<VisualEditor />} />
+        <Route path="visual-editor" element={<VisualEditorPage />} />
         <Route path="color-palette" element={<div className="p-8"><h1 className="text-2xl font-bold">Paletas de Colores - Próximamente</h1></div>} />
         <Route path="typography" element={<div className="p-8"><h1 className="text-2xl font-bold">Tipografías - Próximamente</h1></div>} />
         <Route path="gallery" element={<div className="p-8"><h1 className="text-2xl font-bold">Galería de Imágenes - Próximamente</h1></div>} />
