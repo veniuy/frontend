@@ -47,78 +47,38 @@ export default function EditorPanel({
   setEvent,
 }) {
   /* =================== PALETAS =================== */
-  const PALETTES = [
+   const PALETTES = [
     {
       name: "Champagne",
-      tones: [
-        { label: "Claro", hex: "#F6E3D4" },
-        { label: "Intermedio", hex: "#E1C1A8" },
-        { label: "Intermedio", hex: "#D1A880" },
-        { label: "Oscuro", hex: "#B8997F" },
-      ],
+      tones: [{ hex: "#F6E3D4" }, { hex: "#E1C1A8" }, { hex: "#D1A880" }, { hex: "#B8997F" }],
     },
     {
       name: "Boho Chic",
-      tones: [
-        { label: "Claro", hex: "#EFC4B1" },
-        { label: "Intermedio", hex: "#E7B7A2" },
-        { label: "Intermedio", hex: "#DBA583" },
-        { label: "Oscuro", hex: "#D99873" },
-      ],
+      tones: [{ hex: "#EFC4B1" }, { hex: "#E7B7A2" }, { hex: "#DBA583" }, { hex: "#D99873" }],
     },
     {
       name: "Sage & Terracotta",
-      tones: [
-        { hex: "#B7B79D" },
-        { hex: "#C16D4D" },
-        { hex: "#D57555" },
-        { hex: "#C96342" },
-      ],
+      tones: [{ hex: "#B7B79D" }, { hex: "#C16D4D" }, { hex: "#D57555" }, { hex: "#C96342" }],
     },
     {
       name: "Blush and Gray",
-      tones: [
-        { label: "Claro", hex: "#EEC9C5" },
-        { label: "Intermedio", hex: "#C9C9C9" },
-        { label: "Intermedio", hex: "#B9B9B9" },
-        { label: "Oscuro", hex: "#8B8B8B" },
-      ],
+      tones: [{ hex: "#EEC9C5" }, { hex: "#C9C9C9" }, { hex: "#B9B9B9" }, { hex: "#8B8B8B" }],
     },
     {
       name: "Just Peachy",
-      tones: [
-        { label: "Claro", hex: "#F2C3B1" },
-        { label: "Intermedio", hex: "#E6B79E" },
-        { label: "Intermedio", hex: "#E5A88B" },
-        { label: "Oscuro", hex: "#C8C6A8" },
-      ],
+      tones: [{ hex: "#F2C3B1" }, { hex: "#E6B79E" }, { hex: "#E5A88B" }, { hex: "#C8C6A8" }],
     },
     {
       name: "Classic Romance",
-      tones: [
-        { label: "Claro", hex: "#EFEAE6" },
-        { label: "Intermedio", hex: "#E7D7D3" },
-        { label: "Intermedio", hex: "#B6AFAA" },
-        { label: "Oscuro", hex: "#871C2B" },
-      ],
+      tones: [{ hex: "#EFEAE6" }, { hex: "#E7D7D3" }, { hex: "#B6AFAA" }, { hex: "#871C2B" }],
     },
     {
       name: "Frosted Winter",
-      tones: [
-        { label: "Claro", hex: "#C2C4CA" },
-        { label: "Intermedio", hex: "#ADB3BB" },
-        { label: "Intermedio", hex: "#8F9AA7" },
-        { label: "Oscuro", hex: "#245D63" },
-      ],
+      tones: [{ hex: "#C2C4CA" }, { hex: "#ADB3BB" }, { hex: "#8F9AA7" }, { hex: "#245D63" }],
     },
     {
       name: "Rustic Elegance",
-      tones: [
-        { label: "Claro", hex: "#E0C9C9" },
-        { label: "Intermedio", hex: "#C9AFA0" },
-        { label: "Intermedio", hex: "#D4CAB0" },
-        { label: "Oscuro", hex: "#5A6C48" },
-      ],
+      tones: [{ hex: "#E0C9C9" }, { hex: "#C9AFA0" }, { hex: "#D4CAB0" }, { hex: "#5A6C48" }],
     },
   ];
 
