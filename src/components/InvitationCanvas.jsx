@@ -113,7 +113,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
   });
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: COLORS.paper }}>
+      <div className="min-h-screen" dir={event?.direction || "ltr"} style={{ backgroundColor: COLORS.paper }}>
       {/* ===== HERO con textura + florales (sin cambios de layout) ===== */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
