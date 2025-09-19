@@ -235,7 +235,7 @@ export default function EditorPanel({
                       onClick={() => applyPalette(p.tones)}
                       title="Aplicar paleta"
                     >
-                      Aplicar paleta
+                      Aplicar
                     </button>
                   </div>
                   <div className="flex gap-2 mt-2">
@@ -251,9 +251,7 @@ export default function EditorPanel({
                       </div>
                     ))}
                   </div>
-                  <div className="text-[10px] text-gray-500 mt-2">
-                    Mapeo al aplicar: <b>Primario</b> = Intermedio 2, <b>Secundario</b> = Oscuro, <b>Texto</b> = Oscuro.
-                  </div>
+                  
                 </div>
               ))}
             </CardContent>
