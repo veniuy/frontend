@@ -1,3 +1,4 @@
+// src/components/EditableText.jsx
 import React, { useEffect, useRef, useState } from "react";
 
 export default function EditableText({
@@ -57,9 +58,18 @@ export default function EditableText({
       onInput={handleInput}
       onKeyDown={handleKeyDown}
       onPaste={handlePaste}
+      // Fuerza escritura LTR y aísla del contexto RTL externo
+      dir="ltr"
       spellCheck={false}
-      className={`${className} outline-none ${editing ? "ring-2 ring-blue-400 bg-blue-50 rounded px-1" : "cursor-text"}`}
-      style={{ direction: "ltr", whiteSpace: singleLine ? "nowrap" : "pre-wrap", ...style }}
+      className={`${className} outline-none ${
+        editing ? "ring-2 ring-blue-400 bg-blue-50 rounded px-1" : "cursor-text"
+      }`}
+      style={{
+        direction: "ltr",
+        unicodeBidi: "isolate",
+        whiteSpace: singleLine ? "nowrap" : "pre-wrap",
+        ...style,
+      }}
     >
       {value}
     </Tag>
