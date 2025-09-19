@@ -147,44 +147,44 @@ const fontSecondary = event.fonts?.secondary || "'Great Vibes', cursive";
         )}
 
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <h1
-            className="font-display font-light mb-3 tracking-wider"
-            style={{ color: COLORS.ink, fontSize: "clamp(2.75rem, 8vw, 6rem)", fontFamily: fontSecondary }}
-          >
-            <EditableText
-              value={(event.couple?.bride || "Belén"}
-              onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: val } }))}
-              ariaLabel="Nombre 1"
-              className="px-1"
-              singleLine
-              style={{ color: COLORS.ink }}
-            />
-          </h1>
-
-          <div className="flex items-center justify-center my-6">
-            <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
-            <div
-              className="mx-4 font-light"
-              style={{ color: COLORS.primary, fontSize: "clamp(1.75rem, 5vw, 3rem)", fontFamily: fontSecondary }}
-            >
-              ∞
-            </div>
-            <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
-          </div>
-
-          <h1
-            className="font-display font-light mb-8 tracking-wider"
-            style={{ color: COLORS.ink, fontSize: "clamp(2.75rem, 8vw, 6rem)", fontFamily: fontSecondary }}
-          >
-            <EditableText
-              value={(event.couple?.groom || "Amadeo"}
-              onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: val } }))}
-              ariaLabel="Nombre 2"
-              className="px-1"
-              singleLine
-              style={{ color: COLORS.ink }}
-            />
-          </h1>
+         <h1
+  className="font-display font-light mb-3 tracking-wider"
+  style={{ color: COLORS.ink, fontSize: "clamp(2.75rem, 8vw, 6rem)", fontFamily: fontSecondary }}
+>
+  <EditableText
+    value={event.couple?.bride || "Belén"}
+    onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: val } }))}
+    ariaLabel="Nombre 1"
+    className="px-1"
+    singleLine
+    style={{ color: COLORS.ink }}
+  />
+                </h1>
+                
+                <div className="flex items-center justify-center my-6">
+                  <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
+                  <div
+                    className="mx-4 font-light"
+                    style={{ color: COLORS.primary, fontSize: "clamp(1.75rem, 5vw, 3rem)", fontFamily: fontSecondary }}
+                  >
+                    ∞
+                  </div>
+                  <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
+                </div>
+                
+                <h1
+                  className="font-display font-light mb-8 tracking-wider"
+                  style={{ color: COLORS.ink, fontSize: "clamp(2.75rem, 8vw, 6rem)", fontFamily: fontSecondary }}
+                >
+                  <EditableText
+                    value={event.couple?.groom || "Amadeo"}
+                    onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: val } }))}
+                    ariaLabel="Nombre 2"
+                    className="px-1"
+                    singleLine
+                    style={{ color: COLORS.ink }}
+                  />
+                </h1>
 
           <p
             className="font-light mb-10 tracking-wide"
