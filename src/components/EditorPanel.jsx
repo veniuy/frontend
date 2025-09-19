@@ -17,16 +17,17 @@ import {
   CreditCard,
   Hash,
 } from "lucide-react";
+import ImagesPanel from "./ImagesPanel";
 
 /**
  * EditorPanel
  * - Pestaña Color: 8 paletas pedidas + colores personalizados (primary, secondary, text).
  * - Pestaña Contenido: datos bancarios, mesa de regalos (links), textos de secciones.
- * - Pestaña Imágenes: placeholder (se hará después).
+ * - Pestaña Imágenes: ahora usa <ImagesPanel /> (fondos predefinidos, subir fondo propio, logo y decorativos).
  * - Pestaña Templates: sin cambios.
  * - Cierre en móviles con "X".
  *
- * Props esperadas (como ya usas):
+ * Props esperadas:
  *  - event, ui
  *  - setActiveTab(value), setShowMobilePanel(bool)
  *  - handleColorChange(key, value)
@@ -143,7 +144,7 @@ export default function EditorPanel({
 
   /* =================== Helpers =================== */
   const applyPalette = (tones) => {
-    // Mapeo solicitado: primary = Intermedio 2 (tones[2]), secondary = Oscuro (tones[3]), text = Oscuro (tones[3])
+    // Mapeo: primary = Intermedio 2 (tones[2]), secondary = Oscuro (tones[3]), text = Oscuro (tones[3])
     const primary = tones[2]?.hex || event.colors?.primary || "#8FAF86";
     const secondary = tones[3]?.hex || event.colors?.secondary || "#D4B28A";
     const text = tones[3]?.hex || event.colors?.text || "#2E2E2E";
@@ -233,9 +234,9 @@ export default function EditorPanel({
                     <button
                       className="text-xs px-2 py-1 rounded border border-gray-300 hover:bg-gray-50"
                       onClick={() => applyPalette(p.tones)}
-                      title="Aplicar paleta"
+                      title="Aplicar paleta completa"
                     >
-                      Aplicar
+                      Aplicar paleta
                     </button>
                   </div>
                   <div className="flex gap-2 mt-2">
@@ -247,11 +248,15 @@ export default function EditorPanel({
                           onClick={() => handleColorChange("primary", t.hex)}
                           title={`${t.label} · Usar como primario`}
                         />
-                        <span className="text-[10px] text-gray-600 mt-1">{i === 3 ? "Oscuro" : t.label}</span>
+                        <span className="text-[10px] text-gray-600 mt-1">
+                          {i === 3 ? "Oscuro" : t.label}
+                        </span>
                       </div>
                     ))}
                   </div>
-                  
+                  <div className="text-[10px] text-gray-500 mt-2">
+                    Mapeo al aplicar: <b>Primario</b> = Intermedio 2, <b>Secundario</b> = Oscuro, <b>Texto</b> = Oscuro.
+                  </div>
                 </div>
               ))}
             </CardContent>
@@ -602,27 +607,9 @@ export default function EditorPanel({
           </Card>
         </TabsContent>
 
-        {/* ============ IMÁGENES (placeholder, se hará después) ============ */}
+        {/* ============ IMÁGENES (usa ImagesPanel) ============ */}
         <TabsContent value="images" className="px-4 pb-4">
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-sm">Imágenes (próximo paso)</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2 text-xs text-gray-600">
-              <p>
-                Aquí conectaremos el <b>uploader</b> para:
-              </p>
-              <ul className="list-disc pl-5 space-y-1">
-                <li>Textura principal del hero</li>
-                <li>Decorativos superior e inferior</li>
-              </ul>
-              <p>
-                Las claves esperadas por <code>InvitationCanvas</code> son:{" "}
-                <code>event.images.heroTexture</code>, <code>event.images.heroTop</code>,{" "}
-                <code>event.images.heroBottom</code>.
-              </p>
-            </CardContent>
-          </Card>
+          <ImagesPanel event={event} setEvent={setEvent} />
         </TabsContent>
 
         {/* ============ TEMPLATES ============ */}
