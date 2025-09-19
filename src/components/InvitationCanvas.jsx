@@ -23,28 +23,31 @@ import { asset, onImgError } from "../utils/assets";
 
 /**
  * InvitationCanvas
- * - Conectado al EditorPanel.
- * - Root con dir={event?.direction || 'ltr'}.
- * - Hero con logo opcional (decorativo superior) si event.images.logo existe.
- * - Colores editables: primary/secondary/text y dark (Dress code + Footer).
+ * - Visual tipo DemoBlack (franjas) sin cambiar el layout.
+ * - Sincroniza con EditorPanel:
+ *   · Colores: event.colors.{primary, secondary, text, dark}
+ *   · Tipografías: event.fonts.{primary, secondary}
+ *   · Imágenes: event.images.{heroTexture, logo}
+ * - Dirección del documento configurable: event.direction ("ltr" | "rtl" | "auto")
  */
 
 export default function InvitationCanvas({ event, ui, setEvent }) {
   if (!event) return null;
 
-  // ========== Colores / Tipografías ==========
+  /* =================== Colores / Tipografías =================== */
   const COLORS = useMemo(() => {
     const c = event.colors || {};
-    const primary   = c.primary   || "#8FAF86";
-    const secondary = c.secondary || "#D4B28A";
-    const text      = c.text      || "#2E2E2E";
-    const dark      = c.dark      || "#1F2937"; // NUEVO: para Dress code y Footer
-
+    const primary = c.primary || "#8FAF86";      // acentos
+    const secondary = c.secondary || "#D4B28A";  // franja regalos
+    const text = c.text || "#2E2E2E";            // textos base
+    // Fallback "dark": si no viene del panel, lo derivamos de la paleta (secondary → mezcla con negro)
+    const darkDerived = mixHex(secondary, "#000000", 0.75);
+    const dark = c.dark || darkDerived;
     return {
       primary,
-      primaryText: "#ffffff",
+      primaryText: "#FFFFFF",
       secondary,
-      secondaryText: "#ffffff",
+      secondaryText: "#FFFFFF",
       ink: text,
       body: text,
       muted: "#6B7280",
@@ -60,10 +63,11 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
   const fontPrimary = event.fonts?.primary || "Inter, system-ui, sans-serif";
   const fontSecondary = event.fonts?.secondary || "Playfair Display, Georgia, serif";
 
-  // ========== Imágenes ==========
+  /* =================== Imágenes =================== */
   const heroTexture = event.images?.heroTexture || asset("src/assets/portada.webp");
+  // Logo opcional (decorativo superior): event.images.logo
 
-  // ========== Countdown ==========
+  /* =================== Countdown =================== */
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   useEffect(() => {
     const iso = buildTargetISO(event.date, event.time);
@@ -80,7 +84,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
     return () => clearInterval(id);
   }, [event.date, event.time]);
 
-  // ========== Modales / RSVP ==========
+  /* =================== Estado modales =================== */
   const [showRSVP, setShowRSVP] = useState(false);
   const [showGifts, setShowGifts] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -96,13 +100,28 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
     }, 2200);
   };
 
-  // ========== Helpers edición ==========
-  const addGift = () => setEvent((p) => ({ ...p, gifts: [ ...(p.gifts || []), { label: "Mesa de Regalos", url: "" } ] }));
-  const updateGift = (i, k, v) => setEvent((p) => { const arr = [ ...(p.gifts || []) ]; arr[i] = { ...arr[i], [k]: v }; return { ...p, gifts: arr }; });
-  const removeGift = (i) => setEvent((p) => { const arr = [ ...(p.gifts || []) ]; arr.splice(i, 1); return { ...p, gifts: arr }; });
+  /* =================== Helpers edición =================== */
+  const addGift = () =>
+    setEvent((p) => ({ ...p, gifts: [...(p.gifts || []), { label: "Mesa de Regalos", url: "" }] }));
+  const updateGift = (i, k, v) =>
+    setEvent((p) => {
+      const arr = [...(p.gifts || [])];
+      arr[i] = { ...arr[i], [k]: v };
+      return { ...p, gifts: arr };
+    });
+  const removeGift = (i) =>
+    setEvent((p) => {
+      const arr = [...(p.gifts || [])];
+      arr.splice(i, 1);
+      return { ...p, gifts: arr };
+    });
 
   return (
-    <div className="min-h-screen" dir={event?.direction || "ltr"} style={{ backgroundColor: COLORS.paper }}>
+    <div
+      className="min-h-screen"
+      dir={event?.direction || "ltr"}
+      style={{ backgroundColor: COLORS.paper }}
+    >
       {/* ===== HERO ===== */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
@@ -179,9 +198,9 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         </div>
       </section>
 
-      {/* ===== COUNTDOWN ===== */}
+      {/* ===== COUNTDOWN (franja acento) ===== */}
       <section className="py-12 sm:py-16" style={{ backgroundColor: COLORS.primary }}>
-        <div className="max-w-4xl mx-auto px-4 text-center">
+        <div className="max-w-4xl mx-auto px-4 text-center" dir="ltr">
           <h2
             className="font-light mb-6 sm:mb-8 tracking-wide"
             style={{ color: COLORS.primaryText, fontSize: "clamp(1.25rem, 3.5vw, 1.875rem)", fontFamily: fontPrimary }}
@@ -201,8 +220,8 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         </div>
       </section>
 
-      {/* ===== DETALLES ===== */}
-      <section className="py-16 bg-white">
+      {/* ===== DETALLES (blanco) ===== */}
+      <section className="py-16 bg-white" dir="ltr">
         <div className="max-w-4xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12">
             {/* Ceremonia */}
@@ -321,7 +340,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
       </section>
 
       {/* ===== REGALOS / TRANSFERENCIAS ===== */}
-      <section className="py-16 text-center" style={{ backgroundColor: COLORS.secondary }}>
+      <section className="py-16 text-center" style={{ backgroundColor: COLORS.secondary }} dir="ltr">
         <div className="max-w-3xl mx-auto px-4">
           <Gift className="w-10 h-10 mx-auto mb-6" style={{ color: COLORS.secondaryText }} />
           <p
@@ -336,16 +355,23 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
               style={{ color: COLORS.secondaryText }}
             />
           </p>
-          <Button className="rounded-full px-8 py-3" style={{ backgroundColor: COLORS.white, color: COLORS.secondary }}>
-            <span onClick={() => setShowGifts(true)}>VER DATOS BANCARIOS</span>
+          <Button
+            className="rounded-full px-8 py-3"
+            style={{ backgroundColor: COLORS.white, color: COLORS.secondary }}
+            onClick={() => setShowGifts(true)}
+          >
+            VER DATOS BANCARIOS
           </Button>
         </div>
       </section>
 
       {/* ===== INSTAGRAM ===== */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white" dir="ltr">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{ backgroundColor: COLORS.primarySoft }}>
+          <div
+            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+            style={{ backgroundColor: COLORS.primarySoft }}
+          >
             <Instagram className="w-8 h-8" style={{ color: COLORS.primary }} />
           </div>
           <h2 className="text-2xl font-display font-medium mb-4" style={{ color: COLORS.ink, fontFamily: fontSecondary }}>
@@ -364,8 +390,8 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         </div>
       </section>
 
-      {/* ===== DRESS CODE (usa COLORS.dark / darkText) ===== */}
-      <section className="py-16" style={{ backgroundColor: COLORS.dark, color: COLORS.darkText }}>
+      {/* ===== DRESS CODE (editable por event.colors.dark) ===== */}
+      <section className="py-16" style={{ backgroundColor: COLORS.dark, color: COLORS.darkText }} dir="ltr">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-display font-medium mb-4 tracking-wide" style={{ fontFamily: fontSecondary }}>
             DRESS CODE
@@ -383,7 +409,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
       </section>
 
       {/* ===== RSVP ===== */}
-      <section className="py-16" style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}>
+      <section className="py-16" style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }} dir="ltr">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ fontFamily: fontSecondary }}>
             CONFIRMACIÓN DE ASISTENCIA
@@ -414,7 +440,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
               className="mt-4 rounded-full px-8 py-3"
               style={{ borderColor: COLORS.primaryText, color: COLORS.primaryText }}
               onClick={() => {
-                /* generar .ics si deseas */
+                /* generar .ics si aplica */
               }}
             >
               AGENDAR EVENTO
@@ -424,7 +450,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
       </section>
 
       {/* ===== SUGERENCIAS MUSICALES ===== */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white" dir="ltr">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ color: COLORS.ink, fontFamily: fontSecondary }}>
             ¿QUÉ CANCIONES NO PUEDEN FALTAR?
@@ -444,12 +470,12 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
       </section>
 
       {/* ===== INFO ÚTIL ===== */}
-      <section className="py-16" style={{ backgroundColor: COLORS.paper }}>
+      <section className="py-16" style={{ backgroundColor: COLORS.paper }} dir="ltr">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ color: COLORS.ink, fontFamily: fontSecondary }}>
             INFO ÚTIL
           </h2>
-          <p className="mb-8 max-w-2xl mx-auto" style={{ color: COLORS.body }}>
+        <p className="mb-8 max-w-2xl mx-auto" style={{ color: COLORS.body }}>
             <EditableText
               value={event.info?.help || "Te dejamos sugerencias de alojamientos y traslados para ese fin de semana."}
               onChange={(v) => setEvent((p) => ({ ...p, info: { ...(p.info || {}), help: v } }))}
@@ -469,7 +495,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         </div>
       </section>
 
-      {/* ===== FOOTER (usa COLORS.dark / darkText) ===== */}
+      {/* ===== FOOTER (editable por event.colors.dark) ===== */}
       <footer className="py-12" style={{ backgroundColor: COLORS.dark, color: COLORS.darkText }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-lg mb-8">¡Gracias por acompañarnos en este momento tan importante!</p>
@@ -535,7 +561,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                   <p style={{ color: COLORS.body }}>Gracias por confirmar tu asistencia. ¡Te esperamos!</p>
                 </div>
               ) : (
-                <form onSubmit={handleRSVPSubmit} className="space-y-4">
+                <form onSubmit={handleRSVPSubmit} className="space-y-4" dir="ltr">
                   <Labeled label="Nombre completo *">
                     <Input
                       required
@@ -575,7 +601,9 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                         min="0"
                         max="5"
                         value={rsvpData.guests}
-                        onChange={(e) => setRsvpData({ ...rsvpData, guests: parseInt(e.target.value || "0", 10) })}
+                        onChange={(e) =>
+                          setRsvpData({ ...rsvpData, guests: parseInt(e.target.value || "0", 10) })
+                        }
                       />
                     </Labeled>
                   )}
@@ -589,7 +617,11 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                     />
                   </Labeled>
 
-                  <Button type="submit" className="w-full" style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
+                  >
                     <Heart className="w-4 h-4 mr-2" />
                     Confirmar Asistencia
                   </Button>
@@ -614,7 +646,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                 </Button>
               </div>
 
-              <div className="space-y-4 text-sm">
+              <div className="space-y-4 text-sm" dir="ltr">
                 <div className="text-center mb-2">
                   <CreditCard className="w-12 h-12 mx-auto mb-4" style={{ color: COLORS.primary }} />
                   <p style={{ color: COLORS.body }}>Si deseás colaborar con nuestra Luna de Miel:</p>
@@ -630,7 +662,11 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                     {renderBankLine("Alias", event.bank?.alias)}
                     {renderBankLine("Titular", event.bank?.titular)}
                     {renderBankLine("Cuenta", event.bank?.cuenta)}
-                    {event.bank?.nota ? <p className="text-xs" style={{ color: COLORS.muted }}>{event.bank?.nota}</p> : null}
+                    {event.bank?.nota ? (
+                      <p className="text-xs" style={{ color: COLORS.muted }}>
+                        {event.bank?.nota}
+                      </p>
+                    ) : null}
                   </div>
                 </div>
 
@@ -683,7 +719,6 @@ function TimeCell({ value, label, color = "#fff" }) {
     </div>
   );
 }
-
 function SeparatorDot({ color = "#fff" }) {
   return (
     <div className="self-center font-light" style={{ color, fontSize: "clamp(2rem, 7vw, 4rem)" }}>
@@ -707,16 +742,14 @@ function DetailIconCard({ icon, iconBg, title, titleColor, textColor, muted, chi
     </div>
   );
 }
-
 function Labeled({ label, children }) {
   return (
-    <label className="block text-sm">
+    <label className="block text-sm" dir="ltr">
       <span className="mb-1 block text-gray-700">{label}</span>
       {children}
     </label>
   );
 }
-
 function renderBankLine(label, value) {
   if (!value) return null;
   return (
@@ -731,15 +764,25 @@ function toSoft(hex, alpha = 0.14) {
   const { r, g, b } = hexToRgb(hex);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
-
 function hexToRgb(hex) {
-  let h = hex.replace("#", "").trim();
+  let h = (hex || "#000").replace("#", "").trim();
   if (h.length === 3) h = h.split("").map((ch) => ch + ch).join("");
   const num = parseInt(h, 16);
   return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
 }
 
-/** Devuelve blanco o casi negro según contraste */
+/** Mezcla dos colores hex con peso [0..1] hacia hexB */
+function mixHex(hexA, hexB, weight = 0.5) {
+  const a = hexToRgb(hexA);
+  const b = hexToRgb(hexB);
+  const mix = (x, y) => Math.round(x * (1 - weight) + y * weight);
+  const r = mix(a.r, b.r);
+  const g = mix(a.g, b.g);
+  const bch = mix(a.b, b.b);
+  return `#${[r, g, bch].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+}
+
+/** Elige color de texto (negro/blanco) según contraste YIQ */
 function pickTextColor(hex) {
   const { r, g, b } = hexToRgb(hex);
   const yiq = (r * 299 + g * 587 + b * 114) / 1000;
@@ -783,7 +826,6 @@ function buildTargetISO(dateStr, timeStr) {
   }
   return null;
 }
-
 function pad(n) {
   return String(n).padStart(2, "0");
 }
