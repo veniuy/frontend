@@ -105,7 +105,6 @@ export default function EditorPanel({
 
   /* =================== Helpers =================== */
   const applyPalette = (tones) => {
-    // Mapeo al aplicar paleta:
     // primary = Intermedio 2 (tones[2])
     // secondary = Oscuro (tones[3])
     // text = Oscuro (tones[3])
@@ -203,7 +202,7 @@ export default function EditorPanel({
                       onClick={() => applyPalette(p.tones)}
                       title="Aplicar paleta completa"
                     >
-                      Aplicar paleta
+                      Aplicar
                     </button>
                   </div>
                   <div className="flex gap-2 mt-2">
@@ -217,10 +216,6 @@ export default function EditorPanel({
                         />
                       </div>
                     ))}
-                  </div>
-                  <div className="text-[10px] text-gray-500 mt-2">
-                    Mapeo al aplicar: <b>Primario</b> = Intermedio 2 · <b>Secundario</b> = Oscuro ·{" "}
-                    <b>Texto</b> = Oscuro · <b>Dark</b> = Oscuro.
                   </div>
                 </div>
               ))}
