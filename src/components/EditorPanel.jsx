@@ -1,4 +1,5 @@
-// src/components/EditorPanel.jsx - TENEMOS QUE AGREGAR event.colors.dark COMO 4 COLOR EL OSCURO DE LA PALETA
+// src/components/EditorPanel.jsx
+// TENEMOS QUE AGREGAR event.colors.dark COMO 4 COLOR EL OSCURO DE LA PALETA
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,19 +22,17 @@ import ImagesPanel from "./ImagesPanel";
 
 /**
  * EditorPanel
- * - Pestaña Color: 8 paletas pedidas + colores personalizados (primary, secondary, text).
- * - Pestaña Contenido: datos bancarios, mesa de regalos (links), textos de secciones.
- * - Pestaña Imágenes: ahora usa <ImagesPanel /> (fondos predefinidos, subir fondo propio, logo y decorativos).
+ * - Pestaña Color: 8 paletas + colores personalizados (primary, secondary, text, dark).
+ * - Pestaña Contenido: datos bancarios, mesa de regalos, textos de secciones.
+ * - Pestaña Imágenes: <ImagesPanel /> (fondos, logo, decorativos).
  * - Pestaña Templates: sin cambios.
  * - Cierre en móviles con "X".
  *
- * Props esperadas:
+ * Props:
  *  - event, ui
- *  - setActiveTab(value), setShowMobilePanel(bool)
- *  - handleColorChange(key, value)
- *  - handleFontChange(key, value)
- *  - handleTemplateChange(id)
- *  - setEvent(updater)
+ *  - setActiveTab, setShowMobilePanel
+ *  - handleColorChange, handleFontChange, handleTemplateChange
+ *  - setEvent
  */
 
 export default function EditorPanel({
@@ -47,7 +46,7 @@ export default function EditorPanel({
   setEvent,
 }) {
   /* =================== PALETAS =================== */
-   const PALETTES = [
+  const PALETTES = [
     {
       name: "Champagne",
       tones: [{ hex: "#F6E3D4" }, { hex: "#E1C1A8" }, { hex: "#D1A880" }, { hex: "#B8997F" }],
@@ -104,14 +103,20 @@ export default function EditorPanel({
 
   /* =================== Helpers =================== */
   const applyPalette = (tones) => {
-    // Mapeo: primary = Intermedio 2 (tones[2]), secondary = Oscuro (tones[3]), text = Oscuro (tones[3])
+    // Mapeo al aplicar paleta:
+    // primary = Intermedio 2 (tones[2])
+    // secondary = Oscuro (tones[3])
+    // text = Oscuro (tones[3])
+    // dark = Oscuro (tones[3])   <-- NUEVO
     const primary = tones[2]?.hex || event.colors?.primary || "#8FAF86";
     const secondary = tones[3]?.hex || event.colors?.secondary || "#D4B28A";
     const text = tones[3]?.hex || event.colors?.text || "#2E2E2E";
+    const dark = tones[3]?.hex || event.colors?.dark || "#1F2937";
 
     handleColorChange("primary", primary);
     handleColorChange("secondary", secondary);
     handleColorChange("text", text);
+    handleColorChange("dark", dark); // <- NUEVO
   };
 
   const addGift = () =>
@@ -200,16 +205,20 @@ export default function EditorPanel({
                     </button>
                   </div>
                   <div className="flex gap-2 mt-2">
-                    {p.tones.map((t, i) => (
+                    {p.tones.map((t) => (
                       <div key={t.hex} className="flex flex-col items-center">
                         <button
                           className="w-9 h-9 rounded border-2 border-gray-200 hover:border-gray-400"
                           style={{ backgroundColor: t.hex }}
                           onClick={() => handleColorChange("primary", t.hex)}
-                          title={`${t.label} · Usar como primario`}
+                          title={`Usar ${t.hex} como primario`}
                         />
                       </div>
                     ))}
+                  </div>
+                  <div className="text-[10px] text-gray-500 mt-2">
+                    Mapeo al aplicar: <b>Primario</b> = Intermedio 2 · <b>Secundario</b> = Oscuro ·{" "}
+                    <b>Texto</b> = Oscuro · <b>Dark</b> = Oscuro.
                   </div>
                 </div>
               ))}
@@ -221,7 +230,7 @@ export default function EditorPanel({
               <CardTitle className="text-sm">Colores Personalizados</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {["primary", "secondary", "text"].map((key) => (
+              {["primary", "secondary", "text", "dark"].map((key) => (
                 <div key={key}>
                   <Label className="text-xs capitalize">Color {key}</Label>
                   <div className="flex gap-2 mt-1">
@@ -239,6 +248,11 @@ export default function EditorPanel({
                       placeholder="#RRGGBB"
                     />
                   </div>
+                  {key === "dark" && (
+                    <p className="text-[10px] text-gray-500 mt-1">
+                      Usado en “Dress code” y “Footer”.
+                    </p>
+                  )}
                 </div>
               ))}
             </CardContent>
@@ -511,7 +525,7 @@ export default function EditorPanel({
             </CardContent>
           </Card>
 
-          {/* Textos de secciones (para InvitationCanvas) */}
+          {/* Textos de secciones */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm">Textos de Secciones</CardTitle>
@@ -594,3 +608,4 @@ export default function EditorPanel({
     </div>
   );
 }
+
