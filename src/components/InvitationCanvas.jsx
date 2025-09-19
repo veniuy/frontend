@@ -119,14 +119,19 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         <div className="absolute inset-0">
           <img src={heroTexture} onError={(e)=>onImgError(e,"Textura")} alt="Textura" className="absolute inset-0 w-full h-full object-cover object-center block" />
         </div>
-        <div className="absolute top-0 left-0 w-[420px] h-[260px] opacity-80 pointer-events-none">
-          <img src={floralTop} onError={(e)=>onImgError(e,"Decorativo superior")} alt="Decorativo superior" className="absolute inset-0 w-full h-full object-cover block" />
-        </div>
-        <div className="absolute bottom-0 right-0 w-[460px] h-[280px] opacity-80 pointer-events-none">
-          <img src={floralBottom} onError={(e)=>onImgError(e,"Decorativo inferior")} alt="Decorativo inferior" className="absolute inset-0 w-full h-full object-cover block" />
-        </div>
-
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto" dir="ltr">
+        )}
+        {/* Logo (decorativo superior) — solo si existe */}
+{event?.images?.logo && (
+  <div className="absolute top-0 left-0 w-[420px] h-[260px] opacity-80 pointer-events-none">
+    <img
+      src={event.images.logo}
+      onError={(e) => onImgError(e, "Logo")}
+      alt="Logo"
+      className="absolute inset-0 w-full h-full object-contain block"
+    />
+  </div>
+)}
+        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <h1 className="font-display font-light mb-3 tracking-wider"
               style={{ color: COLORS.ink, fontSize: "clamp(2.75rem, 8vw, 6rem)", fontFamily: fontSecondary }}>
             <EditableText
