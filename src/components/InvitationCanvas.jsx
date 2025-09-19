@@ -60,8 +60,9 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
     };
   }, [event.colors]);
 
-  const fontPrimary = event.fonts?.primary || "Inter, system-ui, sans-serif";
-  const fontSecondary = event.fonts?.secondary || "Playfair Display, Georgia, serif";
+const fontPrimary = event.fonts?.primary || "'Playfair Display', serif";
+const fontSecondary = event.fonts?.secondary || "'Great Vibes', cursive";
+
 
   /* =================== Imágenes =================== */
   const heroTexture = event.images?.heroTexture || asset("src/assets/portada.webp");
