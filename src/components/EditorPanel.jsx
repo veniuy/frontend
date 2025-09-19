@@ -82,16 +82,18 @@ export default function EditorPanel({
   ];
 
   const fontFamilies = [
-    "Inter",
-    "Helvetica Neue",
-    "Arial",
-    "Georgia",
-    "Times New Roman",
-    "Playfair Display",
-    "Montserrat",
-    "Open Sans",
-    "Lato",
-    "Roboto",
+  "Inter, system-ui, sans-serif",
+  "'Great Vibes', cursive",
+  "'Playfair Display', serif",
+  "Cardo, serif",
+  "'Pinyon Script', cursive",
+  "'Cormorant Garamond', serif",
+  "Bellefair, serif",
+  "'Alex Brush', cursive",
+  "Tangerine, cursive",
+  "Montserrat, sans-serif",
+  "Open Sans, sans-serif",
+  "Lato, sans-serif",
   ];
 
   const templates = [
