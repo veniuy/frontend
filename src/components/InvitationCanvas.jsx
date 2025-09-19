@@ -19,55 +19,52 @@ import {
   X,
   CheckCircle,
 } from "lucide-react";
-// Helpers de assets (usa los mismos que en tus demos)
 import { asset, onImgError } from "../utils/assets";
 
 /**
  * InvitationCanvas
- * Landing por franjas (igual a DemoBlack), pero editable y conectada al EditorPanel:
- *  - Colores: event.colors.primary / secondary / text
- *  - Tipografías: event.fonts.primary / secondary
- *  - Imágenes: event.images.heroTexture / heroTop / heroBottom (desde pestaña Imágenes)
- *
- * NO se modifica la estructura visual ni el orden de secciones.
+ * - Conectado al EditorPanel.
+ * - Root con dir={event?.direction || 'ltr'}.
+ * - Hero con logo opcional (decorativo superior) si event.images.logo existe.
+ * - Colores editables: primary/secondary/text y dark (Dress code + Footer).
  */
 
 export default function InvitationCanvas({ event, ui, setEvent }) {
   if (!event) return null;
 
-  // ========== Colores / Tipografías (controlados por el Panel) ==========
-  // Fallbacks alineados a tu demo; se overridean con event.colors.*
+  // ========== Colores / Tipografías ==========
   const COLORS = useMemo(() => {
     const c = event.colors || {};
-    const primary = c.primary || "#8FAF86";       // acentos (antes: "sage")
-    const secondary = c.secondary || "#D4B28A";   // regalos/transferencias (antes: "almond")
-    const text = c.text || "#2E2E2E";             // textos
+    const primary   = c.primary   || "#8FAF86";
+    const secondary = c.secondary || "#D4B28A";
+    const text      = c.text      || "#2E2E2E";
+    const dark      = c.dark      || "#1F2937"; // NUEVO: para Dress code y Footer
+
     return {
-      primary,            // acentos, CTA, iconos, countdown bg, rsvp, etc.
-      primaryText: "#ffffff", // texto sobre fondos primary
-      secondary,          // franja regalos
-      secondaryText: "#ffffff", // texto sobre fondos secondary
-      ink: text,          // títulos/lettering principales
-      body: text,         // párrafos
-      muted: "#6B7280",   // descripciones suaves
-      paper: "#F8F8F6",   // fondo general claro
+      primary,
+      primaryText: "#ffffff",
+      secondary,
+      secondaryText: "#ffffff",
+      ink: text,
+      body: text,
+      muted: "#6B7280",
+      paper: "#F8F8F6",
       white: "#FFFFFF",
-      // derivadas suaves
       primarySoft: toSoft(primary, 0.16),
       secondarySoft: toSoft(secondary, 0.12),
+      dark,
+      darkText: pickTextColor(dark),
     };
   }, [event.colors]);
 
   const fontPrimary = event.fonts?.primary || "Inter, system-ui, sans-serif";
   const fontSecondary = event.fonts?.secondary || "Playfair Display, Georgia, serif";
 
-  // ========== Imágenes (desde Panel/Images) ==========
+  // ========== Imágenes ==========
   const heroTexture = event.images?.heroTexture || asset("src/assets/portada.webp");
-  const floralTop   = event.images?.heroTop     || asset("src/assets/hero_top.png");
-  const floralBottom= event.images?.heroBottom  || asset("src/assets/hero_bottom.png");
 
   // ========== Countdown ==========
-  const [timeLeft, setTimeLeft] = useState({ days:0, hours:0, minutes:0, seconds:0 });
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   useEffect(() => {
     const iso = buildTargetISO(event.date, event.time);
     const target = new Date(iso || "2026-11-23T19:00:00");
@@ -83,11 +80,11 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
     return () => clearInterval(id);
   }, [event.date, event.time]);
 
-  // ========== Estado de modales ==========
+  // ========== Modales / RSVP ==========
   const [showRSVP, setShowRSVP] = useState(false);
   const [showGifts, setShowGifts] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [rsvpData, setRsvpData] = useState({ name:"", email:"", attendance:"", guests:1, message:"" });
+  const [rsvpData, setRsvpData] = useState({ name: "", email: "", attendance: "", guests: 1, message: "" });
 
   const handleRSVPSubmit = (e) => {
     e.preventDefault();
@@ -95,48 +92,48 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
     setTimeout(() => {
       setShowSuccess(false);
       setShowRSVP(false);
-      setRsvpData({ name:"", email:"", attendance:"", guests:1, message:"" });
+      setRsvpData({ name: "", email: "", attendance: "", guests: 1, message: "" });
     }, 2200);
   };
 
   // ========== Helpers edición ==========
-  const setCoupleFromString = (val) => {
-    const [bride="", groom=""] = val.split("&").map(s=>s.trim());
-    setEvent(p => ({ ...p, couple:{ bride, groom: groom || p.couple?.groom || "" } }));
-  };
-  const addGift = () => setEvent(p => ({ ...p, gifts:[...(p.gifts||[]), { label:"Mesa de Regalos", url:"" }] }));
-  const updateGift = (i,k,v) => setEvent(p => {
-    const arr = [...(p.gifts||[])]; arr[i] = { ...arr[i], [k]: v }; return { ...p, gifts: arr };
-  });
-  const removeGift = (i) => setEvent(p => {
-    const arr = [...(p.gifts||[])]; arr.splice(i,1); return { ...p, gifts: arr };
-  });
+  const addGift = () => setEvent((p) => ({ ...p, gifts: [ ...(p.gifts || []), { label: "Mesa de Regalos", url: "" } ] }));
+  const updateGift = (i, k, v) => setEvent((p) => { const arr = [ ...(p.gifts || []) ]; arr[i] = { ...arr[i], [k]: v }; return { ...p, gifts: arr }; });
+  const removeGift = (i) => setEvent((p) => { const arr = [ ...(p.gifts || []) ]; arr.splice(i, 1); return { ...p, gifts: arr }; });
 
   return (
-      <div className="min-h-screen" dir={event?.direction || "ltr"} style={{ backgroundColor: COLORS.paper }}>
-      {/* ===== HERO con textura + florales (sin cambios de layout) ===== */}
+    <div className="min-h-screen" dir={event?.direction || "ltr"} style={{ backgroundColor: COLORS.paper }}>
+      {/* ===== HERO ===== */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
-          <img src={heroTexture} onError={(e)=>onImgError(e,"Textura")} alt="Textura" className="absolute inset-0 w-full h-full object-cover object-center block" />
+          <img
+            src={heroTexture}
+            onError={(e) => onImgError(e, "Textura")}
+            alt="Textura"
+            className="absolute inset-0 w-full h-full object-cover object-center block"
+          />
         </div>
-        )}
+
         {/* Logo (decorativo superior) — solo si existe */}
-{event?.images?.logo && (
-  <div className="absolute top-0 left-0 w-[420px] h-[260px] opacity-80 pointer-events-none">
-    <img
-      src={event.images.logo}
-      onError={(e) => onImgError(e, "Logo")}
-      alt="Logo"
-      className="absolute inset-0 w-full h-full object-contain block"
-    />
-  </div>
-)}
+        {event?.images?.logo && (
+          <div className="absolute top-0 left-0 w-[420px] h-[260px] opacity-80 pointer-events-none">
+            <img
+              src={event.images.logo}
+              onError={(e) => onImgError(e, "Logo")}
+              alt="Logo"
+              className="absolute inset-0 w-full h-full object-contain block"
+            />
+          </div>
+        )}
+
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <h1 className="font-display font-light mb-3 tracking-wider"
-              style={{ color: COLORS.ink, fontSize: "clamp(2.75rem, 8vw, 6rem)", fontFamily: fontSecondary }}>
+          <h1
+            className="font-display font-light mb-3 tracking-wider"
+            style={{ color: COLORS.ink, fontSize: "clamp(2.75rem, 8vw, 6rem)", fontFamily: fontSecondary }}
+          >
             <EditableText
               value={(event.couple?.bride || "Belén").toUpperCase()}
-              onChange={(val)=>setEvent(p=>({ ...p, couple:{ ...p.couple, bride: val } }))}
+              onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: val } }))}
               ariaLabel="Nombre 1"
               className="px-1"
               singleLine
@@ -146,18 +143,22 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
 
           <div className="flex items-center justify-center my-6">
             <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
-            <div className="mx-4 font-light"
-                 style={{ color: COLORS.primary, fontSize: "clamp(1.75rem, 5vw, 3rem)", fontFamily: fontSecondary }}>
+            <div
+              className="mx-4 font-light"
+              style={{ color: COLORS.primary, fontSize: "clamp(1.75rem, 5vw, 3rem)", fontFamily: fontSecondary }}
+            >
               ∞
             </div>
             <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
           </div>
 
-          <h1 className="font-display font-light mb-8 tracking-wider"
-              style={{ color: COLORS.ink, fontSize: "clamp(2.75rem, 8vw, 6rem)", fontFamily: fontSecondary }}>
+          <h1
+            className="font-display font-light mb-8 tracking-wider"
+            style={{ color: COLORS.ink, fontSize: "clamp(2.75rem, 8vw, 6rem)", fontFamily: fontSecondary }}
+          >
             <EditableText
               value={(event.couple?.groom || "Amadeo").toUpperCase()}
-              onChange={(val)=>setEvent(p=>({ ...p, couple:{ ...p.couple, groom: val } }))}
+              onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: val } }))}
               ariaLabel="Nombre 2"
               className="px-1"
               singleLine
@@ -165,8 +166,10 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
             />
           </h1>
 
-          <p className="font-light mb-10 tracking-wide"
-             style={{ color: COLORS.muted, fontSize: "clamp(1.1rem, 3.5vw, 1.5rem)", fontFamily: fontPrimary }}>
+          <p
+            className="font-light mb-10 tracking-wide"
+            style={{ color: COLORS.muted, fontSize: "clamp(1.1rem, 3.5vw, 1.5rem)", fontFamily: fontPrimary }}
+          >
             ¡NOS CASAMOS!
           </p>
 
@@ -176,28 +179,30 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         </div>
       </section>
 
-      {/* ===== COUNTDOWN (franja acento) ===== */}
+      {/* ===== COUNTDOWN ===== */}
       <section className="py-12 sm:py-16" style={{ backgroundColor: COLORS.primary }}>
-        <div className="max-w-4xl mx-auto px-4 text-center" dir="ltr">
-          <h2 className="font-light mb-6 sm:mb-8 tracking-wide"
-              style={{ color: COLORS.primaryText, fontSize: "clamp(1.25rem, 3.5vw, 1.875rem)", fontFamily: fontPrimary }}>
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2
+            className="font-light mb-6 sm:mb-8 tracking-wide"
+            style={{ color: COLORS.primaryText, fontSize: "clamp(1.25rem, 3.5vw, 1.875rem)", fontFamily: fontPrimary }}
+          >
             Bienvenidos a nuestra boda
           </h2>
 
           <div className="flex items-stretch justify-center gap-5 sm:gap-8 select-none">
-            <TimeCell value={timeLeft.days}    label="días" color={COLORS.primaryText} />
+            <TimeCell value={timeLeft.days} label="días" color={COLORS.primaryText} />
             <SeparatorDot color={COLORS.primaryText} />
-            <TimeCell value={timeLeft.hours}   label="hs"   color={COLORS.primaryText} />
+            <TimeCell value={timeLeft.hours} label="hs" color={COLORS.primaryText} />
             <SeparatorDot color={COLORS.primaryText} />
-            <TimeCell value={timeLeft.minutes} label="min"  color={COLORS.primaryText} />
+            <TimeCell value={timeLeft.minutes} label="min" color={COLORS.primaryText} />
             <SeparatorDot color={COLORS.primaryText} />
-            <TimeCell value={timeLeft.seconds} label="seg"  color={COLORS.primaryText} />
+            <TimeCell value={timeLeft.seconds} label="seg" color={COLORS.primaryText} />
           </div>
         </div>
       </section>
 
-      {/* ===== DETALLES (blanco) ===== */}
-      <section className="py-16 bg-white" dir="ltr">
+      {/* ===== DETALLES ===== */}
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12">
             {/* Ceremonia */}
@@ -213,7 +218,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                 <p className="text-lg" style={{ color: COLORS.body }}>
                   <EditableText
                     value={event.date || "23 de Noviembre, 2026"}
-                    onChange={(v)=>setEvent(p=>({ ...p, date: v }))}
+                    onChange={(v) => setEvent((p) => ({ ...p, date: v }))}
                     className="px-1"
                     singleLine
                   />
@@ -221,7 +226,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                 <p className="text-lg" style={{ color: COLORS.body }}>
                   <EditableText
                     value={event.ceremony?.time || event.time || "19:00 hs"}
-                    onChange={(v)=>setEvent(p=>({ ...p, ceremony:{ ...p.ceremony, time: v } }))}
+                    onChange={(v) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, time: v } }))}
                     className="px-1"
                     singleLine
                   />
@@ -229,7 +234,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                 <p className="font-medium" style={{ color: COLORS.body }}>
                   <EditableText
                     value={event.ceremony?.venue || "Iglesia Nuestra Señora del Carmen"}
-                    onChange={(v)=>setEvent(p=>({ ...p, ceremony:{ ...p.ceremony, venue: v } }))}
+                    onChange={(v) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, venue: v } }))}
                     className="px-1"
                     singleLine
                   />
@@ -237,7 +242,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                 <p style={{ color: COLORS.body }}>
                   <EditableText
                     value={event.ceremony?.location || "Villa Allende, Córdoba"}
-                    onChange={(v)=>setEvent(p=>({ ...p, ceremony:{ ...p.ceremony, location: v } }))}
+                    onChange={(v) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, location: v } }))}
                     className="px-1"
                     singleLine
                   />
@@ -246,9 +251,16 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                   Recibí debajo las indicaciones para llegar.
                 </p>
               </div>
-              <Button className="px-8 py-3 rounded-full"
-                      style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
-                      onClick={()=>window.open(`https://maps.google.com/?q=${event.ceremony?.address || "Av. San Martín 456, Villa Allende"}`,"_blank")}>
+              <Button
+                className="px-8 py-3 rounded-full"
+                style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
+                onClick={() =>
+                  window.open(
+                    `https://maps.google.com/?q=${event.ceremony?.address || "Av. San Martín 456, Villa Allende"}`,
+                    "_blank"
+                  )
+                }
+              >
                 LLEGAR A LA CEREMONIA
               </Button>
             </DetailIconCard>
@@ -266,7 +278,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                 <p className="text-lg" style={{ color: COLORS.body }}>
                   <EditableText
                     value={event.reception?.time || "Después de la ceremonia"}
-                    onChange={(v)=>setEvent(p=>({ ...p, reception:{ ...p.reception, time: v } }))}
+                    onChange={(v) => setEvent((p) => ({ ...p, reception: { ...p.reception, time: v } }))}
                     className="px-1"
                     singleLine
                   />
@@ -274,7 +286,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                 <p className="font-medium" style={{ color: COLORS.body }}>
                   <EditableText
                     value={event.reception?.venue || "Rincón Calina"}
-                    onChange={(v)=>setEvent(p=>({ ...p, reception:{ ...p.reception, venue: v } }))}
+                    onChange={(v) => setEvent((p) => ({ ...p, reception: { ...p.reception, venue: v } }))}
                     className="px-1"
                     singleLine
                   />
@@ -282,7 +294,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                 <p style={{ color: COLORS.body }}>
                   <EditableText
                     value={event.reception?.location || "Unquillo, Córdoba"}
-                    onChange={(v)=>setEvent(p=>({ ...p, reception:{ ...p.reception, location: v } }))}
+                    onChange={(v) => setEvent((p) => ({ ...p, reception: { ...p.reception, location: v } }))}
                     className="px-1"
                     singleLine
                   />
@@ -291,9 +303,16 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                   ¡Te esperamos!
                 </p>
               </div>
-              <Button className="px-8 py-3 rounded-full"
-                      style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
-                      onClick={()=>window.open(`https://maps.google.com/?q=${event.reception?.address || "Ruta Provincial E-53 Km 8, Unquillo"}`,"_blank")}>
+              <Button
+                className="px-8 py-3 rounded-full"
+                style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
+                onClick={() =>
+                  window.open(
+                    `https://maps.google.com/?q=${event.reception?.address || "Ruta Provincial E-53 Km 8, Unquillo"}`,
+                    "_blank"
+                  )
+                }
+              >
                 LLEGAR A LA FIESTA
               </Button>
             </DetailIconCard>
@@ -301,50 +320,52 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         </div>
       </section>
 
-      {/* ===== REGALOS / TRANSFERENCIAS (franja secondary) ===== */}
-      <section className="py-16 text-center" style={{ backgroundColor: COLORS.secondary }} dir="ltr">
+      {/* ===== REGALOS / TRANSFERENCIAS ===== */}
+      <section className="py-16 text-center" style={{ backgroundColor: COLORS.secondary }}>
         <div className="max-w-3xl mx-auto px-4">
           <Gift className="w-10 h-10 mx-auto mb-6" style={{ color: COLORS.secondaryText }} />
-          <p className="mb-8" style={{ color: COLORS.secondaryText, fontSize: "clamp(1rem, 2.5vw, 1.25rem)", fontFamily: fontPrimary }}>
+          <p
+            className="mb-8"
+            style={{ color: COLORS.secondaryText, fontSize: "clamp(1rem, 2.5vw, 1.25rem)", fontFamily: fontPrimary }}
+          >
             <EditableText
               value={event.giftsNote || "Si deseás realizarnos un regalo podés colaborar con nuestra Luna de Miel…"}
-              onChange={(v)=>setEvent(p=>({ ...p, giftsNote: v }))}
+              onChange={(v) => setEvent((p) => ({ ...p, giftsNote: v }))}
               className="px-1"
               singleLine={false}
               style={{ color: COLORS.secondaryText }}
             />
           </p>
-          <Button className="rounded-full px-8 py-3"
-                  style={{ backgroundColor: COLORS.white, color: COLORS.secondary }}>
-            <span onClick={()=>setShowGifts(true)}>VER DATOS BANCARIOS</span>
+          <Button className="rounded-full px-8 py-3" style={{ backgroundColor: COLORS.white, color: COLORS.secondary }}>
+            <span onClick={() => setShowGifts(true)}>VER DATOS BANCARIOS</span>
           </Button>
         </div>
       </section>
 
-      {/* ===== INSTAGRAM (blanco) ===== */}
-      <section className="py-16 bg-white" dir="ltr">
+      {/* ===== INSTAGRAM ===== */}
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-               style={{ backgroundColor: COLORS.primarySoft }}>
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{ backgroundColor: COLORS.primarySoft }}>
             <Instagram className="w-8 h-8" style={{ color: COLORS.primary }} />
           </div>
-          <h2 className="text-2xl font-display font-medium mb-4"
-              style={{ color: COLORS.ink, fontFamily: fontSecondary }}>
-            @{(event.hashtag || "#beluyamador").replace("#","")}
+          <h2 className="text-2xl font-display font-medium mb-4" style={{ color: COLORS.ink, fontFamily: fontSecondary }}>
+            @{(event.hashtag || "#beluyamador").replace("#", "")}
           </h2>
           <p className="mb-6 max-w-2xl mx-auto" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
             ¡Preparate para nuestro gran día! Seguinos y etiquetanos en tus fotos y videos.
           </p>
-          <Button className="px-8 py-3 rounded-full"
-                  style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
-                  onClick={()=>window.open("https://instagram.com","_blank")}>
+          <Button
+            className="px-8 py-3 rounded-full"
+            style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
+            onClick={() => window.open("https://instagram.com", "_blank")}
+          >
             Ver en Instagram
           </Button>
         </div>
       </section>
 
-      {/* ===== DRESS CODE (oscuro, texto blanco para contraste) ===== */}
-      <section className="py-16" style={{ backgroundColor: "#1F2937", color: COLORS.white }} dir="ltr">
+      {/* ===== DRESS CODE (usa COLORS.dark / darkText) ===== */}
+      <section className="py-16" style={{ backgroundColor: COLORS.dark, color: COLORS.darkText }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-display font-medium mb-4 tracking-wide" style={{ fontFamily: fontSecondary }}>
             DRESS CODE
@@ -352,17 +373,17 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
           <p className="text-lg">
             <EditableText
               value={event.info?.dresscode || "Vestimenta formal, elegante"}
-              onChange={(v)=>setEvent(p=>({ ...p, info:{ ...(p.info||{}), dresscode: v } }))}
+              onChange={(v) => setEvent((p) => ({ ...p, info: { ...(p.info || {}), dresscode: v } }))}
               className="px-1"
               singleLine
-              style={{ color: COLORS.white }}
+              style={{ color: COLORS.darkText }}
             />
           </p>
         </div>
       </section>
 
-      {/* ===== RSVP (franja primary) ===== */}
-      <section className="py-16" style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }} dir="ltr">
+      {/* ===== RSVP ===== */}
+      <section className="py-16" style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ fontFamily: fontSecondary }}>
             CONFIRMACIÓN DE ASISTENCIA
@@ -372,91 +393,117 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
           <p className="text-lg mb-8 max-w-2xl mx-auto" style={{ fontFamily: fontPrimary }}>
             <EditableText
               value={event.rsvpNote || "Esperamos que seas parte de esta gran celebración. ¡Confirmanos tu asistencia!"}
-              onChange={(v)=>setEvent(p=>({ ...p, rsvpNote: v }))}
+              onChange={(v) => setEvent((p) => ({ ...p, rsvpNote: v }))}
               className="px-1"
               singleLine={false}
               style={{ color: COLORS.primaryText }}
             />
           </p>
-          <Button className="px-8 py-3 rounded-full font-medium"
-                  style={{ backgroundColor: COLORS.white, color: COLORS.primary }}
-                  onClick={()=>setShowRSVP(true)}>
+          <Button
+            className="px-8 py-3 rounded-full font-medium"
+            style={{ backgroundColor: COLORS.white, color: COLORS.primary }}
+            onClick={() => setShowRSVP(true)}
+          >
             Confirmar asistencia
           </Button>
 
           <div className="mt-8 pt-8" style={{ borderTop: `1px solid ${COLORS.primarySoft}` }}>
             <p className="text-lg">¡Agendá la fecha en tu calendario!</p>
-            <Button variant="outline" className="mt-4 rounded-full px-8 py-3"
-                    style={{ borderColor: COLORS.primaryText, color: COLORS.primaryText }}
-                    onClick={()=>{/* generar .ics aquí si querés */}}>
+            <Button
+              variant="outline"
+              className="mt-4 rounded-full px-8 py-3"
+              style={{ borderColor: COLORS.primaryText, color: COLORS.primaryText }}
+              onClick={() => {
+                /* generar .ics si deseas */
+              }}
+            >
               AGENDAR EVENTO
             </Button>
           </div>
         </div>
       </section>
 
-      {/* ===== SUGERENCIAS MUSICALES (blanco) ===== */}
-      <section className="py-16 bg-white" dir="ltr">
+      {/* ===== SUGERENCIAS MUSICALES ===== */}
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-display font-medium mb-6 tracking-wide"
-              style={{ color: COLORS.ink, fontFamily: fontSecondary }}>
+          <h2 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ color: COLORS.ink, fontFamily: fontSecondary }}>
             ¿QUÉ CANCIONES NO PUEDEN FALTAR?
           </h2>
           <p className="mb-8 max-w-2xl mx-auto" style={{ color: COLORS.body }}>
             ¡Ayudanos sugiriendo las canciones que pensás que no pueden faltar!
           </p>
-          <Button className="px-8 py-3 rounded-full"
-                  style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
-                  onClick={()=>alert("Abrir formulario de canciones (pendiente)")}>
+          <Button
+            className="px-8 py-3 rounded-full"
+            style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
+            onClick={() => alert("Abrir formulario de canciones (pendiente)")}
+          >
             <Music className="w-4 h-4 mr-2" />
             Sugerir canción
           </Button>
         </div>
       </section>
 
-      {/* ===== INFO ÚTIL (paper) ===== */}
-      <section className="py-16" style={{ backgroundColor: COLORS.paper }} dir="ltr">
+      {/* ===== INFO ÚTIL ===== */}
+      <section className="py-16" style={{ backgroundColor: COLORS.paper }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-display font-medium mb-6 tracking-wide"
-              style={{ color: COLORS.ink, fontFamily: fontSecondary }}>
+          <h2 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ color: COLORS.ink, fontFamily: fontSecondary }}>
             INFO ÚTIL
           </h2>
           <p className="mb-8 max-w-2xl mx-auto" style={{ color: COLORS.body }}>
             <EditableText
               value={event.info?.help || "Te dejamos sugerencias de alojamientos y traslados para ese fin de semana."}
-              onChange={(v)=>setEvent(p=>({ ...p, info:{ ...(p.info||{}), help: v } }))}
+              onChange={(v) => setEvent((p) => ({ ...p, info: { ...(p.info || {}), help: v } }))}
               className="px-1"
               singleLine={false}
               style={{ color: COLORS.body }}
             />
           </p>
-          <Button variant="outline" className="px-8 py-3 rounded-full"
-                  style={{ borderColor: COLORS.primary, color: COLORS.primary }}
-                  onClick={()=>alert("Ver más (pendiente)")}>
+          <Button
+            variant="outline"
+            className="px-8 py-3 rounded-full"
+            style={{ borderColor: COLORS.primary, color: COLORS.primary }}
+            onClick={() => alert("Ver más (pendiente)")}
+          >
             VER MÁS
           </Button>
         </div>
       </section>
 
-      {/* ===== FOOTER ===== */}
-      <footer className="py-12" style={{ backgroundColor: "#1F2937", color: COLORS.white }}>
+      {/* ===== FOOTER (usa COLORS.dark / darkText) ===== */}
+      <footer className="py-12" style={{ backgroundColor: COLORS.dark, color: COLORS.darkText }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-lg mb-8">¡Gracias por acompañarnos en este momento tan importante!</p>
-          <div className="pt-8" style={{ borderTop: "1px solid #4B5563" }}>
+          <div
+            className="pt-8"
+            style={{
+              borderTop:
+                pickTextColor(COLORS.dark) === "#FFFFFF" ? "1px solid rgba(255,255,255,.25)" : "1px solid rgba(0,0,0,.25)",
+            }}
+          >
             <p className="text-sm opacity-70 mb-4">
               Invitación digital creada con ❤️ por{" "}
-              <span className="font-medium" style={{ color: COLORS.primary }}>Venite</span>
+              <span className="font-medium" style={{ color: COLORS.primary }}>
+                Venite
+              </span>
             </p>
             <div className="flex justify-center gap-3">
-              <Button variant="outline" size="sm" className="rounded-full"
-                      style={{ borderColor: COLORS.white, color: COLORS.white }}
-                      onClick={()=>navigator.clipboard?.writeText(window.location.href).catch(()=>{})}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full"
+                style={{ borderColor: COLORS.darkText, color: COLORS.darkText }}
+                onClick={() => navigator.clipboard?.writeText(window.location.href).catch(() => {})}
+              >
                 <Share2 className="w-4 h-4 mr-2" />
                 Compartir
               </Button>
-              <Button variant="outline" size="sm" className="rounded-full"
-                      style={{ borderColor: COLORS.white, color: COLORS.white }}
-                      onClick={()=>{/* descarga screenshot/pdf si querés */}}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full"
+                style={{ borderColor: COLORS.darkText, color: COLORS.darkText }}
+                onClick={() => {}}
+              >
                 <Download className="w-4 h-4 mr-2" />
                 Guardar
               </Button>
@@ -474,7 +521,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                 <h3 className="text-xl font-medium" style={{ color: COLORS.ink }}>
                   Confirmar Asistencia
                 </h3>
-                <Button variant="ghost" size="sm" onClick={()=>setShowRSVP(false)}>
+                <Button variant="ghost" size="sm" onClick={() => setShowRSVP(false)}>
                   <X className="w-4 h-4" />
                 </Button>
               </div>
@@ -485,28 +532,36 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                   <h4 className="text-lg font-medium mb-2" style={{ color: COLORS.ink }}>
                     ¡Confirmación Recibida!
                   </h4>
-                  <p style={{ color: COLORS.body }}>
-                    Gracias por confirmar tu asistencia. ¡Te esperamos!
-                  </p>
+                  <p style={{ color: COLORS.body }}>Gracias por confirmar tu asistencia. ¡Te esperamos!</p>
                 </div>
               ) : (
-                <form onSubmit={handleRSVPSubmit} className="space-y-4" dir="ltr">
+                <form onSubmit={handleRSVPSubmit} className="space-y-4">
                   <Labeled label="Nombre completo *">
-                    <Input required value={rsvpData.name}
-                           onChange={(e)=>setRsvpData({ ...rsvpData, name: e.target.value })}
-                           placeholder="Tu nombre completo" />
+                    <Input
+                      required
+                      value={rsvpData.name}
+                      onChange={(e) => setRsvpData({ ...rsvpData, name: e.target.value })}
+                      placeholder="Tu nombre completo"
+                    />
                   </Labeled>
 
                   <Labeled label="Email *">
-                    <Input type="email" required value={rsvpData.email}
-                           onChange={(e)=>setRsvpData({ ...rsvpData, email: e.target.value })}
-                           placeholder="tu@email.com" />
+                    <Input
+                      type="email"
+                      required
+                      value={rsvpData.email}
+                      onChange={(e) => setRsvpData({ ...rsvpData, email: e.target.value })}
+                      placeholder="tu@email.com"
+                    />
                   </Labeled>
 
                   <Labeled label="¿Asistirás? *">
-                    <select required value={rsvpData.attendance}
-                            onChange={(e)=>setRsvpData({ ...rsvpData, attendance: e.target.value })}
-                            className="w-full p-2 border border-gray-300 rounded-md">
+                    <select
+                      required
+                      value={rsvpData.attendance}
+                      onChange={(e) => setRsvpData({ ...rsvpData, attendance: e.target.value })}
+                      className="w-full p-2 border border-gray-300 rounded-md"
+                    >
                       <option value="">Selecciona una opción</option>
                       <option value="yes">Sí, asistiré</option>
                       <option value="no">No podré asistir</option>
@@ -515,19 +570,26 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
 
                   {rsvpData.attendance === "yes" && (
                     <Labeled label="Número de acompañantes">
-                      <Input type="number" min="0" max="5" value={rsvpData.guests}
-                             onChange={(e)=>setRsvpData({ ...rsvpData, guests: parseInt(e.target.value || "0", 10) })} />
+                      <Input
+                        type="number"
+                        min="0"
+                        max="5"
+                        value={rsvpData.guests}
+                        onChange={(e) => setRsvpData({ ...rsvpData, guests: parseInt(e.target.value || "0", 10) })}
+                      />
                     </Labeled>
                   )}
 
                   <Labeled label="Mensaje (opcional)">
-                    <Textarea value={rsvpData.message}
-                              onChange={(e)=>setRsvpData({ ...rsvpData, message: e.target.value })}
-                              placeholder="Déjanos un mensaje..." rows={3} />
+                    <Textarea
+                      value={rsvpData.message}
+                      onChange={(e) => setRsvpData({ ...rsvpData, message: e.target.value })}
+                      placeholder="Déjanos un mensaje..."
+                      rows={3}
+                    />
                   </Labeled>
 
-                  <Button type="submit" className="w-full"
-                          style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}>
+                  <Button type="submit" className="w-full" style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}>
                     <Heart className="w-4 h-4 mr-2" />
                     Confirmar Asistencia
                   </Button>
@@ -547,17 +609,15 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                 <h3 className="text-xl font-medium" style={{ color: COLORS.ink }}>
                   Datos Bancarios
                 </h3>
-                <Button variant="ghost" size="sm" onClick={()=>setShowGifts(false)}>
+                <Button variant="ghost" size="sm" onClick={() => setShowGifts(false)}>
                   <X className="w-4 h-4" />
                 </Button>
               </div>
 
-              <div className="space-y-4 text-sm" dir="ltr">
+              <div className="space-y-4 text-sm">
                 <div className="text-center mb-2">
                   <CreditCard className="w-12 h-12 mx-auto mb-4" style={{ color: COLORS.primary }} />
-                  <p style={{ color: COLORS.body }}>
-                    Si deseás colaborar con nuestra Luna de Miel:
-                  </p>
+                  <p style={{ color: COLORS.body }}>Si deseás colaborar con nuestra Luna de Miel:</p>
                 </div>
 
                 <div className="p-4 rounded-lg" style={{ backgroundColor: COLORS.paper }}>
@@ -576,13 +636,20 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
 
                 {(event.gifts || []).length > 0 && (
                   <div className="p-4 rounded-lg" style={{ backgroundColor: COLORS.paper }}>
-                    <h4 className="font-medium mb-2" style={{ color: COLORS.ink }}>Mesas de Regalos</h4>
+                    <h4 className="font-medium mb-2" style={{ color: COLORS.ink }}>
+                      Mesas de Regalos
+                    </h4>
                     <ul className="list-disc pl-5 space-y-1">
                       {event.gifts.map((g, i) => (
                         <li key={i}>
                           {g.url ? (
-                            <a href={g.url} target="_blank" rel="noreferrer"
-                               className="underline hover:opacity-80" style={{ color: COLORS.primary }}>
+                            <a
+                              href={g.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="underline hover:opacity-80"
+                              style={{ color: COLORS.primary }}
+                            >
                               {g.label || g.url}
                             </a>
                           ) : (
@@ -604,18 +671,25 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
 
 /* =================== Subcomponentes / helpers =================== */
 
-function TimeCell({ value, label, color="#fff" }) {
+function TimeCell({ value, label, color = "#fff" }) {
   return (
     <div className="flex flex-col items-center">
       <div className="font-light leading-none" style={{ fontSize: "clamp(2.25rem, 7vw, 4.5rem)", color }}>
-        {String(value).padStart(2,"0")}
+        {String(value).padStart(2, "0")}
       </div>
-      <div className="opacity-90 text-sm sm:text-base" style={{ color }}>{label}</div>
+      <div className="opacity-90 text-sm sm:text-base" style={{ color }}>
+        {label}
+      </div>
     </div>
   );
 }
-function SeparatorDot({ color="#fff" }) {
-  return <div className="self-center font-light" style={{ color, fontSize: "clamp(2rem, 7vw, 4rem)" }}>:</div>;
+
+function SeparatorDot({ color = "#fff" }) {
+  return (
+    <div className="self-center font-light" style={{ color, fontSize: "clamp(2rem, 7vw, 4rem)" }}>
+      :
+    </div>
+  );
 }
 
 function DetailIconCard({ icon, iconBg, title, titleColor, textColor, muted, children }) {
@@ -627,21 +701,29 @@ function DetailIconCard({ icon, iconBg, title, titleColor, textColor, muted, chi
       <h3 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ color: titleColor }}>
         {title}
       </h3>
-      <div className="text-base" style={{ color: textColor }}>{children}</div>
+      <div className="text-base" style={{ color: textColor }}>
+        {children}
+      </div>
     </div>
   );
 }
+
 function Labeled({ label, children }) {
   return (
-    <label className="block text-sm" dir="ltr">
+    <label className="block text-sm">
       <span className="mb-1 block text-gray-700">{label}</span>
       {children}
     </label>
   );
 }
+
 function renderBankLine(label, value) {
   if (!value) return null;
-  return <p><strong>{label}:</strong> {value}</p>;
+  return (
+    <p>
+      <strong>{label}:</strong> {value}
+    </p>
+  );
 }
 
 /** Colorea un fondo suave a partir de un hex, con opacidad */
@@ -649,11 +731,19 @@ function toSoft(hex, alpha = 0.14) {
   const { r, g, b } = hexToRgb(hex);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
+
 function hexToRgb(hex) {
-  let h = hex.replace("#","").trim();
-  if (h.length === 3) h = h.split("").map(ch => ch+ch).join("");
+  let h = hex.replace("#", "").trim();
+  if (h.length === 3) h = h.split("").map((ch) => ch + ch).join("");
   const num = parseInt(h, 16);
-  return { r:(num>>16)&255, g:(num>>8)&255, b:num&255 };
+  return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+}
+
+/** Devuelve blanco o casi negro según contraste */
+function pickTextColor(hex) {
+  const { r, g, b } = hexToRgb(hex);
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return yiq >= 128 ? "#111827" : "#FFFFFF";
 }
 
 /** Construye ISO a partir de fecha en español y hora "HH:mm" */
@@ -665,17 +755,39 @@ function buildTargetISO(dateStr, timeStr) {
       const [, d, m, y] = dateStr.trim().match(re);
       return `${y}-${pad(m)}-${pad(d)}T${padTime(timeStr || "00:00")}`;
     }
-    const meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+    const meses = [
+      "enero",
+      "febrero",
+      "marzo",
+      "abril",
+      "mayo",
+      "junio",
+      "julio",
+      "agosto",
+      "septiembre",
+      "octubre",
+      "noviembre",
+      "diciembre",
+    ];
     const ds = dateStr.toLowerCase();
-    const mIdx = meses.findIndex((m)=>ds.includes(m));
+    const mIdx = meses.findIndex((m) => ds.includes(m));
     const dMatch = ds.match(/\d{1,2}/);
     const yMatch = ds.match(/\d{4}/);
     if (mIdx >= 0 && dMatch && yMatch) {
-      const d = Number(dMatch[0]), y = Number(yMatch[0]);
-      return `${y}-${pad(mIdx+1)}-${pad(d)}T${padTime(timeStr || "00:00")}`;
+      const d = Number(dMatch[0]),
+        y = Number(yMatch[0]);
+      return `${y}-${pad(mIdx + 1)}-${pad(d)}T${padTime(timeStr || "00:00")}`;
     }
-  } catch { return null; }
+  } catch {
+    return null;
+  }
   return null;
 }
-function pad(n){ return String(n).padStart(2,"0"); }
-function padTime(hhmm){ const [h="00",m="00"]=(hhmm||"").split(":"); return `${pad(h)}:${pad(m)}:00`; }
+
+function pad(n) {
+  return String(n).padStart(2, "0");
+}
+function padTime(hhmm) {
+  const [h = "00", m = "00"] = (hhmm || "").split(":");
+  return `${pad(h)}:${pad(m)}:00`;
+}
