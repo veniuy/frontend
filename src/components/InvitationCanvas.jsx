@@ -152,7 +152,7 @@ const fontSecondary = event.fonts?.secondary || "'Great Vibes', cursive";
             style={{ color: COLORS.ink, fontSize: "clamp(2.75rem, 8vw, 6rem)", fontFamily: fontSecondary }}
           >
             <EditableText
-              value={(event.couple?.bride || "Belén").toUpperCase()}
+              value={(event.couple?.bride || "Belén"}
               onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: val } }))}
               ariaLabel="Nombre 1"
               className="px-1"
@@ -177,7 +177,7 @@ const fontSecondary = event.fonts?.secondary || "'Great Vibes', cursive";
             style={{ color: COLORS.ink, fontSize: "clamp(2.75rem, 8vw, 6rem)", fontFamily: fontSecondary }}
           >
             <EditableText
-              value={(event.couple?.groom || "Amadeo").toUpperCase()}
+              value={(event.couple?.groom || "Amadeo"}
               onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: val } }))}
               ariaLabel="Nombre 2"
               className="px-1"
