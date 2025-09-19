@@ -1,5 +1,5 @@
 // src/components/EditableText.jsx
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 
 export default function EditableText({
   value,
@@ -9,6 +9,7 @@ export default function EditableText({
   style = {},
   singleLine = true,
   ariaLabel = "Editar texto",
+  direction = "auto", // "auto" | "ltr" | "rtl"
 }) {
   const Tag = as;
   const ref = useRef(null);
@@ -39,12 +40,15 @@ export default function EditableText({
       ref.current?.blur();
     }
   };
-
   const handlePaste = (e) => {
     e.preventDefault();
     const text = (e.clipboardData || window.clipboardData).getData("text/plain");
     document.execCommand?.("insertText", false, text);
   };
+
+  // si direction === "auto" no seteamos CSS direction; solo dir="auto"
+  const cssDirection =
+    direction === "ltr" ? "ltr" : direction === "rtl" ? "rtl" : undefined;
 
   return (
     <Tag
@@ -58,15 +62,16 @@ export default function EditableText({
       onInput={handleInput}
       onKeyDown={handleKeyDown}
       onPaste={handlePaste}
-      // Fuerza escritura LTR y aísla del contexto RTL externo
-      dir="ltr"
+      dir={direction}                // "auto" | "ltr" | "rtl"
       spellCheck={false}
       className={`${className} outline-none ${
         editing ? "ring-2 ring-blue-400 bg-blue-50 rounded px-1" : "cursor-text"
       }`}
       style={{
-        direction: "ltr",
+        // aísla el contenido del contexto bidi externo
         unicodeBidi: "isolate",
+        // solo fijamos CSS direction si es ltr o rtl explícito
+        ...(cssDirection ? { direction: cssDirection } : {}),
         whiteSpace: singleLine ? "nowrap" : "pre-wrap",
         ...style,
       }}
