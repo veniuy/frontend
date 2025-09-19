@@ -1,4 +1,4 @@
-// src/components/EditorPanel.jsx
+// src/components/EditorPanel.jsx - TENEMOS QUE AGREGAR event.colors.dark COMO 4 COLOR EL OSCURO DE LA PALETA
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
