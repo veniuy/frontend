@@ -208,9 +208,6 @@ export default function EditorPanel({
                           onClick={() => handleColorChange("primary", t.hex)}
                           title={`${t.label} · Usar como primario`}
                         />
-                        <span className="text-[10px] text-gray-600 mt-1">
-                          {i === 3 ? "Oscuro" : t.label}
-                        </span>
                       </div>
                     ))}
                   </div>
