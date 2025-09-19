@@ -69,10 +69,10 @@ export default function EditorPanel({
     {
       name: "Sage & Terracotta",
       tones: [
-        { label: "Claro", hex: "#B7B79D" },
-        { label: "Intermedio", hex: "#C16D4D" },
-        { label: "Intermedio", hex: "#D57555" },
-        { label: "Oscuro", hex: "#C96342" },
+        { hex: "#B7B79D" },
+        { hex: "#C16D4D" },
+        { hex: "#D57555" },
+        { hex: "#C96342" },
       ],
     },
     {
