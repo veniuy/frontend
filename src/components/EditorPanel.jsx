@@ -19,6 +19,7 @@ import {
   Menu,
   Save as SaveIcon,
   ChevronRight,
+  ChevronLeft,
   ToggleLeft,
   ToggleRight,
   CheckCircle2,
@@ -27,16 +28,6 @@ import {
   Link as LinkIcon,
 } from "lucide-react";
 import ImagesPanel from "./ImagesPanel";
-
-/**
- * EditorPanel (mobile hamburger + guardar/siguiente + switches de secciones)
- * - Barra superior en móviles: Hamburger + Guardar + Siguiente (también dentro del panel abierto).
- * - Sin footer pegado a "Colores".
- * - Contenido: agrega Info útil → Alojamiento/Transporte.
- * - Imágenes: agrega editor de Galería (6 fotos).
- *
- * event.sections: ceremony, reception, bank, songs, info, dresscode, instagram
- */
 
 export default function EditorPanel({
   event,
@@ -160,25 +151,17 @@ export default function EditorPanel({
       return { ...p, info: { ...(p.info || {}), transport: arr } };
     });
 
-  // Galería (6 fotos)
-  const DEFAULTS = [
-    "src/assets/categoria_boda_grid.webp",
-    "src/assets/categoria_cumpleanos.webp",
-    "src/assets/categoria_invitaciones_digitales.webp",
-    "src/assets/categoria_productos_fotos.webp",
-    "src/assets/elegant-floral.jpg",
-    "src/assets/hero_bottom.png",
-    "src/assets/portada.webp",
-    "src/assets/portada1.webp",
-  ];
+  /* ===== Galería (6 fotos) con subida de archivos (base64) ===== */
   const gallery = (event.images?.gallery || []).slice(0, 6);
   const setGallery = (arr) => setEvent((p) => ({ ...p, images: { ...(p.images || {}), gallery: arr.slice(0, 6) } }));
-  const setGalleryAt = (i, url) => {
+
+  const setGalleryAtFile = async (i, file) => {
+    if (!file) return;
+    const dataUrl = await readFileAsDataURL(file);
     const arr = [...gallery];
-    arr[i] = url;
+    arr[i] = dataUrl;
     setGallery(arr);
   };
-  const addGalleryItem = (url) => setGallery([...(gallery || []), url].slice(0, 6));
   const removeGalleryItem = (i) => setGallery(gallery.filter((_, idx) => idx !== i));
 
   const SECTION_KEYS = [
@@ -189,6 +172,7 @@ export default function EditorPanel({
     { key: "info", label: "Info útil" },
     { key: "dresscode", label: "Dress code" },
     { key: "instagram", label: "Instagram" },
+    { key: "gallery", label: "Galería" }, // NUEVO switch de galería
   ];
 
   const isSectionOn = (k) => {
@@ -213,12 +197,18 @@ export default function EditorPanel({
     }
   };
 
-  const NEXT_ORDER = ["design", "content", "images", "layout"];
+  const ORDER = ["design", "content", "images", "layout"];
   const goNextTab = () => {
-    const idx = NEXT_ORDER.indexOf(ui.activeTab);
-    const next = NEXT_ORDER[Math.min(NEXT_ORDER.length - 1, idx + 1)];
+    const idx = ORDER.indexOf(ui.activeTab);
+    const next = ORDER[Math.min(ORDER.length - 1, idx + 1)];
     setActiveTab(next);
   };
+  const goPrevTab = () => {
+    const idx = ORDER.indexOf(ui.activeTab);
+    const prev = ORDER[Math.max(0, idx - 1)];
+    setActiveTab(prev);
+  };
+  const canGoPrev = ORDER.indexOf(ui.activeTab) > 0;
 
   const validate = () => {
     const errs = [];
@@ -252,7 +242,7 @@ export default function EditorPanel({
   /* =================== Render =================== */
   return (
     <>
-      {/* TOOLBAR MÓVIL EN CANVAS (panel cerrado): Hamburger + Guardar + Siguiente */}
+      {/* TOOLBAR MÓVIL EN CANVAS (panel cerrado): Hamburger + ← + Guardar + → + Siguiente */}
       {ui.isMobile && !ui.showMobilePanel && (
         <div className="fixed top-2 left-2 right-2 z-40 flex items-center gap-2">
           <button
@@ -263,6 +253,19 @@ export default function EditorPanel({
           >
             <Menu className="w-6 h-6" />
           </button>
+
+          <button
+            className={`inline-flex items-center gap-2 text-sm px-3 py-2 rounded border ${
+              canGoPrev ? "border-gray-300 bg-white hover:bg-gray-50" : "border-gray-200 bg-gray-100 opacity-60"
+            }`}
+            onClick={goPrevTab}
+            disabled={!canGoPrev}
+            aria-label="Anterior"
+            title="Anterior"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+
           <button
             className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50"
             onClick={doSave}
@@ -272,8 +275,18 @@ export default function EditorPanel({
             <SaveIcon className="w-4 h-4" />
             Guardar
           </button>
+
           <button
-            className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded bg-black text-white hover:opacity-90"
+            className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50"
+            onClick={goNextTab}
+            aria-label="Adelante"
+            title="Adelante"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+
+          <button
+            className="ml-auto inline-flex items-center gap-2 text-sm px-3 py-2 rounded bg-black text-white hover:opacity-90"
             onClick={handleNext}
             aria-label="Siguiente"
             title="Siguiente"
@@ -293,10 +306,10 @@ export default function EditorPanel({
             : "w-80 bg-white border-r border-gray-200 overflow-y-auto"
         }
       >
-        {/* Barra superior del PANEL (móvil): Hamburger(cerrar) + Guardar + Siguiente + estado */}
+        {/* Barra superior del PANEL (móvil): Hamburger(cerrar) + ← + Guardar + → + Siguiente + estado */}
         {ui.isMobile && (
           <div className="sticky top-0 z-10 bg-white border-b border-gray-200">
-            <div className="flex items-center justify-between px-3 py-2">
+            <div className="flex items-center justify-between px-3 py-2 gap-2">
               <div className="flex items-center gap-2">
                 <button
                   className="p-2 rounded hover:bg-gray-100"
@@ -306,6 +319,19 @@ export default function EditorPanel({
                 >
                   <Menu className="h-5 w-5" />
                 </button>
+
+                <button
+                  className={`inline-flex items-center gap-2 text-sm px-3 py-2 rounded border ${
+                    canGoPrev ? "border-gray-300 bg-white hover:bg-gray-50" : "border-gray-200 bg-gray-100 opacity-60"
+                  }`}
+                  onClick={goPrevTab}
+                  disabled={!canGoPrev}
+                  aria-label="Anterior"
+                  title="Anterior"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
                 <button
                   className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50"
                   onClick={doSave}
@@ -315,6 +341,16 @@ export default function EditorPanel({
                   <SaveIcon className="w-4 h-4" />
                   Guardar
                 </button>
+
+                <button
+                  className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50"
+                  onClick={goNextTab}
+                  aria-label="Adelante"
+                  title="Adelante"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+
                 <button
                   className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded bg-black text-white hover:opacity-90"
                   onClick={handleNext}
@@ -325,6 +361,7 @@ export default function EditorPanel({
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
+
               <div className="flex items-center gap-2">
                 {saved && (
                   <span className="inline-flex items-center text-xs text-green-600">
@@ -877,11 +914,30 @@ export default function EditorPanel({
             {/* Panel existente (fondos, logo, etc.) */}
             <ImagesPanel event={event} setEvent={setEvent} />
 
-            {/* Editor de Galería (6 fotos) */}
+            {/* Editor de Galería (6 fotos) — subida de archivos + switch ON/OFF */}
             <Card>
               <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Galería (máx. 6 imágenes)</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm">Galería (máx. 6 imágenes)</CardTitle>
+                  <button
+                    className="inline-flex items-center gap-2 text-xs px-2 py-1 rounded border border-gray-300 hover:bg-gray-50"
+                    onClick={() => toggleSection("gallery")}
+                    aria-label="Alternar galería"
+                    title="Alternar galería"
+                  >
+                    {isSectionOn("gallery") ? (
+                      <>
+                        <ToggleRight className="w-4 h-4 text-green-600" /> ON
+                      </>
+                    ) : (
+                      <>
+                        <ToggleLeft className="w-4 h-4 text-gray-500" /> OFF
+                      </>
+                    )}
+                  </button>
+                </div>
               </CardHeader>
+
               <CardContent className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   {Array.from({ length: 6 }).map((_, i) => {
@@ -897,13 +953,18 @@ export default function EditorPanel({
                             </div>
                           )}
                         </div>
+
                         <div className="mt-2 flex gap-2">
-                          <Input
-                            className="text-xs"
-                            placeholder="URL de imagen"
-                            value={url}
-                            onChange={(e) => setGalleryAt(i, e.target.value)}
-                          />
+                          <label className="inline-flex items-center justify-center text-xs px-3 py-2 rounded border border-gray-300 hover:bg-gray-50 cursor-pointer">
+                            Cargar
+                            <input
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => setGalleryAtFile(i, e.target.files?.[0])}
+                            />
+                          </label>
+
                           {url && (
                             <button
                               className="px-2 py-2 rounded border border-red-300 text-red-700 hover:bg-red-50"
@@ -919,25 +980,9 @@ export default function EditorPanel({
                     );
                   })}
                 </div>
-
-                <div>
-                  <Label className="text-xs">Elegir de ejemplos</Label>
-                  <div className="grid grid-cols-4 gap-2 mt-2">
-                    {DEFAULTS.map((u) => (
-                      <button
-                        key={u}
-                        className="border rounded overflow-hidden hover:opacity-90"
-                        onClick={() => addGalleryItem(u)}
-                        title="Agregar a la galería"
-                      >
-                        <img src={u} alt="ejemplo" className="w-full h-20 object-cover" />
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-[10px] text-gray-500 mt-1">
-                    Toca una miniatura para agregarla. La galería muestra hasta 6 imágenes.
-                  </p>
-                </div>
+                <p className="text-[10px] text-gray-500">
+                  Se guardan como imágenes embebidas (base64) para que persistan al guardar el borrador.
+                </p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -972,3 +1017,13 @@ export default function EditorPanel({
   );
 }
 
+/* ===== helpers ===== */
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(fr.result);
+    fr.onerror = (e) => reject(e);
+    fr.readAsDataURL(file);
+  });
+}
+               
