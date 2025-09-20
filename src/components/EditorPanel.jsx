@@ -23,40 +23,19 @@ import {
   ToggleRight,
   CheckCircle2,
   AlertTriangle,
+  ImagePlus,
+  Link as LinkIcon,
 } from "lucide-react";
 import ImagesPanel from "./ImagesPanel";
 
 /**
  * EditorPanel (mobile hamburger + guardar/siguiente + switches de secciones)
+ * - Barra superior en móviles: Hamburger + Guardar + Siguiente (también dentro del panel abierto).
+ * - Sin footer pegado a "Colores".
+ * - Contenido: agrega Info útil → Alojamiento/Transporte.
+ * - Imágenes: agrega editor de Galería (6 fotos).
  *
- * Pestañas:
- *  - Color: paletas (primary, secondary, text, dark) + tipografías
- *  - Contenido: datos básicos, banco, regalos, textos y switches de secciones
- *  - Imágenes: fondos, logo (decorativo superior)
- *  - Templates
- *
- * Móvil:
- *  - Botón flotante "hamburger" para abrir el panel
- *  - Barra superior con "X" para cerrar
- *  - Footer fijo dentro del panel con botones Guardar y Siguiente
- *
- * Switches de secciones (event.sections):
- *  - ceremony, reception, bank, songs, info, dresscode, instagram
- *
- * Validación (Siguiente):
- *  - Verifica campos claves (nombres, fecha, hora, venues, y banco si está activo)
- *
- * Guardar:
- *  - Si no hay callback, guarda en localStorage ("event-draft") y muestra feedback
- *
- * Props esperadas:
- *  - event, ui
- *  - setActiveTab(value), setShowMobilePanel(bool)
- *  - handleColorChange(key, value)
- *  - handleFontChange(key, value)
- *  - handleTemplateChange(id)
- *  - setEvent(updater)
- *  - onSave? (opcional) => si se provee, se usa en lugar del guardado local
+ * event.sections: ceremony, reception, bank, songs, info, dresscode, instagram
  */
 
 export default function EditorPanel({
@@ -144,6 +123,64 @@ export default function EditorPanel({
       return { ...p, gifts: arr };
     });
 
+  // Info útil: alojamiento / transporte
+  const addLodging = () =>
+    setEvent((p) => ({
+      ...p,
+      info: { ...(p.info || {}), lodging: [...(p.info?.lodging || []), { name: "", url: "" }] },
+    }));
+  const updateLodging = (i, k, v) =>
+    setEvent((p) => {
+      const arr = [...(p.info?.lodging || [])];
+      arr[i] = { ...arr[i], [k]: v };
+      return { ...p, info: { ...(p.info || {}), lodging: arr } };
+    });
+  const removeLodging = (i) =>
+    setEvent((p) => {
+      const arr = [...(p.info?.lodging || [])];
+      arr.splice(i, 1);
+      return { ...p, info: { ...(p.info || {}), lodging: arr } };
+    });
+
+  const addTransport = () =>
+    setEvent((p) => ({
+      ...p,
+      info: { ...(p.info || {}), transport: [...(p.info?.transport || []), { name: "", note: "", url: "" }] },
+    }));
+  const updateTransport = (i, k, v) =>
+    setEvent((p) => {
+      const arr = [...(p.info?.transport || [])];
+      arr[i] = { ...arr[i], [k]: v };
+      return { ...p, info: { ...(p.info || {}), transport: arr } };
+    });
+  const removeTransport = (i) =>
+    setEvent((p) => {
+      const arr = [...(p.info?.transport || [])];
+      arr.splice(i, 1);
+      return { ...p, info: { ...(p.info || {}), transport: arr } };
+    });
+
+  // Galería (6 fotos)
+  const DEFAULTS = [
+    "src/assets/categoria_boda_grid.webp",
+    "src/assets/categoria_cumpleanos.webp",
+    "src/assets/categoria_invitaciones_digitales.webp",
+    "src/assets/categoria_productos_fotos.webp",
+    "src/assets/elegant-floral.jpg",
+    "src/assets/hero_bottom.png",
+    "src/assets/portada.webp",
+    "src/assets/portada1.webp",
+  ];
+  const gallery = (event.images?.gallery || []).slice(0, 6);
+  const setGallery = (arr) => setEvent((p) => ({ ...p, images: { ...(p.images || {}), gallery: arr.slice(0, 6) } }));
+  const setGalleryAt = (i, url) => {
+    const arr = [...gallery];
+    arr[i] = url;
+    setGallery(arr);
+  };
+  const addGalleryItem = (url) => setGallery([...(gallery || []), url].slice(0, 6));
+  const removeGalleryItem = (i) => setGallery(gallery.filter((_, idx) => idx !== i));
+
   const SECTION_KEYS = [
     { key: "ceremony", label: "Ceremonia" },
     { key: "reception", label: "Fiesta" },
@@ -181,10 +218,6 @@ export default function EditorPanel({
     const idx = NEXT_ORDER.indexOf(ui.activeTab);
     const next = NEXT_ORDER[Math.min(NEXT_ORDER.length - 1, idx + 1)];
     setActiveTab(next);
-    // Si ya estamos en el último y es mobile, opcionalmente cerrar
-    if (ui.isMobile && next === "layout") {
-      // no cerramos automáticamente para permitir cambios
-    }
   };
 
   const validate = () => {
@@ -219,16 +252,36 @@ export default function EditorPanel({
   /* =================== Render =================== */
   return (
     <>
-      {/* BOTÓN HAMBURGER FLOTANTE (solo móviles y panel oculto) */}
+      {/* TOOLBAR MÓVIL EN CANVAS (panel cerrado): Hamburger + Guardar + Siguiente */}
       {ui.isMobile && !ui.showMobilePanel && (
-        <button
-          className="fixed bottom-4 right-4 z-40 rounded-full shadow-lg p-3 bg-white border border-gray-200 hover:bg-gray-50 active:scale-95 transition"
-          onClick={() => setShowMobilePanel(true)}
-          aria-label="Abrir editor"
-          title="Abrir editor"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
+        <div className="fixed top-2 left-2 right-2 z-40 flex items-center gap-2">
+          <button
+            className="rounded-full shadow p-3 bg-white border border-gray-200 hover:bg-gray-50 active:scale-95 transition"
+            onClick={() => setShowMobilePanel(true)}
+            aria-label="Abrir editor"
+            title="Abrir editor"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+          <button
+            className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50"
+            onClick={doSave}
+            aria-label="Guardar cambios"
+            title="Guardar cambios"
+          >
+            <SaveIcon className="w-4 h-4" />
+            Guardar
+          </button>
+          <button
+            className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded bg-black text-white hover:opacity-90"
+            onClick={handleNext}
+            aria-label="Siguiente"
+            title="Siguiente"
+          >
+            Siguiente
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
       )}
 
       <div
@@ -240,11 +293,38 @@ export default function EditorPanel({
             : "w-80 bg-white border-r border-gray-200 overflow-y-auto"
         }
       >
-        {/* Barra superior (mobile) con X y feedback */}
+        {/* Barra superior del PANEL (móvil): Hamburger(cerrar) + Guardar + Siguiente + estado */}
         {ui.isMobile && (
           <div className="sticky top-0 z-10 bg-white border-b border-gray-200">
             <div className="flex items-center justify-between px-3 py-2">
-              <div className="text-sm font-medium">Editor</div>
+              <div className="flex items-center gap-2">
+                <button
+                  className="p-2 rounded hover:bg-gray-100"
+                  onClick={() => setShowMobilePanel(false)}
+                  aria-label="Cerrar panel"
+                  title="Cerrar panel"
+                >
+                  <Menu className="h-5 w-5" />
+                </button>
+                <button
+                  className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50"
+                  onClick={doSave}
+                  aria-label="Guardar cambios"
+                  title="Guardar cambios"
+                >
+                  <SaveIcon className="w-4 h-4" />
+                  Guardar
+                </button>
+                <button
+                  className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded bg-black text-white hover:opacity-90"
+                  onClick={handleNext}
+                  aria-label="Siguiente"
+                  title="Siguiente"
+                >
+                  Siguiente
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
               <div className="flex items-center gap-2">
                 {saved && (
                   <span className="inline-flex items-center text-xs text-green-600">
@@ -255,13 +335,14 @@ export default function EditorPanel({
                 <button
                   className="p-1 rounded hover:bg-gray-100"
                   onClick={() => setShowMobilePanel(false)}
-                  aria-label="Cerrar panel"
+                  aria-label="Cerrar"
                   title="Cerrar"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
             </div>
+
             {errors.length > 0 && (
               <div className="mx-3 mb-2 rounded border border-red-200 bg-red-50 p-2 text-[12px] text-red-700">
                 <div className="flex items-center gap-2 font-medium">
@@ -277,7 +358,7 @@ export default function EditorPanel({
           </div>
         )}
 
-        <Tabs value={ui.activeTab} onValueChange={setActiveTab} className="h-full pb-16">
+        <Tabs value={ui.activeTab} onValueChange={setActiveTab} className="h-full">
           <TabsList className="grid w-full grid-cols-4 p-1 m-4">
             <TabsTrigger value="design" className="flex flex-col items-center gap-1 p-2">
               <Palette className="h-4 w-4" />
@@ -298,7 +379,7 @@ export default function EditorPanel({
           </TabsList>
 
           {/* ============ COLOR (PALETAS + PERSONALIZADOS) ============ */}
-          <TabsContent value="design" className="space-y-4 px-4 pb-4">
+          <TabsContent value="design" className="space-y-4 px-4 pb-6">
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm">Paletas de Colores</CardTitle>
@@ -393,8 +474,8 @@ export default function EditorPanel({
             </Card>
           </TabsContent>
 
-          {/* ============ CONTENIDO (BÁSICO + BANCO + REGALOS + TEXTOS + SECCIONES) ============ */}
-          <TabsContent value="content" className="space-y-4 px-4 pb-24">
+          {/* ============ CONTENIDO (BÁSICO + BANCO + REGALOS + INFO ÚTIL + SECCIONES) ============ */}
+          <TabsContent value="content" className="space-y-4 px-4 pb-6">
             {/* Información de la Pareja */}
             <Card>
               <CardHeader className="pb-3">
@@ -666,6 +747,95 @@ export default function EditorPanel({
               </CardContent>
             </Card>
 
+            {/* Info útil → Alojamiento */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Alojamiento recomendado</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {(event.info?.lodging || []).map((h, i) => (
+                  <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
+                    <Input
+                      className="text-xs"
+                      placeholder="Nombre del hotel / lugar"
+                      value={h.name || ""}
+                      onChange={(e) => updateLodging(i, "name", e.target.value)}
+                    />
+                    <div className="flex gap-2">
+                      <Input
+                        className="text-xs flex-1"
+                        placeholder="URL (opcional)"
+                        value={h.url || ""}
+                        onChange={(e) => updateLodging(i, "url", e.target.value)}
+                      />
+                      <a
+                        href={h.url || "#"}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center justify-center px-2 border rounded text-gray-600 hover:bg-gray-50"
+                        title="Abrir"
+                      >
+                        <LinkIcon className="w-4 h-4" />
+                      </a>
+                    </div>
+                    <button
+                      className="px-2 py-2 rounded border border-red-300 text-red-700 hover:bg-red-50"
+                      onClick={() => removeLodging(i)}
+                      title="Quitar"
+                      aria-label="Quitar alojamiento"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  className="text-xs inline-flex items-center gap-1 px-3 py-2 rounded border border-gray-300 hover:bg-gray-50"
+                  onClick={addLodging}
+                >
+                  <Plus className="w-3 h-3" /> Agregar alojamiento
+                </button>
+              </CardContent>
+            </Card>
+
+            {/* Info útil → Transporte */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Transporte / Traslados</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {(event.info?.transport || []).map((t, i) => (
+                  <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
+                    <Input
+                      className="text-xs"
+                      placeholder="Nombre (empresa, taxi, remis...)"
+                      value={t.name || ""}
+                      onChange={(e) => updateTransport(i, "name", e.target.value)}
+                    />
+                    <Input
+                      className="text-xs"
+                      placeholder="Nota (teléfono, horario, tarifa...)"
+                      value={t.note || ""}
+                      onChange={(e) => updateTransport(i, "note", e.target.value)}
+                    />
+                    <button
+                      className="px-2 py-2 rounded border border-red-300 text-red-700 hover:bg-red-50"
+                      onClick={() => removeTransport(i)}
+                      title="Quitar"
+                      aria-label="Quitar transporte"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  className="text-xs inline-flex items-center gap-1 px-3 py-2 rounded border border-gray-300 hover:bg-gray-50"
+                  onClick={addTransport}
+                >
+                  <Plus className="w-3 h-3" /> Agregar transporte
+                </button>
+              </CardContent>
+            </Card>
+
             {/* Switches de secciones (encendido/apagado) */}
             <Card>
               <CardHeader className="pb-3">
@@ -702,13 +872,78 @@ export default function EditorPanel({
             </Card>
           </TabsContent>
 
-          {/* ============ IMÁGENES (usa ImagesPanel) ============ */}
-          <TabsContent value="images" className="px-4 pb-24">
+          {/* ============ IMÁGENES (fondos/logo + Galería) ============ */}
+          <TabsContent value="images" className="px-4 pb-8 space-y-4">
+            {/* Panel existente (fondos, logo, etc.) */}
             <ImagesPanel event={event} setEvent={setEvent} />
+
+            {/* Editor de Galería (6 fotos) */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm">Galería (máx. 6 imágenes)</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  {Array.from({ length: 6 }).map((_, i) => {
+                    const url = gallery[i] || "";
+                    return (
+                      <div key={i} className="border rounded-lg p-2">
+                        <div className="aspect-[4/3] bg-gray-50 rounded flex items-center justify-center overflow-hidden">
+                          {url ? (
+                            <img src={url} alt={`img-${i + 1}`} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="text-xs text-gray-400 flex items-center gap-1">
+                              <ImagePlus className="w-4 h-4" /> Sin imagen
+                            </div>
+                          )}
+                        </div>
+                        <div className="mt-2 flex gap-2">
+                          <Input
+                            className="text-xs"
+                            placeholder="URL de imagen"
+                            value={url}
+                            onChange={(e) => setGalleryAt(i, e.target.value)}
+                          />
+                          {url && (
+                            <button
+                              className="px-2 py-2 rounded border border-red-300 text-red-700 hover:bg-red-50"
+                              onClick={() => removeGalleryItem(i)}
+                              title="Quitar"
+                              aria-label="Quitar"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div>
+                  <Label className="text-xs">Elegir de ejemplos</Label>
+                  <div className="grid grid-cols-4 gap-2 mt-2">
+                    {DEFAULTS.map((u) => (
+                      <button
+                        key={u}
+                        className="border rounded overflow-hidden hover:opacity-90"
+                        onClick={() => addGalleryItem(u)}
+                        title="Agregar a la galería"
+                      >
+                        <img src={u} alt="ejemplo" className="w-full h-20 object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-gray-500 mt-1">
+                    Toca una miniatura para agregarla. La galería muestra hasta 6 imágenes.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* ============ TEMPLATES ============ */}
-          <TabsContent value="layout" className="px-4 pb-24">
+          <TabsContent value="layout" className="px-4 pb-8">
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm">Plantillas</CardTitle>
@@ -732,29 +967,8 @@ export default function EditorPanel({
             </Card>
           </TabsContent>
         </Tabs>
-
-        {/* FOOTER FIJO (Guardar / Siguiente) */}
-        <div className="sticky bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-3 py-2 flex items-center justify-between">
-          <button
-            className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded border border-gray-300 hover:bg-gray-50"
-            onClick={doSave}
-            aria-label="Guardar cambios"
-            title="Guardar cambios"
-          >
-            <SaveIcon className="w-4 h-4" />
-            Guardar
-          </button>
-          <button
-            className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded bg-black text-white hover:opacity-90"
-            onClick={handleNext}
-            aria-label="Siguiente"
-            title="Siguiente"
-          >
-            Siguiente
-            <ChevronRight className="w-4 h-4" />
-          </button>
-        </div>
       </div>
     </>
   );
 }
+
