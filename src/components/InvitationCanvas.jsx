@@ -27,12 +27,21 @@ import { asset, onImgError } from "../utils/assets";
  * - Sincroniza con EditorPanel:
  *   · Colores: event.colors.{primary, secondary, text, dark}
  *   · Tipografías: event.fonts.{primary, secondary}
- *   · Imágenes: event.images.{heroTexture, logo}
+ *   · Imágenes: event.images.{heroTexture, logo, gallery[]}
  * - Dirección del documento configurable: event.direction ("ltr" | "rtl" | "auto")
+ * - Respeta visibilidad por secciones: event.sections = {
+ *     ceremony, reception, bank, songs, info, dresscode, instagram
+ *   } (true por defecto; si es false, no se muestra)
  */
 
 export default function InvitationCanvas({ event, ui, setEvent }) {
   if (!event) return null;
+
+  /* =================== Helpers de secciones =================== */
+  const isOn = (key) => {
+    const s = event.sections || {};
+    return s[key] !== false; // default: visible
+  };
 
   /* =================== Colores / Tipografías =================== */
   const COLORS = useMemo(() => {
@@ -40,7 +49,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
     const primary = c.primary || "#8FAF86";      // acentos
     const secondary = c.secondary || "#D4B28A";  // franja regalos
     const text = c.text || "#2E2E2E";            // textos base
-    // Fallback "dark": si no viene del panel, lo derivamos de la paleta (secondary → mezcla con negro)
+    // Fallback "dark": si no viene del panel, derivamos de secondary
     const darkDerived = mixHex(secondary, "#000000", 0.75);
     const dark = c.dark || darkDerived;
     return {
@@ -60,13 +69,21 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
     };
   }, [event.colors]);
 
-const fontPrimary = event.fonts?.primary || "'Playfair Display', serif";
-const fontSecondary = event.fonts?.secondary || "'Great Vibes', cursive";
-
+  const fontPrimary = event.fonts?.primary || "'Playfair Display', serif";
+  const fontSecondary = event.fonts?.secondary || "'Great Vibes', cursive";
 
   /* =================== Imágenes =================== */
   const heroTexture = event.images?.heroTexture || asset("src/assets/portada.webp");
-  // Logo opcional (decorativo superior): event.images.logo
+  const defaultGallery = [
+    asset("src/assets/categoria_boda_grid.webp"),
+    asset("src/assets/categoria_cumpleanos.webp"),
+    asset("src/assets/categoria_invitaciones_digitales.webp"),
+    asset("src/assets/categoria_productos_fotos.webp"),
+    asset("src/assets/elegant-floral.jpg"),
+    asset("src/assets/portada1.webp"),
+  ];
+  const galleryImages =
+    (event.images?.gallery && event.images.gallery.length > 0 ? event.images.gallery : defaultGallery).slice(0, 6);
 
   /* =================== Countdown =================== */
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -88,20 +105,45 @@ const fontSecondary = event.fonts?.secondary || "'Great Vibes', cursive";
   /* =================== Estado modales =================== */
   const [showRSVP, setShowRSVP] = useState(false);
   const [showGifts, setShowGifts] = useState(false);
+  const [showInfo, setShowInfo] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [rsvpData, setRsvpData] = useState({ name: "", email: "", attendance: "", guests: 1, message: "" });
+
+  const [rsvpData, setRsvpData] = useState({
+    name: "",
+    email: "",
+    attendance: "",
+    guests: 1,
+    message: "",
+    diet: [],        // ["celiaco","vegetariano",...]
+    dietOther: "",   // texto libre
+  });
+
+  const handleDietToggle = (key) =>
+    setRsvpData((d) => {
+      const set = new Set(d.diet || []);
+      if (set.has(key)) set.delete(key);
+      else set.add(key);
+      return { ...d, diet: Array.from(set) };
+    });
 
   const handleRSVPSubmit = (e) => {
     e.preventDefault();
+    // persistimos localmente en el estado del evento (simple)
+    try {
+      setEvent((p) => ({
+        ...p,
+        rsvps: [...(p.rsvps || []), { ...rsvpData, createdAt: new Date().toISOString() }],
+      }));
+    } catch {}
     setShowSuccess(true);
     setTimeout(() => {
       setShowSuccess(false);
       setShowRSVP(false);
-      setRsvpData({ name: "", email: "", attendance: "", guests: 1, message: "" });
+      setRsvpData({ name: "", email: "", attendance: "", guests: 1, message: "", diet: [], dietOther: "" });
     }, 2200);
   };
 
-  /* =================== Helpers edición =================== */
+  /* =================== Helpers edición (gifts) =================== */
   const addGift = () =>
     setEvent((p) => ({ ...p, gifts: [...(p.gifts || []), { label: "Mesa de Regalos", url: "" }] }));
   const updateGift = (i, k, v) =>
@@ -118,11 +160,7 @@ const fontSecondary = event.fonts?.secondary || "'Great Vibes', cursive";
     });
 
   return (
-    <div
-      className="min-h-screen"
-      dir={event?.direction || "ltr"}
-      style={{ backgroundColor: COLORS.paper }}
-    >
+    <div className="min-h-screen" dir={event?.direction || "ltr"} style={{ backgroundColor: COLORS.paper }}>
       {/* ===== HERO ===== */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
@@ -147,44 +185,44 @@ const fontSecondary = event.fonts?.secondary || "'Great Vibes', cursive";
         )}
 
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-         <h1
-  className="font-display font-light mb-3 tracking-wider"
-  style={{ color: COLORS.ink, fontSize: "clamp(2.75rem, 8vw, 6rem)", fontFamily: fontSecondary }}
->
-  <EditableText
-    value={event.couple?.bride || "Belén"}
-    onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: val } }))}
-    ariaLabel="Nombre 1"
-    className="px-1"
-    singleLine
-    style={{ color: COLORS.ink }}
-  />
-                </h1>
-                
-                <div className="flex items-center justify-center my-6">
-                  <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
-                  <div
-                    className="mx-4 font-light"
-                    style={{ color: COLORS.primary, fontSize: "clamp(1.75rem, 5vw, 3rem)", fontFamily: fontSecondary }}
-                  >
-                    ∞
-                  </div>
-                  <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
-                </div>
-                
-                <h1
-                  className="font-display font-light mb-8 tracking-wider"
-                  style={{ color: COLORS.ink, fontSize: "clamp(2.75rem, 8vw, 6rem)", fontFamily: fontSecondary }}
-                >
-                  <EditableText
-                    value={event.couple?.groom || "Amadeo"}
-                    onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: val } }))}
-                    ariaLabel="Nombre 2"
-                    className="px-1"
-                    singleLine
-                    style={{ color: COLORS.ink }}
-                  />
-                </h1>
+          <h1
+            className="font-display font-light mb-3 tracking-wider"
+            style={{ color: COLORS.ink, fontSize: "clamp(2.75rem, 8vw, 6rem)", fontFamily: fontSecondary }}
+          >
+            <EditableText
+              value={event.couple?.bride || "Belén"}
+              onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: val } }))}
+              ariaLabel="Nombre 1"
+              className="px-1"
+              singleLine
+              style={{ color: COLORS.ink }}
+            />
+          </h1>
+
+          <div className="flex items-center justify-center my-6">
+            <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
+            <div
+              className="mx-4 font-light"
+              style={{ color: COLORS.primary, fontSize: "clamp(1.75rem, 5vw, 3rem)", fontFamily: fontSecondary }}
+            >
+              ∞
+            </div>
+            <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
+          </div>
+
+          <h1
+            className="font-display font-light mb-8 tracking-wider"
+            style={{ color: COLORS.ink, fontSize: "clamp(2.75rem, 8vw, 6rem)", fontFamily: fontSecondary }}
+          >
+            <EditableText
+              value={event.couple?.groom || "Amadeo"}
+              onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: val } }))}
+              ariaLabel="Nombre 2"
+              className="px-1"
+              singleLine
+              style={{ color: COLORS.ink }}
+            />
+          </h1>
 
           <p
             className="font-light mb-10 tracking-wide"
@@ -222,192 +260,225 @@ const fontSecondary = event.fonts?.secondary || "'Great Vibes', cursive";
       </section>
 
       {/* ===== DETALLES (blanco) ===== */}
-      <section className="py-16 bg-white" dir="ltr">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12">
-            {/* Ceremonia */}
-            <DetailIconCard
-              icon={<Church className="w-8 h-8" style={{ color: COLORS.primary }} />}
-              iconBg={COLORS.primarySoft}
-              title="CEREMONIA"
-              titleColor={COLORS.ink}
-              textColor={COLORS.body}
-              muted={COLORS.muted}
-            >
-              <div className="space-y-3 mb-8">
-                <p className="text-lg" style={{ color: COLORS.body }}>
-                  <EditableText
-                    value={event.date || "23 de Noviembre, 2026"}
-                    onChange={(v) => setEvent((p) => ({ ...p, date: v }))}
-                    className="px-1"
-                    singleLine
-                  />
-                </p>
-                <p className="text-lg" style={{ color: COLORS.body }}>
-                  <EditableText
-                    value={event.ceremony?.time || event.time || "19:00 hs"}
-                    onChange={(v) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, time: v } }))}
-                    className="px-1"
-                    singleLine
-                  />
-                </p>
-                <p className="font-medium" style={{ color: COLORS.body }}>
-                  <EditableText
-                    value={event.ceremony?.venue || "Iglesia Nuestra Señora del Carmen"}
-                    onChange={(v) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, venue: v } }))}
-                    className="px-1"
-                    singleLine
-                  />
-                </p>
-                <p style={{ color: COLORS.body }}>
-                  <EditableText
-                    value={event.ceremony?.location || "Villa Allende, Córdoba"}
-                    onChange={(v) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, location: v } }))}
-                    className="px-1"
-                    singleLine
-                  />
-                </p>
-                <p className="text-sm" style={{ color: COLORS.muted }}>
-                  Recibí debajo las indicaciones para llegar.
-                </p>
-              </div>
-              <Button
-                className="px-8 py-3 rounded-full"
-                style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
-                onClick={() =>
-                  window.open(
-                    `https://maps.google.com/?q=${event.ceremony?.address || "Av. San Martín 456, Villa Allende"}`,
-                    "_blank"
-                  )
-                }
-              >
-                LLEGAR A LA CEREMONIA
-              </Button>
-            </DetailIconCard>
+      {(isOn("ceremony") || isOn("reception")) && (
+        <section className="py-16 bg-white" dir="ltr">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className={`grid md:grid-cols-2 gap-12`}>
+              {/* Ceremonia */}
+              {isOn("ceremony") && (
+                <DetailIconCard
+                  icon={<Church className="w-8 h-8" style={{ color: COLORS.primary }} />}
+                  iconBg={COLORS.primarySoft}
+                  title="CEREMONIA"
+                  titleColor={COLORS.ink}
+                  textColor={COLORS.body}
+                  muted={COLORS.muted}
+                >
+                  <div className="space-y-3 mb-8">
+                    <p className="text-lg" style={{ color: COLORS.body }}>
+                      <EditableText
+                        value={event.date || "23 de Noviembre, 2026"}
+                        onChange={(v) => setEvent((p) => ({ ...p, date: v }))}
+                        className="px-1"
+                        singleLine
+                      />
+                    </p>
+                    <p className="text-lg" style={{ color: COLORS.body }}>
+                      <EditableText
+                        value={event.ceremony?.time || event.time || "19:00 hs"}
+                        onChange={(v) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, time: v } }))}
+                        className="px-1"
+                        singleLine
+                      />
+                    </p>
+                    <p className="font-medium" style={{ color: COLORS.body }}>
+                      <EditableText
+                        value={event.ceremony?.venue || "Iglesia Nuestra Señora del Carmen"}
+                        onChange={(v) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, venue: v } }))}
+                        className="px-1"
+                        singleLine
+                      />
+                    </p>
+                    <p style={{ color: COLORS.body }}>
+                      <EditableText
+                        value={event.ceremony?.location || "Villa Allende, Córdoba"}
+                        onChange={(v) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, location: v } }))}
+                        className="px-1"
+                        singleLine
+                      />
+                    </p>
+                    <p className="text-sm" style={{ color: COLORS.muted }}>
+                      Recibí debajo las indicaciones para llegar.
+                    </p>
+                  </div>
+                  <Button
+                    className="px-8 py-3 rounded-full"
+                    style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
+                    onClick={() =>
+                      window.open(
+                        `https://maps.google.com/?q=${event.ceremony?.address || "Av. San Martín 456, Villa Allende"}`,
+                        "_blank"
+                      )
+                    }
+                  >
+                    LLEGAR A LA CEREMONIA
+                  </Button>
+                </DetailIconCard>
+              )}
 
-            {/* Fiesta */}
-            <DetailIconCard
-              icon={<PartyPopper className="w-8 h-8" style={{ color: COLORS.primary }} />}
-              iconBg={COLORS.primarySoft}
-              title="FIESTA"
-              titleColor={COLORS.ink}
-              textColor={COLORS.body}
-              muted={COLORS.muted}
-            >
-              <div className="space-y-3 mb-8">
-                <p className="text-lg" style={{ color: COLORS.body }}>
-                  <EditableText
-                    value={event.reception?.time || "Después de la ceremonia"}
-                    onChange={(v) => setEvent((p) => ({ ...p, reception: { ...p.reception, time: v } }))}
-                    className="px-1"
-                    singleLine
-                  />
-                </p>
-                <p className="font-medium" style={{ color: COLORS.body }}>
-                  <EditableText
-                    value={event.reception?.venue || "Rincón Calina"}
-                    onChange={(v) => setEvent((p) => ({ ...p, reception: { ...p.reception, venue: v } }))}
-                    className="px-1"
-                    singleLine
-                  />
-                </p>
-                <p style={{ color: COLORS.body }}>
-                  <EditableText
-                    value={event.reception?.location || "Unquillo, Córdoba"}
-                    onChange={(v) => setEvent((p) => ({ ...p, reception: { ...p.reception, location: v } }))}
-                    className="px-1"
-                    singleLine
-                  />
-                </p>
-                <p className="text-lg font-medium" style={{ color: COLORS.primary }}>
-                  ¡Te esperamos!
-                </p>
+              {/* Fiesta */}
+              {isOn("reception") && (
+                <DetailIconCard
+                  icon={<PartyPopper className="w-8 h-8" style={{ color: COLORS.primary }} />}
+                  iconBg={COLORS.primarySoft}
+                  title="FIESTA"
+                  titleColor={COLORS.ink}
+                  textColor={COLORS.body}
+                  muted={COLORS.muted}
+                >
+                  <div className="space-y-3 mb-8">
+                    <p className="text-lg" style={{ color: COLORS.body }}>
+                      <EditableText
+                        value={event.reception?.time || "Después de la ceremonia"}
+                        onChange={(v) => setEvent((p) => ({ ...p, reception: { ...p.reception, time: v } }))}
+                        className="px-1"
+                        singleLine
+                      />
+                    </p>
+                    <p className="font-medium" style={{ color: COLORS.body }}>
+                      <EditableText
+                        value={event.reception?.venue || "Rincón Calina"}
+                        onChange={(v) => setEvent((p) => ({ ...p, reception: { ...p.reception, venue: v } }))}
+                        className="px-1"
+                        singleLine
+                      />
+                    </p>
+                    <p style={{ color: COLORS.body }}>
+                      <EditableText
+                        value={event.reception?.location || "Unquillo, Córdoba"}
+                        onChange={(v) => setEvent((p) => ({ ...p, reception: { ...p.reception, location: v } }))}
+                        className="px-1"
+                        singleLine
+                      />
+                    </p>
+                    <p className="text-lg font-medium" style={{ color: COLORS.primary }}>
+                      ¡Te esperamos!
+                    </p>
+                  </div>
+                  <Button
+                    className="px-8 py-3 rounded-full"
+                    style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
+                    onClick={() =>
+                      window.open(
+                        `https://maps.google.com/?q=${event.reception?.address || "Ruta Provincial E-53 Km 8, Unquillo"}`,
+                        "_blank"
+                      )
+                    }
+                  >
+                    LLEGAR A LA FIESTA
+                  </Button>
+                </DetailIconCard>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ===== GALERÍA (6 fotos) ===== */}
+      <section className="py-16" style={{ backgroundColor: COLORS.paper }} dir="ltr">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {galleryImages.map((src, idx) => (
+              <div key={idx} className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                <img
+                  src={src}
+                  onError={(e) => onImgError(e, `Galería ${idx + 1}`)}
+                  alt={`Galería ${idx + 1}`}
+                  className="absolute inset-0 w-full h-full object-cover block"
+                />
               </div>
-              <Button
-                className="px-8 py-3 rounded-full"
-                style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
-                onClick={() =>
-                  window.open(
-                    `https://maps.google.com/?q=${event.reception?.address || "Ruta Provincial E-53 Km 8, Unquillo"}`,
-                    "_blank"
-                  )
-                }
-              >
-                LLEGAR A LA FIESTA
-              </Button>
-            </DetailIconCard>
+            ))}
           </div>
         </div>
       </section>
 
       {/* ===== REGALOS / TRANSFERENCIAS ===== */}
-      <section className="py-16 text-center" style={{ backgroundColor: COLORS.secondary }} dir="ltr">
-        <div className="max-w-3xl mx-auto px-4">
-          <Gift className="w-10 h-10 mx-auto mb-6" style={{ color: COLORS.secondaryText }} />
-          <p
-            className="mb-8"
-            style={{ color: COLORS.secondaryText, fontSize: "clamp(1rem, 2.5vw, 1.25rem)", fontFamily: fontPrimary }}
-          >
-            <EditableText
-              value={event.giftsNote || "Si deseás realizarnos un regalo podés colaborar con nuestra Luna de Miel…"}
-              onChange={(v) => setEvent((p) => ({ ...p, giftsNote: v }))}
-              className="px-1"
-              singleLine={false}
-              style={{ color: COLORS.secondaryText }}
-            />
-          </p>
-          <Button
-            className="rounded-full px-8 py-3"
-            style={{ backgroundColor: COLORS.white, color: COLORS.secondary }}
-            onClick={() => setShowGifts(true)}
-          >
-            VER DATOS BANCARIOS
-          </Button>
-        </div>
-      </section>
+      {isOn("bank") && (
+        <section className="py-16 text-center" style={{ backgroundColor: COLORS.secondary }} dir="ltr">
+          <div className="max-w-3xl mx-auto px-4">
+            <Gift className="w-10 h-10 mx-auto mb-6" style={{ color: COLORS.secondaryText }} />
+            <p
+              className="mb-8"
+              style={{ color: COLORS.secondaryText, fontSize: "clamp(1rem, 2.5vw, 1.25rem)", fontFamily: fontPrimary }}
+            >
+              <EditableText
+                value={event.giftsNote || "Si deseás realizarnos un regalo podés colaborar con nuestra Luna de Miel…"}
+                onChange={(v) => setEvent((p) => ({ ...p, giftsNote: v }))}
+                className="px-1"
+                singleLine={false}
+                style={{ color: COLORS.secondaryText }}
+              />
+            </p>
+            <Button
+              className="rounded-full px-8 py-3"
+              style={{ backgroundColor: COLORS.white, color: COLORS.secondary }}
+              onClick={() => setShowGifts(true)}
+            >
+              VER DATOS BANCARIOS
+            </Button>
+          </div>
+        </section>
+      )}
 
       {/* ===== INSTAGRAM ===== */}
-      <section className="py-16 bg-white" dir="ltr">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <div
-            className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-            style={{ backgroundColor: COLORS.primarySoft }}
-          >
-            <Instagram className="w-8 h-8" style={{ color: COLORS.primary }} />
+      {isOn("instagram") && (
+        <section className="py-16 bg-white" dir="ltr">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
+              style={{ backgroundColor: COLORS.primarySoft }}
+            >
+              <Instagram className="w-8 h-8" style={{ color: COLORS.primary }} />
+            </div>
+            <h2
+              className="text-2xl font-display font-medium mb-4"
+              style={{ color: COLORS.ink, fontFamily: fontSecondary }}
+            >
+              @{(event.hashtag || "#beluyamador").replace("#", "")}
+            </h2>
+            <p className="mb-6 max-w-2xl mx-auto" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
+              ¡Preparate para nuestro gran día! Seguinos y etiquetanos en tus fotos y videos.
+            </p>
+            <Button
+              className="px-8 py-3 rounded-full"
+              style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
+              onClick={() => window.open("https://instagram.com", "_blank")}
+            >
+              Ver en Instagram
+            </Button>
           </div>
-          <h2 className="text-2xl font-display font-medium mb-4" style={{ color: COLORS.ink, fontFamily: fontSecondary }}>
-            @{(event.hashtag || "#beluyamador").replace("#", "")}
-          </h2>
-          <p className="mb-6 max-w-2xl mx-auto" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
-            ¡Preparate para nuestro gran día! Seguinos y etiquetanos en tus fotos y videos.
-          </p>
-          <Button
-            className="px-8 py-3 rounded-full"
-            style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
-            onClick={() => window.open("https://instagram.com", "_blank")}
-          >
-            Ver en Instagram
-          </Button>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ===== DRESS CODE (editable por event.colors.dark) ===== */}
-      <section className="py-16" style={{ backgroundColor: COLORS.dark, color: COLORS.darkText }} dir="ltr">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-display font-medium mb-4 tracking-wide" style={{ fontFamily: fontSecondary }}>
-            DRESS CODE
-          </h2>
-          <p className="text-lg">
-            <EditableText
-              value={event.info?.dresscode || "Vestimenta formal, elegante"}
-              onChange={(v) => setEvent((p) => ({ ...p, info: { ...(p.info || {}), dresscode: v } }))}
-              className="px-1"
-              singleLine
-              style={{ color: COLORS.darkText }}
-            />
-          </p>
-        </div>
-      </section>
+      {isOn("dresscode") && (
+        <section className="py-16" style={{ backgroundColor: COLORS.dark, color: COLORS.darkText }} dir="ltr">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <h2 className="text-2xl font-display font-medium mb-4 tracking-wide" style={{ fontFamily: fontSecondary }}>
+              DRESS CODE
+            </h2>
+            <p className="text-lg">
+              <EditableText
+                value={event.info?.dresscode || "Vestimenta formal, elegante"}
+                onChange={(v) => setEvent((p) => ({ ...p, info: { ...(p.info || {}), dresscode: v } }))}
+                className="px-1"
+                singleLine
+                style={{ color: COLORS.darkText }}
+              />
+            </p>
+          </div>
+        </section>
+      )}
 
       {/* ===== RSVP ===== */}
       <section className="py-16" style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }} dir="ltr">
@@ -451,50 +522,60 @@ const fontSecondary = event.fonts?.secondary || "'Great Vibes', cursive";
       </section>
 
       {/* ===== SUGERENCIAS MUSICALES ===== */}
-      <section className="py-16 bg-white" dir="ltr">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ color: COLORS.ink, fontFamily: fontSecondary }}>
-            ¿QUÉ CANCIONES NO PUEDEN FALTAR?
-          </h2>
-          <p className="mb-8 max-w-2xl mx-auto" style={{ color: COLORS.body }}>
-            ¡Ayudanos sugiriendo las canciones que pensás que no pueden faltar!
-          </p>
-          <Button
-            className="px-8 py-3 rounded-full"
-            style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
-            onClick={() => alert("Abrir formulario de canciones (pendiente)")}
-          >
-            <Music className="w-4 h-4 mr-2" />
-            Sugerir canción
-          </Button>
-        </div>
-      </section>
+      {isOn("songs") && (
+        <section className="py-16 bg-white" dir="ltr">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <h2
+              className="text-2xl font-display font-medium mb-6 tracking-wide"
+              style={{ color: COLORS.ink, fontFamily: fontSecondary }}
+            >
+              ¿QUÉ CANCIONES NO PUEDEN FALTAR?
+            </h2>
+            <p className="mb-8 max-w-2xl mx-auto" style={{ color: COLORS.body }}>
+              ¡Ayudanos sugiriendo las canciones que pensás que no pueden faltar!
+            </p>
+            <Button
+              className="px-8 py-3 rounded-full"
+              style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
+              onClick={() => alert("Abrir formulario de canciones (pendiente)")}
+            >
+              <Music className="w-4 h-4 mr-2" />
+              Sugerir canción
+            </Button>
+          </div>
+        </section>
+      )}
 
       {/* ===== INFO ÚTIL ===== */}
-      <section className="py-16" style={{ backgroundColor: COLORS.paper }} dir="ltr">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ color: COLORS.ink, fontFamily: fontSecondary }}>
-            INFO ÚTIL
-          </h2>
-        <p className="mb-8 max-w-2xl mx-auto" style={{ color: COLORS.body }}>
-            <EditableText
-              value={event.info?.help || "Te dejamos sugerencias de alojamientos y traslados para ese fin de semana."}
-              onChange={(v) => setEvent((p) => ({ ...p, info: { ...(p.info || {}), help: v } }))}
-              className="px-1"
-              singleLine={false}
-              style={{ color: COLORS.body }}
-            />
-          </p>
-          <Button
-            variant="outline"
-            className="px-8 py-3 rounded-full"
-            style={{ borderColor: COLORS.primary, color: COLORS.primary }}
-            onClick={() => alert("Ver más (pendiente)")}
-          >
-            VER MÁS
-          </Button>
-        </div>
-      </section>
+      {isOn("info") && (
+        <section className="py-16" style={{ backgroundColor: COLORS.paper }} dir="ltr">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <h2
+              className="text-2xl font-display font-medium mb-6 tracking-wide"
+              style={{ color: COLORS.ink, fontFamily: fontSecondary }}
+            >
+              INFO ÚTIL
+            </h2>
+            <p className="mb-8 max-w-2xl mx-auto" style={{ color: COLORS.body }}>
+              <EditableText
+                value={event.info?.help || "Te dejamos sugerencias de alojamientos y traslados para ese fin de semana."}
+                onChange={(v) => setEvent((p) => ({ ...p, info: { ...(p.info || {}), help: v } }))}
+                className="px-1"
+                singleLine={false}
+                style={{ color: COLORS.body }}
+              />
+            </p>
+            <Button
+              variant="outline"
+              className="px-8 py-3 rounded-full"
+              style={{ borderColor: COLORS.primary, color: COLORS.primary }}
+              onClick={() => setShowInfo(true)}
+            >
+              VER MÁS
+            </Button>
+          </div>
+        </section>
+      )}
 
       {/* ===== FOOTER (editable por event.colors.dark) ===== */}
       <footer className="py-12" style={{ backgroundColor: COLORS.dark, color: COLORS.darkText }}>
@@ -596,17 +677,47 @@ const fontSecondary = event.fonts?.secondary || "'Great Vibes', cursive";
                   </Labeled>
 
                   {rsvpData.attendance === "yes" && (
-                    <Labeled label="Número de acompañantes">
-                      <Input
-                        type="number"
-                        min="0"
-                        max="5"
-                        value={rsvpData.guests}
-                        onChange={(e) =>
-                          setRsvpData({ ...rsvpData, guests: parseInt(e.target.value || "0", 10) })
-                        }
-                      />
-                    </Labeled>
+                    <>
+                      <Labeled label="Número de acompañantes">
+                        <Input
+                          type="number"
+                          min="0"
+                          max="5"
+                          value={rsvpData.guests}
+                          onChange={(e) =>
+                            setRsvpData({ ...rsvpData, guests: parseInt(e.target.value || "0", 10) })
+                          }
+                        />
+                      </Labeled>
+
+                      <div className="space-y-2">
+                        <span className="block text-sm text-gray-700">Preferencias alimentarias (opcional)</span>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          {[
+                            ["celiaco", "Celíaco/a"],
+                            ["vegetariano", "Vegetariano/a"],
+                            ["vegano", "Vegano/a"],
+                            ["sin-cerdo", "Sin cerdo"],
+                            ["sin-lactosa", "Sin lactosa"],
+                          ].map(([key, label]) => (
+                            <label key={key} className="inline-flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                checked={rsvpData.diet.includes(key)}
+                                onChange={() => handleDietToggle(key)}
+                              />
+                              <span>{label}</span>
+                            </label>
+                          ))}
+                        </div>
+                        <Input
+                          className="text-sm"
+                          placeholder="Otras restricciones (especificar)"
+                          value={rsvpData.dietOther}
+                          onChange={(e) => setRsvpData({ ...rsvpData, dietOther: e.target.value })}
+                        />
+                      </div>
+                    </>
                   )}
 
                   <Labeled label="Mensaje (opcional)">
@@ -628,6 +739,76 @@ const fontSecondary = event.fonts?.secondary || "'Great Vibes', cursive";
                   </Button>
                 </form>
               )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* ===== MODAL INFO ÚTIL ===== */}
+      {showInfo && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-2xl">
+            <CardContent className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-medium" style={{ color: COLORS.ink }}>
+                  Información útil
+                </h3>
+                <Button variant="ghost" size="sm" onClick={() => setShowInfo(false)}>
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+
+              <div className="space-y-6 text-sm" dir="ltr" style={{ color: COLORS.body }}>
+                {event.info?.help && <p className="whitespace-pre-wrap">{event.info.help}</p>}
+
+                {(event.info?.lodging || []).length > 0 && (
+                  <div>
+                    <h4 className="font-medium mb-2" style={{ color: COLORS.ink }}>
+                      Alojamiento recomendado
+                    </h4>
+                    <ul className="list-disc pl-5 space-y-1">
+                      {event.info.lodging.map((item, i) => (
+                        <li key={i}>
+                          {typeof item === "string" ? (
+                            item
+                          ) : (
+                            <>
+                              <span className="font-medium">{item.name}</span>
+                              {item.url ? (
+                                <>
+                                  {" — "}
+                                  <a
+                                    href={item.url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="underline hover:opacity-80"
+                                    style={{ color: COLORS.primary }}
+                                  >
+                                    Ver
+                                  </a>
+                                </>
+                              ) : null}
+                            </>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {(event.info?.transport || []).length > 0 && (
+                  <div>
+                    <h4 className="font-medium mb-2" style={{ color: COLORS.ink }}>
+                      Traslados / Transporte
+                    </h4>
+                    <ul className="list-disc pl-5 space-y-1">
+                      {event.info.transport.map((item, i) => (
+                        <li key={i}>{typeof item === "string" ? item : `${item.name || ""} ${item.note || ""}`}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
         </div>
