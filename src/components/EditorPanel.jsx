@@ -19,7 +19,6 @@ import {
   Menu,
   Save as SaveIcon,
   ChevronRight,
-  ChevronLeft,
   ToggleLeft,
   ToggleRight,
   CheckCircle2,
@@ -172,7 +171,7 @@ export default function EditorPanel({
     { key: "info", label: "Info útil" },
     { key: "dresscode", label: "Dress code" },
     { key: "instagram", label: "Instagram" },
-    { key: "gallery", label: "Galería" }, // NUEVO switch de galería
+    { key: "gallery", label: "Galería" }, // switch de galería
   ];
 
   const isSectionOn = (k) => {
@@ -203,12 +202,6 @@ export default function EditorPanel({
     const next = ORDER[Math.min(ORDER.length - 1, idx + 1)];
     setActiveTab(next);
   };
-  const goPrevTab = () => {
-    const idx = ORDER.indexOf(ui.activeTab);
-    const prev = ORDER[Math.max(0, idx - 1)];
-    setActiveTab(prev);
-  };
-  const canGoPrev = ORDER.indexOf(ui.activeTab) > 0;
 
   const validate = () => {
     const errs = [];
@@ -242,7 +235,7 @@ export default function EditorPanel({
   /* =================== Render =================== */
   return (
     <>
-      {/* TOOLBAR MÓVIL EN CANVAS (panel cerrado): Hamburger + ← + Guardar + → + Siguiente */}
+      {/* TOOLBAR MÓVIL EN CANVAS (panel cerrado): Hamburger + Guardar + Siguiente */}
       {ui.isMobile && !ui.showMobilePanel && (
         <div className="fixed top-2 left-2 right-2 z-40 flex items-center gap-2">
           <button
@@ -255,18 +248,6 @@ export default function EditorPanel({
           </button>
 
           <button
-            className={`inline-flex items-center gap-2 text-sm px-3 py-2 rounded border ${
-              canGoPrev ? "border-gray-300 bg-white hover:bg-gray-50" : "border-gray-200 bg-gray-100 opacity-60"
-            }`}
-            onClick={goPrevTab}
-            disabled={!canGoPrev}
-            aria-label="Anterior"
-            title="Anterior"
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-
-          <button
             className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50"
             onClick={doSave}
             aria-label="Guardar cambios"
@@ -274,15 +255,6 @@ export default function EditorPanel({
           >
             <SaveIcon className="w-4 h-4" />
             Guardar
-          </button>
-
-          <button
-            className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50"
-            onClick={goNextTab}
-            aria-label="Adelante"
-            title="Adelante"
-          >
-            <ChevronRight className="w-4 h-4" />
           </button>
 
           <button
@@ -306,11 +278,13 @@ export default function EditorPanel({
             : "w-80 bg-white border-r border-gray-200 overflow-y-auto"
         }
       >
-        {/* Barra superior del PANEL (móvil): Hamburger(cerrar) + ← + Guardar + → + Siguiente + estado */}
-        {ui.isMobile && (
-          <div className="sticky top-0 z-10 bg-white border-b border-gray-200">
-            <div className="flex items-center justify-between px-3 py-2 gap-2">
-              <div className="flex items-center gap-2">
+        {/* Barra superior del PANEL:
+            - Móvil: Hamburger(cerrar) + Guardar + Siguiente + estado
+            - Desktop: Guardar + Siguiente + estado (sin hamburger) */}
+        <div className="sticky top-0 z-10 bg-white border-b border-gray-200">
+          <div className="flex items-center justify-between px-3 py-2 gap-2">
+            <div className="flex items-center gap-2">
+              {ui.isMobile && (
                 <button
                   className="p-2 rounded hover:bg-gray-100"
                   onClick={() => setShowMobilePanel(false)}
@@ -319,56 +293,37 @@ export default function EditorPanel({
                 >
                   <Menu className="h-5 w-5" />
                 </button>
+              )}
 
-                <button
-                  className={`inline-flex items-center gap-2 text-sm px-3 py-2 rounded border ${
-                    canGoPrev ? "border-gray-300 bg-white hover:bg-gray-50" : "border-gray-200 bg-gray-100 opacity-60"
-                  }`}
-                  onClick={goPrevTab}
-                  disabled={!canGoPrev}
-                  aria-label="Anterior"
-                  title="Anterior"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </button>
+              <button
+                className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50"
+                onClick={doSave}
+                aria-label="Guardar cambios"
+                title="Guardar cambios"
+              >
+                <SaveIcon className="w-4 h-4" />
+                Guardar
+              </button>
 
-                <button
-                  className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50"
-                  onClick={doSave}
-                  aria-label="Guardar cambios"
-                  title="Guardar cambios"
-                >
-                  <SaveIcon className="w-4 h-4" />
-                  Guardar
-                </button>
+              <button
+                className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded bg-black text-white hover:opacity-90"
+                onClick={handleNext}
+                aria-label="Siguiente"
+                title="Siguiente"
+              >
+                Siguiente
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
 
-                <button
-                  className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50"
-                  onClick={goNextTab}
-                  aria-label="Adelante"
-                  title="Adelante"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-
-                <button
-                  className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded bg-black text-white hover:opacity-90"
-                  onClick={handleNext}
-                  aria-label="Siguiente"
-                  title="Siguiente"
-                >
-                  Siguiente
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="flex items-center gap-2">
-                {saved && (
-                  <span className="inline-flex items-center text-xs text-green-600">
-                    <CheckCircle2 className="w-4 h-4 mr-1" />
-                    Guardado
-                  </span>
-                )}
+            <div className="flex items-center gap-2">
+              {saved && (
+                <span className="inline-flex items-center text-xs text-green-600">
+                  <CheckCircle2 className="w-4 h-4 mr-1" />
+                  Guardado
+                </span>
+              )}
+              {ui.isMobile && (
                 <button
                   className="p-1 rounded hover:bg-gray-100"
                   onClick={() => setShowMobilePanel(false)}
@@ -377,23 +332,23 @@ export default function EditorPanel({
                 >
                   <X className="h-5 w-5" />
                 </button>
-              </div>
+              )}
             </div>
-
-            {errors.length > 0 && (
-              <div className="mx-3 mb-2 rounded border border-red-200 bg-red-50 p-2 text-[12px] text-red-700">
-                <div className="flex items-center gap-2 font-medium">
-                  <AlertTriangle className="w-4 h-4" /> Revisa estos puntos
-                </div>
-                <ul className="list-disc pl-5 mt-1 space-y-1">
-                  {errors.map((e, i) => (
-                    <li key={i}>{e}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
           </div>
-        )}
+
+          {errors.length > 0 && (
+            <div className="mx-3 mb-2 rounded border border-red-200 bg-red-50 p-2 text-[12px] text-red-700">
+              <div className="flex items-center gap-2 font-medium">
+                <AlertTriangle className="w-4 h-4" /> Revisa estos puntos
+              </div>
+              <ul className="list-disc pl-5 mt-1 space-y-1">
+                {errors.map((e, i) => (
+                  <li key={i}>{e}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
 
         <Tabs value={ui.activeTab} onValueChange={setActiveTab} className="h-full">
           <TabsList className="grid w-full grid-cols-4 p-1 m-4">
@@ -1026,4 +981,3 @@ function readFileAsDataURL(file) {
     fr.readAsDataURL(file);
   });
 }
-               
