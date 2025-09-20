@@ -21,35 +21,19 @@ import {
 } from "lucide-react";
 import { asset, onImgError } from "../utils/assets";
 
-/**
- * InvitationCanvas
- * - Visual tipo DemoBlack (franjas) sin cambiar el layout.
- * - Sincroniza con EditorPanel:
- *   · Colores: event.colors.{primary, secondary, text, dark}
- *   · Tipografías: event.fonts.{primary, secondary}
- *   · Imágenes: event.images.{heroTexture, logo, gallery[]}
- * - Dirección del documento configurable: event.direction ("ltr" | "rtl" | "auto")
- * - Respeta visibilidad por secciones: event.sections = {
- *     ceremony, reception, bank, songs, info, dresscode, instagram
- *   } (true por defecto; si es false, no se muestra)
- */
-
 export default function InvitationCanvas({ event, ui, setEvent }) {
   if (!event) return null;
 
-  /* =================== Helpers de secciones =================== */
   const isOn = (key) => {
     const s = event.sections || {};
-    return s[key] !== false; // default: visible
+    return s[key] !== false; // default visible
   };
 
-  /* =================== Colores / Tipografías =================== */
   const COLORS = useMemo(() => {
     const c = event.colors || {};
-    const primary = c.primary || "#8FAF86";      // acentos
-    const secondary = c.secondary || "#D4B28A";  // franja regalos
-    const text = c.text || "#2E2E2E";            // textos base
-    // Fallback "dark": si no viene del panel, derivamos de secondary
+    const primary = c.primary || "#8FAF86";
+    const secondary = c.secondary || "#D4B28A";
+    const text = c.text || "#2E2E2E";
     const darkDerived = mixHex(secondary, "#000000", 0.75);
     const dark = c.dark || darkDerived;
     return {
@@ -72,7 +56,6 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
   const fontPrimary = event.fonts?.primary || "'Playfair Display', serif";
   const fontSecondary = event.fonts?.secondary || "'Great Vibes', cursive";
 
-  /* =================== Imágenes =================== */
   const heroTexture = event.images?.heroTexture || asset("src/assets/portada.webp");
   const defaultGallery = [
     asset("src/assets/categoria_boda_grid.webp"),
@@ -85,7 +68,6 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
   const galleryImages =
     (event.images?.gallery && event.images.gallery.length > 0 ? event.images.gallery : defaultGallery).slice(0, 6);
 
-  /* =================== Countdown =================== */
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   useEffect(() => {
     const iso = buildTargetISO(event.date, event.time);
@@ -102,7 +84,6 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
     return () => clearInterval(id);
   }, [event.date, event.time]);
 
-  /* =================== Estado modales =================== */
   const [showRSVP, setShowRSVP] = useState(false);
   const [showGifts, setShowGifts] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -114,8 +95,8 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
     attendance: "",
     guests: 1,
     message: "",
-    diet: [],        // ["celiaco","vegetariano",...]
-    dietOther: "",   // texto libre
+    diet: [],
+    dietOther: "",
   });
 
   const handleDietToggle = (key) =>
@@ -128,7 +109,6 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
 
   const handleRSVPSubmit = (e) => {
     e.preventDefault();
-    // persistimos localmente en el estado del evento (simple)
     try {
       setEvent((p) => ({
         ...p,
@@ -143,7 +123,6 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
     }, 2200);
   };
 
-  /* =================== Helpers edición (gifts) =================== */
   const addGift = () =>
     setEvent((p) => ({ ...p, gifts: [...(p.gifts || []), { label: "Mesa de Regalos", url: "" }] }));
   const updateGift = (i, k, v) =>
@@ -172,7 +151,6 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
           />
         </div>
 
-        {/* Logo (decorativo superior) — solo si existe */}
         {event?.images?.logo && (
           <div className="absolute top-0 left-0 w-[420px] h-[260px] opacity-80 pointer-events-none">
             <img
@@ -237,7 +215,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         </div>
       </section>
 
-      {/* ===== COUNTDOWN (franja acento) ===== */}
+      {/* ===== COUNTDOWN ===== */}
       <section className="py-12 sm:py-16" style={{ backgroundColor: COLORS.primary }}>
         <div className="max-w-4xl mx-auto px-4 text-center" dir="ltr">
           <h2
@@ -259,12 +237,11 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         </div>
       </section>
 
-      {/* ===== DETALLES (blanco) ===== */}
+      {/* ===== DETALLES ===== */}
       {(isOn("ceremony") || isOn("reception")) && (
         <section className="py-16 bg-white" dir="ltr">
           <div className="max-w-4xl mx-auto px-4">
             <div className={`grid md:grid-cols-2 gap-12`}>
-              {/* Ceremonia */}
               {isOn("ceremony") && (
                 <DetailIconCard
                   icon={<Church className="w-8 h-8" style={{ color: COLORS.primary }} />}
@@ -326,7 +303,6 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                 </DetailIconCard>
               )}
 
-              {/* Fiesta */}
               {isOn("reception") && (
                 <DetailIconCard
                   icon={<PartyPopper className="w-8 h-8" style={{ color: COLORS.primary }} />}
@@ -384,23 +360,25 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         </section>
       )}
 
-      {/* ===== GALERÍA (6 fotos) ===== */}
-      <section className="py-16" style={{ backgroundColor: COLORS.paper }} dir="ltr">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {galleryImages.map((src, idx) => (
-              <div key={idx} className="relative aspect-[4/3] overflow-hidden rounded-lg">
-                <img
-                  src={src}
-                  onError={(e) => onImgError(e, `Galería ${idx + 1}`)}
-                  alt={`Galería ${idx + 1}`}
-                  className="absolute inset-0 w-full h-full object-cover block"
-                />
-              </div>
-            ))}
+      {/* ===== GALERÍA (6 fotos) — ahora respeta event.sections.gallery ===== */}
+      {isOn("gallery") && (
+        <section className="py-16" style={{ backgroundColor: COLORS.paper }} dir="ltr">
+          <div className="max-w-5xl mx-auto px-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {galleryImages.map((src, idx) => (
+                <div key={idx} className="relative aspect-[4/3] overflow-hidden rounded-lg">
+                  <img
+                    src={src}
+                    onError={(e) => onImgError(e, `Galería ${idx + 1}`)}
+                    alt={`Galería ${idx + 1}`}
+                    className="absolute inset-0 w-full h-full object-cover block"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ===== REGALOS / TRANSFERENCIAS ===== */}
       {isOn("bank") && (
@@ -460,7 +438,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         </section>
       )}
 
-      {/* ===== DRESS CODE (editable por event.colors.dark) ===== */}
+      {/* ===== DRESS CODE ===== */}
       {isOn("dresscode") && (
         <section className="py-16" style={{ backgroundColor: COLORS.dark, color: COLORS.darkText }} dir="ltr">
           <div className="max-w-4xl mx-auto px-4 text-center">
@@ -577,7 +555,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         </section>
       )}
 
-      {/* ===== FOOTER (editable por event.colors.dark) ===== */}
+      {/* ===== FOOTER ===== */}
       <footer className="py-12" style={{ backgroundColor: COLORS.dark, color: COLORS.darkText }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-lg mb-8">¡Gracias por acompañarnos en este momento tan importante!</p>
@@ -620,7 +598,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         </div>
       </footer>
 
-      {/* ===== MODAL RSVP ===== */}
+      {/* ===== MODALES ===== */}
       {showRSVP && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <Card className="w-full max-w-md">
@@ -744,7 +722,6 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         </div>
       )}
 
-      {/* ===== MODAL INFO ÚTIL ===== */}
       {showInfo && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <Card className="w-full max-w-2xl">
@@ -814,7 +791,6 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         </div>
       )}
 
-      {/* ===== MODAL DATOS BANCARIOS ===== */}
       {showGifts && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <Card className="w-full max-w-md">
@@ -887,8 +863,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
   );
 }
 
-/* =================== Subcomponentes / helpers =================== */
-
+/* ===== subcomponentes / helpers ===== */
 function TimeCell({ value, label, color = "#fff" }) {
   return (
     <div className="flex flex-col items-center">
@@ -908,7 +883,6 @@ function SeparatorDot({ color = "#fff" }) {
     </div>
   );
 }
-
 function DetailIconCard({ icon, iconBg, title, titleColor, textColor, muted, children }) {
   return (
     <div className="text-center">
@@ -940,8 +914,6 @@ function renderBankLine(label, value) {
     </p>
   );
 }
-
-/** Colorea un fondo suave a partir de un hex, con opacidad */
 function toSoft(hex, alpha = 0.14) {
   const { r, g, b } = hexToRgb(hex);
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
@@ -952,8 +924,6 @@ function hexToRgb(hex) {
   const num = parseInt(h, 16);
   return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
 }
-
-/** Mezcla dos colores hex con peso [0..1] hacia hexB */
 function mixHex(hexA, hexB, weight = 0.5) {
   const a = hexToRgb(hexA);
   const b = hexToRgb(hexB);
@@ -963,15 +933,11 @@ function mixHex(hexA, hexB, weight = 0.5) {
   const bch = mix(a.b, b.b);
   return `#${[r, g, bch].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
 }
-
-/** Elige color de texto (negro/blanco) según contraste YIQ */
 function pickTextColor(hex) {
   const { r, g, b } = hexToRgb(hex);
   const yiq = (r * 299 + g * 587 + b * 114) / 1000;
   return yiq >= 128 ? "#111827" : "#FFFFFF";
 }
-
-/** Construye ISO a partir de fecha en español y hora "HH:mm" */
 function buildTargetISO(dateStr, timeStr) {
   if (!dateStr) return null;
   try {
@@ -981,37 +947,19 @@ function buildTargetISO(dateStr, timeStr) {
       return `${y}-${pad(m)}-${pad(d)}T${padTime(timeStr || "00:00")}`;
     }
     const meses = [
-      "enero",
-      "febrero",
-      "marzo",
-      "abril",
-      "mayo",
-      "junio",
-      "julio",
-      "agosto",
-      "septiembre",
-      "octubre",
-      "noviembre",
-      "diciembre",
+      "enero","febrero","marzo","abril","mayo","junio",
+      "julio","agosto","septiembre","octubre","noviembre","diciembre",
     ];
     const ds = dateStr.toLowerCase();
     const mIdx = meses.findIndex((m) => ds.includes(m));
     const dMatch = ds.match(/\d{1,2}/);
     const yMatch = ds.match(/\d{4}/);
     if (mIdx >= 0 && dMatch && yMatch) {
-      const d = Number(dMatch[0]),
-        y = Number(yMatch[0]);
+      const d = Number(dMatch[0]), y = Number(yMatch[0]);
       return `${y}-${pad(mIdx + 1)}-${pad(d)}T${padTime(timeStr || "00:00")}`;
     }
-  } catch {
-    return null;
-  }
+  } catch { return null; }
   return null;
 }
-function pad(n) {
-  return String(n).padStart(2, "0");
-}
-function padTime(hhmm) {
-  const [h = "00", m = "00"] = (hhmm || "").split(":");
-  return `${pad(h)}:${pad(m)}:00`;
-}
+function pad(n) { return String(n).padStart(2, "0"); }
+function padTime(hhmm) { const [h = "00", m = "00"] = (hhmm || "").split(":"); return `${pad(h)}:${pad(m)}:00`; }
