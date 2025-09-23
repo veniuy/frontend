@@ -39,6 +39,8 @@ import {
   Settings,
   Zap,
   Sparkles,
+  Heart,
+  Church,
 } from "lucide-react";
 import ImagesPanel from "./ImagesPanel";
 
