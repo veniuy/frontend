@@ -78,20 +78,34 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
   const galleryImages =
     (event.images?.gallery && event.images.gallery.length > 0 ? event.images.gallery : defaultGallery).slice(0, 6);
 
+  // Cuenta regresiva corregida
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   useEffect(() => {
-    const iso = buildTargetISO(event.date, event.time);
-    const target = new Date(iso || "2026-11-23T19:00:00");
-    const id = setInterval(() => {
-      const d = Math.max(0, target.getTime() - Date.now());
-      setTimeLeft({
-        days: Math.floor(d / 86400000),
-        hours: Math.floor((d % 86400000) / 3600000),
-        minutes: Math.floor((d % 3600000) / 60000),
-        seconds: Math.floor((d % 60000) / 1000),
-      });
-    }, 1000);
-    return () => clearInterval(id);
+    const updateCountdown = () => {
+      const targetDate = buildTargetDate(event.date, event.time);
+      if (!targetDate) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return;
+      }
+
+      const now = new Date().getTime();
+      const distance = targetDate.getTime() - now;
+
+      if (distance > 0) {
+        setTimeLeft({
+          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((distance % (1000 * 60)) / 1000),
+        });
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
   }, [event.date, event.time]);
 
   const [showRSVP, setShowRSVP] = useState(false);
@@ -148,6 +162,9 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
       return { ...p, gifts: arr };
     });
 
+  // Determinar si es quinceaños
+  const isQuinceanera = event.template === "quinceanera";
+
   return (
     <div className="min-h-screen" dir={event?.direction || "ltr"} style={{ backgroundColor: COLORS.paper }}>
       {/* Inyectar estilos de fuente dinámicos */}
@@ -176,67 +193,107 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         )}
 
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          <h1
-            className="font-secondary font-light mb-3 tracking-wider"
-            style={{ 
-              color: COLORS.ink, 
-              fontSize: "clamp(2.75rem, 8vw, 6rem)", 
-              fontFamily: fontSecondary 
-            }}
-          >
-            <EditableText
-              value={event.couple?.bride || "Belén"}
-              onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: val } }))}
-              ariaLabel="Nombre 1"
-              className="px-1 editable-text"
-              singleLine
-              style={{ color: COLORS.ink, fontFamily: fontSecondary }}
-            />
-          </h1>
+          {isQuinceanera ? (
+            // Layout para Quinceaños - Solo un nombre
+            <>
+              <h1
+                className="font-secondary font-light mb-8 tracking-wider"
+                style={{ 
+                  color: COLORS.ink, 
+                  fontSize: "clamp(3rem, 10vw, 7rem)", 
+                  fontFamily: fontSecondary 
+                }}
+              >
+                <EditableText
+                  value={event.couple?.bride || event.quinceañera?.name || "Isabella"}
+                  onChange={(val) => setEvent((p) => ({ 
+                    ...p, 
+                    couple: { ...p.couple, bride: val },
+                    quinceañera: { ...p.quinceañera, name: val }
+                  }))}
+                  ariaLabel="Nombre de la quinceañera"
+                  className="px-1 editable-text"
+                  singleLine
+                  style={{ color: COLORS.ink, fontFamily: fontSecondary }}
+                />
+              </h1>
+              <p
+                className="font-primary font-light mb-10 tracking-wide"
+                style={{ 
+                  color: COLORS.muted, 
+                  fontSize: "clamp(1.2rem, 4vw, 2rem)", 
+                  fontFamily: fontPrimary 
+                }}
+              >
+                MIS 15 AÑOS
+              </p>
+            </>
+          ) : (
+            // Layout para Bodas - Dos nombres
+            <>
+              <h1
+                className="font-secondary font-light mb-3 tracking-wider"
+                style={{ 
+                  color: COLORS.ink, 
+                  fontSize: "clamp(2.75rem, 8vw, 6rem)", 
+                  fontFamily: fontSecondary 
+                }}
+              >
+                <EditableText
+                  value={event.couple?.bride || "Belén"}
+                  onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: val } }))}
+                  ariaLabel="Nombre 1"
+                  className="px-1 editable-text"
+                  singleLine
+                  style={{ color: COLORS.ink, fontFamily: fontSecondary }}
+                />
+              </h1>
 
-          <div className="flex items-center justify-center my-6">
-            <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
-            <div
-              className="mx-4 font-light font-secondary"
-              style={{ 
-                color: COLORS.primary, 
-                fontSize: "clamp(1.75rem, 5vw, 3rem)", 
-                fontFamily: fontSecondary 
-              }}
-            >
-              ∞
-            </div>
-            <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
-          </div>
+              <div className="flex items-center justify-center my-6">
+                <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
+                <div
+                  className="mx-4 font-light font-secondary"
+                  style={{ 
+                    color: COLORS.primary, 
+                    fontSize: "clamp(1.75rem, 5vw, 3rem)", 
+                    fontFamily: fontSecondary 
+                  }}
+                >
+                  &
+                </div>
+                <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
+              </div>
 
-          <h1
-            className="font-secondary font-light mb-8 tracking-wider"
-            style={{ 
-              color: COLORS.ink, 
-              fontSize: "clamp(2.75rem, 8vw, 6rem)", 
-              fontFamily: fontSecondary 
-            }}
-          >
-            <EditableText
-              value={event.couple?.groom || "Amadeo"}
-              onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: val } }))}
-              ariaLabel="Nombre 2"
-              className="px-1 editable-text"
-              singleLine
-              style={{ color: COLORS.ink, fontFamily: fontSecondary }}
-            />
-          </h1>
+              <h1
+                className="font-secondary font-light mb-8 tracking-wider"
+                style={{ 
+                  color: COLORS.ink, 
+                  fontSize: "clamp(2.75rem, 8vw, 6rem)", 
+                  fontFamily: fontSecondary 
+                }}
+              >
+                <EditableText
+                  value={event.couple?.groom || "Amadeo"}
+                  onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: val } }))}
+                  ariaLabel="Nombre 2"
+                  className="px-1 editable-text"
+                  singleLine
+                  style={{ color: COLORS.ink, fontFamily: fontSecondary }}
+                />
+              </h1>
 
-          <p
-            className="font-primary font-light mb-10 tracking-wide"
-            style={{ 
-              color: COLORS.muted, 
-              fontSize: "clamp(1.1rem, 3.5vw, 1.5rem)", 
-              fontFamily: fontPrimary 
-            }}
-          >
-            ¡NOS CASAMOS!
-          </p>
+              <p
+                className="font-primary font-light mb-10 tracking-wide"
+                style={{ 
+                  color: COLORS.muted, 
+                  fontSize: "clamp(1.1rem, 3.5vw, 1.5rem)", 
+                  fontFamily: fontPrimary 
+                }}
+              >
+                NOS CASAMOS
+              </p>
+            </>
+          )}
 
           <div className="animate-bounce">
             <ChevronDown className="w-8 h-8 mx-auto" style={{ color: COLORS.primary }} />
@@ -255,7 +312,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
               fontFamily: fontPrimary 
             }}
           >
-            Bienvenidos a nuestra boda
+            {isQuinceanera ? "Bienvenidos a mis 15 años" : "Bienvenidos a nuestra boda"}
           </h2>
 
           <div className="flex items-stretch justify-center gap-5 sm:gap-8 select-none">
@@ -274,12 +331,14 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
       {(isOn("ceremony") || isOn("reception")) && (
         <section className="py-16 bg-white" dir="ltr">
           <div className="max-w-4xl mx-auto px-4">
-            <div className={`grid md:grid-cols-2 gap-12`}>
-              {isOn("ceremony") && (
+            <div className={`grid ${isQuinceanera ? 'md:grid-cols-1' : 'md:grid-cols-2'} gap-12`}>
+              
+              {/* Ceremonia - Solo para bodas */}
+              {!isQuinceanera && isOn("ceremony") && (
                 <DetailIconCard
                   icon={<Church className="w-8 h-8" style={{ color: COLORS.primary }} />}
                   iconBg={COLORS.primarySoft}
-                  title="CEREMONIA"
+                  title={event.ceremony?.type === "civil" ? "CEREMONIA CIVIL" : "CEREMONIA"}
                   titleColor={COLORS.ink}
                   textColor={COLORS.body}
                   muted={COLORS.muted}
@@ -306,7 +365,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                     </p>
                     <p className="font-medium font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
                       <EditableText
-                        value={event.ceremony?.venue || "Iglesia Nuestra Señora del Carmen"}
+                        value={event.ceremony?.venue || (event.ceremony?.type === "civil" ? "Registro Civil" : "Iglesia Nuestra Señora del Carmen")}
                         onChange={(v) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, venue: v } }))}
                         className="px-1 editable-text"
                         singleLine
@@ -340,11 +399,12 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                 </DetailIconCard>
               )}
 
+              {/* Fiesta/Recepción */}
               {isOn("reception") && (
                 <DetailIconCard
                   icon={<PartyPopper className="w-8 h-8" style={{ color: COLORS.primary }} />}
                   iconBg={COLORS.primarySoft}
-                  title="FIESTA"
+                  title={isQuinceanera ? "CELEBRACIÓN" : "FIESTA"}
                   titleColor={COLORS.ink}
                   textColor={COLORS.body}
                   muted={COLORS.muted}
@@ -353,7 +413,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                   <div className="space-y-3 mb-8">
                     <p className="text-lg font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
                       <EditableText
-                        value={event.reception?.time || "Después de la ceremonia"}
+                        value={event.reception?.time || (isQuinceanera ? event.time || "20:00 hs" : "Después de la ceremonia")}
                         onChange={(v) => setEvent((p) => ({ ...p, reception: { ...p.reception, time: v } }))}
                         className="px-1 editable-text"
                         singleLine
@@ -362,7 +422,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                     </p>
                     <p className="font-medium font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
                       <EditableText
-                        value={event.reception?.venue || "Rincón Calina"}
+                        value={event.reception?.venue || (isQuinceanera ? "Salón de Fiestas" : "Rincón Calina")}
                         onChange={(v) => setEvent((p) => ({ ...p, reception: { ...p.reception, venue: v } }))}
                         className="px-1 editable-text"
                         singleLine
@@ -379,7 +439,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                       />
                     </p>
                     <p className="text-lg font-medium font-primary" style={{ color: COLORS.primary, fontFamily: fontPrimary }}>
-                      ¡Te esperamos!
+                      {isQuinceanera ? "¡Te espero!" : "¡Te esperamos!"}
                     </p>
                   </div>
                   <StyledButton
@@ -391,7 +451,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                       )
                     }
                   >
-                    LLEGAR A LA FIESTA
+                    {isQuinceanera ? "LLEGAR A LA CELEBRACIÓN" : "LLEGAR A LA FIESTA"}
                   </StyledButton>
                 </DetailIconCard>
               )}
@@ -434,7 +494,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
               }}
             >
               <EditableText
-                value={event.giftsNote || "Si deseás realizarnos un regalo podés colaborar con nuestra Luna de Miel…"}
+                value={event.giftsNote || (isQuinceanera ? "Si deseás realizarme un regalo podés colaborar con mi fiesta..." : "Si deseás realizarnos un regalo podés colaborar con nuestra Luna de Miel…")}
                 onChange={(v) => setEvent((p) => ({ ...p, giftsNote: v }))}
                 className="px-1 editable-text"
                 singleLine={false}
@@ -466,14 +526,14 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
               className="text-2xl font-secondary font-medium mb-6 tracking-wide"
               style={{ color: COLORS.ink, fontFamily: fontSecondary }}
             >
-              ¡COMPARTÍ TUS FOTOS!
+              COMPARTÍ TUS FOTOS
             </h2>
             <p className="mb-8 max-w-2xl mx-auto font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
               Usá nuestro hashtag para que podamos ver todas las fotos de este día tan especial.
             </p>
             <div className="text-2xl font-medium mb-8" style={{ color: COLORS.primary }}>
               <EditableText
-                value={event.hashtag || "#NuestraBoda"}
+                value={event.hashtag || (isQuinceanera ? "#Mis15Años" : "#NuestraBoda")}
                 onChange={(v) => setEvent((p) => ({ ...p, hashtag: v }))}
                 className="px-1 editable-text"
                 singleLine
@@ -539,7 +599,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
               ¿QUÉ CANCIONES NO PUEDEN FALTAR?
             </h2>
             <p className="mb-8 max-w-2xl mx-auto font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
-              ¡Ayudanos sugiriendo las canciones que pensás que no pueden faltar!
+              {isQuinceanera ? "¡Ayudame sugiriendo las canciones que pensás que no pueden faltar!" : "¡Ayudanos sugiriendo las canciones que pensás que no pueden faltar!"}
             </p>
             <StyledButton
               colors={COLORS}
@@ -586,7 +646,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
       <footer className="py-12" style={{ backgroundColor: COLORS.dark, color: COLORS.darkText }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-lg mb-8 font-primary" style={{ fontFamily: fontPrimary }}>
-            ¡Gracias por acompañarnos en este momento tan importante!
+            {isQuinceanera ? "¡Gracias por acompañarme en este momento tan importante!" : "¡Gracias por acompañarnos en este momento tan importante!"}
           </p>
           <div
             className="pt-8"
@@ -596,7 +656,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
             }}
           >
             <p className="text-sm opacity-70 mb-4 font-primary" style={{ fontFamily: fontPrimary }}>
-              Invitación digital creada con ❤️ por{" "}
+              Invitación digital creada con{" "}
               <span className="font-medium" style={{ color: COLORS.primary }}>
                 Venite
               </span>
@@ -646,7 +706,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                     ¡Confirmación Recibida!
                   </h4>
                   <p className="font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
-                    Gracias por confirmar tu asistencia. ¡Te esperamos!
+                    Gracias por confirmar tu asistencia. {isQuinceanera ? "¡Te espero!" : "¡Te esperamos!"}
                   </p>
                 </div>
               ) : (
@@ -844,7 +904,9 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
               <div className="space-y-4 text-sm font-primary" dir="ltr" style={{ fontFamily: fontPrimary }}>
                 <div className="text-center mb-2">
                   <CreditCard className="w-12 h-12 mx-auto mb-4" style={{ color: COLORS.primary }} />
-                  <p style={{ color: COLORS.body }}>Si deseás colaborar con nuestra Luna de Miel:</p>
+                  <p style={{ color: COLORS.body }}>
+                    {isQuinceanera ? "Si deseás colaborar con mi celebración:" : "Si deseás colaborar con nuestra Luna de Miel:"}
+                  </p>
                 </div>
 
                 <div className="p-4 rounded-lg" style={{ backgroundColor: COLORS.paper }}>
@@ -902,7 +964,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
 
 /* ===== COMPONENTES MEJORADOS ===== */
 
-// Botón estilizado que respeta los colores del tema
+// Botón estilizado que respeta los colores del tema - SIN EMOJIS
 function StyledButton({ 
   children, 
   colors, 
@@ -914,12 +976,21 @@ function StyledButton({
   ...props 
 }) {
   const getButtonStyles = () => {
-    const baseStyles = "px-8 py-3 rounded-full transition-all duration-200 font-medium";
+    const baseStyles = "inline-flex items-center justify-center rounded-full font-medium transition-all duration-200 hover:opacity-90 active:scale-95";
+    
+    // Tamaños proporcionados
+    const sizeClasses = {
+      sm: "px-4 py-2 text-sm",
+      default: "px-6 py-3 text-base",
+      lg: "px-8 py-4 text-lg"
+    };
+    
+    const sizeClass = sizeClasses[size] || sizeClasses.default;
     
     switch (variant) {
       case "primary":
         return {
-          className: `${baseStyles} ${className}`,
+          className: `${baseStyles} ${sizeClass} ${className}`,
           style: { 
             backgroundColor: colors.primary, 
             color: colors.primaryText,
@@ -928,7 +999,7 @@ function StyledButton({
         };
       case "secondary":
         return {
-          className: `${baseStyles} ${className}`,
+          className: `${baseStyles} ${sizeClass} ${className}`,
           style: { 
             backgroundColor: colors.white, 
             color: colors.secondary,
@@ -937,7 +1008,7 @@ function StyledButton({
         };
       case "primary-inverse":
         return {
-          className: `${baseStyles} ${className}`,
+          className: `${baseStyles} ${sizeClass} ${className}`,
           style: { 
             backgroundColor: colors.white, 
             color: colors.primary,
@@ -946,7 +1017,7 @@ function StyledButton({
         };
       case "outline":
         return {
-          className: `${baseStyles} ${className}`,
+          className: `${baseStyles} ${sizeClass} ${className}`,
           style: { 
             backgroundColor: "transparent", 
             color: colors.primary,
@@ -955,7 +1026,7 @@ function StyledButton({
         };
       case "outline-dark":
         return {
-          className: `${baseStyles} ${className}`,
+          className: `${baseStyles} ${sizeClass} ${className}`,
           style: { 
             backgroundColor: "transparent", 
             color: colors.darkText,
@@ -964,7 +1035,7 @@ function StyledButton({
         };
       default:
         return {
-          className: `${baseStyles} ${className}`,
+          className: `${baseStyles} ${sizeClass} ${className}`,
           style: { 
             backgroundColor: colors.primary, 
             color: colors.primaryText,
@@ -974,14 +1045,13 @@ function StyledButton({
     }
   };
 
-  const sizeStyles = size === "sm" ? "px-4 py-2 text-sm" : "px-8 py-3";
   const buttonProps = getButtonStyles();
   
   return (
     <button
       type={type}
       onClick={onClick}
-      className={`${buttonProps.className.replace("px-8 py-3", sizeStyles)} hover:opacity-90 active:scale-95`}
+      className={buttonProps.className}
       style={buttonProps.style}
       {...props}
     >
@@ -1082,13 +1152,49 @@ function pickTextColor(bgHex) {
   return luminance > 0.5 ? "#000000" : "#FFFFFF";
 }
 
-function buildTargetISO(date, time) {
-  if (!date || !time) return null;
+// Función mejorada para construir fecha objetivo
+function buildTargetDate(dateStr, timeStr) {
+  if (!dateStr || !timeStr) return null;
+  
   try {
-    const [day, month, year] = date.split(/[\/\-\s]+/);
-    const [hours, minutes] = time.split(":");
-    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}T${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}:00`;
-  } catch {
+    // Intentar diferentes formatos de fecha
+    let day, month, year;
+    
+    // Formato DD/MM/YYYY o DD-MM-YYYY
+    if (dateStr.includes('/') || dateStr.includes('-')) {
+      const separator = dateStr.includes('/') ? '/' : '-';
+      const parts = dateStr.split(separator);
+      if (parts.length === 3) {
+        day = parseInt(parts[0], 10);
+        month = parseInt(parts[1], 10);
+        year = parseInt(parts[2], 10);
+      }
+    }
+    // Formato "DD de Mes, YYYY"
+    else if (dateStr.includes(' de ')) {
+      const monthNames = {
+        'enero': 1, 'febrero': 2, 'marzo': 3, 'abril': 4, 'mayo': 5, 'junio': 6,
+        'julio': 7, 'agosto': 8, 'septiembre': 9, 'octubre': 10, 'noviembre': 11, 'diciembre': 12
+      };
+      
+      const parts = dateStr.toLowerCase().split(' ');
+      if (parts.length >= 4) {
+        day = parseInt(parts[0], 10);
+        month = monthNames[parts[2]] || 1;
+        year = parseInt(parts[3].replace(',', ''), 10);
+      }
+    }
+    
+    if (!day || !month || !year) return null;
+    
+    // Parsear hora
+    const timeParts = timeStr.split(':');
+    const hours = parseInt(timeParts[0], 10) || 0;
+    const minutes = parseInt(timeParts[1], 10) || 0;
+    
+    return new Date(year, month - 1, day, hours, minutes, 0);
+  } catch (error) {
+    console.error('Error parsing date:', error);
     return null;
   }
 }
