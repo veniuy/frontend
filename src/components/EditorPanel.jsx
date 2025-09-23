@@ -43,6 +43,8 @@ import {
   Church,
   PartyPopper,
   Crown,
+  Music,
+  Instagram,
 } from "lucide-react";
 import ImagesPanel from "./ImagesPanel";
 
