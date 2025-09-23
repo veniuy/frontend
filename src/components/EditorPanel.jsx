@@ -41,6 +41,8 @@ import {
   Sparkles,
   Heart,
   Church,
+  PartyPopper,
+  Crown,
 } from "lucide-react";
 import ImagesPanel from "./ImagesPanel";
 
@@ -54,6 +56,7 @@ export default function EditorPanel({
   handleTemplateChange,
   setEvent,
   onSave,
+  onFinish, // Nueva prop para manejar finalización
 }) {
   /* =================== ESTADO MEJORADO =================== */
   const [errors, setErrors] = useState([]);
@@ -64,6 +67,77 @@ export default function EditorPanel({
   const [isDragging, setIsDragging] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [recentColors, setRecentColors] = useState([]);
+
+  /* =================== PLANTILLAS MEJORADAS SIN EMOJIS =================== */
+  const templates = useMemo(() => [
+    // QUINCEAÑOS
+    { 
+      id: "quinceanera-elegant", 
+      name: "Quinceaños Elegante", 
+      type: "quinceanera",
+      description: "Diseño sofisticado para celebración de 15 años",
+      colors: { primary: "#E1C1A8", secondary: "#F6E3D4", text: "#2E2E2E" },
+      fonts: { primary: "'Playfair Display', serif", secondary: "'Great Vibes', cursive" }
+    },
+    { 
+      id: "quinceanera-romantic", 
+      name: "Quinceaños Romántico", 
+      type: "quinceanera",
+      description: "Colores suaves y delicados para tu celebración",
+      colors: { primary: "#EEC9C5", secondary: "#C9C9C9", text: "#2E2E2E" },
+      fonts: { primary: "'Cormorant Garamond', serif", secondary: "'Pinyon Script', cursive" }
+    },
+    { 
+      id: "quinceanera-modern", 
+      name: "Quinceaños Moderno", 
+      type: "quinceanera",
+      description: "Diseño contemporáneo y vibrante",
+      colors: { primary: "#B7B79D", secondary: "#C16D4D", text: "#2E2E2E" },
+      fonts: { primary: "Montserrat, sans-serif", secondary: "'Alex Brush', cursive" }
+    },
+    
+    // BODAS
+    { 
+      id: "wedding-elegant", 
+      name: "Boda Elegante", 
+      type: "wedding",
+      description: "Diseño sofisticado y minimalista",
+      colors: { primary: "#8FAF86", secondary: "#D4B28A", text: "#2E2E2E" },
+      fonts: { primary: "'Playfair Display', serif", secondary: "'Great Vibes', cursive" }
+    },
+    { 
+      id: "wedding-romantic", 
+      name: "Boda Romántica", 
+      type: "wedding",
+      description: "Colores suaves y florales",
+      colors: { primary: "#EEC9C5", secondary: "#C9C9C9", text: "#2E2E2E" },
+      fonts: { primary: "Cardo, serif", secondary: "'Pinyon Script', cursive" }
+    },
+    { 
+      id: "wedding-modern", 
+      name: "Boda Moderna", 
+      type: "wedding",
+      description: "Diseño contemporáneo y vibrante",
+      colors: { primary: "#245D63", secondary: "#8F9AA7", text: "#2E2E2E" },
+      fonts: { primary: "Inter, sans-serif", secondary: "'Alex Brush', cursive" }
+    },
+    { 
+      id: "wedding-classic", 
+      name: "Boda Clásica", 
+      type: "wedding",
+      description: "Estilo tradicional y atemporal",
+      colors: { primary: "#871C2B", secondary: "#EFEAE6", text: "#2E2E2E" },
+      fonts: { primary: "Bellefair, serif", secondary: "'Tangerine', cursive" }
+    },
+    { 
+      id: "wedding-rustic", 
+      name: "Boda Rústica", 
+      type: "wedding",
+      description: "Estilo campestre y natural",
+      colors: { primary: "#5A6C48", secondary: "#E0C9C9", text: "#2E2E2E" },
+      fonts: { primary: "'Cormorant Garamond', serif", secondary: "'Great Vibes', cursive" }
+    },
+  ], []);
 
   /* =================== PALETAS MEJORADAS =================== */
   const PALETTES = useMemo(
@@ -167,37 +241,6 @@ export default function EditorPanel({
     { name: "Lato", family: "Lato, sans-serif", category: "Sans Serif", preview: "Aa" },
   ], []);
 
-  const templates = useMemo(() => [
-    { 
-      id: "elegant", 
-      name: "Elegante", 
-      description: "Diseño sofisticado y minimalista",
-      preview: "🎭",
-      colors: { primary: "#8FAF86", secondary: "#D4B28A" }
-    },
-    { 
-      id: "romantic", 
-      name: "Romántico", 
-      description: "Colores suaves y florales",
-      preview: "💕",
-      colors: { primary: "#EEC9C5", secondary: "#C9C9C9" }
-    },
-    { 
-      id: "modern", 
-      name: "Moderno", 
-      description: "Diseño contemporáneo y vibrante",
-      preview: "⚡",
-      colors: { primary: "#245D63", secondary: "#8F9AA7" }
-    },
-    { 
-      id: "classic", 
-      name: "Clásico", 
-      description: "Estilo tradicional y atemporal",
-      preview: "👑",
-      colors: { primary: "#871C2B", secondary: "#EFEAE6" }
-    },
-  ], []);
-
   /* =================== HOOKS MEJORADOS =================== */
   
   // Detección de dispositivo mejorada
@@ -239,6 +282,53 @@ export default function EditorPanel({
 
   /* =================== HELPERS MEJORADOS =================== */
   
+  const applyTemplate = useCallback((template) => {
+    // Aplicar plantilla completa
+    setEvent(prev => ({
+      ...prev,
+      template: template.type, // 'quinceanera' o 'wedding'
+      templateId: template.id,
+      colors: {
+        ...prev.colors,
+        ...template.colors
+      },
+      fonts: {
+        ...prev.fonts,
+        ...template.fonts
+      },
+      // Configurar secciones según el tipo
+      sections: {
+        ...prev.sections,
+        ceremony: template.type === 'wedding', // Solo bodas tienen ceremonia
+        reception: true, // Ambos tienen fiesta/celebración
+        bank: true,
+        songs: true,
+        info: true,
+        instagram: true,
+        gallery: true,
+      }
+    }));
+
+    // Aplicar colores
+    if (template.colors) {
+      Object.entries(template.colors).forEach(([key, value]) => {
+        handleColorChange(key, value);
+        addRecentColor(value);
+      });
+    }
+
+    // Aplicar fuentes
+    if (template.fonts) {
+      Object.entries(template.fonts).forEach(([key, value]) => {
+        handleFontChange(key, value);
+      });
+    }
+
+    if (handleTemplateChange) {
+      handleTemplateChange(template.id);
+    }
+  }, [setEvent, handleColorChange, handleFontChange, handleTemplateChange, addRecentColor]);
+
   const applyPalette = useCallback((tones) => {
     const primary = tones[2]?.hex || event.colors?.primary || "#8FAF86";
     const secondary = tones[3]?.hex || event.colors?.secondary || "#D4B28A";
@@ -340,14 +430,13 @@ export default function EditorPanel({
   , [gallery, setGallery]);
 
   const SECTION_KEYS = useMemo(() => [
-    { key: "ceremony", label: "Ceremonia", icon: "⛪" },
-    { key: "reception", label: "Fiesta", icon: "🎉" },
-    { key: "bank", label: "Cuenta bancaria", icon: "💳" },
-    { key: "songs", label: "Canciones", icon: "🎵" },
-    { key: "info", label: "Info útil", icon: "ℹ️" },
-    { key: "dresscode", label: "Dress code", icon: "👗" },
-    { key: "instagram", label: "Instagram", icon: "📷" },
-    { key: "gallery", label: "Galería", icon: "🖼️" },
+    { key: "ceremony", label: "Ceremonia", icon: <Church className="w-4 h-4" /> },
+    { key: "reception", label: "Fiesta", icon: <PartyPopper className="w-4 h-4" /> },
+    { key: "bank", label: "Cuenta bancaria", icon: <CreditCard className="w-4 h-4" /> },
+    { key: "songs", label: "Canciones", icon: <Music className="w-4 h-4" /> },
+    { key: "info", label: "Info útil", icon: <AlertTriangle className="w-4 h-4" /> },
+    { key: "instagram", label: "Instagram", icon: <Instagram className="w-4 h-4" /> },
+    { key: "gallery", label: "Galería", icon: <ImageIcon className="w-4 h-4" /> },
   ], []);
 
   const isSectionOn = useCallback((k) => {
@@ -373,7 +462,8 @@ export default function EditorPanel({
     }
   }, [event, onSave]);
 
-  const ORDER = ["design", "content", "images", "layout"];
+  // NUEVO ORDEN: Plantillas, Contenido, Diseño, Imágenes
+  const ORDER = ["templates", "content", "design", "images"];
   const goNextTab = useCallback(() => {
     const idx = ORDER.indexOf(ui.activeTab);
     const next = ORDER[Math.min(ORDER.length - 1, idx + 1)];
@@ -383,16 +473,30 @@ export default function EditorPanel({
   const validate = useCallback(() => {
     const errs = [];
     const c = event || {};
-    const couple = c.couple || {};
-    const ceremony = c.ceremony || {};
-    const reception = c.reception || {};
+    const isQuinceanera = c.template === "quinceanera";
     
-    if (!couple.bride || !couple.bride.trim()) errs.push("Falta el nombre de la novia.");
-    if (!couple.groom || !couple.groom.trim()) errs.push("Falta el nombre del novio.");
+    if (isQuinceanera) {
+      const name = c.couple?.bride || c.quinceañera?.name;
+      if (!name || !name.trim()) errs.push("Falta el nombre de la quinceañera.");
+    } else {
+      const couple = c.couple || {};
+      if (!couple.bride || !couple.bride.trim()) errs.push("Falta el nombre de la novia.");
+      if (!couple.groom || !couple.groom.trim()) errs.push("Falta el nombre del novio.");
+    }
+    
     if (!c.date || !c.date.trim()) errs.push("Falta la fecha.");
     if (!c.time || !c.time.trim()) errs.push("Falta la hora.");
-    if (isSectionOn("ceremony") && !ceremony.venue) errs.push("Falta el lugar de la ceremonia.");
-    if (isSectionOn("reception") && !reception.venue) errs.push("Falta el lugar de la fiesta.");
+    
+    if (!isQuinceanera && isSectionOn("ceremony")) {
+      const ceremony = c.ceremony || {};
+      if (!ceremony.venue) errs.push("Falta el lugar de la ceremonia.");
+    }
+    
+    if (isSectionOn("reception")) {
+      const reception = c.reception || {};
+      if (!reception.venue) errs.push("Falta el lugar de la fiesta.");
+    }
+    
     if (isSectionOn("bank")) {
       const b = c.bank || {};
       if (!b.titular && !b.cbu && !b.cuenta) {
@@ -406,9 +510,16 @@ export default function EditorPanel({
     const errs = validate();
     setErrors(errs);
     if (errs.length === 0) {
-      goNextTab();
+      if (ui.activeTab === ORDER[ORDER.length - 1]) {
+        // Es la última pestaña, finalizar
+        if (typeof onFinish === "function") {
+          onFinish(event);
+        }
+      } else {
+        goNextTab();
+      }
     }
-  }, [validate, goNextTab]);
+  }, [validate, goNextTab, ui.activeTab, ORDER, onFinish, event]);
 
   /* =================== COMPONENTES DE UI MEJORADOS =================== */
   
@@ -656,26 +767,456 @@ export default function EditorPanel({
           )}
         </div>
 
-        {/* Tabs mejorados */}
+        {/* Tabs mejorados - NUEVO ORDEN */}
         <Tabs value={ui.activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
           <TabsList className="grid w-full grid-cols-4 p-1 mx-3 mb-3">
-            <TabsTrigger value="design" className="flex flex-col items-center gap-1 p-2 text-xs">
-              <Palette className="h-3 w-3" />
-              Diseño
+            <TabsTrigger value="templates" className="flex flex-col items-center gap-1 p-2 text-xs">
+              <Layout className="h-3 w-3" />
+              Plantillas
             </TabsTrigger>
             <TabsTrigger value="content" className="flex flex-col items-center gap-1 p-2 text-xs">
               <Type className="h-3 w-3" />
               Contenido
             </TabsTrigger>
+            <TabsTrigger value="design" className="flex flex-col items-center gap-1 p-2 text-xs">
+              <Palette className="h-3 w-3" />
+              Diseño
+            </TabsTrigger>
             <TabsTrigger value="images" className="flex flex-col items-center gap-1 p-2 text-xs">
               <ImageIcon className="h-3 w-3" />
               Imágenes
             </TabsTrigger>
-            <TabsTrigger value="layout" className="flex flex-col items-center gap-1 p-2 text-xs">
-              <Layout className="h-3 w-3" />
-              Plantillas
-            </TabsTrigger>
           </TabsList>
+
+          {/* ============ PLANTILLAS (PRIMERA PESTAÑA) ============ */}
+          <TabsContent value="templates" className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full px-3 pb-6">
+              <div className="space-y-4">
+                
+                {/* Plantillas de Quinceaños */}
+                <CollapsibleSection 
+                  title="Quinceaños" 
+                  icon={<Crown className="w-4 h-4" />}
+                  defaultOpen={true}
+                >
+                  <div className="space-y-3">
+                    {templates.filter(t => t.type === 'quinceanera').map((template) => (
+                      <div
+                        key={template.id}
+                        className={`border rounded-lg p-3 hover:bg-gray-50 transition-colors cursor-pointer ${
+                          event.templateId === template.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                        }`}
+                        onClick={() => applyTemplate(template)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1">
+                            <h3 className="font-medium text-sm">{template.name}</h3>
+                            <p className="text-xs text-gray-600">{template.description}</p>
+                          </div>
+                          <div className="flex gap-1">
+                            <div 
+                              className="w-4 h-4 rounded-full border"
+                              style={{ backgroundColor: template.colors?.primary }}
+                            />
+                            <div 
+                              className="w-4 h-4 rounded-full border"
+                              style={{ backgroundColor: template.colors?.secondary }}
+                            />
+                          </div>
+                        </div>
+                        {event.templateId === template.id && (
+                          <div className="mt-2 flex items-center gap-1 text-xs text-blue-600">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Plantilla activa
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </CollapsibleSection>
+
+                {/* Plantillas de Bodas */}
+                <CollapsibleSection 
+                  title="Bodas" 
+                  icon={<Heart className="w-4 h-4" />}
+                  defaultOpen={true}
+                >
+                  <div className="space-y-3">
+                    {templates.filter(t => t.type === 'wedding').map((template) => (
+                      <div
+                        key={template.id}
+                        className={`border rounded-lg p-3 hover:bg-gray-50 transition-colors cursor-pointer ${
+                          event.templateId === template.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                        }`}
+                        onClick={() => applyTemplate(template)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1">
+                            <h3 className="font-medium text-sm">{template.name}</h3>
+                            <p className="text-xs text-gray-600">{template.description}</p>
+                          </div>
+                          <div className="flex gap-1">
+                            <div 
+                              className="w-4 h-4 rounded-full border"
+                              style={{ backgroundColor: template.colors?.primary }}
+                            />
+                            <div 
+                              className="w-4 h-4 rounded-full border"
+                              style={{ backgroundColor: template.colors?.secondary }}
+                            />
+                          </div>
+                        </div>
+                        {event.templateId === template.id && (
+                          <div className="mt-2 flex items-center gap-1 text-xs text-blue-600">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Plantilla activa
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </CollapsibleSection>
+
+                {/* Tipo de ceremonia para bodas */}
+                {event.template === 'wedding' && (
+                  <CollapsibleSection 
+                    title="Tipo de Ceremonia" 
+                    icon={<Church className="w-4 h-4" />}
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          id="religious"
+                          name="ceremonyType"
+                          value="religious"
+                          checked={event.ceremony?.type !== "civil"}
+                          onChange={() => setEvent(p => ({ 
+                            ...p, 
+                            ceremony: { ...p.ceremony, type: "religious" } 
+                          }))}
+                        />
+                        <label htmlFor="religious" className="text-sm">Ceremonia Religiosa</label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          id="civil"
+                          name="ceremonyType"
+                          value="civil"
+                          checked={event.ceremony?.type === "civil"}
+                          onChange={() => setEvent(p => ({ 
+                            ...p, 
+                            ceremony: { ...p.ceremony, type: "civil" } 
+                          }))}
+                        />
+                        <label htmlFor="civil" className="text-sm">Ceremonia Civil</label>
+                      </div>
+                    </div>
+                  </CollapsibleSection>
+                )}
+
+              </div>
+            </ScrollArea>
+          </TabsContent>
+
+          {/* ============ CONTENIDO ============ */}
+          <TabsContent value="content" className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full px-3 pb-6">
+              <div className="space-y-4">
+                
+                {/* Información básica */}
+                <CollapsibleSection 
+                  title="Información Básica" 
+                  icon={<Heart className="w-4 h-4" />}
+                  defaultOpen={true}
+                >
+                  {event.template === "quinceanera" ? (
+                    // Layout para Quinceaños
+                    <div className="space-y-3">
+                      <div>
+                        <Label className="text-xs">Nombre de la Quinceañera</Label>
+                        <Input
+                          value={event.couple?.bride || event.quinceañera?.name || ""}
+                          onChange={(e) => setEvent((p) => ({ 
+                            ...p, 
+                            couple: { ...p.couple, bride: e.target.value },
+                            quinceañera: { ...p.quinceañera, name: e.target.value }
+                          }))}
+                          className="text-xs mt-1"
+                          placeholder="Nombre"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    // Layout para Bodas
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-xs">Nombre 1</Label>
+                        <Input
+                          value={event.couple?.bride || ""}
+                          onChange={(e) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: e.target.value } }))}
+                          className="text-xs mt-1"
+                          placeholder="Novia"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs">Nombre 2</Label>
+                        <Input
+                          value={event.couple?.groom || ""}
+                          onChange={(e) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: e.target.value } }))}
+                          className="text-xs mt-1"
+                          placeholder="Novio"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-3 mt-3">
+                    <div>
+                      <Label className="text-xs">Fecha</Label>
+                      <Input
+                        value={event.date || ""}
+                        onChange={(e) => setEvent((p) => ({ ...p, date: e.target.value }))}
+                        className="text-xs mt-1"
+                        placeholder="DD/MM/YYYY"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Hora</Label>
+                      <Input
+                        value={event.time || ""}
+                        onChange={(e) => setEvent((p) => ({ ...p, time: e.target.value }))}
+                        className="text-xs mt-1"
+                        placeholder="HH:mm"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs">Hashtag</Label>
+                    <Input
+                      value={event.hashtag || ""}
+                      onChange={(e) => setEvent((p) => ({ ...p, hashtag: e.target.value }))}
+                      className="text-xs mt-1"
+                      placeholder={event.template === "quinceanera" ? "#Mis15Años" : "#NuestraBoda"}
+                    />
+                  </div>
+                </CollapsibleSection>
+
+                {/* Detalles del evento */}
+                <CollapsibleSection 
+                  title="Detalles del Evento" 
+                  icon={<Church className="w-4 h-4" />}
+                >
+                  <div className="space-y-3">
+                    {/* Ceremonia - Solo para bodas */}
+                    {event.template !== "quinceanera" && (
+                      <>
+                        <div>
+                          <Label className="text-xs">Lugar de Ceremonia</Label>
+                          <Input
+                            value={event.ceremony?.venue || ""}
+                            onChange={(e) =>
+                              setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, venue: e.target.value } }))
+                            }
+                            className="text-xs mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Dirección de Ceremonia</Label>
+                          <Textarea
+                            value={event.ceremony?.address || ""}
+                            onChange={(e) =>
+                              setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, address: e.target.value } }))
+                            }
+                            className="text-xs mt-1 min-h-[60px]"
+                          />
+                        </div>
+                      </>
+                    )}
+
+                    <div>
+                      <Label className="text-xs">{event.template === "quinceanera" ? "Lugar de Celebración" : "Lugar de Recepción"}</Label>
+                      <Input
+                        value={event.reception?.venue || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, reception: { ...p.reception, venue: e.target.value } }))
+                        }
+                        className="text-xs mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">{event.template === "quinceanera" ? "Dirección de Celebración" : "Dirección de Recepción"}</Label>
+                      <Textarea
+                        value={event.reception?.address || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, reception: { ...p.reception, address: e.target.value } }))
+                        }
+                        className="text-xs mt-1 min-h-[60px]"
+                      />
+                    </div>
+                  </div>
+                </CollapsibleSection>
+
+                {/* Información bancaria */}
+                <CollapsibleSection 
+                  title="Información Bancaria" 
+                  icon={<CreditCard className="w-4 h-4" />}
+                >
+                  <div className="grid grid-cols-1 gap-3">
+                    <div>
+                      <Label className="text-xs">Titular</Label>
+                      <Input
+                        value={event.bank?.titular || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), titular: e.target.value } }))
+                        }
+                        className="text-xs mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Banco</Label>
+                      <Input
+                        value={event.bank?.banco || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), banco: e.target.value } }))
+                        }
+                        className="text-xs mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">CBU / IBAN</Label>
+                      <Input
+                        value={event.bank?.cbu || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), cbu: e.target.value } }))
+                        }
+                        className="text-xs mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Alias</Label>
+                      <Input
+                        value={event.bank?.alias || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), alias: e.target.value } }))
+                        }
+                        className="text-xs mt-1"
+                      />
+                    </div>
+                  </div>
+                </CollapsibleSection>
+
+                {/* Mesa de regalos */}
+                <CollapsibleSection 
+                  title="Mesa de Regalos" 
+                  icon={<Gift className="w-4 h-4" />}
+                >
+                  <div className="space-y-3">
+                    {(event.gifts || []).map((g, idx) => (
+                      <div key={idx} className="flex gap-2 items-center">
+                        <Input
+                          className="text-xs flex-1"
+                          placeholder="Nombre"
+                          value={g.label || ""}
+                          onChange={(e) => updateGift(idx, "label", e.target.value)}
+                        />
+                        <Input
+                          className="text-xs flex-1"
+                          placeholder="URL"
+                          value={g.url || ""}
+                          onChange={(e) => updateGift(idx, "url", e.target.value)}
+                        />
+                        <EnhancedButton
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeGift(idx)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </EnhancedButton>
+                      </div>
+                    ))}
+                    <EnhancedButton
+                      variant="outline"
+                      size="sm"
+                      onClick={addGift}
+                      className="w-full text-xs"
+                    >
+                      <Plus className="w-3 h-3 mr-1" />
+                      Agregar enlace
+                    </EnhancedButton>
+                  </div>
+                </CollapsibleSection>
+
+                {/* Textos personalizables */}
+                <CollapsibleSection 
+                  title="Textos Personalizables" 
+                  icon={<Type className="w-4 h-4" />}
+                >
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-xs">Nota de Regalos</Label>
+                      <Textarea
+                        className="text-xs mt-1 min-h-[60px]"
+                        value={event.giftsNote || ""}
+                        onChange={(e) => setEvent((p) => ({ ...p, giftsNote: e.target.value }))}
+                        placeholder="Mensaje para la sección de regalos"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Nota de RSVP</Label>
+                      <Textarea
+                        className="text-xs mt-1 min-h-[60px]"
+                        value={event.rsvpNote || ""}
+                        onChange={(e) => setEvent((p) => ({ ...p, rsvpNote: e.target.value }))}
+                        placeholder="Mensaje para confirmación de asistencia"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Info Útil</Label>
+                      <Textarea
+                        className="text-xs mt-1 min-h-[60px]"
+                        value={event.info?.help || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, info: { ...(p.info || {}), help: e.target.value } }))
+                        }
+                        placeholder="Información sobre alojamiento, transporte, etc."
+                      />
+                    </div>
+                  </div>
+                </CollapsibleSection>
+
+                {/* Secciones visibles */}
+                <CollapsibleSection 
+                  title="Secciones Visibles" 
+                  icon={<Eye className="w-4 h-4" />}
+                >
+                  <div className="grid grid-cols-1 gap-2">
+                    {SECTION_KEYS.map(({ key, label, icon }) => {
+                      // Ocultar ceremonia para quinceaños
+                      if (key === "ceremony" && event.template === "quinceanera") return null;
+                      
+                      return (
+                        <div key={key} className="flex items-center justify-between p-2 border rounded hover:bg-gray-50">
+                          <div className="flex items-center gap-2">
+                            {icon}
+                            <span className="text-sm">{label}</span>
+                          </div>
+                          <Switch
+                            checked={isSectionOn(key)}
+                            onCheckedChange={() => toggleSection(key)}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CollapsibleSection>
+
+              </div>
+            </ScrollArea>
+          </TabsContent>
 
           {/* ============ DISEÑO (PALETAS + PERSONALIZADOS) ============ */}
           <TabsContent value="design" className="flex-1 overflow-hidden">
@@ -829,274 +1370,6 @@ export default function EditorPanel({
             </ScrollArea>
           </TabsContent>
 
-          {/* ============ CONTENIDO ============ */}
-          <TabsContent value="content" className="flex-1 overflow-hidden">
-            <ScrollArea className="h-full px-3 pb-6">
-              <div className="space-y-4">
-                
-                {/* Información básica */}
-                <CollapsibleSection 
-                  title="Información Básica" 
-                  icon={<Heart className="w-4 h-4" />}
-                  defaultOpen={true}
-                >
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label className="text-xs">Nombre 1</Label>
-                      <Input
-                        value={event.couple?.bride || ""}
-                        onChange={(e) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: e.target.value } }))}
-                        className="text-xs mt-1"
-                        placeholder="Novia"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs">Nombre 2</Label>
-                      <Input
-                        value={event.couple?.groom || ""}
-                        onChange={(e) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: e.target.value } }))}
-                        className="text-xs mt-1"
-                        placeholder="Novio"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3 mt-3">
-                    <div>
-                      <Label className="text-xs">Fecha</Label>
-                      <Input
-                        value={event.date || ""}
-                        onChange={(e) => setEvent((p) => ({ ...p, date: e.target.value }))}
-                        className="text-xs mt-1"
-                        placeholder="DD/MM/YYYY"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs">Hora</Label>
-                      <Input
-                        value={event.time || ""}
-                        onChange={(e) => setEvent((p) => ({ ...p, time: e.target.value }))}
-                        className="text-xs mt-1"
-                        placeholder="HH:mm"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label className="text-xs">Hashtag</Label>
-                    <Input
-                      value={event.hashtag || ""}
-                      onChange={(e) => setEvent((p) => ({ ...p, hashtag: e.target.value }))}
-                      className="text-xs mt-1"
-                      placeholder="#NuestraBoda"
-                    />
-                  </div>
-                </CollapsibleSection>
-
-                {/* Detalles del evento */}
-                <CollapsibleSection 
-                  title="Detalles del Evento" 
-                  icon={<Church className="w-4 h-4" />}
-                >
-                  <div className="space-y-3">
-                    <div>
-                      <Label className="text-xs">Lugar de Ceremonia</Label>
-                      <Input
-                        value={event.ceremony?.venue || ""}
-                        onChange={(e) =>
-                          setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, venue: e.target.value } }))
-                        }
-                        className="text-xs mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs">Dirección de Ceremonia</Label>
-                      <Textarea
-                        value={event.ceremony?.address || ""}
-                        onChange={(e) =>
-                          setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, address: e.target.value } }))
-                        }
-                        className="text-xs mt-1 min-h-[60px]"
-                      />
-                    </div>
-
-                    <div>
-                      <Label className="text-xs">Lugar de Recepción</Label>
-                      <Input
-                        value={event.reception?.venue || ""}
-                        onChange={(e) =>
-                          setEvent((p) => ({ ...p, reception: { ...p.reception, venue: e.target.value } }))
-                        }
-                        className="text-xs mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs">Dirección de Recepción</Label>
-                      <Textarea
-                        value={event.reception?.address || ""}
-                        onChange={(e) =>
-                          setEvent((p) => ({ ...p, reception: { ...p.reception, address: e.target.value } }))
-                        }
-                        className="text-xs mt-1 min-h-[60px]"
-                      />
-                    </div>
-                  </div>
-                </CollapsibleSection>
-
-                {/* Información bancaria */}
-                <CollapsibleSection 
-                  title="Información Bancaria" 
-                  icon={<CreditCard className="w-4 h-4" />}
-                >
-                  <div className="grid grid-cols-1 gap-3">
-                    <div>
-                      <Label className="text-xs">Titular</Label>
-                      <Input
-                        value={event.bank?.titular || ""}
-                        onChange={(e) =>
-                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), titular: e.target.value } }))
-                        }
-                        className="text-xs mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs">Banco</Label>
-                      <Input
-                        value={event.bank?.banco || ""}
-                        onChange={(e) =>
-                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), banco: e.target.value } }))
-                        }
-                        className="text-xs mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs">CBU / IBAN</Label>
-                      <Input
-                        value={event.bank?.cbu || ""}
-                        onChange={(e) =>
-                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), cbu: e.target.value } }))
-                        }
-                        className="text-xs mt-1"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs">Alias</Label>
-                      <Input
-                        value={event.bank?.alias || ""}
-                        onChange={(e) =>
-                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), alias: e.target.value } }))
-                        }
-                        className="text-xs mt-1"
-                      />
-                    </div>
-                  </div>
-                </CollapsibleSection>
-
-                {/* Mesa de regalos */}
-                <CollapsibleSection 
-                  title="Mesa de Regalos" 
-                  icon={<Gift className="w-4 h-4" />}
-                >
-                  <div className="space-y-3">
-                    {(event.gifts || []).map((g, idx) => (
-                      <div key={idx} className="flex gap-2 items-center">
-                        <Input
-                          className="text-xs flex-1"
-                          placeholder="Nombre"
-                          value={g.label || ""}
-                          onChange={(e) => updateGift(idx, "label", e.target.value)}
-                        />
-                        <Input
-                          className="text-xs flex-1"
-                          placeholder="URL"
-                          value={g.url || ""}
-                          onChange={(e) => updateGift(idx, "url", e.target.value)}
-                        />
-                        <EnhancedButton
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeGift(idx)}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </EnhancedButton>
-                      </div>
-                    ))}
-                    <EnhancedButton
-                      variant="outline"
-                      size="sm"
-                      onClick={addGift}
-                      className="w-full text-xs"
-                    >
-                      <Plus className="w-3 h-3 mr-1" />
-                      Agregar enlace
-                    </EnhancedButton>
-                  </div>
-                </CollapsibleSection>
-
-                {/* Textos personalizables */}
-                <CollapsibleSection 
-                  title="Textos Personalizables" 
-                  icon={<Type className="w-4 h-4" />}
-                >
-                  <div className="space-y-3">
-                    <div>
-                      <Label className="text-xs">Nota de Regalos</Label>
-                      <Textarea
-                        className="text-xs mt-1 min-h-[60px]"
-                        value={event.giftsNote || ""}
-                        onChange={(e) => setEvent((p) => ({ ...p, giftsNote: e.target.value }))}
-                        placeholder="Mensaje para la sección de regalos"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs">Nota de RSVP</Label>
-                      <Textarea
-                        className="text-xs mt-1 min-h-[60px]"
-                        value={event.rsvpNote || ""}
-                        onChange={(e) => setEvent((p) => ({ ...p, rsvpNote: e.target.value }))}
-                        placeholder="Mensaje para confirmación de asistencia"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-xs">Info Útil</Label>
-                      <Textarea
-                        className="text-xs mt-1 min-h-[60px]"
-                        value={event.info?.help || ""}
-                        onChange={(e) =>
-                          setEvent((p) => ({ ...p, info: { ...(p.info || {}), help: e.target.value } }))
-                        }
-                        placeholder="Información sobre alojamiento, transporte, etc."
-                      />
-                    </div>
-                  </div>
-                </CollapsibleSection>
-
-                {/* Secciones visibles */}
-                <CollapsibleSection 
-                  title="Secciones Visibles" 
-                  icon={<Eye className="w-4 h-4" />}
-                >
-                  <div className="grid grid-cols-1 gap-2">
-                    {SECTION_KEYS.map(({ key, label, icon }) => (
-                      <div key={key} className="flex items-center justify-between p-2 border rounded hover:bg-gray-50">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm">{icon}</span>
-                          <span className="text-sm">{label}</span>
-                        </div>
-                        <Switch
-                          checked={isSectionOn(key)}
-                          onCheckedChange={() => toggleSection(key)}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </CollapsibleSection>
-
-              </div>
-            </ScrollArea>
-          </TabsContent>
-
           {/* ============ IMÁGENES ============ */}
           <TabsContent value="images" className="flex-1 overflow-hidden">
             <ScrollArea className="h-full px-3 pb-6">
@@ -1165,65 +1438,16 @@ export default function EditorPanel({
             </ScrollArea>
           </TabsContent>
 
-          {/* ============ PLANTILLAS ============ */}
-          <TabsContent value="layout" className="flex-1 overflow-hidden">
-            <ScrollArea className="h-full px-3 pb-6">
-              <div className="space-y-4">
-                
-                <CollapsibleSection 
-                  title="Plantillas de Diseño" 
-                  icon={<Layout className="w-4 h-4" />}
-                  defaultOpen={true}
-                >
-                  <div className="grid grid-cols-1 gap-3">
-                    {templates.map((template) => (
-                      <div
-                        key={template.id}
-                        className="border rounded-lg p-3 hover:bg-gray-50 transition-colors cursor-pointer"
-                        onClick={() => {
-                          handleTemplateChange(template.id);
-                          if (template.colors) {
-                            handleColorChange("primary", template.colors.primary);
-                            handleColorChange("secondary", template.colors.secondary);
-                          }
-                        }}
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="text-2xl">{template.preview}</div>
-                          <div className="flex-1">
-                            <h3 className="font-medium text-sm">{template.name}</h3>
-                            <p className="text-xs text-gray-600">{template.description}</p>
-                          </div>
-                          <div className="flex gap-1">
-                            <div 
-                              className="w-4 h-4 rounded-full border"
-                              style={{ backgroundColor: template.colors?.primary }}
-                            />
-                            <div 
-                              className="w-4 h-4 rounded-full border"
-                              style={{ backgroundColor: template.colors?.secondary }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CollapsibleSection>
-
-              </div>
-            </ScrollArea>
-          </TabsContent>
-
         </Tabs>
 
-        {/* Footer con botón de siguiente */}
+        {/* Footer con botón de siguiente/finalizar */}
         <div className="border-t border-gray-200 p-3">
           <EnhancedButton
             onClick={handleNext}
             className="w-full"
             size="lg"
           >
-            {ui.activeTab === ORDER[ORDER.length - 1] ? "Finalizar" : "Siguiente"}
+            {ui.activeTab === ORDER[ORDER.length - 1] ? "Finalizar y Proceder al Pago" : "Siguiente"}
             <ChevronRight className="w-4 h-4 ml-2" />
           </EnhancedButton>
         </div>
