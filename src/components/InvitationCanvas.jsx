@@ -53,8 +53,18 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
     };
   }, [event.colors]);
 
+  // Mejorar la aplicación de fuentes - asegurar que se apliquen consistentemente
   const fontPrimary = event.fonts?.primary || "'Playfair Display', serif";
   const fontSecondary = event.fonts?.secondary || "'Great Vibes', cursive";
+
+  // Crear estilos CSS dinámicos para aplicar fuentes globalmente
+  const fontStyles = useMemo(() => {
+    return `
+      .font-primary { font-family: ${fontPrimary} !important; }
+      .font-secondary { font-family: ${fontSecondary} !important; }
+      .editable-text { font-family: inherit !important; }
+    `;
+  }, [fontPrimary, fontSecondary]);
 
   const heroTexture = event.images?.heroTexture || asset("src/assets/portada.webp");
   const defaultGallery = [
@@ -140,6 +150,9 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
 
   return (
     <div className="min-h-screen" dir={event?.direction || "ltr"} style={{ backgroundColor: COLORS.paper }}>
+      {/* Inyectar estilos de fuente dinámicos */}
+      <style dangerouslySetInnerHTML={{ __html: fontStyles }} />
+
       {/* ===== HERO ===== */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
@@ -164,24 +177,32 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
 
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
           <h1
-            className="font-display font-light mb-3 tracking-wider"
-            style={{ color: COLORS.ink, fontSize: "clamp(2.75rem, 8vw, 6rem)", fontFamily: fontSecondary }}
+            className="font-secondary font-light mb-3 tracking-wider"
+            style={{ 
+              color: COLORS.ink, 
+              fontSize: "clamp(2.75rem, 8vw, 6rem)", 
+              fontFamily: fontSecondary 
+            }}
           >
             <EditableText
               value={event.couple?.bride || "Belén"}
               onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: val } }))}
               ariaLabel="Nombre 1"
-              className="px-1"
+              className="px-1 editable-text"
               singleLine
-              style={{ color: COLORS.ink }}
+              style={{ color: COLORS.ink, fontFamily: fontSecondary }}
             />
           </h1>
 
           <div className="flex items-center justify-center my-6">
             <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
             <div
-              className="mx-4 font-light"
-              style={{ color: COLORS.primary, fontSize: "clamp(1.75rem, 5vw, 3rem)", fontFamily: fontSecondary }}
+              className="mx-4 font-light font-secondary"
+              style={{ 
+                color: COLORS.primary, 
+                fontSize: "clamp(1.75rem, 5vw, 3rem)", 
+                fontFamily: fontSecondary 
+              }}
             >
               ∞
             </div>
@@ -189,22 +210,30 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
           </div>
 
           <h1
-            className="font-display font-light mb-8 tracking-wider"
-            style={{ color: COLORS.ink, fontSize: "clamp(2.75rem, 8vw, 6rem)", fontFamily: fontSecondary }}
+            className="font-secondary font-light mb-8 tracking-wider"
+            style={{ 
+              color: COLORS.ink, 
+              fontSize: "clamp(2.75rem, 8vw, 6rem)", 
+              fontFamily: fontSecondary 
+            }}
           >
             <EditableText
               value={event.couple?.groom || "Amadeo"}
               onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: val } }))}
               ariaLabel="Nombre 2"
-              className="px-1"
+              className="px-1 editable-text"
               singleLine
-              style={{ color: COLORS.ink }}
+              style={{ color: COLORS.ink, fontFamily: fontSecondary }}
             />
           </h1>
 
           <p
-            className="font-light mb-10 tracking-wide"
-            style={{ color: COLORS.muted, fontSize: "clamp(1.1rem, 3.5vw, 1.5rem)", fontFamily: fontPrimary }}
+            className="font-primary font-light mb-10 tracking-wide"
+            style={{ 
+              color: COLORS.muted, 
+              fontSize: "clamp(1.1rem, 3.5vw, 1.5rem)", 
+              fontFamily: fontPrimary 
+            }}
           >
             ¡NOS CASAMOS!
           </p>
@@ -219,8 +248,12 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
       <section className="py-12 sm:py-16" style={{ backgroundColor: COLORS.primary }}>
         <div className="max-w-4xl mx-auto px-4 text-center" dir="ltr">
           <h2
-            className="font-light mb-6 sm:mb-8 tracking-wide"
-            style={{ color: COLORS.primaryText, fontSize: "clamp(1.25rem, 3.5vw, 1.875rem)", fontFamily: fontPrimary }}
+            className="font-primary font-light mb-6 sm:mb-8 tracking-wide"
+            style={{ 
+              color: COLORS.primaryText, 
+              fontSize: "clamp(1.25rem, 3.5vw, 1.875rem)", 
+              fontFamily: fontPrimary 
+            }}
           >
             Bienvenidos a nuestra boda
           </h2>
@@ -250,47 +283,51 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                   titleColor={COLORS.ink}
                   textColor={COLORS.body}
                   muted={COLORS.muted}
+                  fontPrimary={fontPrimary}
                 >
                   <div className="space-y-3 mb-8">
-                    <p className="text-lg" style={{ color: COLORS.body }}>
+                    <p className="text-lg font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
                       <EditableText
                         value={event.date || "23 de Noviembre, 2026"}
                         onChange={(v) => setEvent((p) => ({ ...p, date: v }))}
-                        className="px-1"
+                        className="px-1 editable-text"
                         singleLine
+                        style={{ fontFamily: fontPrimary }}
                       />
                     </p>
-                    <p className="text-lg" style={{ color: COLORS.body }}>
+                    <p className="text-lg font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
                       <EditableText
                         value={event.ceremony?.time || event.time || "19:00 hs"}
                         onChange={(v) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, time: v } }))}
-                        className="px-1"
+                        className="px-1 editable-text"
                         singleLine
+                        style={{ fontFamily: fontPrimary }}
                       />
                     </p>
-                    <p className="font-medium" style={{ color: COLORS.body }}>
+                    <p className="font-medium font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
                       <EditableText
                         value={event.ceremony?.venue || "Iglesia Nuestra Señora del Carmen"}
                         onChange={(v) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, venue: v } }))}
-                        className="px-1"
+                        className="px-1 editable-text"
                         singleLine
+                        style={{ fontFamily: fontPrimary }}
                       />
                     </p>
-                    <p style={{ color: COLORS.body }}>
+                    <p className="font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
                       <EditableText
                         value={event.ceremony?.location || "Villa Allende, Córdoba"}
                         onChange={(v) => setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, location: v } }))}
-                        className="px-1"
+                        className="px-1 editable-text"
                         singleLine
+                        style={{ fontFamily: fontPrimary }}
                       />
                     </p>
-                    <p className="text-sm" style={{ color: COLORS.muted }}>
+                    <p className="text-sm font-primary" style={{ color: COLORS.muted, fontFamily: fontPrimary }}>
                       Recibí debajo las indicaciones para llegar.
                     </p>
                   </div>
-                  <Button
-                    className="px-8 py-3 rounded-full"
-                    style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
+                  <StyledButton
+                    colors={COLORS}
                     onClick={() =>
                       window.open(
                         `https://maps.google.com/?q=${event.ceremony?.address || "Av. San Martín 456, Villa Allende"}`,
@@ -299,7 +336,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                     }
                   >
                     LLEGAR A LA CEREMONIA
-                  </Button>
+                  </StyledButton>
                 </DetailIconCard>
               )}
 
@@ -311,39 +348,42 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                   titleColor={COLORS.ink}
                   textColor={COLORS.body}
                   muted={COLORS.muted}
+                  fontPrimary={fontPrimary}
                 >
                   <div className="space-y-3 mb-8">
-                    <p className="text-lg" style={{ color: COLORS.body }}>
+                    <p className="text-lg font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
                       <EditableText
                         value={event.reception?.time || "Después de la ceremonia"}
                         onChange={(v) => setEvent((p) => ({ ...p, reception: { ...p.reception, time: v } }))}
-                        className="px-1"
+                        className="px-1 editable-text"
                         singleLine
+                        style={{ fontFamily: fontPrimary }}
                       />
                     </p>
-                    <p className="font-medium" style={{ color: COLORS.body }}>
+                    <p className="font-medium font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
                       <EditableText
                         value={event.reception?.venue || "Rincón Calina"}
                         onChange={(v) => setEvent((p) => ({ ...p, reception: { ...p.reception, venue: v } }))}
-                        className="px-1"
+                        className="px-1 editable-text"
                         singleLine
+                        style={{ fontFamily: fontPrimary }}
                       />
                     </p>
-                    <p style={{ color: COLORS.body }}>
+                    <p className="font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
                       <EditableText
                         value={event.reception?.location || "Unquillo, Córdoba"}
                         onChange={(v) => setEvent((p) => ({ ...p, reception: { ...p.reception, location: v } }))}
-                        className="px-1"
+                        className="px-1 editable-text"
                         singleLine
+                        style={{ fontFamily: fontPrimary }}
                       />
                     </p>
-                    <p className="text-lg font-medium" style={{ color: COLORS.primary }}>
+                    <p className="text-lg font-medium font-primary" style={{ color: COLORS.primary, fontFamily: fontPrimary }}>
                       ¡Te esperamos!
                     </p>
                   </div>
-                  <Button
-                    className="px-8 py-3 rounded-full"
-                    style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
+                  <StyledButton
+                    colors={COLORS}
                     onClick={() =>
                       window.open(
                         `https://maps.google.com/?q=${event.reception?.address || "Ruta Provincial E-53 Km 8, Unquillo"}`,
@@ -352,7 +392,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                     }
                   >
                     LLEGAR A LA FIESTA
-                  </Button>
+                  </StyledButton>
                 </DetailIconCard>
               )}
             </div>
@@ -360,7 +400,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         </section>
       )}
 
-      {/* ===== GALERÍA (6 fotos) — ahora respeta event.sections.gallery ===== */}
+      {/* ===== GALERÍA (6 fotos) ===== */}
       {isOn("gallery") && (
         <section className="py-16" style={{ backgroundColor: COLORS.paper }} dir="ltr">
           <div className="max-w-5xl mx-auto px-4">
@@ -386,24 +426,28 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
           <div className="max-w-3xl mx-auto px-4">
             <Gift className="w-10 h-10 mx-auto mb-6" style={{ color: COLORS.secondaryText }} />
             <p
-              className="mb-8"
-              style={{ color: COLORS.secondaryText, fontSize: "clamp(1rem, 2.5vw, 1.25rem)", fontFamily: fontPrimary }}
+              className="mb-8 font-primary"
+              style={{ 
+                color: COLORS.secondaryText, 
+                fontSize: "clamp(1rem, 2.5vw, 1.25rem)", 
+                fontFamily: fontPrimary 
+              }}
             >
               <EditableText
                 value={event.giftsNote || "Si deseás realizarnos un regalo podés colaborar con nuestra Luna de Miel…"}
                 onChange={(v) => setEvent((p) => ({ ...p, giftsNote: v }))}
-                className="px-1"
+                className="px-1 editable-text"
                 singleLine={false}
-                style={{ color: COLORS.secondaryText }}
+                style={{ color: COLORS.secondaryText, fontFamily: fontPrimary }}
               />
             </p>
-            <Button
-              className="rounded-full px-8 py-3"
-              style={{ backgroundColor: COLORS.white, color: COLORS.secondary }}
+            <StyledButton
+              colors={COLORS}
+              variant="secondary"
               onClick={() => setShowGifts(true)}
             >
               VER DATOS BANCARIOS
-            </Button>
+            </StyledButton>
           </div>
         </section>
       )}
@@ -419,83 +463,68 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
               <Instagram className="w-8 h-8" style={{ color: COLORS.primary }} />
             </div>
             <h2
-              className="text-2xl font-display font-medium mb-4"
+              className="text-2xl font-secondary font-medium mb-6 tracking-wide"
               style={{ color: COLORS.ink, fontFamily: fontSecondary }}
             >
-              @{(event.hashtag || "#beluyamador").replace("#", "")}
+              ¡COMPARTÍ TUS FOTOS!
             </h2>
-            <p className="mb-6 max-w-2xl mx-auto" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
-              ¡Preparate para nuestro gran día! Seguinos y etiquetanos en tus fotos y videos.
+            <p className="mb-8 max-w-2xl mx-auto font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
+              Usá nuestro hashtag para que podamos ver todas las fotos de este día tan especial.
             </p>
-            <Button
-              className="px-8 py-3 rounded-full"
-              style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
+            <div className="text-2xl font-medium mb-8" style={{ color: COLORS.primary }}>
+              <EditableText
+                value={event.hashtag || "#NuestraBoda"}
+                onChange={(v) => setEvent((p) => ({ ...p, hashtag: v }))}
+                className="px-1 editable-text"
+                singleLine
+                style={{ color: COLORS.primary }}
+              />
+            </div>
+            <StyledButton
+              colors={COLORS}
               onClick={() => window.open("https://instagram.com", "_blank")}
             >
+              <Instagram className="w-4 h-4 mr-2" />
               Ver en Instagram
-            </Button>
-          </div>
-        </section>
-      )}
-
-      {/* ===== DRESS CODE ===== */}
-      {isOn("dresscode") && (
-        <section className="py-16" style={{ backgroundColor: COLORS.dark, color: COLORS.darkText }} dir="ltr">
-          <div className="max-w-4xl mx-auto px-4 text-center">
-            <h2 className="text-2xl font-display font-medium mb-4 tracking-wide" style={{ fontFamily: fontSecondary }}>
-              DRESS CODE
-            </h2>
-            <p className="text-lg">
-              <EditableText
-                value={event.info?.dresscode || "Vestimenta formal, elegante"}
-                onChange={(v) => setEvent((p) => ({ ...p, info: { ...(p.info || {}), dresscode: v } }))}
-                className="px-1"
-                singleLine
-                style={{ color: COLORS.darkText }}
-              />
-            </p>
+            </StyledButton>
           </div>
         </section>
       )}
 
       {/* ===== RSVP ===== */}
-      <section className="py-16" style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }} dir="ltr">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ fontFamily: fontSecondary }}>
-            CONFIRMACIÓN DE ASISTENCIA
+      <section className="py-16 text-center" style={{ backgroundColor: COLORS.primary }} dir="ltr">
+        <div className="max-w-3xl mx-auto px-4">
+          <Heart className="w-10 h-10 mx-auto mb-6" style={{ color: COLORS.primaryText }} />
+          <h2
+            className="text-2xl font-secondary font-medium mb-6 tracking-wide"
+            style={{ color: COLORS.primaryText, fontFamily: fontSecondary }}
+          >
+            CONFIRMÁ TU ASISTENCIA
           </h2>
-        </div>
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <p className="text-lg mb-8 max-w-2xl mx-auto" style={{ fontFamily: fontPrimary }}>
+          <p
+            className="mb-8 font-primary"
+            style={{ 
+              color: COLORS.primaryText, 
+              fontSize: "clamp(1rem, 2.5vw, 1.25rem)", 
+              fontFamily: fontPrimary 
+            }}
+          >
             <EditableText
-              value={event.rsvpNote || "Esperamos que seas parte de esta gran celebración. ¡Confirmanos tu asistencia!"}
+              value={event.rsvpNote || "Por favor confirmanos tu asistencia antes del 15 de octubre."}
               onChange={(v) => setEvent((p) => ({ ...p, rsvpNote: v }))}
-              className="px-1"
+              className="px-1 editable-text"
               singleLine={false}
-              style={{ color: COLORS.primaryText }}
+              style={{ color: COLORS.primaryText, fontFamily: fontPrimary }}
             />
           </p>
-          <Button
-            className="px-8 py-3 rounded-full font-medium"
-            style={{ backgroundColor: COLORS.white, color: COLORS.primary }}
+          <StyledButton
+            colors={COLORS}
+            variant="primary-inverse"
             onClick={() => setShowRSVP(true)}
           >
-            Confirmar asistencia
-          </Button>
-
-          <div className="mt-8 pt-8" style={{ borderTop: `1px solid ${COLORS.primarySoft}` }}>
-            <p className="text-lg">¡Agendá la fecha en tu calendario!</p>
-            <Button
-              variant="outline"
-              className="mt-4 rounded-full px-8 py-3"
-              style={{ borderColor: COLORS.primaryText, color: COLORS.primaryText }}
-              onClick={() => {
-                /* generar .ics si aplica */
-              }}
-            >
-              AGENDAR EVENTO
-            </Button>
-          </div>
+            <Heart className="w-4 h-4 mr-2" />
+            CONFIRMAR ASISTENCIA
+          </StyledButton>
         </div>
       </section>
 
@@ -504,22 +533,21 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         <section className="py-16 bg-white" dir="ltr">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h2
-              className="text-2xl font-display font-medium mb-6 tracking-wide"
+              className="text-2xl font-secondary font-medium mb-6 tracking-wide"
               style={{ color: COLORS.ink, fontFamily: fontSecondary }}
             >
               ¿QUÉ CANCIONES NO PUEDEN FALTAR?
             </h2>
-            <p className="mb-8 max-w-2xl mx-auto" style={{ color: COLORS.body }}>
+            <p className="mb-8 max-w-2xl mx-auto font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
               ¡Ayudanos sugiriendo las canciones que pensás que no pueden faltar!
             </p>
-            <Button
-              className="px-8 py-3 rounded-full"
-              style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
+            <StyledButton
+              colors={COLORS}
               onClick={() => alert("Abrir formulario de canciones (pendiente)")}
             >
               <Music className="w-4 h-4 mr-2" />
               Sugerir canción
-            </Button>
+            </StyledButton>
           </div>
         </section>
       )}
@@ -529,28 +557,27 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
         <section className="py-16" style={{ backgroundColor: COLORS.paper }} dir="ltr">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h2
-              className="text-2xl font-display font-medium mb-6 tracking-wide"
+              className="text-2xl font-secondary font-medium mb-6 tracking-wide"
               style={{ color: COLORS.ink, fontFamily: fontSecondary }}
             >
               INFO ÚTIL
             </h2>
-            <p className="mb-8 max-w-2xl mx-auto" style={{ color: COLORS.body }}>
+            <p className="mb-8 max-w-2xl mx-auto font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
               <EditableText
                 value={event.info?.help || "Te dejamos sugerencias de alojamientos y traslados para ese fin de semana."}
                 onChange={(v) => setEvent((p) => ({ ...p, info: { ...(p.info || {}), help: v } }))}
-                className="px-1"
+                className="px-1 editable-text"
                 singleLine={false}
-                style={{ color: COLORS.body }}
+                style={{ color: COLORS.body, fontFamily: fontPrimary }}
               />
             </p>
-            <Button
+            <StyledButton
+              colors={COLORS}
               variant="outline"
-              className="px-8 py-3 rounded-full"
-              style={{ borderColor: COLORS.primary, color: COLORS.primary }}
               onClick={() => setShowInfo(true)}
             >
               VER MÁS
-            </Button>
+            </StyledButton>
           </div>
         </section>
       )}
@@ -558,7 +585,9 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
       {/* ===== FOOTER ===== */}
       <footer className="py-12" style={{ backgroundColor: COLORS.dark, color: COLORS.darkText }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <p className="text-lg mb-8">¡Gracias por acompañarnos en este momento tan importante!</p>
+          <p className="text-lg mb-8 font-primary" style={{ fontFamily: fontPrimary }}>
+            ¡Gracias por acompañarnos en este momento tan importante!
+          </p>
           <div
             className="pt-8"
             style={{
@@ -566,33 +595,31 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                 pickTextColor(COLORS.dark) === "#FFFFFF" ? "1px solid rgba(255,255,255,.25)" : "1px solid rgba(0,0,0,.25)",
             }}
           >
-            <p className="text-sm opacity-70 mb-4">
+            <p className="text-sm opacity-70 mb-4 font-primary" style={{ fontFamily: fontPrimary }}>
               Invitación digital creada con ❤️ por{" "}
               <span className="font-medium" style={{ color: COLORS.primary }}>
                 Venite
               </span>
             </p>
             <div className="flex justify-center gap-3">
-              <Button
-                variant="outline"
+              <StyledButton
+                colors={COLORS}
+                variant="outline-dark"
                 size="sm"
-                className="rounded-full"
-                style={{ borderColor: COLORS.darkText, color: COLORS.darkText }}
                 onClick={() => navigator.clipboard?.writeText(window.location.href).catch(() => {})}
               >
                 <Share2 className="w-4 h-4 mr-2" />
                 Compartir
-              </Button>
-              <Button
-                variant="outline"
+              </StyledButton>
+              <StyledButton
+                colors={COLORS}
+                variant="outline-dark"
                 size="sm"
-                className="rounded-full"
-                style={{ borderColor: COLORS.darkText, color: COLORS.darkText }}
                 onClick={() => {}}
               >
                 <Download className="w-4 h-4 mr-2" />
                 Guardar
-              </Button>
+              </StyledButton>
             </div>
           </div>
         </div>
@@ -604,7 +631,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
           <Card className="w-full max-w-md">
             <CardContent className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-medium" style={{ color: COLORS.ink }}>
+                <h3 className="text-xl font-medium font-primary" style={{ color: COLORS.ink, fontFamily: fontPrimary }}>
                   Confirmar Asistencia
                 </h3>
                 <Button variant="ghost" size="sm" onClick={() => setShowRSVP(false)}>
@@ -615,38 +642,43 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
               {showSuccess ? (
                 <div className="text-center py-8">
                   <CheckCircle className="w-16 h-16 mx-auto mb-4" style={{ color: COLORS.primary }} />
-                  <h4 className="text-lg font-medium mb-2" style={{ color: COLORS.ink }}>
+                  <h4 className="text-lg font-medium mb-2 font-primary" style={{ color: COLORS.ink, fontFamily: fontPrimary }}>
                     ¡Confirmación Recibida!
                   </h4>
-                  <p style={{ color: COLORS.body }}>Gracias por confirmar tu asistencia. ¡Te esperamos!</p>
+                  <p className="font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
+                    Gracias por confirmar tu asistencia. ¡Te esperamos!
+                  </p>
                 </div>
               ) : (
                 <form onSubmit={handleRSVPSubmit} className="space-y-4" dir="ltr">
-                  <Labeled label="Nombre completo *">
+                  <Labeled label="Nombre completo *" fontFamily={fontPrimary}>
                     <Input
                       required
                       value={rsvpData.name}
                       onChange={(e) => setRsvpData({ ...rsvpData, name: e.target.value })}
                       placeholder="Tu nombre completo"
+                      style={{ fontFamily: fontPrimary }}
                     />
                   </Labeled>
 
-                  <Labeled label="Email *">
+                  <Labeled label="Email *" fontFamily={fontPrimary}>
                     <Input
                       type="email"
                       required
                       value={rsvpData.email}
                       onChange={(e) => setRsvpData({ ...rsvpData, email: e.target.value })}
                       placeholder="tu@email.com"
+                      style={{ fontFamily: fontPrimary }}
                     />
                   </Labeled>
 
-                  <Labeled label="¿Asistirás? *">
+                  <Labeled label="¿Asistirás? *" fontFamily={fontPrimary}>
                     <select
                       required
                       value={rsvpData.attendance}
                       onChange={(e) => setRsvpData({ ...rsvpData, attendance: e.target.value })}
                       className="w-full p-2 border border-gray-300 rounded-md"
+                      style={{ fontFamily: fontPrimary }}
                     >
                       <option value="">Selecciona una opción</option>
                       <option value="yes">Sí, asistiré</option>
@@ -656,7 +688,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
 
                   {rsvpData.attendance === "yes" && (
                     <>
-                      <Labeled label="Número de acompañantes">
+                      <Labeled label="Número de acompañantes" fontFamily={fontPrimary}>
                         <Input
                           type="number"
                           min="0"
@@ -665,11 +697,14 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                           onChange={(e) =>
                             setRsvpData({ ...rsvpData, guests: parseInt(e.target.value || "0", 10) })
                           }
+                          style={{ fontFamily: fontPrimary }}
                         />
                       </Labeled>
 
                       <div className="space-y-2">
-                        <span className="block text-sm text-gray-700">Preferencias alimentarias (opcional)</span>
+                        <span className="block text-sm text-gray-700" style={{ fontFamily: fontPrimary }}>
+                          Preferencias alimentarias (opcional)
+                        </span>
                         <div className="grid grid-cols-2 gap-2 text-sm">
                           {[
                             ["celiaco", "Celíaco/a"],
@@ -678,7 +713,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                             ["sin-cerdo", "Sin cerdo"],
                             ["sin-lactosa", "Sin lactosa"],
                           ].map(([key, label]) => (
-                            <label key={key} className="inline-flex items-center gap-2">
+                            <label key={key} className="inline-flex items-center gap-2" style={{ fontFamily: fontPrimary }}>
                               <input
                                 type="checkbox"
                                 checked={rsvpData.diet.includes(key)}
@@ -693,28 +728,30 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                           placeholder="Otras restricciones (especificar)"
                           value={rsvpData.dietOther}
                           onChange={(e) => setRsvpData({ ...rsvpData, dietOther: e.target.value })}
+                          style={{ fontFamily: fontPrimary }}
                         />
                       </div>
                     </>
                   )}
 
-                  <Labeled label="Mensaje (opcional)">
+                  <Labeled label="Mensaje (opcional)" fontFamily={fontPrimary}>
                     <Textarea
                       value={rsvpData.message}
                       onChange={(e) => setRsvpData({ ...rsvpData, message: e.target.value })}
                       placeholder="Déjanos un mensaje..."
                       rows={3}
+                      style={{ fontFamily: fontPrimary }}
                     />
                   </Labeled>
 
-                  <Button
+                  <StyledButton
                     type="submit"
+                    colors={COLORS}
                     className="w-full"
-                    style={{ backgroundColor: COLORS.primary, color: COLORS.primaryText }}
                   >
                     <Heart className="w-4 h-4 mr-2" />
                     Confirmar Asistencia
-                  </Button>
+                  </StyledButton>
                 </form>
               )}
             </CardContent>
@@ -727,7 +764,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
           <Card className="w-full max-w-2xl">
             <CardContent className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-medium" style={{ color: COLORS.ink }}>
+                <h3 className="text-xl font-medium font-primary" style={{ color: COLORS.ink, fontFamily: fontPrimary }}>
                   Información útil
                 </h3>
                 <Button variant="ghost" size="sm" onClick={() => setShowInfo(false)}>
@@ -735,7 +772,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                 </Button>
               </div>
 
-              <div className="space-y-6 text-sm" dir="ltr" style={{ color: COLORS.body }}>
+              <div className="space-y-6 text-sm font-primary" dir="ltr" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
                 {event.info?.help && <p className="whitespace-pre-wrap">{event.info.help}</p>}
 
                 {(event.info?.lodging || []).length > 0 && (
@@ -796,7 +833,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
           <Card className="w-full max-w-md">
             <CardContent className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-medium" style={{ color: COLORS.ink }}>
+                <h3 className="text-xl font-medium font-primary" style={{ color: COLORS.ink, fontFamily: fontPrimary }}>
                   Datos Bancarios
                 </h3>
                 <Button variant="ghost" size="sm" onClick={() => setShowGifts(false)}>
@@ -804,7 +841,7 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
                 </Button>
               </div>
 
-              <div className="space-y-4 text-sm" dir="ltr">
+              <div className="space-y-4 text-sm font-primary" dir="ltr" style={{ fontFamily: fontPrimary }}>
                 <div className="text-center mb-2">
                   <CreditCard className="w-12 h-12 mx-auto mb-4" style={{ color: COLORS.primary }} />
                   <p style={{ color: COLORS.body }}>Si deseás colaborar con nuestra Luna de Miel:</p>
@@ -863,6 +900,108 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
   );
 }
 
+/* ===== COMPONENTES MEJORADOS ===== */
+
+// Botón estilizado que respeta los colores del tema
+function StyledButton({ 
+  children, 
+  colors, 
+  variant = "primary", 
+  size = "default", 
+  className = "", 
+  onClick, 
+  type,
+  ...props 
+}) {
+  const getButtonStyles = () => {
+    const baseStyles = "px-8 py-3 rounded-full transition-all duration-200 font-medium";
+    
+    switch (variant) {
+      case "primary":
+        return {
+          className: `${baseStyles} ${className}`,
+          style: { 
+            backgroundColor: colors.primary, 
+            color: colors.primaryText,
+            border: `2px solid ${colors.primary}`
+          }
+        };
+      case "secondary":
+        return {
+          className: `${baseStyles} ${className}`,
+          style: { 
+            backgroundColor: colors.white, 
+            color: colors.secondary,
+            border: `2px solid ${colors.white}`
+          }
+        };
+      case "primary-inverse":
+        return {
+          className: `${baseStyles} ${className}`,
+          style: { 
+            backgroundColor: colors.white, 
+            color: colors.primary,
+            border: `2px solid ${colors.white}`
+          }
+        };
+      case "outline":
+        return {
+          className: `${baseStyles} ${className}`,
+          style: { 
+            backgroundColor: "transparent", 
+            color: colors.primary,
+            border: `2px solid ${colors.primary}`
+          }
+        };
+      case "outline-dark":
+        return {
+          className: `${baseStyles} ${className}`,
+          style: { 
+            backgroundColor: "transparent", 
+            color: colors.darkText,
+            border: `2px solid ${colors.darkText}`
+          }
+        };
+      default:
+        return {
+          className: `${baseStyles} ${className}`,
+          style: { 
+            backgroundColor: colors.primary, 
+            color: colors.primaryText,
+            border: `2px solid ${colors.primary}`
+          }
+        };
+    }
+  };
+
+  const sizeStyles = size === "sm" ? "px-4 py-2 text-sm" : "px-8 py-3";
+  const buttonProps = getButtonStyles();
+  
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      className={`${buttonProps.className.replace("px-8 py-3", sizeStyles)} hover:opacity-90 active:scale-95`}
+      style={buttonProps.style}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
+
+// Componente de label mejorado
+function Labeled({ label, children, fontFamily }) {
+  return (
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-1" style={{ fontFamily }}>
+        {label}
+      </label>
+      {children}
+    </div>
+  );
+}
+
 /* ===== subcomponentes / helpers ===== */
 function TimeCell({ value, label, color = "#fff" }) {
   return (
@@ -876,6 +1015,7 @@ function TimeCell({ value, label, color = "#fff" }) {
     </div>
   );
 }
+
 function SeparatorDot({ color = "#fff" }) {
   return (
     <div className="self-center font-light" style={{ color, fontSize: "clamp(2rem, 7vw, 4rem)" }}>
@@ -883,83 +1023,80 @@ function SeparatorDot({ color = "#fff" }) {
     </div>
   );
 }
-function DetailIconCard({ icon, iconBg, title, titleColor, textColor, muted, children }) {
+
+function DetailIconCard({ icon, iconBg, title, titleColor, textColor, muted, children, fontPrimary }) {
   return (
     <div className="text-center">
       <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{ backgroundColor: iconBg }}>
         {icon}
       </div>
-      <h3 className="text-2xl font-display font-medium mb-6 tracking-wide" style={{ color: titleColor }}>
+      <h3 
+        className="text-2xl font-medium mb-6 tracking-wide font-primary" 
+        style={{ color: titleColor, fontFamily: fontPrimary }}
+      >
         {title}
       </h3>
-      <div className="text-base" style={{ color: textColor }}>
-        {children}
-      </div>
+      {children}
     </div>
   );
 }
-function Labeled({ label, children }) {
-  return (
-    <label className="block text-sm" dir="ltr">
-      <span className="mb-1 block text-gray-700">{label}</span>
-      {children}
-    </label>
-  );
-}
+
 function renderBankLine(label, value) {
   if (!value) return null;
   return (
-    <p>
-      <strong>{label}:</strong> {value}
-    </p>
+    <div className="flex justify-between">
+      <span className="font-medium">{label}:</span>
+      <span>{value}</span>
+    </div>
   );
 }
-function toSoft(hex, alpha = 0.14) {
-  const { r, g, b } = hexToRgb(hex);
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+
+/* ===== HELPERS DE COLOR ===== */
+function mixHex(hex1, hex2, ratio) {
+  const r1 = parseInt(hex1.slice(1, 3), 16);
+  const g1 = parseInt(hex1.slice(3, 5), 16);
+  const b1 = parseInt(hex1.slice(5, 7), 16);
+  const r2 = parseInt(hex2.slice(1, 3), 16);
+  const g2 = parseInt(hex2.slice(3, 5), 16);
+  const b2 = parseInt(hex2.slice(5, 7), 16);
+  
+  const r = Math.round(r1 * (1 - ratio) + r2 * ratio);
+  const g = Math.round(g1 * (1 - ratio) + g2 * ratio);
+  const b = Math.round(b1 * (1 - ratio) + b2 * ratio);
+  
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
-function hexToRgb(hex) {
-  let h = (hex || "#000").replace("#", "").trim();
-  if (h.length === 3) h = h.split("").map((ch) => ch + ch).join("");
-  const num = parseInt(h, 16);
-  return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+
+function toSoft(hex, opacity) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
-function mixHex(hexA, hexB, weight = 0.5) {
-  const a = hexToRgb(hexA);
-  const b = hexToRgb(hexB);
-  const mix = (x, y) => Math.round(x * (1 - weight) + y * weight);
-  const r = mix(a.r, b.r);
-  const g = mix(a.g, b.g);
-  const bch = mix(a.b, b.b);
-  return `#${[r, g, bch].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+
+function pickTextColor(bgHex) {
+  const r = parseInt(bgHex.slice(1, 3), 16);
+  const g = parseInt(bgHex.slice(3, 5), 16);
+  const b = parseInt(bgHex.slice(5, 7), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? "#000000" : "#FFFFFF";
 }
-function pickTextColor(hex) {
-  const { r, g, b } = hexToRgb(hex);
-  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-  return yiq >= 128 ? "#111827" : "#FFFFFF";
-}
-function buildTargetISO(dateStr, timeStr) {
-  if (!dateStr) return null;
+
+function buildTargetISO(date, time) {
+  if (!date || !time) return null;
   try {
-    const re = /^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/; // dd/mm/yyyy
-    if (re.test(dateStr.trim())) {
-      const [, d, m, y] = dateStr.trim().match(re);
-      return `${y}-${pad(m)}-${pad(d)}T${padTime(timeStr || "00:00")}`;
-    }
-    const meses = [
-      "enero","febrero","marzo","abril","mayo","junio",
-      "julio","agosto","septiembre","octubre","noviembre","diciembre",
-    ];
-    const ds = dateStr.toLowerCase();
-    const mIdx = meses.findIndex((m) => ds.includes(m));
-    const dMatch = ds.match(/\d{1,2}/);
-    const yMatch = ds.match(/\d{4}/);
-    if (mIdx >= 0 && dMatch && yMatch) {
-      const d = Number(dMatch[0]), y = Number(yMatch[0]);
-      return `${y}-${pad(mIdx + 1)}-${pad(d)}T${padTime(timeStr || "00:00")}`;
-    }
-  } catch { return null; }
-  return null;
+    const [day, month, year] = date.split(/[\/\-\s]+/);
+    const [hours, minutes] = time.split(":");
+    return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}T${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}:00`;
+  } catch {
+    return null;
+  }
 }
-function pad(n) { return String(n).padStart(2, "0"); }
-function padTime(hhmm) { const [h = "00", m = "00"] = (hhmm || "").split(":"); return `${pad(h)}:${pad(m)}:00`; }
+
+async function readFileAsDataURL(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.readAsDataURL(file);
+  });
+}
