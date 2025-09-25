@@ -2,7 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import EditableText from "@/components/EditableText.jsx";
 import { Button } from "@/src/components/ui/button";
-import { Card, CardContent } from "@src//components/ui/card";
+import { Card, CardContent } from "@/src/components/ui/card";
 import { Input } from "@/src/components/ui/input";
 import { Textarea } from "@/src/components/ui/textarea";
 import {
