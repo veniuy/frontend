@@ -65,14 +65,14 @@ export default function QuinceaneraElegantTemplate({ event, ui, setEvent }) {
     }
   `, [fontPrimary, fontSecondary, COLORS.accent]);
 
-  const heroTexture = event.images?.heroTexture || asset("src/assets/portada.webp");
+  const heroTexture = event.images?.heroTexture || asset("src/assets/florcitas.webp");
   const defaultGallery = [
     asset("src/assets/categoria_boda_grid.webp"),
     asset("src/assets/categoria_cumpleanos.webp"),
     asset("src/assets/categoria_invitaciones_digitales.webp"),
     asset("src/assets/categoria_productos_fotos.webp"),
     asset("src/assets/elegant-floral.jpg"),
-    asset("src/assets/portada1.webp"),
+    asset("src/assets/florcitas.webp"),
   ];
   const galleryImages = (event.images?.gallery && event.images.gallery.length > 0 ? event.images.gallery : defaultGallery).slice(0, 6);
 
