@@ -1,4 +1,4 @@
-// src/components/templates/WeddingElegantTemplate.jsx
+// src/components/templates/WeddingInitialsTemplate.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import EditableText from "../EditableText.jsx";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { asset, onImgError } from "../../utils/assets";
 
-export default function WeddingElegantTemplate({ event, ui, setEvent }) {
+export default function WeddingInitialsTemplate({ event, ui, setEvent }) {
   if (!event) return null;
 
   const isOn = (key) => {
@@ -65,15 +65,11 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
   }, [fontPrimary, fontSecondary]);
 
   const heroTexture = event.images?.heroTexture || asset("src/assets/portada.webp");
-  const defaultGallery = [
-    asset("src/assets/categoria_boda_grid.webp"),
-    asset("src/assets/categoria_cumpleanos.webp"),
-    asset("src/assets/categoria_invitaciones_digitales.webp"),
-    asset("src/assets/categoria_productos_fotos.webp"),
-    asset("src/assets/elegant-floral.jpg"),
-    asset("src/assets/portada1.webp"),
-  ];
-  const galleryImages = (event.images?.gallery && event.images.gallery.length > 0 ? event.images.gallery : defaultGallery).slice(0, 6);
+
+  // Obtener iniciales
+  const getInitial = (name) => name ? name.charAt(0).toUpperCase() : "";
+  const brideInitial = getInitial(event.couple?.bride || "B");
+  const groomInitial = getInitial(event.couple?.groom || "A");
 
   // Cuenta regresiva
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -139,7 +135,7 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
     <div className="min-h-screen" style={{ backgroundColor: COLORS.paper }}>
       <style dangerouslySetInnerHTML={{ __html: fontStyles }} />
 
-      {/* ===== HERO ELEGANTE - Nombres completos ===== */}
+      {/* ===== HERO CON INICIALES ===== */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0">
           <img
@@ -162,63 +158,135 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
         )}
 
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          {/* Nombres completos */}
-          <h1
-            className="font-secondary font-light mb-3 tracking-wider"
-            style={{ 
-              color: COLORS.ink, 
-              fontSize: "clamp(2.75rem, 8vw, 6rem)", 
-              fontFamily: fontSecondary 
-            }}
-          >
-            <EditableText
-              value={event.couple?.bride || "Belén"}
-              onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: val } }))}
-              ariaLabel="Nombre de la novia"
-              className="px-1 editable-text"
-              singleLine
-              style={{ color: COLORS.ink, fontFamily: fontSecondary }}
-            />
-          </h1>
+          {/* Iniciales grandes estilo R&T */}
+          <div className="relative mb-8">
+            {/* Fecha en esquinas como en la imagen de referencia */}
+            <div className="absolute -top-8 -left-8 text-right">
+              <div 
+                className="font-primary text-lg font-light tracking-wider"
+                style={{ color: COLORS.ink, fontFamily: fontPrimary }}
+              >
+                JU
+              </div>
+              <div 
+                className="font-primary text-lg font-light tracking-wider"
+                style={{ color: COLORS.ink, fontFamily: fontPrimary }}
+              >
+                NE
+              </div>
+            </div>
+            
+            <div className="absolute -top-8 -right-8 text-left">
+              <div 
+                className="font-primary text-lg font-light tracking-wider"
+                style={{ color: COLORS.ink, fontFamily: fontPrimary }}
+              >
+                20
+              </div>
+              <div 
+                className="font-primary text-lg font-light tracking-wider"
+                style={{ color: COLORS.ink, fontFamily: fontPrimary }}
+              >
+                25
+              </div>
+            </div>
 
-          <div className="flex items-center justify-center my-6">
-            <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
-            <div
-              className="mx-4 font-light font-secondary"
+            {/* Iniciales principales */}
+            <div className="flex items-center justify-center">
+              <span
+                className="font-primary font-light tracking-wider"
+                style={{ 
+                  color: COLORS.ink, 
+                  fontSize: "clamp(8rem, 20vw, 16rem)", 
+                  fontFamily: fontPrimary,
+                  lineHeight: "0.8"
+                }}
+              >
+                {brideInitial}
+              </span>
+              
+              <div className="mx-8">
+                <div
+                  className="font-secondary font-light"
+                  style={{ 
+                    color: COLORS.primary, 
+                    fontSize: "clamp(3rem, 8vw, 6rem)", 
+                    fontFamily: fontSecondary 
+                  }}
+                >
+                  &
+                </div>
+              </div>
+              
+              <span
+                className="font-primary font-light tracking-wider"
+                style={{ 
+                  color: COLORS.ink, 
+                  fontSize: "clamp(8rem, 20vw, 16rem)", 
+                  fontFamily: fontPrimary,
+                  lineHeight: "0.8"
+                }}
+              >
+                {groomInitial}
+              </span>
+            </div>
+          </div>
+
+          {/* Nombres completos más pequeños */}
+          <div className="mb-8">
+            <h2
+              className="font-secondary font-light mb-2 tracking-wider"
               style={{ 
-                color: COLORS.primary, 
-                fontSize: "clamp(1.75rem, 5vw, 3rem)", 
+                color: COLORS.muted, 
+                fontSize: "clamp(1.5rem, 4vw, 2.5rem)", 
                 fontFamily: fontSecondary 
               }}
             >
-              &
+              <EditableText
+                value={event.couple?.bride || "Belén"}
+                onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: val } }))}
+                ariaLabel="Nombre de la novia"
+                className="px-1 editable-text"
+                singleLine
+                style={{ color: COLORS.muted, fontFamily: fontSecondary }}
+              />
+            </h2>
+            
+            <div className="flex items-center justify-center my-3">
+              <div className="h-px w-12" style={{ backgroundColor: "#CFCFCF" }} />
+              <span 
+                className="mx-3 font-secondary text-lg"
+                style={{ color: COLORS.primary, fontFamily: fontSecondary }}
+              >
+                &
+              </span>
+              <div className="h-px w-12" style={{ backgroundColor: "#CFCFCF" }} />
             </div>
-            <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
+            
+            <h2
+              className="font-secondary font-light tracking-wider"
+              style={{ 
+                color: COLORS.muted, 
+                fontSize: "clamp(1.5rem, 4vw, 2.5rem)", 
+                fontFamily: fontSecondary 
+              }}
+            >
+              <EditableText
+                value={event.couple?.groom || "Amadeo"}
+                onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: val } }))}
+                ariaLabel="Nombre del novio"
+                className="px-1 editable-text"
+                singleLine
+                style={{ color: COLORS.muted, fontFamily: fontSecondary }}
+              />
+            </h2>
           </div>
-
-          <h1
-            className="font-secondary font-light mb-8 tracking-wider"
-            style={{ 
-              color: COLORS.ink, 
-              fontSize: "clamp(2.75rem, 8vw, 6rem)", 
-              fontFamily: fontSecondary 
-            }}
-          >
-            <EditableText
-              value={event.couple?.groom || "Amadeo"}
-              onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: val } }))}
-              ariaLabel="Nombre del novio"
-              className="px-1 editable-text"
-              singleLine
-              style={{ color: COLORS.ink, fontFamily: fontSecondary }}
-            />
-          </h1>
 
           <p
             className="font-primary font-light mb-10 tracking-wide"
             style={{ 
               color: COLORS.muted, 
-              fontSize: "clamp(1.1rem, 3.5vw, 1.5rem)", 
+              fontSize: "clamp(1rem, 3vw, 1.3rem)", 
               fontFamily: fontPrimary 
             }}
           >
@@ -231,6 +299,7 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
         </div>
       </section>
 
+      {/* Resto de secciones igual que WeddingElegantTemplate */}
       {/* ===== COUNTDOWN ===== */}
       <section className="py-20" style={{ backgroundColor: COLORS.primary }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
@@ -376,104 +445,6 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
                 </StyledButton>
               </DetailCard>
             </div>
-          </div>
-        </section>
-      )}
-
-      {/* ===== GALERÍA ===== */}
-      {isOn("gallery") && (
-        <section className="py-20 bg-white">
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="text-center mb-12">
-              <h2
-                className="text-3xl font-secondary font-medium mb-4 tracking-wide"
-                style={{ color: COLORS.ink, fontFamily: fontSecondary }}
-              >
-                Nuestra Historia
-              </h2>
-              <div className="w-24 h-px mx-auto" style={{ backgroundColor: COLORS.secondary }} />
-            </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-              {galleryImages.map((src, idx) => (
-                <div key={idx} className="relative aspect-[4/3] overflow-hidden rounded-xl group">
-                  <img
-                    src={src}
-                    onError={(e) => onImgError(e, `Galería ${idx + 1}`)}
-                    alt={`Galería ${idx + 1}`}
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ===== REGALOS ===== */}
-      {isOn("bank") && (
-        <section className="py-20 text-center" style={{ backgroundColor: COLORS.primarySoft }}>
-          <div className="max-w-3xl mx-auto px-4">
-            <Gift className="w-12 h-12 mx-auto mb-6" style={{ color: COLORS.primary }} />
-            <h2
-              className="text-2xl font-secondary font-medium mb-6 tracking-wide"
-              style={{ color: COLORS.ink, fontFamily: fontSecondary }}
-            >
-              Regalos
-            </h2>
-            <p
-              className="mb-8 font-primary text-lg leading-relaxed"
-              style={{ color: COLORS.body, fontFamily: fontPrimary }}
-            >
-              <EditableText
-                value={event.giftsNote || "Si deseás realizarnos un regalo podés colaborar con nuestra luna de miel..."}
-                onChange={(v) => setEvent((p) => ({ ...p, giftsNote: v }))}
-                className="px-1 editable-text"
-                singleLine={false}
-                style={{ color: COLORS.body, fontFamily: fontPrimary }}
-              />
-            </p>
-            <StyledButton
-              colors={COLORS}
-              variant="secondary"
-              onClick={() => setShowGifts(true)}
-            >
-              VER DATOS BANCARIOS
-            </StyledButton>
-          </div>
-        </section>
-      )}
-
-      {/* ===== INSTAGRAM ===== */}
-      {isOn("instagram") && (
-        <section className="py-20 bg-white">
-          <div className="max-w-4xl mx-auto px-4 text-center">
-            <Instagram className="w-12 h-12 mx-auto mb-6" style={{ color: COLORS.primary }} />
-            <h2
-              className="text-2xl font-secondary font-medium mb-6 tracking-wide"
-              style={{ color: COLORS.ink, fontFamily: fontSecondary }}
-            >
-              Compartí tus fotos
-            </h2>
-            <p className="mb-8 max-w-2xl mx-auto font-primary text-lg" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
-              Usá nuestro hashtag para que podamos ver todas las fotos de este día tan especial.
-            </p>
-            <div className="text-3xl font-medium mb-8" style={{ color: COLORS.primary, fontFamily: fontSecondary }}>
-              <EditableText
-                value={event.hashtag || "#BelenYAmadeo"}
-                onChange={(v) => setEvent((p) => ({ ...p, hashtag: v }))}
-                className="px-1 editable-text"
-                singleLine
-                style={{ color: COLORS.primary, fontFamily: fontSecondary }}
-              />
-            </div>
-            <StyledButton
-              colors={COLORS}
-              onClick={() => window.open("https://instagram.com", "_blank")}
-            >
-              <Instagram className="w-5 h-5 mr-2" />
-              Ver en Instagram
-            </StyledButton>
           </div>
         </section>
       )}
@@ -664,51 +635,11 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
           </Card>
         </div>
       )}
-
-      {/* Modal de regalos */}
-      {showGifts && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-md">
-            <CardContent className="p-8">
-              <div className="flex justify-between items-center mb-8">
-                <h3 className="text-xl font-medium font-primary" style={{ color: COLORS.ink, fontFamily: fontPrimary }}>
-                  Datos Bancarios
-                </h3>
-                <Button variant="ghost" size="sm" onClick={() => setShowGifts(false)}>
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-
-              <div className="space-y-6 text-sm font-primary" style={{ fontFamily: fontPrimary }}>
-                <div className="text-center mb-4">
-                  <CreditCard className="w-12 h-12 mx-auto mb-4" style={{ color: COLORS.primary }} />
-                  <p style={{ color: COLORS.body }}>
-                    Si deseás colaborar con nuestra luna de miel:
-                  </p>
-                </div>
-
-                <div className="border p-6 rounded-lg" style={{ backgroundColor: COLORS.paper }}>
-                  <h4 className="font-medium mb-4" style={{ color: COLORS.ink }}>
-                    Transferencia Bancaria
-                  </h4>
-                  <div className="space-y-2 text-sm" style={{ color: COLORS.body }}>
-                    {renderBankLine("Banco", event.bank?.banco)}
-                    {renderBankLine("CBU/IBAN", event.bank?.cbu)}
-                    {renderBankLine("Alias", event.bank?.alias)}
-                    {renderBankLine("Titular", event.bank?.titular)}
-                    {renderBankLine("Cuenta", event.bank?.cuenta)}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
     </div>
   );
 }
 
-/* ===== COMPONENTES HELPER ===== */
+/* ===== COMPONENTES HELPER (iguales que WeddingElegantTemplate) ===== */
 
 function StyledButton({ 
   children, 
@@ -829,16 +760,6 @@ function DetailCard({ icon, title, children, colors, fontPrimary }) {
         {title}
       </h3>
       {children}
-    </div>
-  );
-}
-
-function renderBankLine(label, value) {
-  if (!value) return null;
-  return (
-    <div className="flex justify-between">
-      <span className="font-medium">{label}:</span>
-      <span>{value}</span>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-// src/components/templates/QuinceaneraElegantTemplate.jsx
+// src/components/templates/QuinceaneraCreativeTemplate.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import EditableText from "../EditableText.jsx";
 import { Button } from "@/components/ui/button";
@@ -19,10 +19,11 @@ import {
   CheckCircle,
   Crown,
   Sparkles,
+  Star,
 } from "lucide-react";
 import { asset, onImgError } from "../../utils/assets";
 
-export default function QuinceaneraElegantTemplate({ event, ui, setEvent }) {
+export default function QuinceaneraCreativeTemplate({ event, ui, setEvent }) {
   if (!event) return null;
 
   const isOn = (key) => {
@@ -32,8 +33,8 @@ export default function QuinceaneraElegantTemplate({ event, ui, setEvent }) {
 
   const COLORS = useMemo(() => {
     const c = event.colors || {};
-    const primary = c.primary || "#D4AF37"; // Dorado elegante
-    const secondary = c.secondary || "#F5E6D3"; // Champagne
+    const primary = c.primary || "#E91E63"; // Rosa vibrante
+    const secondary = c.secondary || "#FCE4EC"; // Rosa muy suave
     const text = c.text || "#2E2E2E";
     const darkDerived = mixHex(secondary, "#000000", 0.75);
     const dark = c.dark || darkDerived;
@@ -55,7 +56,7 @@ export default function QuinceaneraElegantTemplate({ event, ui, setEvent }) {
   }, [event.colors]);
 
   const fontPrimary = event.fonts?.primary || "'Playfair Display', serif";
-  const fontSecondary = event.fonts?.secondary || "'Dancing Script', cursive";
+  const fontSecondary = event.fonts?.secondary || "'Pacifico', cursive";
 
   const fontStyles = useMemo(() => {
     return `
@@ -131,134 +132,208 @@ export default function QuinceaneraElegantTemplate({ event, ui, setEvent }) {
     <div className="min-h-screen" style={{ backgroundColor: COLORS.paper }}>
       <style dangerouslySetInnerHTML={{ __html: fontStyles }} />
 
-      {/* ===== HERO QUINCEAÑERA ELEGANTE ===== */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0">
-          <img
-            src={heroTexture}
-            onError={(e) => onImgError(e, "Textura")}
-            alt="Textura"
-            className="absolute inset-0 w-full h-full object-cover object-center block"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30" />
-        </div>
-
-        {/* Decoraciones elegantes */}
-        <div className="absolute top-12 left-12 opacity-30">
-          <Crown className="w-16 h-16" style={{ color: COLORS.primary }} />
-        </div>
-        <div className="absolute top-16 right-16 opacity-25">
-          <Sparkles className="w-14 h-14" style={{ color: COLORS.primary }} />
-        </div>
-        <div className="absolute bottom-16 left-16 opacity-30">
-          <Heart className="w-12 h-12" style={{ color: COLORS.primary }} />
-        </div>
-        <div className="absolute bottom-12 right-12 opacity-25">
-          <Crown className="w-18 h-18" style={{ color: COLORS.primary }} />
-        </div>
-
-        {event?.images?.logo && (
-          <div className="absolute top-0 left-0 w-[420px] h-[260px] opacity-80 pointer-events-none">
-            <img
-              src={event.images.logo}
-              onError={(e) => onImgError(e, "Logo")}
-              alt="Logo"
-              className="absolute inset-0 w-full h-full object-contain block"
-            />
-          </div>
-        )}
-
-        <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
-          {/* Nombre principal */}
-          <div className="mb-8">
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <Crown className="w-8 h-8" style={{ color: COLORS.primary }} />
-              <Sparkles className="w-6 h-6" style={{ color: COLORS.primary }} />
-              <Crown className="w-8 h-8" style={{ color: COLORS.primary }} />
-            </div>
+      {/* ===== HERO CREATIVO 2 COLUMNAS ===== */}
+      <section className="relative min-h-screen flex items-center overflow-hidden">
+        <div className="w-full max-w-7xl mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 min-h-screen">
             
-            <h1
-              className="font-secondary font-light mb-6 tracking-wider"
-              style={{ 
-                color: COLORS.ink, 
-                fontSize: "clamp(3.5rem, 12vw, 8rem)", 
-                fontFamily: fontSecondary,
-                textShadow: "2px 2px 4px rgba(0,0,0,0.1)"
-              }}
-            >
-              <EditableText
-                value={event.quinceañera?.name || event.couple?.bride || "Isabella"}
-                onChange={(val) => setEvent((p) => ({ 
-                  ...p, 
-                  quinceañera: { ...p.quinceañera, name: val },
-                  couple: { ...p.couple, bride: val }
-                }))}
-                ariaLabel="Nombre de la quinceañera"
-                className="px-1 editable-text"
-                singleLine
-                style={{ color: COLORS.ink, fontFamily: fontSecondary }}
-              />
-            </h1>
+            {/* COLUMNA IZQUIERDA - IMAGEN */}
+            <div className="relative overflow-hidden lg:order-1 order-2">
+              <div className="absolute inset-0">
+                <img
+                  src={heroTexture}
+                  onError={(e) => onImgError(e, "Textura")}
+                  alt="Textura"
+                  className="absolute inset-0 w-full h-full object-cover object-center"
+                />
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black/20" />
+              </div>
 
-            <div className="flex items-center justify-center my-8">
-              <div className="h-px w-20" style={{ backgroundColor: COLORS.primary }} />
-              <Crown className="mx-6 w-6 h-6" style={{ color: COLORS.primary }} />
-              <div className="h-px w-20" style={{ backgroundColor: COLORS.primary }} />
+              {/* Decoraciones flotantes */}
+              <div className="absolute top-16 left-16 opacity-40">
+                <Star className="w-12 h-12" style={{ color: COLORS.primary }} />
+              </div>
+              <div className="absolute top-32 right-20 opacity-30">
+                <Sparkles className="w-10 h-10" style={{ color: COLORS.primary }} />
+              </div>
+              <div className="absolute bottom-32 left-20 opacity-35">
+                <Crown className="w-14 h-14" style={{ color: COLORS.primary }} />
+              </div>
+              <div className="absolute bottom-16 right-16 opacity-25">
+                <Heart className="w-8 h-8" style={{ color: COLORS.primary }} />
+              </div>
+
+              {event?.images?.logo && (
+                <div className="absolute top-8 left-8 w-[300px] h-[180px] opacity-90 pointer-events-none">
+                  <img
+                    src={event.images.logo}
+                    onError={(e) => onImgError(e, "Logo")}
+                    alt="Logo"
+                    className="absolute inset-0 w-full h-full object-contain"
+                  />
+                </div>
+              )}
             </div>
-          </div>
 
-          <p
-            className="font-primary font-light mb-10 tracking-wide"
-            style={{ 
-              color: COLORS.muted, 
-              fontSize: "clamp(1.3rem, 4.5vw, 2.2rem)", 
-              fontFamily: fontPrimary 
-            }}
-          >
-            MIS 15 AÑOS
-          </p>
+            {/* COLUMNA DERECHA - INFORMACIÓN */}
+            <div className="relative flex items-center justify-center lg:order-2 order-1 py-16 lg:py-0" style={{ backgroundColor: COLORS.secondary }}>
+              <div className="text-center px-8 max-w-lg mx-auto">
+                
+                {/* Decoraciones en la información */}
+                <div className="flex items-center justify-center gap-3 mb-8">
+                  <Star className="w-6 h-6" style={{ color: COLORS.primary }} />
+                  <Crown className="w-8 h-8" style={{ color: COLORS.primary }} />
+                  <Star className="w-6 h-6" style={{ color: COLORS.primary }} />
+                </div>
 
-          <div className="flex items-center justify-center gap-6 text-lg" style={{ color: COLORS.muted, fontFamily: fontPrimary }}>
-            <span>{event.date || "15 de Septiembre, 2025"}</span>
-            <Heart className="w-4 h-4" style={{ color: COLORS.primary }} />
-            <span>{event.time || "20:00 hs"}</span>
-          </div>
+                {/* Nombre principal */}
+                <h1
+                  className="font-secondary font-bold mb-6 tracking-wider"
+                  style={{ 
+                    color: COLORS.ink, 
+                    fontSize: "clamp(3rem, 8vw, 5rem)", 
+                    fontFamily: fontSecondary,
+                    textShadow: "2px 2px 4px rgba(0,0,0,0.1)"
+                  }}
+                >
+                  <EditableText
+                    value={event.quinceañera?.name || event.couple?.bride || "Valentina"}
+                    onChange={(val) => setEvent((p) => ({ 
+                      ...p, 
+                      quinceañera: { ...p.quinceañera, name: val },
+                      couple: { ...p.couple, bride: val }
+                    }))}
+                    ariaLabel="Nombre de la quinceañera"
+                    className="px-1 editable-text"
+                    singleLine
+                    style={{ color: COLORS.ink, fontFamily: fontSecondary }}
+                  />
+                </h1>
 
-          <div className="animate-bounce mt-10">
-            <ChevronDown className="w-8 h-8 mx-auto" style={{ color: COLORS.primary }} />
+                {/* Separador creativo */}
+                <div className="flex items-center justify-center my-8">
+                  <div className="h-1 w-16 rounded-full" style={{ backgroundColor: COLORS.primary }} />
+                  <Sparkles className="mx-4 w-6 h-6" style={{ color: COLORS.primary }} />
+                  <div className="h-1 w-16 rounded-full" style={{ backgroundColor: COLORS.primary }} />
+                </div>
+
+                {/* Título */}
+                <p
+                  className="font-primary font-bold mb-8 tracking-widest uppercase"
+                  style={{ 
+                    color: COLORS.primary, 
+                    fontSize: "clamp(1.2rem, 3vw, 1.8rem)", 
+                    fontFamily: fontPrimary,
+                    letterSpacing: "0.2em"
+                  }}
+                >
+                  MIS 15 AÑOS
+                </p>
+
+                {/* Fecha dividida en líneas como en la imagen de referencia */}
+                <div className="mb-8 space-y-2">
+                  <div className="flex items-center justify-center gap-4">
+                    <div 
+                      className="font-primary font-light text-lg tracking-wider"
+                      style={{ color: COLORS.muted, fontFamily: fontPrimary }}
+                    >
+                      SÁBADO
+                    </div>
+                    <div className="h-px w-8" style={{ backgroundColor: COLORS.muted }} />
+                    <div 
+                      className="font-primary font-light text-lg tracking-wider"
+                      style={{ color: COLORS.muted, fontFamily: fontPrimary }}
+                    >
+                      {event.time || "20:00"}
+                    </div>
+                  </div>
+                  
+                  <div 
+                    className="font-primary font-bold text-2xl tracking-wider"
+                    style={{ color: COLORS.ink, fontFamily: fontPrimary }}
+                  >
+                    <EditableText
+                      value={event.date || "15 SEPTIEMBRE 2025"}
+                      onChange={(v) => setEvent((p) => ({ ...p, date: v }))}
+                      className="px-1 editable-text"
+                      singleLine
+                      style={{ color: COLORS.ink, fontFamily: fontPrimary }}
+                    />
+                  </div>
+                  
+                  <div 
+                    className="font-primary font-light text-lg tracking-wider"
+                    style={{ color: COLORS.muted, fontFamily: fontPrimary }}
+                  >
+                    <EditableText
+                      value={event.celebration?.location || "Salón de Fiestas Princess"}
+                      onChange={(v) => setEvent((p) => ({ ...p, celebration: { ...p.celebration, location: v } }))}
+                      className="px-1 editable-text"
+                      singleLine
+                      style={{ color: COLORS.muted, fontFamily: fontPrimary }}
+                    />
+                  </div>
+                </div>
+
+                {/* Mensaje especial */}
+                <p
+                  className="font-secondary text-xl mb-8 italic"
+                  style={{ 
+                    color: COLORS.primary, 
+                    fontFamily: fontSecondary 
+                  }}
+                >
+                  ¡Quiero que seas parte de mi sueño!
+                </p>
+
+                {/* Botón de acción */}
+                <CreativeButton
+                  colors={COLORS}
+                  onClick={() => setShowRSVP(true)}
+                >
+                  <Heart className="w-5 h-5 mr-2" />
+                  CONFIRMAR ASISTENCIA
+                </CreativeButton>
+
+                {/* Flecha hacia abajo */}
+                <div className="animate-bounce mt-12 lg:hidden">
+                  <ChevronDown className="w-8 h-8 mx-auto" style={{ color: COLORS.primary }} />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ===== COUNTDOWN QUINCEAÑERA ===== */}
+      {/* ===== COUNTDOWN CREATIVO ===== */}
       <section className="py-20" style={{ backgroundColor: COLORS.primary }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="mb-10">
             <div className="flex items-center justify-center gap-2 mb-6">
-              <Crown className="w-8 h-8" style={{ color: COLORS.primaryText }} />
-              <Sparkles className="w-6 h-6" style={{ color: COLORS.primaryText }} />
-              <Crown className="w-8 h-8" style={{ color: COLORS.primaryText }} />
+              <Star className="w-8 h-8" style={{ color: COLORS.primaryText }} />
+              <Crown className="w-10 h-10" style={{ color: COLORS.primaryText }} />
+              <Star className="w-8 h-8" style={{ color: COLORS.primaryText }} />
             </div>
             <h2
-              className="font-primary font-light tracking-wide"
+              className="font-secondary font-bold tracking-wide"
               style={{ 
                 color: COLORS.primaryText, 
-                fontSize: "clamp(1.4rem, 4vw, 2rem)", 
-                fontFamily: fontPrimary 
+                fontSize: "clamp(1.5rem, 4vw, 2.2rem)", 
+                fontFamily: fontSecondary 
               }}
             >
-              Faltan para mi gran día
+              ¡Faltan para mi gran día!
             </h2>
           </div>
 
-          <div className="flex items-stretch justify-center gap-8 sm:gap-12">
-            <QuinceTimeCell value={timeLeft.days} label="días" color={COLORS.primaryText} />
-            <QuinceSeparator color={COLORS.primaryText} />
-            <QuinceTimeCell value={timeLeft.hours} label="hs" color={COLORS.primaryText} />
-            <QuinceSeparator color={COLORS.primaryText} />
-            <QuinceTimeCell value={timeLeft.minutes} label="min" color={COLORS.primaryText} />
-            <QuinceSeparator color={COLORS.primaryText} />
-            <QuinceTimeCell value={timeLeft.seconds} label="seg" color={COLORS.primaryText} />
+          <div className="flex items-stretch justify-center gap-6 sm:gap-10">
+            <CreativeTimeCell value={timeLeft.days} label="días" color={COLORS.primaryText} />
+            <CreativeSeparator color={COLORS.primaryText} />
+            <CreativeTimeCell value={timeLeft.hours} label="hs" color={COLORS.primaryText} />
+            <CreativeSeparator color={COLORS.primaryText} />
+            <CreativeTimeCell value={timeLeft.minutes} label="min" color={COLORS.primaryText} />
+            <CreativeSeparator color={COLORS.primaryText} />
+            <CreativeTimeCell value={timeLeft.seconds} label="seg" color={COLORS.primaryText} />
           </div>
         </div>
       </section>
@@ -267,11 +342,12 @@ export default function QuinceaneraElegantTemplate({ event, ui, setEvent }) {
       <section className="py-24 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center">
-            <QuinceDetailCard
+            <CreativeDetailCard
               icon={<PartyPopper className="w-12 h-12" style={{ color: COLORS.primary }} />}
-              title="CELEBRACIÓN"
+              title="¡A CELEBRAR!"
               colors={COLORS}
               fontPrimary={fontPrimary}
+              fontSecondary={fontSecondary}
             >
               <div className="space-y-6 mb-12">
                 <p className="text-2xl font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
@@ -283,9 +359,9 @@ export default function QuinceaneraElegantTemplate({ event, ui, setEvent }) {
                     style={{ fontFamily: fontPrimary }}
                   />
                 </p>
-                <p className="text-3xl font-medium font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
+                <p className="text-3xl font-bold font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
                   <EditableText
-                    value={event.celebration?.venue || "Salón de Fiestas Elegance"}
+                    value={event.celebration?.venue || "Salón de Fiestas Princess"}
                     onChange={(v) => setEvent((p) => ({ ...p, celebration: { ...p.celebration, venue: v } }))}
                     className="px-1 editable-text"
                     singleLine
@@ -301,67 +377,65 @@ export default function QuinceaneraElegantTemplate({ event, ui, setEvent }) {
                     style={{ fontFamily: fontPrimary }}
                   />
                 </p>
-                <p className="text-2xl font-medium" style={{ color: COLORS.primary, fontFamily: fontSecondary }}>
-                  ¡Vamos a celebrar juntos!
+                <p className="text-2xl font-bold" style={{ color: COLORS.primary, fontFamily: fontSecondary }}>
+                  ¡Vamos a bailar toda la noche!
                 </p>
               </div>
-              <QuinceButton
+              <CreativeButton
                 colors={COLORS}
                 onClick={() =>
                   window.open(
-                    `https://maps.google.com/?q=${event.celebration?.address || "Salón de Fiestas Elegance, Córdoba"}`,
+                    `https://maps.google.com/?q=${event.celebration?.address || "Salón de Fiestas Princess, Córdoba"}`,
                     "_blank"
                   )
                 }
               >
-                LLEGAR A LA CELEBRACIÓN
-              </QuinceButton>
-            </QuinceDetailCard>
+                LLEGAR A LA FIESTA
+              </CreativeButton>
+            </CreativeDetailCard>
           </div>
         </div>
       </section>
 
-      {/* ===== RSVP ===== */}
-      <section className="py-20 text-center" style={{ backgroundColor: COLORS.primary }}>
-        <div className="max-w-3xl mx-auto px-4">
-          <Heart className="w-12 h-12 mx-auto mb-6" style={{ color: COLORS.primaryText }} />
-          <h2
-            className="text-3xl font-secondary font-medium mb-6 tracking-wide"
-            style={{ color: COLORS.primaryText, fontFamily: fontSecondary }}
-          >
-            Confirmá tu asistencia
-          </h2>
-          <p
-            className="mb-10 font-primary text-lg"
-            style={{ 
-              color: COLORS.primaryText, 
-              fontFamily: fontPrimary 
-            }}
-          >
-            <EditableText
-              value={event.rsvpNote || "Por favor confirmame tu asistencia antes del 1 de septiembre."}
-              onChange={(v) => setEvent((p) => ({ ...p, rsvpNote: v }))}
-              className="px-1 editable-text"
-              singleLine={false}
-              style={{ color: COLORS.primaryText, fontFamily: fontPrimary }}
-            />
-          </p>
-          <QuinceButton
-            colors={COLORS}
-            variant="primary-inverse"
-            onClick={() => setShowRSVP(true)}
-          >
-            <Heart className="w-5 h-5 mr-2" />
-            CONFIRMAR ASISTENCIA
-          </QuinceButton>
-        </div>
-      </section>
+      {/* ===== INSTAGRAM ===== */}
+      {isOn("instagram") && (
+        <section className="py-20" style={{ backgroundColor: COLORS.secondary }}>
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <Instagram className="w-12 h-12 mx-auto mb-6" style={{ color: COLORS.primary }} />
+            <h2
+              className="text-2xl font-secondary font-bold mb-6 tracking-wide"
+              style={{ color: COLORS.ink, fontFamily: fontSecondary }}
+            >
+              ¡Compartí tus fotos!
+            </h2>
+            <p className="mb-8 max-w-2xl mx-auto font-primary text-lg" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
+              Usá mi hashtag para que pueda ver todas las fotos de esta noche mágica.
+            </p>
+            <div className="text-4xl font-bold mb-8" style={{ color: COLORS.primary, fontFamily: fontSecondary }}>
+              <EditableText
+                value={event.hashtag || "#Valentina15"}
+                onChange={(v) => setEvent((p) => ({ ...p, hashtag: v }))}
+                className="px-1 editable-text"
+                singleLine
+                style={{ color: COLORS.primary, fontFamily: fontSecondary }}
+              />
+            </div>
+            <CreativeButton
+              colors={COLORS}
+              onClick={() => window.open("https://instagram.com", "_blank")}
+            >
+              <Instagram className="w-5 h-5 mr-2" />
+              Ver en Instagram
+            </CreativeButton>
+          </div>
+        </section>
+      )}
 
       {/* ===== FOOTER ===== */}
       <footer className="py-16" style={{ backgroundColor: COLORS.dark, color: COLORS.darkText }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-xl mb-10 font-primary" style={{ fontFamily: fontPrimary }}>
-            ¡Gracias por acompañarme en este momento tan importante!
+            ¡Gracias por ser parte de mi sueño de princesa!
           </p>
           <div className="pt-8 border-t border-white/25">
             <p className="text-sm opacity-70 mb-6 font-primary" style={{ fontFamily: fontPrimary }}>
@@ -395,7 +469,7 @@ export default function QuinceaneraElegantTemplate({ event, ui, setEvent }) {
                     ¡Confirmación Recibida!
                   </h4>
                   <p className="font-primary" style={{ color: COLORS.body, fontFamily: fontPrimary }}>
-                    Gracias por confirmar tu asistencia. ¡Te espero!
+                    ¡Gracias por confirmar! Te espero para celebrar juntos.
                   </p>
                 </div>
               ) : (
@@ -439,7 +513,7 @@ export default function QuinceaneraElegantTemplate({ event, ui, setEvent }) {
                       style={{ fontFamily: fontPrimary }}
                     >
                       <option value="">Selecciona una opción</option>
-                      <option value="yes">Sí, asistiré</option>
+                      <option value="yes">¡Sí, estaré ahí!</option>
                       <option value="no">No podré asistir</option>
                     </select>
                   </div>
@@ -467,20 +541,20 @@ export default function QuinceaneraElegantTemplate({ event, ui, setEvent }) {
                     <Textarea
                       value={rsvpData.message}
                       onChange={(e) => setRsvpData({ ...rsvpData, message: e.target.value })}
-                      placeholder="Déjame un mensaje..."
+                      placeholder="Déjame un mensaje especial..."
                       rows={3}
                       style={{ fontFamily: fontPrimary }}
                     />
                   </div>
 
-                  <QuinceButton
+                  <CreativeButton
                     type="submit"
                     colors={COLORS}
                     className="w-full"
                   >
                     <Heart className="w-4 h-4 mr-2" />
                     Confirmar Asistencia
-                  </QuinceButton>
+                  </CreativeButton>
                 </form>
               )}
             </CardContent>
@@ -491,9 +565,9 @@ export default function QuinceaneraElegantTemplate({ event, ui, setEvent }) {
   );
 }
 
-/* ===== COMPONENTES QUINCEAÑERA ===== */
+/* ===== COMPONENTES CREATIVOS ===== */
 
-function QuinceButton({ 
+function CreativeButton({ 
   children, 
   colors, 
   variant = "primary", 
@@ -504,12 +578,12 @@ function QuinceButton({
   ...props 
 }) {
   const getButtonStyles = () => {
-    const baseStyles = "inline-flex items-center justify-center rounded-full font-medium transition-all duration-300 hover:scale-105 active:scale-95 shadow-lg";
+    const baseStyles = "inline-flex items-center justify-center rounded-full font-bold transition-all duration-300 hover:scale-110 active:scale-95 shadow-xl transform hover:rotate-1";
     
     const sizeClasses = {
       sm: "px-8 py-3 text-sm",
-      default: "px-10 py-4 text-base",
-      lg: "px-12 py-5 text-lg"
+      default: "px-12 py-4 text-base",
+      lg: "px-16 py-5 text-lg"
     };
     
     const sizeClass = sizeClasses[size] || sizeClasses.default;
@@ -521,7 +595,8 @@ function QuinceButton({
           style: { 
             backgroundColor: colors.primary, 
             color: colors.primaryText,
-            border: `2px solid ${colors.primary}`
+            border: `3px solid ${colors.primary}`,
+            background: `linear-gradient(45deg, ${colors.primary}, ${colors.primary}dd)`
           }
         };
       case "secondary":
@@ -530,25 +605,7 @@ function QuinceButton({
           style: { 
             backgroundColor: colors.white, 
             color: colors.primary,
-            border: `2px solid ${colors.primary}`
-          }
-        };
-      case "primary-inverse":
-        return {
-          className: `${baseStyles} ${sizeClass} ${className}`,
-          style: { 
-            backgroundColor: colors.white, 
-            color: colors.primary,
-            border: `2px solid ${colors.white}`
-          }
-        };
-      case "outline-dark":
-        return {
-          className: `${baseStyles} ${sizeClass} ${className}`,
-          style: { 
-            backgroundColor: "transparent", 
-            color: colors.darkText,
-            border: `2px solid ${colors.darkText}`
+            border: `3px solid ${colors.primary}`
           }
         };
       default:
@@ -557,7 +614,8 @@ function QuinceButton({
           style: { 
             backgroundColor: colors.primary, 
             color: colors.primaryText,
-            border: `2px solid ${colors.primary}`
+            border: `3px solid ${colors.primary}`,
+            background: `linear-gradient(45deg, ${colors.primary}, ${colors.primary}dd)`
           }
         };
     }
@@ -578,36 +636,36 @@ function QuinceButton({
   );
 }
 
-function QuinceTimeCell({ value, label, color = "#fff" }) {
+function CreativeTimeCell({ value, label, color = "#fff" }) {
   return (
-    <div className="flex flex-col items-center bg-white/15 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
-      <div className="font-light leading-none" style={{ fontSize: "clamp(2.8rem, 9vw, 5.5rem)", color }}>
+    <div className="flex flex-col items-center bg-white/20 backdrop-blur-sm p-6 rounded-3xl shadow-2xl transform hover:scale-105 transition-transform">
+      <div className="font-bold leading-none" style={{ fontSize: "clamp(3rem, 10vw, 6rem)", color }}>
         {String(value).padStart(2, "0")}
       </div>
-      <div className="opacity-90 text-base sm:text-lg mt-3" style={{ color }}>
+      <div className="opacity-90 text-base sm:text-lg mt-3 font-bold" style={{ color }}>
         {label}
       </div>
     </div>
   );
 }
 
-function QuinceSeparator({ color = "#fff" }) {
+function CreativeSeparator({ color = "#fff" }) {
   return (
-    <div className="self-center font-light opacity-70" style={{ color, fontSize: "clamp(2.2rem, 8vw, 4.5rem)" }}>
-      ♡
+    <div className="self-center font-bold opacity-80" style={{ color, fontSize: "clamp(2.5rem, 9vw, 5rem)" }}>
+      ★
     </div>
   );
 }
 
-function QuinceDetailCard({ icon, title, children, colors, fontPrimary }) {
+function CreativeDetailCard({ icon, title, children, colors, fontPrimary, fontSecondary }) {
   return (
-    <div className="bg-white p-16 mx-4 rounded-2xl shadow-xl">
-      <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-10" style={{ backgroundColor: colors.primarySoft }}>
+    <div className="bg-white p-16 mx-4 rounded-3xl shadow-2xl transform hover:scale-105 transition-transform">
+      <div className="w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-10 shadow-lg" style={{ backgroundColor: colors.primarySoft }}>
         {icon}
       </div>
       <h3 
-        className="text-4xl font-medium mb-10 tracking-wide font-primary" 
-        style={{ color: colors.ink, fontFamily: fontPrimary }}
+        className="text-4xl font-bold mb-10 tracking-wide" 
+        style={{ color: colors.ink, fontFamily: fontSecondary }}
       >
         {title}
       </h3>
