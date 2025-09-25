@@ -2,135 +2,175 @@
 import React from "react";
 
 // Importar todas las plantillas
-import QuinceaneraElegantTemplate from "./templates/QuinceaneraElegantTemplate";
-import QuinceaneraRomanticTemplate from "./templates/QuinceaneraRomanticTemplate";
-import QuinceaneraModernTemplate from "./templates/QuinceaneraModernTemplate";
-import WeddingElegantTemplate from "./templates/WeddingElegantTemplate";
-import WeddingRomanticTemplate from "./templates/WeddingRomanticTemplate";
-import WeddingModernTemplate from "./templates/WeddingModernTemplate";
-import WeddingClassicTemplate from "./templates/WeddingClassicTemplate";
-import WeddingRusticTemplate from "./templates/WeddingRusticTemplate";
+import WeddingElegantTemplate from "./templates/WeddingElegantTemplate.jsx";
+import WeddingInitialsTemplate from "./templates/WeddingInitialsTemplate.jsx";
+import WeddingRomanticTemplate from "./templates/WeddingRomanticTemplate.jsx";
+import WeddingModernTemplate from "./templates/WeddingModernTemplate.jsx";
+import WeddingClassicTemplate from "./templates/WeddingClassicTemplate.jsx";
+import WeddingRusticTemplate from "./templates/WeddingRusticTemplate.jsx";
+
+import QuinceaneraElegantTemplate from "./templates/QuinceaneraElegantTemplate.jsx";
+import QuinceaneraCreativeTemplate from "./templates/QuinceaneraCreativeTemplate.jsx";
+import QuinceaneraRomanticTemplate from "./templates/QuinceaneraRomanticTemplate.jsx";
+import QuinceaneraModernTemplate from "./templates/QuinceaneraModernTemplate.jsx";
 
 // Mapeo de plantillas
 const TEMPLATE_COMPONENTS = {
-  // Quinceaños
-  "quinceanera-elegant": QuinceaneraElegantTemplate,
-  "quinceanera-romantic": QuinceaneraRomanticTemplate,
-  "quinceanera-modern": QuinceaneraModernTemplate,
-  
-  // Bodas
+  // Plantillas de Bodas
   "wedding-elegant": WeddingElegantTemplate,
+  "wedding-initials": WeddingInitialsTemplate,
   "wedding-romantic": WeddingRomanticTemplate,
   "wedding-modern": WeddingModernTemplate,
   "wedding-classic": WeddingClassicTemplate,
   "wedding-rustic": WeddingRusticTemplate,
+  
+  // Plantillas de Quinceaños
+  "quinceanera-elegant": QuinceaneraElegantTemplate,
+  "quinceanera-creative": QuinceaneraCreativeTemplate,
+  "quinceanera-romantic": QuinceaneraRomanticTemplate,
+  "quinceanera-modern": QuinceaneraModernTemplate,
 };
 
+// Plantilla por defecto si no se especifica
+const DEFAULT_TEMPLATE = "wedding-elegant";
+
 export default function TemplateRenderer({ event, ui, setEvent }) {
+  if (!event) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold text-gray-600 mb-4">
+            Selecciona una plantilla para comenzar
+          </h2>
+          <p className="text-gray-500">
+            Usa el editor para elegir el tipo de evento y plantilla
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   // Obtener el ID de la plantilla del evento
-  const templateId = event?.templateId || "wedding-elegant";
+  const templateId = event.templateId || DEFAULT_TEMPLATE;
   
   // Obtener el componente de plantilla correspondiente
   const TemplateComponent = TEMPLATE_COMPONENTS[templateId];
   
-  // Si no se encuentra la plantilla, usar la plantilla por defecto
   if (!TemplateComponent) {
-    console.warn(`Template ${templateId} not found, using default`);
-    const DefaultTemplate = TEMPLATE_COMPONENTS["wedding-elegant"];
-    return <DefaultTemplate event={event} ui={ui} setEvent={setEvent} />;
+    console.warn(`Plantilla no encontrada: ${templateId}. Usando plantilla por defecto.`);
+    const DefaultComponent = TEMPLATE_COMPONENTS[DEFAULT_TEMPLATE];
+    return <DefaultComponent event={event} ui={ui} setEvent={setEvent} />;
   }
-  
-  // Renderizar la plantilla seleccionada
+
   return <TemplateComponent event={event} ui={ui} setEvent={setEvent} />;
 }
 
-// Función helper para obtener información de plantillas
-export function getTemplateInfo() {
-  return [
-    // QUINCEAÑOS
-    { 
-      id: "quinceanera-elegant", 
-      name: "Quinceaños Elegante", 
-      type: "quinceanera",
-      description: "Diseño sofisticado para celebración de 15 años",
-      colors: { primary: "#E1C1A8", secondary: "#F6E3D4", text: "#2E2E2E" },
-      fonts: { primary: "'Playfair Display', serif", secondary: "'Great Vibes', cursive" },
-      preview: "/previews/quinceanera-elegant.jpg"
-    },
-    { 
-      id: "quinceanera-romantic", 
-      name: "Quinceaños Romántico", 
-      type: "quinceanera",
-      description: "Colores suaves y delicados para tu celebración",
-      colors: { primary: "#EEC9C5", secondary: "#C9C9C9", text: "#2E2E2E" },
-      fonts: { primary: "'Cormorant Garamond', serif", secondary: "'Pinyon Script', cursive" },
-      preview: "/previews/quinceanera-romantic.jpg"
-    },
-    { 
-      id: "quinceanera-modern", 
-      name: "Quinceaños Moderno", 
-      type: "quinceanera",
-      description: "Diseño contemporáneo y vibrante",
-      colors: { primary: "#B7B79D", secondary: "#C16D4D", text: "#2E2E2E" },
-      fonts: { primary: "Montserrat, sans-serif", secondary: "'Alex Brush', cursive" },
-      preview: "/previews/quinceanera-modern.jpg"
-    },
+// Exportar información de plantillas para el editor
+export const TEMPLATE_INFO = {
+  wedding: {
+    name: "Bodas",
+    templates: [
+      {
+        id: "wedding-elegant",
+        name: "Boda Elegante",
+        description: "Diseño minimalista con nombres completos",
+        colors: { primary: "#8FAF86", secondary: "#D4B28A" },
+        fonts: { primary: "'Playfair Display', serif", secondary: "'Great Vibes', cursive" }
+      },
+      {
+        id: "wedding-initials", 
+        name: "Boda Iniciales",
+        description: "Diseño con iniciales grandes estilo R&T",
+        colors: { primary: "#8FAF86", secondary: "#D4B28A" },
+        fonts: { primary: "'Playfair Display', serif", secondary: "'Great Vibes', cursive" }
+      },
+      {
+        id: "wedding-romantic",
+        name: "Boda Romántica", 
+        description: "Estilo romántico con colores suaves",
+        colors: { primary: "#EEC9C5", secondary: "#C9C9C9" },
+        fonts: { primary: "Cardo, serif", secondary: "'Pinyon Script', cursive" }
+      },
+      {
+        id: "wedding-modern",
+        name: "Boda Moderna",
+        description: "Diseño contemporáneo y vibrante", 
+        colors: { primary: "#245D63", secondary: "#8F9AA7" },
+        fonts: { primary: "Inter, sans-serif", secondary: "'Alex Brush', cursive" }
+      },
+      {
+        id: "wedding-classic",
+        name: "Boda Clásica",
+        description: "Estilo tradicional y elegante",
+        colors: { primary: "#871C2B", secondary: "#EFEAE6" },
+        fonts: { primary: "'Playfair Display', serif", secondary: "'Great Vibes', cursive" }
+      },
+      {
+        id: "wedding-rustic",
+        name: "Boda Rústica", 
+        description: "Diseño natural y campestre",
+        colors: { primary: "#5A6C48", secondary: "#E0C9C9" },
+        fonts: { primary: "'Playfair Display', serif", secondary: "'Dancing Script', cursive" }
+      }
+    ]
+  },
+  quinceanera: {
+    name: "Quinceaños",
+    templates: [
+      {
+        id: "quinceanera-elegant",
+        name: "Quinceaños Elegante",
+        description: "Diseño sofisticado dorado y champagne",
+        colors: { primary: "#D4AF37", secondary: "#F5E6D3" },
+        fonts: { primary: "'Playfair Display', serif", secondary: "'Dancing Script', cursive" }
+      },
+      {
+        id: "quinceanera-creative",
+        name: "Quinceaños Creativo",
+        description: "Diseño de 2 columnas con imagen y información",
+        colors: { primary: "#E91E63", secondary: "#FCE4EC" },
+        fonts: { primary: "'Playfair Display', serif", secondary: "'Pacifico', cursive" }
+      },
+      {
+        id: "quinceanera-romantic",
+        name: "Quinceaños Romántico",
+        description: "Estilo suave rosa blush y perla",
+        colors: { primary: "#F8BBD9", secondary: "#FDF2F8" },
+        fonts: { primary: "'Playfair Display', serif", secondary: "'Dancing Script', cursive" }
+      },
+      {
+        id: "quinceanera-modern", 
+        name: "Quinceaños Moderno",
+        description: "Contemporáneo verde oliva y terracota",
+        colors: { primary: "#6B8E23", secondary: "#DEB887" },
+        fonts: { primary: "Inter, sans-serif", secondary: "'Pacifico', cursive" }
+      }
+    ]
+  }
+};
+
+// Función helper para aplicar plantilla
+export function applyTemplate(templateId, setEvent) {
+  const templateInfo = Object.values(TEMPLATE_INFO)
+    .flatMap(category => category.templates)
+    .find(template => template.id === templateId);
     
-    // BODAS
-    { 
-      id: "wedding-elegant", 
-      name: "Boda Elegante", 
-      type: "wedding",
-      description: "Diseño sofisticado y minimalista",
-      colors: { primary: "#8FAF86", secondary: "#D4B28A", text: "#2E2E2E" },
-      fonts: { primary: "'Playfair Display', serif", secondary: "'Great Vibes', cursive" },
-      preview: "/previews/wedding-elegant.jpg"
-    },
-    { 
-      id: "wedding-romantic", 
-      name: "Boda Romántica", 
-      type: "wedding",
-      description: "Colores suaves y florales",
-      colors: { primary: "#EEC9C5", secondary: "#C9C9C9", text: "#2E2E2E" },
-      fonts: { primary: "Cardo, serif", secondary: "'Pinyon Script', cursive" },
-      preview: "/previews/wedding-romantic.jpg"
-    },
-    { 
-      id: "wedding-modern", 
-      name: "Boda Moderna", 
-      type: "wedding",
-      description: "Diseño contemporáneo y vibrante",
-      colors: { primary: "#245D63", secondary: "#8F9AA7", text: "#2E2E2E" },
-      fonts: { primary: "Inter, sans-serif", secondary: "'Alex Brush', cursive" },
-      preview: "/previews/wedding-modern.jpg"
-    },
-    { 
-      id: "wedding-classic", 
-      name: "Boda Clásica", 
-      type: "wedding",
-      description: "Estilo tradicional y atemporal",
-      colors: { primary: "#871C2B", secondary: "#EFEAE6", text: "#2E2E2E" },
-      fonts: { primary: "Bellefair, serif", secondary: "'Tangerine', cursive" },
-      preview: "/previews/wedding-classic.jpg"
-    },
-    { 
-      id: "wedding-rustic", 
-      name: "Boda Rústica", 
-      type: "wedding",
-      description: "Estilo campestre y natural",
-      colors: { primary: "#5A6C48", secondary: "#E0C9C9", text: "#2E2E2E" },
-      fonts: { primary: "'Cormorant Garamond', serif", secondary: "'Great Vibes', cursive" },
-      preview: "/previews/wedding-rustic.jpg"
-    },
-  ];
-}
+  if (!templateInfo) {
+    console.warn(`Información de plantilla no encontrada: ${templateId}`);
+    return;
+  }
 
-// Función helper para obtener plantillas por tipo
-export function getTemplatesByType(type) {
-  return getTemplateInfo().filter(template => template.type === type);
-}
-
-// Función helper para obtener una plantilla específica
-export function getTemplateById(id) {
-  return getTemplateInfo().find(template => template.id === id);
+  setEvent(prev => ({
+    ...prev,
+    templateId,
+    eventType: templateId.startsWith('wedding') ? 'wedding' : 'quinceanera',
+    colors: {
+      ...prev.colors,
+      ...templateInfo.colors
+    },
+    fonts: {
+      ...prev.fonts,
+      ...templateInfo.fonts
+    }
+  }));
 }
