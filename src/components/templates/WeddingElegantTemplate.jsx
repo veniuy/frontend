@@ -1,10 +1,10 @@
 // src/components/InvitationCanvas.jsx
 import React, { useEffect, useMemo, useState } from "react";
-import EditableText from "./EditableText.jsx";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import EditableText from "@/components/EditableText.jsx";
+import { Button } from "@/src/components/ui/button";
+import { Card, CardContent } from "@src//components/ui/card";
+import { Input } from "@/src/components/ui/input";
+import { Textarea } from "@/src/components/ui/textarea";
 import {
   Heart,
   ChevronDown,
@@ -19,7 +19,7 @@ import {
   X,
   CheckCircle,
 } from "lucide-react";
-import { asset, onImgError } from "../utils/assets";
+import { asset, onImgError } from "../src/utils/assets";
 
 export default function InvitationCanvas({ event, ui, setEvent }) {
   if (!event) return null;
