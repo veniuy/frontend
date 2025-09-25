@@ -65,7 +65,7 @@ export default function QuinceaneraElegantTemplate({ event, ui, setEvent }) {
     `;
   }, [fontPrimary, fontSecondary]);
 
-  const heroTexture = event.images?.heroTexture || asset("src/assets/portada.webp");
+  const heroTexture = event.images?.heroTexture || asset("src/assets/florcitas.webp");
 
   // Cuenta regresiva
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
