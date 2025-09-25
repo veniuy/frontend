@@ -55,8 +55,8 @@ export default function InvitationCanvas({ event, ui, setEvent }) {
   }, [event.colors]);
 
   // Mejorar la aplicación de fuentes - asegurar que se apliquen consistentemente
-  const fontPrimary = event.fonts?.primary || "'Playfair Display', serif";
-  const fontSecondary = event.fonts?.secondary || "'Great Vibes', cursive";
+  const fontPrimary = event.fonts?.primary || "'Cormorant Garamond', Serif";
+  const fontSecondary = event.fonts?.secondary || "'Playfair Display', serif";
 
   // Crear estilos CSS dinámicos para aplicar fuentes globalmente
   const fontStyles = useMemo(() => {
