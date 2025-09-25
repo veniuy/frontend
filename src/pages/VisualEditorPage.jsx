@@ -3,6 +3,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import EditorPanel from "../components/EditorPanel";
 import InvitationCanvas from "../components/InvitationCanvas";
+import TemplateRenderer from "../components/TemplateRenderer";
+
 
 export default function VisualEditorPage() {
   const { id } = useParams();
