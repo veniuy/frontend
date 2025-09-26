@@ -8,7 +8,6 @@ import WeddingRomanticTemplate from "./templates/WeddingRomanticTemplate.jsx";
 import WeddingModernTemplate from "./templates/WeddingModernTemplate.jsx";
 import WeddingClassicTemplate from "./templates/WeddingClassicTemplate.jsx";
 import WeddingRusticTemplate from "./templates/WeddingRusticTemplate.jsx";
-
 import QuinceaneraElegantTemplate from "./templates/QuinceaneraElegantTemplate.jsx";
 import QuinceaneraCreativeTemplate from "./templates/QuinceaneraCreativeTemplate.jsx";
 import QuinceaneraRomanticTemplate from "./templates/QuinceaneraRomanticTemplate.jsx";
@@ -16,56 +15,34 @@ import QuinceaneraModernTemplate from "./templates/QuinceaneraModernTemplate.jsx
 
 // Mapeo de plantillas
 const TEMPLATE_COMPONENTS = {
-  // Plantillas de Bodas
   "wedding-elegant": WeddingElegantTemplate,
   "wedding-initials": WeddingInitialsTemplate,
   "wedding-romantic": WeddingRomanticTemplate,
   "wedding-modern": WeddingModernTemplate,
   "wedding-classic": WeddingClassicTemplate,
   "wedding-rustic": WeddingRusticTemplate,
-  
-  // Plantillas de Quinceaños
   "quinceanera-elegant": QuinceaneraElegantTemplate,
   "quinceanera-creative": QuinceaneraCreativeTemplate,
   "quinceanera-romantic": QuinceaneraRomanticTemplate,
   "quinceanera-modern": QuinceaneraModernTemplate,
 };
 
-// Plantilla por defecto si no se especifica
-const DEFAULT_TEMPLATE = "wedding-elegant";
-
 export default function TemplateRenderer({ event, ui, setEvent }) {
-  if (!event) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold text-gray-600 mb-4">
-            Selecciona una plantilla para comenzar
-          </h2>
-          <p className="text-gray-500">
-            Usa el editor para elegir el tipo de evento y plantilla
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Obtener el ID de la plantilla del evento
-  const templateId = event.templateId || DEFAULT_TEMPLATE;
-  
-  // Obtener el componente de plantilla correspondiente
+  // Determinar qué plantilla usar
+  const templateId = event?.templateId || "wedding-elegant";
   const TemplateComponent = TEMPLATE_COMPONENTS[templateId];
-  
+
+  // Si no se encuentra la plantilla, usar la elegante por defecto
   if (!TemplateComponent) {
-    console.warn(`Plantilla no encontrada: ${templateId}. Usando plantilla por defecto.`);
-    const DefaultComponent = TEMPLATE_COMPONENTS[DEFAULT_TEMPLATE];
-    return <DefaultComponent event={event} ui={ui} setEvent={setEvent} />;
+    console.warn(`Plantilla no encontrada: ${templateId}, usando wedding-elegant por defecto`);
+    const DefaultTemplate = TEMPLATE_COMPONENTS["wedding-elegant"];
+    return <DefaultTemplate event={event} ui={ui} setEvent={setEvent} />;
   }
 
   return <TemplateComponent event={event} ui={ui} setEvent={setEvent} />;
 }
 
-// Exportar información de plantillas para el editor
+// Información de plantillas para el editor
 export const TEMPLATE_INFO = {
   wedding: {
     name: "Bodas",
@@ -75,14 +52,14 @@ export const TEMPLATE_INFO = {
         name: "Boda Elegante",
         description: "Diseño minimalista con nombres completos",
         colors: { primary: "#8FAF86", secondary: "#D4B28A" },
-        fonts: { primary: "'Playfair Display', serif", secondary: "'Great Vibes', cursive" }
+        fonts: { primary: "'Cormorant Garamond', serif", secondary: "'Playfair Display', serif" }
       },
       {
         id: "wedding-initials", 
         name: "Boda Iniciales",
         description: "Diseño con iniciales grandes estilo R&T",
         colors: { primary: "#8FAF86", secondary: "#D4B28A" },
-        fonts: { primary: "'Playfair Display', serif", secondary: "'Great Vibes', cursive" }
+        fonts: { primary: "'Cormorant Garamond', serif", secondary: "'Great Vibes', cursive" }
       },
       {
         id: "wedding-romantic",
@@ -127,7 +104,7 @@ export const TEMPLATE_INFO = {
       {
         id: "quinceanera-creative",
         name: "Quinceaños Creativo",
-        description: "Diseño de 2 columnas con imagen y información",
+        description: "Diseño juvenil y vibrante",
         colors: { primary: "#E91E63", secondary: "#FCE4EC" },
         fonts: { primary: "'Playfair Display', serif", secondary: "'Pacifico', cursive" }
       },
@@ -148,29 +125,3 @@ export const TEMPLATE_INFO = {
     ]
   }
 };
-
-// Función helper para aplicar plantilla
-export function applyTemplate(templateId, setEvent) {
-  const templateInfo = Object.values(TEMPLATE_INFO)
-    .flatMap(category => category.templates)
-    .find(template => template.id === templateId);
-    
-  if (!templateInfo) {
-    console.warn(`Información de plantilla no encontrada: ${templateId}`);
-    return;
-  }
-
-  setEvent(prev => ({
-    ...prev,
-    templateId,
-    eventType: templateId.startsWith('wedding') ? 'wedding' : 'quinceanera',
-    colors: {
-      ...prev.colors,
-      ...templateInfo.colors
-    },
-    fonts: {
-      ...prev.fonts,
-      ...templateInfo.fonts
-    }
-  }));
-}
