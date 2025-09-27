@@ -1,81 +1,38 @@
 import React from 'react';
-import './WeddingInitialsTemplate.css'; // Para estilos específicos
+import Hero from './components/Hero';
+import Countdown from './components/Countdown';
+import Ceremony from './components/Ceremony';
+import Party from './components/Party';
+import Gallery from './components/Gallery';
+import Gifts from './components/Gifts';
+import Instagram from './components/Instagram';
+import RSVP from './components/RSVP';
+import Songs from './components/Songs';
+import UsefulInfo from './components/UsefulInfo';
+import Footer from './components/Footer';
+import Modal from './components/Modal';
+import './styles/WeddingInitialsTemplate.css'; // Importar el archivo CSS
 
-const WeddingInitialsTemplate = () => {
+const WeddingInitialsTemplate = ({ config }) => {
+  const { 
+    showHero, showCountdown, showCeremony, showParty, showGallery, showGifts, 
+    showInstagram, showRSVP, showSongs, showUsefulInfo, showFooter, showModal 
+  } = config || {};
+
   return (
     <div className="wedding-initials-template">
-      {/* Sección Hero con iniciales R&T */}
-      <section className="hero-section">
-        <div className="hero-content">
-          <h1 className="initials">R&T</h1>
-          <p className="hero-message">¡Nos casamos!</p>
-          {/* Botones o elementos adicionales del hero */}
-        </div>
-      </section>
-
-      {/* Sección Countdown */}
-      <section className="countdown-section">
-        <h2>¡La cuenta regresiva ha comenzado!</h2>
-        {/* Componente de cuenta regresiva */}
-      </section>
-
-      {/* Sección Ceremonia */}
-      <section className="ceremony-section">
-        <h2>Ceremonia</h2>
-        {/* Detalles de la ceremonia */}
-      </section>
-
-      {/* Sección Fiesta */}
-      <section className="party-section">
-        <h2>Fiesta</h2>
-        {/* Detalles de la fiesta */}
-      </section>
-
-      {/* Sección Galería */}
-      <section className="gallery-section">
-        <h2>Nuestra Galería</h2>
-        {/* Componente de galería de fotos */}
-      </section>
-
-      {/* Sección Regalos */}
-      <section className="gifts-section">
-        <h2>Lista de Regalos</h2>
-        {/* Información de regalos */}
-      </section>
-
-      {/* Sección Instagram */}
-      <section className="instagram-section">
-        <h2>#NuestraBoda</h2>
-        {/* Feed de Instagram o enlace */}
-      </section>
-
-      {/* Sección RSVP */}
-      <section className="rsvp-section">
-        <h2>Confirma tu Asistencia</h2>
-        {/* Formulario RSVP */}
-      </section>
-
-      {/* Sección Canciones */}
-      <section className="songs-section">
-        <h2>Pide tu Canción</h2>
-        {/* Formulario para pedir canciones */}
-      </section>
-
-      {/* Sección Info Útil */}
-      <section className="useful-info-section">
-        <h2>Información Útil</h2>
-        {/* Detalles de alojamiento, transporte, etc. */}
-      </section>
-
-      {/* Footer */}
-      <footer className="footer-section">
-        <p>&copy; 2025 R&T. Todos los derechos reservados.</p>
-      </footer>
-
-      {/* Modales (ejemplos) */}
-      {/* Modal de confirmación de RSVP */}
-      {/* Modal de detalles de ubicación */}
-      {/* Modal de galería de imágenes */}
+      {showHero && <Hero config={config?.hero} />}
+      {showCountdown && <Countdown config={config?.countdown} />}
+      {showCeremony && <Ceremony config={config?.ceremony} />}
+      {showParty && <Party config={config?.party} />}
+      {showGallery && <Gallery config={config?.gallery} />}
+      {showGifts && <Gifts config={config?.gifts} />}
+      {showInstagram && <Instagram config={config?.instagram} />}
+      {showRSVP && <RSVP config={config?.rsvp} />}
+      {showSongs && <Songs config={config?.songs} />}
+      {showUsefulInfo && <UsefulInfo config={config?.usefulInfo} />}
+      {showFooter && <Footer config={config?.footer} />}
+      {showModal && <Modal config={config?.modal} />}
     </div>
   );
 };

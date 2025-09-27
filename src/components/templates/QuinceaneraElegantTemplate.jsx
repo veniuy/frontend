@@ -1,98 +1,204 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './QuinceaneraElegantTemplate.css';
 
+// Importar componentes modulares
+import Hero from './components/Hero';
+import Countdown from './components/Countdown';
+import Ceremony from './components/Ceremony';
+import Party from './components/Party';
+import Gallery from './components/Gallery';
+import Gifts from './components/Gifts';
+import Instagram from './components/Instagram';
+import RSVP from './components/RSVP';
+import Songs from './components/Songs';
+import UsefulInfo from './components/UsefulInfo';
+import Footer from './components/Footer';
+import Modal from './components/Modal';
+
 const QuinceaneraElegantTemplate = () => {
+  // Definir estilos para colores y fuentes
+  const primaryColor = '#D4AF37';
+  const secondaryColor = '#F5E6D3';
+  const playfairDisplayFont = 'Playfair Display, serif';
+  const dancingScriptFont = 'Dancing Script, cursive';
+
+  // Estados para contenido editable y visibilidad de secciones
+  const [heroTitle, setHeroTitle] = useState('Mis Quince Años');
+  const [heroSubtitle, setHeroSubtitle] = useState('¡Te esperamos para celebrar!');
+  const [showCountdown, setShowCountdown] = useState(true);
+  const [showCeremony, setShowCeremony] = useState(true);
+  const [showParty, setShowParty] = useState(true);
+  const [showGallery, setShowGallery] = useState(true);
+  const [showGifts, setShowGifts] = useState(true);
+  const [showInstagram, setShowInstagram] = useState(true);
+  const [showRSVP, setShowRSVP] = useState(true);
+  const [showSongs, setShowSongs] = useState(true);
+  const [showUsefulInfo, setShowUsefulInfo] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const quinceaneraDate = '2026-09-27T19:00:00'; // Ejemplo de fecha
+
   return (
-    <div className="quinceanera-elegant-template">
-      {/* Sección Hero */}
-      <section id="hero" className="hero-section">
-        <div className="hero-content">
-          <h1>[Nombre de la Quinceañera]</h1>
-          <p className="event-title">MIS 15 AÑOS</p>
-          <p className="event-date">[Fecha del Evento]</p>
-          <button className="main-button">Confirmar Mi Asistencia</button>
-        </div>
-      </section>
+    <div style={{
+      '--primary-color': primaryColor,
+      '--secondary-color': secondaryColor,
+      '--font-playfair-display': playfairDisplayFont,
+      '--font-dancing-script': dancingScriptFont,
+    }}>
+      <Hero
+        title={heroTitle}
+        subtitle={heroSubtitle}
+        onTitleChange={setHeroTitle}
+        onSubtitleChange={setHeroSubtitle}
+        backgroundColor={secondaryColor}
+        textColor={primaryColor}
+        fontFamilyTitle={dancingScriptFont}
+        fontFamilySubtitle={playfairDisplayFont}
+      />
 
-      {/* Sección Countdown */}
-      <section id="countdown" className="countdown-section">
-        <h2>Mi Cuenta Regresiva</h2>
-        {/* Placeholder para el componente de cuenta regresiva */}
-        <div className="countdown-placeholder">[Componente de Cuenta Regresiva]</div>
-      </section>
+      {showCountdown && (
+        <Countdown
+          targetDate={quinceaneraDate}
+          titleColor={primaryColor}
+          textColor={primaryColor}
+          backgroundColor={secondaryColor}
+          fontFamily={playfairDisplayFont}
+        />
+      )}
 
-      {/* Sección Celebración */}
-      <section id="celebration" className="celebration-section">
-        <h2>Mi Celebración</h2>
-        <p>[Detalles de mi celebración: lugar, hora, dirección]</p>
-        <button className="info-button">Ver Ubicación</button>
-      </section>
+      {showCeremony && (
+        <Ceremony
+          title="Ceremonia Religiosa"
+          date="27 de Septiembre de 2026"
+          time="17:00 hrs"
+          location="Parroquia de Nuestra Señora de Guadalupe"
+          address="Calle Falsa 123, Ciudad"
+          mapLink="https://maps.google.com/?q=Parroquia+de+Nuestra+Se%C3%B1ora+de+Guadalupe"
+          titleColor={primaryColor}
+          textColor={primaryColor}
+          backgroundColor={secondaryColor}
+          fontFamilyTitle={dancingScriptFont}
+          fontFamilyText={playfairDisplayFont}
+        />
+      )}
 
-      {/* Sección Galería */}
-      <section id="gallery" className="gallery-section">
-        <h2>Mi Galería</h2>
-        {/* Placeholder para el componente de galería de fotos */}
-        <div className="gallery-placeholder">[Componente de Galería de Fotos]</div>
-      </section>
+      {showParty && (
+        <Party
+          title="Recepción"
+          date="27 de Septiembre de 2026"
+          time="19:00 hrs"
+          location="Salón de Eventos 'El Dorado'"
+          address="Avenida Siempre Viva 742, Ciudad"
+          mapLink="https://maps.google.com/?q=Sal%C3%B3n+de+Eventos+El+Dorado"
+          titleColor={primaryColor}
+          textColor={primaryColor}
+          backgroundColor={secondaryColor}
+          fontFamilyTitle={dancingScriptFont}
+          fontFamilyText={playfairDisplayFont}
+        />
+      )}
 
-      {/* Sección Regalos */}
-      <section id="gifts" className="gifts-section">
-        <h2>Mis Regalos</h2>
-        <p>[Información sobre mi mesa de regalos o sugerencias de regalos]</p>
-        <button className="info-button">Ver Opciones de Regalo</button>
-      </section>
+      {showGallery && (
+        <Gallery
+          title="Galería de Fotos"
+          images={[
+            { src: '/images/quince1.jpg', alt: 'Quinceañera 1' },
+            { src: '/images/quince2.jpg', alt: 'Quinceañera 2' },
+          ]} // Ejemplo de imágenes
+          titleColor={primaryColor}
+          backgroundColor={secondaryColor}
+          fontFamilyTitle={dancingScriptFont}
+        />
+      )}
 
-      {/* Sección Instagram */}
-      <section id="instagram" className="instagram-section">
-        <h2>#Mis15Años</h2>
-        {/* Placeholder para el feed de Instagram */}
-        <div className="instagram-placeholder">[Feed de Instagram]</div>
-      </section>
+      {showGifts && (
+        <Gifts
+          title="Mesa de Regalos"
+          message="Tu presencia es nuestro mejor regalo, pero si deseas obsequiarnos algo, aquí tienes algunas opciones."
+          bankInfo="Banco: XYZ, Cuenta: 1234567890"
+          giftRegistryLink="https://listaderegalos.com/quinceanera"
+          titleColor={primaryColor}
+          textColor={primaryColor}
+          backgroundColor={secondaryColor}
+          fontFamilyTitle={dancingScriptFont}
+          fontFamilyText={playfairDisplayFont}
+        />
+      )}
 
-      {/* Sección RSVP */}
-      <section id="rsvp" className="rsvp-section">
-        <h2>Confirmar Mi Asistencia</h2>
-        {/* Placeholder para el formulario RSVP */}
-        <div className="rsvp-placeholder">[Formulario RSVP]</div>
-      </section>
+      {showInstagram && (
+        <Instagram
+          title="Comparte tus momentos"
+          hashtag="#MisQuinceAños"
+          titleColor={primaryColor}
+          textColor={primaryColor}
+          backgroundColor={secondaryColor}
+          fontFamilyTitle={dancingScriptFont}
+          fontFamilyText={playfairDisplayFont}
+        />
+      )}
 
-      {/* Sección Canciones */}
-      <section id="songs" className="songs-section">
-        <h2>Pide Mi Canción Favorita</h2>
-        {/* Placeholder para el formulario de solicitud de canciones */}
-        <div className="songs-placeholder">[Formulario de Solicitud de Canciones]</div>
-      </section>
+      {showRSVP && (
+        <RSVP
+          title="Confirma tu Asistencia"
+          deadline="15 de Septiembre de 2026"
+          contactEmail="confirmacion@email.com"
+          contactPhone="+1234567890"
+          titleColor={primaryColor}
+          textColor={primaryColor}
+          backgroundColor={secondaryColor}
+          fontFamilyTitle={dancingScriptFont}
+          fontFamilyText={playfairDisplayFont}
+        />
+      )}
 
-      {/* Sección Información Útil */}
-      <section id="useful-info" className="useful-info-section">
-        <h2>Información Útil para Mis Invitados</h2>
-        <p>[Detalles de alojamiento, transporte, código de vestimenta, etc.]</p>
-      </section>
+      {showSongs && (
+        <Songs
+          title="Pide tu Canción"
+          message="Ayúdanos a crear la playlist perfecta para la fiesta."
+          requestLink="https://pedircancion.com/quinceanera"
+          titleColor={primaryColor}
+          textColor={primaryColor}
+          backgroundColor={secondaryColor}
+          fontFamilyTitle={dancingScriptFont}
+          fontFamilyText={playfairDisplayFont}
+        />
+      )}
 
-      {/* Footer */}
-      <footer className="footer-section">
-        <p>&copy; 2025 Mis 15 Años de [Nombre de la Quinceañera]. Todos los derechos reservados.</p>
-      </footer>
+      {showUsefulInfo && (
+        <UsefulInfo
+          title="Información Útil"
+          sections={[
+            { title: 'Código de Vestimenta', content: 'Formal' },
+            { title: 'Alojamiento', content: 'Hoteles cercanos: [Link]' },
+          ]}
+          titleColor={primaryColor}
+          textColor={primaryColor}
+          backgroundColor={secondaryColor}
+          fontFamilyTitle={dancingScriptFont}
+          fontFamilyText={playfairDisplayFont}
+        />
+      )}
 
-      {/* Modales (ej. para detalles de regalos, ubicación, etc.) */}
-      <div id="gift-modal" className="modal">
-        <div className="modal-content">
-          <h3>Detalles de Regalos</h3>
-          <p>[Contenido del modal de regalos]</p>
-          <button className="close-modal">Cerrar</button>
-        </div>
-      </div>
+      <Footer
+        text="¡Gracias por acompañarnos en este día tan especial!"
+        textColor={primaryColor}
+        backgroundColor={secondaryColor}
+        fontFamily={playfairDisplayFont}
+      />
 
-      <div id="location-modal" className="modal">
-        <div className="modal-content">
-          <h3>Ubicación de Mi Celebración</h3>
-          <p>[Contenido del modal de ubicación]</p>
-          <button className="close-modal">Cerrar</button>
-        </div>
-      </div>
+      <button onClick={() => setIsModalOpen(true)}>Abrir Modal</button>
 
-      {/* Otros modales según sea necesario */}
-
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Mensaje Especial"
+        content="¡Estamos muy emocionados de celebrar contigo!"
+        titleColor={primaryColor}
+        textColor={primaryColor}
+        backgroundColor={secondaryColor}
+        fontFamilyTitle={dancingScriptFont}
+        fontFamilyText={playfairDisplayFont}
+      />
     </div>
   );
 };
