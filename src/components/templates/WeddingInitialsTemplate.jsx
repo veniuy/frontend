@@ -11,7 +11,6 @@ import Songs from './components/Songs';
 import UsefulInfo from './components/UsefulInfo';
 import Footer from './components/Footer';
 import Modal from './components/Modal';
-import './WeddingInitialsTemplate.css'; // Importar el archivo CSS
 
 const WeddingInitialsTemplate = ({ config }) => {
   const { 
