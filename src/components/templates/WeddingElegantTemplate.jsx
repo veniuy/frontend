@@ -1,6 +1,5 @@
 // src/components/templates/WeddingElegantTemplate.jsx
 import React, { useMemo } from "react";
-import './WeddingElegantTemplate.css';
 import Hero from './components/Hero';
 import Countdown from './components/Countdown';
 import Ceremony from './components/Ceremony';
