@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './QuinceaneraElegantTemplate.css';
 
 // Importar componentes modulares
 import Hero from './components/Hero';
