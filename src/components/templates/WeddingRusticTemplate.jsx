@@ -1,5 +1,4 @@
 import React from 'react';
-import './WeddingRusticTemplate.css';
 
 import Hero from './components/Hero';
 import Countdown from './components/Countdown';
