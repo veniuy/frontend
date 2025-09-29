@@ -1,5 +1,4 @@
 import React from 'react';
-import './QuinceaneraCreativeTemplate.css'; // Importa el archivo CSS
 
 // Importa los componentes modulares
 import Hero from './components/Hero';
