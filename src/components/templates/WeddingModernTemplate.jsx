@@ -1,5 +1,4 @@
 import React from 'react';
-import './WeddingModernTemplate.css';
 
 // Importar componentes modulares
 import Hero from './components/Hero';
