@@ -1,5 +1,5 @@
 import React from 'react';
-import './styles/WeddingClassicTemplate.css';
+import './WeddingClassicTemplate.css';
 import Hero from './components/Hero';
 import Countdown from './components/Countdown';
 import Ceremony from './components/Ceremony';
