@@ -1,5 +1,4 @@
 import React from 'react';
-import './WeddingRomanticTemplate.css'; // Importa el archivo CSS específico
 
 // Importar todos los componentes modulares
 import Hero from './components/Hero';
