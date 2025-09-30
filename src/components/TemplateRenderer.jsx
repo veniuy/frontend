@@ -28,20 +28,37 @@ const TEMPLATE_COMPONENTS = {
 };
 
 export default function TemplateRenderer({ event, ui, setEvent }) {
-  // Determinar qué plantilla usar
-  const templateId = event?.templateId || "wedding-elegant";
-  const TemplateComponent = TEMPLATE_COMPONENTS[templateId];
+  // Guard básico: crear un event "seguro" sin mutar el original
+  const safeEvent = {
+    templateId: event?.templateId ?? "wedding-elegant",
+    couple: event?.couple ?? {},
+    quinceanera: event?.quinceanera ?? {},
+    sections: event?.sections ?? {},
+    settings: event?.settings ?? {},
+    ...event
+  };
 
-  // Si no se encuentra la plantilla, usar la elegante por defecto
+  const TemplateId = String(safeEvent.templateId || "").trim();
+  const TemplateComponent = templatesMap[TemplateId];
+
+  // Fallback visible en caso de que templateId no exista o el componente no se importe bien
   if (!TemplateComponent) {
-    console.warn(`Plantilla no encontrada: ${templateId}, usando wedding-elegant por defecto`);
-    const DefaultTemplate = TEMPLATE_COMPONENTS["wedding-elegant"];
-    return <DefaultTemplate event={event} ui={ui} setEvent={setEvent} />;
+    return (
+      <div style={{ padding: 20 }}>
+        <strong>Error:</strong> plantilla "{TemplateId}" no encontrada.
+        <div>Verifica que el id en <code>event.templateId</code> coincida con keys en <code>templatesMap</code>.</div>
+      </div>
+    );
   }
-
-  return <TemplateComponent event={event} ui={ui} setEvent={setEvent} />;
-}
-
+   // Render de la plantilla con el event seguro
+    return (
+      <TemplateComponent
+        event={safeEvent}
+        ui={ui}
+        setEvent={setEvent}
+      />
+    );
+  }
 // Información de plantillas para el editor
 export const TEMPLATE_INFO = {
   wedding: {
