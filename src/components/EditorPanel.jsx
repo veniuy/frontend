@@ -48,29 +48,6 @@ import {
 } from "lucide-react";
 import ImagesPanel from "./ImagesPanel";
 
-// Función debounce helper
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-    const later = () => {
-      clearTimeout(timeout);
-      func(...args);
-    };
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-  };
-}
-
-// Función helper para leer archivos
-function readFileAsDataURL(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
 export default function EditorPanel({
   event,
   ui,
@@ -512,6 +489,16 @@ export default function EditorPanel({
     if (!c.date || !c.date.trim()) errs.push("Falta la fecha.");
     if (!c.time || !c.time.trim()) errs.push("Falta la hora.");
     
+    if (!isQuinceanera && isSectionOn("ceremony")) {
+      const ceremony = c.ceremony || {};
+      if (!ceremony.venue) errs.push("Falta el lugar de la ceremonia.");
+    }
+    
+    if (isSectionOn("reception")) {
+      const reception = c.reception || {};
+      if (!reception.venue) errs.push("Falta el lugar de la fiesta.");
+    }
+    
     if (isSectionOn("bank")) {
       const b = c.bank || {};
       if (!b.titular && !b.cbu && !b.cuenta) {
@@ -712,13 +699,12 @@ export default function EditorPanel({
           ui.isMobile
             ? `fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-gray-200 transform transition-transform duration-300 ${
                 ui.showMobilePanel ? "translate-x-0" : "-translate-x-full"
-              } flex flex-col`
-            : "w-80 bg-white border-r border-gray-200 flex flex-col"
+              } overflow-hidden flex flex-col`
+            : "w-80 bg-white border-r border-gray-200 overflow-hidden flex flex-col"
         }
-        style={{ height: '100vh', maxHeight: '100vh' }}
       >
         {/* Header mejorado */}
-        <div className="flex-shrink-0 bg-white border-b border-gray-200 p-3">
+        <div className="sticky top-0 z-10 bg-white border-b border-gray-200 p-3">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               {ui.isMobile && (
@@ -784,31 +770,29 @@ export default function EditorPanel({
         </div>
 
         {/* Tabs mejorados - NUEVO ORDEN */}
-        <Tabs value={ui.activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-          <div className="flex-shrink-0 px-3 mb-3">
-            <TabsList className="grid w-full grid-cols-4 p-1">
-              <TabsTrigger value="templates" className="flex flex-col items-center gap-1 p-2 text-xs">
-                <Layout className="h-3 w-3" />
-                Plantillas
-              </TabsTrigger>
-              <TabsTrigger value="content" className="flex flex-col items-center gap-1 p-2 text-xs">
-                <Type className="h-3 w-3" />
-                Contenido
-              </TabsTrigger>
-              <TabsTrigger value="design" className="flex flex-col items-center gap-1 p-2 text-xs">
-                <Palette className="h-3 w-3" />
-                Diseño
-              </TabsTrigger>
-              <TabsTrigger value="images" className="flex flex-col items-center gap-1 p-2 text-xs">
-                <ImageIcon className="h-3 w-3" />
-                Imágenes
-              </TabsTrigger>
-            </TabsList>
-          </div>
+        <Tabs value={ui.activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+          <TabsList className="grid w-full grid-cols-4 p-1 mx-3 mb-3">
+            <TabsTrigger value="templates" className="flex flex-col items-center gap-1 p-2 text-xs">
+              <Layout className="h-3 w-3" />
+              Plantillas
+            </TabsTrigger>
+            <TabsTrigger value="content" className="flex flex-col items-center gap-1 p-2 text-xs">
+              <Type className="h-3 w-3" />
+              Contenido
+            </TabsTrigger>
+            <TabsTrigger value="design" className="flex flex-col items-center gap-1 p-2 text-xs">
+              <Palette className="h-3 w-3" />
+              Diseño
+            </TabsTrigger>
+            <TabsTrigger value="images" className="flex flex-col items-center gap-1 p-2 text-xs">
+              <ImageIcon className="h-3 w-3" />
+              Imágenes
+            </TabsTrigger>
+          </TabsList>
 
           {/* ============ PLANTILLAS (PRIMERA PESTAÑA) ============ */}
-          <TabsContent value="templates" className="flex-1 min-h-0 m-0">
-            <div className="h-full overflow-y-auto px-3 pb-6">
+          <TabsContent value="templates" className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full px-3 pb-6">
               <div className="space-y-4">
                 
                 {/* Plantillas de Quinceaños */}
@@ -935,87 +919,90 @@ export default function EditorPanel({
                 )}
 
               </div>
-            </div>
+            </ScrollArea>
           </TabsContent>
 
           {/* ============ CONTENIDO ============ */}
-          <TabsContent value="content" className="flex-1 min-h-0 m-0">
-            <div className="h-full overflow-y-auto px-3 pb-6">
+          <TabsContent value="content" className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full px-3 pb-6">
               <div className="space-y-4">
                 
                 {/* Información básica */}
                 <CollapsibleSection 
                   title="Información Básica" 
-                  icon={<Type className="w-4 h-4" />}
+                  icon={<Heart className="w-4 h-4" />}
                   defaultOpen={true}
                 >
-                  <div className="space-y-3">
-                    {event.template === "quinceanera" ? (
+                  {event.template === "quinceanera" ? (
+                    // Layout para Quinceaños
+                    <div className="space-y-3">
                       <div>
                         <Label className="text-xs">Nombre de la Quinceañera</Label>
                         <Input
-                          value={event.quinceañera?.name || ""}
-                          onChange={(e) =>
-                            setEvent((p) => ({ ...p, quinceañera: { ...p.quinceañera, name: e.target.value } }))
-                          }
+                          value={event.couple?.bride || event.quinceañera?.name || ""}
+                          onChange={(e) => setEvent((p) => ({ 
+                            ...p, 
+                            couple: { ...p.couple, bride: e.target.value },
+                            quinceañera: { ...p.quinceañera, name: e.target.value }
+                          }))}
                           className="text-xs mt-1"
-                        />
-                      </div>
-                    ) : (
-                      <>
-                        <div>
-                          <Label className="text-xs">Nombre de la Novia</Label>
-                          <Input
-                            value={event.couple?.bride || ""}
-                            onChange={(e) =>
-                              setEvent((p) => ({ ...p, couple: { ...p.couple, bride: e.target.value } }))
-                            }
-                            className="text-xs mt-1"
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-xs">Nombre del Novio</Label>
-                          <Input
-                            value={event.couple?.groom || ""}
-                            onChange={(e) =>
-                              setEvent((p) => ({ ...p, couple: { ...p.couple, groom: e.target.value } }))
-                            }
-                            className="text-xs mt-1"
-                          />
-                        </div>
-                      </>
-                    )}
-                    
-                    <div className="grid grid-cols-2 gap-2">
-                      <div>
-                        <Label className="text-xs">Fecha</Label>
-                        <Input
-                          type="date"
-                          value={event.date || ""}
-                          onChange={(e) => setEvent((p) => ({ ...p, date: e.target.value }))}
-                          className="text-xs mt-1"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-xs">Hora</Label>
-                        <Input
-                          type="time"
-                          value={event.time || ""}
-                          onChange={(e) => setEvent((p) => ({ ...p, time: e.target.value }))}
-                          className="text-xs mt-1"
+                          placeholder="Nombre"
                         />
                       </div>
                     </div>
+                  ) : (
+                    // Layout para Bodas
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-xs">Nombre 1</Label>
+                        <Input
+                          value={event.couple?.bride || ""}
+                          onChange={(e) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: e.target.value } }))}
+                          className="text-xs mt-1"
+                          placeholder="Novia"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs">Nombre 2</Label>
+                        <Input
+                          value={event.couple?.groom || ""}
+                          onChange={(e) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: e.target.value } }))}
+                          className="text-xs mt-1"
+                          placeholder="Novio"
+                        />
+                      </div>
+                    </div>
+                  )}
 
+                  <div className="grid grid-cols-2 gap-3 mt-3">
                     <div>
-                      <Label className="text-xs">Hashtag</Label>
+                      <Label className="text-xs">Fecha</Label>
                       <Input
-                        value={event.hashtag || ""}
-                        onChange={(e) => setEvent((p) => ({ ...p, hashtag: e.target.value }))}
+                        value={event.date || ""}
+                        onChange={(e) => setEvent((p) => ({ ...p, date: e.target.value }))}
                         className="text-xs mt-1"
-                        placeholder={event.template === "quinceanera" ? "#Mis15Años" : "#NuestraBoda"}
+                        placeholder="DD/MM/YYYY"
                       />
                     </div>
+                    <div>
+                      <Label className="text-xs">Hora</Label>
+                      <Input
+                        value={event.time || ""}
+                        onChange={(e) => setEvent((p) => ({ ...p, time: e.target.value }))}
+                        className="text-xs mt-1"
+                        placeholder="HH:mm"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs">Hashtag</Label>
+                    <Input
+                      value={event.hashtag || ""}
+                      onChange={(e) => setEvent((p) => ({ ...p, hashtag: e.target.value }))}
+                      className="text-xs mt-1"
+                      placeholder={event.template === "quinceanera" ? "#Mis15Años" : "#NuestraBoda"}
+                    />
                   </div>
                 </CollapsibleSection>
 
@@ -1230,12 +1217,12 @@ export default function EditorPanel({
                 </CollapsibleSection>
 
               </div>
-            </div>
+            </ScrollArea>
           </TabsContent>
 
           {/* ============ DISEÑO (PALETAS + PERSONALIZADOS) ============ */}
-          <TabsContent value="design" className="flex-1 min-h-0 m-0">
-            <div className="h-full overflow-y-auto px-3 pb-6">
+          <TabsContent value="design" className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full px-3 pb-6">
               <div className="space-y-4">
                 
                 {/* Paletas de colores mejoradas */}
@@ -1382,37 +1369,114 @@ export default function EditorPanel({
                 </CollapsibleSection>
 
               </div>
-            </div>
+            </ScrollArea>
           </TabsContent>
 
           {/* ============ IMÁGENES ============ */}
-          <TabsContent value="images" className="flex-1 min-h-0 m-0">
-            <div className="h-full overflow-y-auto px-3 pb-6">
-              <ImagesPanel
-                event={event}
-                setEvent={setEvent}
-                gallery={gallery}
-                setGallery={setGallery}
-                setGalleryAtFile={setGalleryAtFile}
-                removeGalleryItem={removeGalleryItem}
-              />
-            </div>
+          <TabsContent value="images" className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full px-3 pb-6">
+              <div className="space-y-4">
+                
+                {/* Panel de imágenes existente */}
+                <ImagesPanel event={event} setEvent={setEvent} />
+
+                {/* Galería mejorada */}
+                <CollapsibleSection 
+                  title="Galería de Fotos" 
+                  icon={<ImageIcon className="w-4 h-4" />}
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-600">Máximo 6 imágenes</span>
+                      <Switch
+                        checked={isSectionOn("gallery")}
+                        onCheckedChange={() => toggleSection("gallery")}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <div key={i} className="relative aspect-square border-2 border-dashed border-gray-300 rounded-lg overflow-hidden group hover:border-gray-400 transition-colors">
+                          {gallery[i] ? (
+                            <>
+                              <img
+                                src={gallery[i]}
+                                alt={`Galería ${i + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <EnhancedButton
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeGalleryItem(i)}
+                                  className="text-white hover:text-red-400"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </EnhancedButton>
+                              </div>
+                            </>
+                          ) : (
+                            <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer text-gray-400 hover:text-gray-600 transition-colors">
+                              <ImagePlus className="w-6 h-6 mb-1" />
+                              <span className="text-xs">Subir foto</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) setGalleryAtFile(i, file);
+                                }}
+                              />
+                            </label>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CollapsibleSection>
+
+              </div>
+            </ScrollArea>
           </TabsContent>
 
         </Tabs>
 
-        {/* Footer con botón de continuar */}
-        <div className="flex-shrink-0 border-t border-gray-200 p-3">
+        {/* Footer con botón de siguiente/finalizar */}
+        <div className="border-t border-gray-200 p-3">
           <EnhancedButton
             onClick={handleNext}
             className="w-full"
-            disabled={errors.length > 0}
+            size="lg"
           >
-            {ui.activeTab === ORDER[ORDER.length - 1] ? "Finalizar" : "Continuar"}
+            {ui.activeTab === ORDER[ORDER.length - 1] ? "Finalizar y Proceder al Pago" : "Siguiente"}
             <ChevronRight className="w-4 h-4 ml-2" />
           </EnhancedButton>
         </div>
+
       </div>
     </>
   );
+}
+
+/* =================== HELPERS =================== */
+
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+async function readFileAsDataURL(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.readAsDataURL(file);
+  });
 }
