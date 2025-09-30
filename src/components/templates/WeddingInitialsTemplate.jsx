@@ -1,6 +1,6 @@
 
 import React from 'react';
-import styles from './Template.module.css';
+import styles from './WeddingInitialsTemplate.module.css';
 
 const Hero = ({ title, subtitle, className }) => (
   <div className={`${styles.hero} ${className}`}>
