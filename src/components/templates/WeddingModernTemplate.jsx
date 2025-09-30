@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './Template.module.css';
+import styles from './WeddingModernTemplate.module.css';
 
 const Hero = ({ className }) => (
   <div className={`${styles.heroSection} ${className}`.trim()}>
