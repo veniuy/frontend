@@ -10,19 +10,32 @@ export default function VisualEditorPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [event, setEvent] = useState({
-    id: id || "1",
-    couple: { bride: "María", groom: "Juan" },
-    heading: "Nuestra Boda",
-    date: "15 de Marzo, 2024",
-    time: "17:00",
-    ceremony: { venue: "Iglesia San Miguel", address: "Calle Mayor 123, Madrid", time: "17:00" },
-    reception: { venue: "Jardín Botánico", address: "Av. Libertador 456, Madrid", time: "19:30" },
-    description: "¡NOS CASAMOS!",
-    hashtag: "#MariaYJuan2024",
-    template: "elegant",
-    colors: { primary: "#e91e63", secondary: "#ffc0cb", background: "#ffffff", text: "#333333", accent: "#8e44ad" },
-    fonts: { primary: "Playfair Display", secondary: "Inter" }
+  const [event, setEvent] = useState(() => {
+    const initialEvent = {
+      id: id || "1",
+      couple: { bride: "María", groom: "Juan" },
+      heading: "Nuestra Boda", // Asegurar que 'heading' esté siempre definido
+      date: "15 de Marzo, 2024",
+      time: "17:00",
+      ceremony: { venue: "Iglesia San Miguel", address: "Calle Mayor 123, Madrid", time: "17:00" },
+      reception: { venue: "Jardín Botánico", address: "Av. Libertador 456, Madrid", time: "19:30" },
+      description: "¡NOS CASAMOS!",
+      hashtag: "#MariaYJuan2024",
+      template: "elegant",
+      colors: { primary: "#e91e63", secondary: "#ffc0cb", background: "#ffffff", text: "#333333", accent: "#8e44ad" },
+      fonts: { primary: "Playfair Display", secondary: "Inter" },
+      // Añadir otras propiedades que puedan ser necesarias y que no se estén inicializando
+      sections: {},
+      bank: {},
+      gifts: [],
+      info: {},
+      images: {},
+      rsvpNote: "",
+      giftsNote: "",
+    };
+    // Aquí podrías cargar datos del backend si 'id' existe
+    // Por ahora, solo devolvemos el estado inicial
+    return initialEvent;
   });
 
   const [ui, setUi] = useState({
