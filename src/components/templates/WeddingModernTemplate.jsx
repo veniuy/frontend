@@ -1,43 +1,27 @@
 import React from 'react';
+import styles from './Template.module.css';
 
-// Importar componentes modulares
-import Hero from './components/Hero';
-import Countdown from './components/Countdown';
-import Ceremony from './components/Ceremony';
-import Party from './components/Party';
-import Gallery from './components/Gallery';
-import Gifts from './components/Gifts';
-import Instagram from './components/Instagram';
-import RSVP from './components/RSVP';
-import Songs from './components/Songs';
-import UsefulInfo from './components/UsefulInfo';
-import Footer from './components/Footer';
-import Modal from './components/Modal';
+const Hero = ({ className }) => (
+  <div className={`${styles.heroSection} ${className}`.trim()}>
+    <h1>Bienvenido a nuestra boda</h1>
+  </div>
+);
 
-const WeddingModernTemplate = ({
-  editable = false,
-  showCountdown = true,
-  showGallery = true,
-  showGifts = true,
-  showInstagram = true,
-  showRSVP = true,
-  showSongs = true,
-  showUsefulInfo = true,
-}) => {
+const Countdown = ({ className }) => (
+  <div className={`${styles.countdownSection} ${className}`.trim()}>
+    <p>Faltan X días</p>
+  </div>
+);
+
+const WeddingModernTemplate = () => {
   return (
-    <div className="wedding-modern-template">
-      <Hero editable={editable} />
-      {showCountdown && <Countdown editable={editable} />}
-      <Ceremony editable={editable} />
-      <Party editable={editable} />
-      {showGallery && <Gallery editable={editable} />}
-      {showGifts && <Gifts editable={editable} />}
-      {showInstagram && <Instagram editable={editable} />}
-      {showRSVP && <RSVP editable={editable} />}
-      {showSongs && <Songs editable={editable} />}
-      {showUsefulInfo && <UsefulInfo editable={editable} />}
-      <Footer editable={editable} />
-      <Modal editable={editable} />
+    <div className="styles.weddingContainer">
+      <Hero className={styles.heroCustomClass} />
+      <Countdown className={styles.countdownCustomClass} />
+      <section className="styles.infoSection">
+        <h2>Nuestra Historia</h2>
+        <p>Lorem ipsum dolor sit amet...</p>
+      </section>
     </div>
   );
 };

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-
-// Importar componentes modulares
+// src/components/templates/QuinceaneraElegantTemplate.jsx
+import React, { useMemo } from "react";
+import styles from './QuinceaneraElegantTemplate.module.css';
 import Hero from './components/Hero';
 import Countdown from './components/Countdown';
 import Ceremony from './components/Ceremony';
@@ -14,193 +14,218 @@ import UsefulInfo from './components/UsefulInfo';
 import Footer from './components/Footer';
 import Modal from './components/Modal';
 
-const QuinceaneraElegantTemplate = () => {
-  // Definir estilos para colores y fuentes
-  const primaryColor = '#D4AF37';
-  const secondaryColor = '#F5E6D3';
-  const playfairDisplayFont = 'Playfair Display, serif';
-  const dancingScriptFont = 'Dancing Script, cursive';
+export default function QuinceaneraElegantTemplate({ event, ui, setEvent }) {
+  if (!event) return null;
 
-  // Estados para contenido editable y visibilidad de secciones
-  const [heroTitle, setHeroTitle] = useState('Mis Quince Años');
-  const [heroSubtitle, setHeroSubtitle] = useState('¡Te esperamos para celebrar!');
-  const [showCountdown, setShowCountdown] = useState(true);
-  const [showCeremony, setShowCeremony] = useState(true);
-  const [showParty, setShowParty] = useState(true);
-  const [showGallery, setShowGallery] = useState(true);
-  const [showGifts, setShowGifts] = useState(true);
-  const [showInstagram, setShowInstagram] = useState(true);
-  const [showRSVP, setShowRSVP] = useState(true);
-  const [showSongs, setShowSongs] = useState(true);
-  const [showUsefulInfo, setShowUsefulInfo] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const isOn = (key) => {
+    const s = event.sections || {};
+    return s[key] !== false; // default visible
+  };
 
-  const quinceaneraDate = '2026-09-27T19:00:00'; // Ejemplo de fecha
+  const COLORS = useMemo(() => {
+    const c = event.colors || {};
+    const primary = c.primary || "#8FAF86";
+    const secondary = c.secondary || "#D4B28A";
+    const text = c.text || "#2E2E2E";
+    const darkDerived = mixHex(secondary, "#000000", 0.75);
+    const dark = c.dark || darkDerived;
+    return {
+      primary,
+      primaryText: "#FFFFFF",
+      secondary,
+      secondaryText: "#FFFFFF",
+      ink: text,
+      body: text,
+      muted: "#6B7280",
+      paper: "#F8F8F6",
+      white: "#FFFFFF",
+      primarySoft: toSoft(primary, 0.16),
+      secondarySoft: toSoft(secondary, 0.12),
+      dark,
+      darkText: pickTextColor(dark),
+    };
+  }, [event.colors]);
+
+  const fontPrimary = event.fonts?.primary || "'Cormorant Garamond', serif";
+  const fontSecondary = event.fonts?.secondary || "'Playfair Display', serif";
+
+  // Crear estilos CSS dinámicos para aplicar fuentes globalmente
+  const fontStyles = useMemo(() => {
+    return `
+      :root {
+        --font-primary: ${fontPrimary};
+        --font-secondary: ${fontSecondary};
+      }
+    `;
+  }, [fontPrimary, fontSecondary]);
+
+  const isQuinceanera = event.eventType === "quinceanera" || event.templateId?.includes("quinceanera");
 
   return (
-    <div style={{
-      '--primary-color': primaryColor,
-      '--secondary-color': secondaryColor,
-      '--font-playfair-display': playfairDisplayFont,
-      '--font-dancing-script': dancingScriptFont,
-    }}>
-      <Hero
-        title={heroTitle}
-        subtitle={heroSubtitle}
-        onTitleChange={setHeroTitle}
-        onSubtitleChange={setHeroSubtitle}
-        backgroundColor={secondaryColor}
-        textColor={primaryColor}
-        fontFamilyTitle={dancingScriptFont}
-        fontFamilySubtitle={playfairDisplayFont}
+    <div className={styles.weddingTemplate} dir={event?.direction || "ltr"} style={{ backgroundColor: COLORS.paper }}>
+      {/* Inyectar estilos de fuente dinámicos */}
+      <style dangerouslySetInnerHTML={{ __html: fontStyles }} />
+
+      {/* Hero Section */}
+      <Hero 
+        event={event} 
+        setEvent={setEvent} 
+        colors={COLORS} 
+        fontPrimary={fontPrimary}
+        fontSecondary={fontSecondary}
+        isQuinceanera={isQuinceanera}
+        styles={styles}
       />
 
-      {showCountdown && (
-        <Countdown
-          targetDate={quinceaneraDate}
-          titleColor={primaryColor}
-          textColor={primaryColor}
-          backgroundColor={secondaryColor}
-          fontFamily={playfairDisplayFont}
-        />
-      )}
-
-      {showCeremony && (
-        <Ceremony
-          title="Ceremonia Religiosa"
-          date="27 de Septiembre de 2026"
-          time="17:00 hrs"
-          location="Parroquia de Nuestra Señora de Guadalupe"
-          address="Calle Falsa 123, Ciudad"
-          mapLink="https://maps.google.com/?q=Parroquia+de+Nuestra+Se%C3%B1ora+de+Guadalupe"
-          titleColor={primaryColor}
-          textColor={primaryColor}
-          backgroundColor={secondaryColor}
-          fontFamilyTitle={dancingScriptFont}
-          fontFamilyText={playfairDisplayFont}
-        />
-      )}
-
-      {showParty && (
-        <Party
-          title="Recepción"
-          date="27 de Septiembre de 2026"
-          time="19:00 hrs"
-          location="Salón de Eventos 'El Dorado'"
-          address="Avenida Siempre Viva 742, Ciudad"
-          mapLink="https://maps.google.com/?q=Sal%C3%B3n+de+Eventos+El+Dorado"
-          titleColor={primaryColor}
-          textColor={primaryColor}
-          backgroundColor={secondaryColor}
-          fontFamilyTitle={dancingScriptFont}
-          fontFamilyText={playfairDisplayFont}
-        />
-      )}
-
-      {showGallery && (
-        <Gallery
-          title="Galería de Fotos"
-          images={[
-            { src: '/images/quince1.jpg', alt: 'Quinceañera 1' },
-            { src: '/images/quince2.jpg', alt: 'Quinceañera 2' },
-          ]} // Ejemplo de imágenes
-          titleColor={primaryColor}
-          backgroundColor={secondaryColor}
-          fontFamilyTitle={dancingScriptFont}
-        />
-      )}
-
-      {showGifts && (
-        <Gifts
-          title="Mesa de Regalos"
-          message="Tu presencia es nuestro mejor regalo, pero si deseas obsequiarnos algo, aquí tienes algunas opciones."
-          bankInfo="Banco: XYZ, Cuenta: 1234567890"
-          giftRegistryLink="https://listaderegalos.com/quinceanera"
-          titleColor={primaryColor}
-          textColor={primaryColor}
-          backgroundColor={secondaryColor}
-          fontFamilyTitle={dancingScriptFont}
-          fontFamilyText={playfairDisplayFont}
-        />
-      )}
-
-      {showInstagram && (
-        <Instagram
-          title="Comparte tus momentos"
-          hashtag="#MisQuinceAños"
-          titleColor={primaryColor}
-          textColor={primaryColor}
-          backgroundColor={secondaryColor}
-          fontFamilyTitle={dancingScriptFont}
-          fontFamilyText={playfairDisplayFont}
-        />
-      )}
-
-      {showRSVP && (
-        <RSVP
-          title="Confirma tu Asistencia"
-          deadline="15 de Septiembre de 2026"
-          contactEmail="confirmacion@email.com"
-          contactPhone="+1234567890"
-          titleColor={primaryColor}
-          textColor={primaryColor}
-          backgroundColor={secondaryColor}
-          fontFamilyTitle={dancingScriptFont}
-          fontFamilyText={playfairDisplayFont}
-        />
-      )}
-
-      {showSongs && (
-        <Songs
-          title="Pide tu Canción"
-          message="Ayúdanos a crear la playlist perfecta para la fiesta."
-          requestLink="https://pedircancion.com/quinceanera"
-          titleColor={primaryColor}
-          textColor={primaryColor}
-          backgroundColor={secondaryColor}
-          fontFamilyTitle={dancingScriptFont}
-          fontFamilyText={playfairDisplayFont}
-        />
-      )}
-
-      {showUsefulInfo && (
-        <UsefulInfo
-          title="Información Útil"
-          sections={[
-            { title: 'Código de Vestimenta', content: 'Formal' },
-            { title: 'Alojamiento', content: 'Hoteles cercanos: [Link]' },
-          ]}
-          titleColor={primaryColor}
-          textColor={primaryColor}
-          backgroundColor={secondaryColor}
-          fontFamilyTitle={dancingScriptFont}
-          fontFamilyText={playfairDisplayFont}
-        />
-      )}
-
-      <Footer
-        text="¡Gracias por acompañarnos en este día tan especial!"
-        textColor={primaryColor}
-        backgroundColor={secondaryColor}
-        fontFamily={playfairDisplayFont}
+      {/* Countdown Section */}
+      <Countdown 
+        event={event} 
+        colors={COLORS} 
+        fontPrimary={fontPrimary}
+        isQuinceanera={isQuinceanera}
+        styles={styles}
       />
 
-      <button onClick={() => setIsModalOpen(true)}>Abrir Modal</button>
+      {/* Details Section */}
+      {(isOn("ceremony") || isOn("reception")) && (
+        <section className={styles.detailsSection} dir="ltr">
+          <div className={styles.container}>
+            <div className={`${styles.grid} ${isQuinceanera ? styles.gridSingle : styles.gridDouble}`}>
+              
+              {/* Ceremony - Solo para bodas */}
+              {!isQuinceanera && isOn("ceremony") && (
+                <Ceremony 
+                  event={event} 
+                  setEvent={setEvent} 
+                  colors={COLORS} 
+                  fontPrimary={fontPrimary}
+                  styles={styles}
+                />
+              )}
 
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Mensaje Especial"
-        content="¡Estamos muy emocionados de celebrar contigo!"
-        titleColor={primaryColor}
-        textColor={primaryColor}
-        backgroundColor={secondaryColor}
-        fontFamilyTitle={dancingScriptFont}
-        fontFamilyText={playfairDisplayFont}
+              {/* Party/Reception */}
+              {isOn("reception") && (
+                <Party 
+                  event={event} 
+                  setEvent={setEvent} 
+                  colors={COLORS} 
+                  fontPrimary={fontPrimary}
+                  isQuinceanera={isQuinceanera}
+                  styles={styles}
+                />
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Gallery Section */}
+      {isOn("gallery") && (
+        <Gallery 
+          event={event} 
+          colors={COLORS} 
+          fontSecondary={fontSecondary}
+          styles={styles}
+        />
+      )}
+
+      {/* Gifts Section */}
+      {isOn("bank") && (
+        <Gifts 
+          event={event} 
+          setEvent={setEvent} 
+          colors={COLORS} 
+          fontPrimary={fontPrimary}
+          fontSecondary={fontSecondary}
+          styles={styles}
+        />
+      )}
+
+      {/* Instagram Section */}
+      {isOn("instagram") && (
+        <Instagram 
+          event={event} 
+          setEvent={setEvent} 
+          colors={COLORS} 
+          fontPrimary={fontPrimary}
+          fontSecondary={fontSecondary}
+          isQuinceanera={isQuinceanera}
+          styles={styles}
+        />
+      )}
+
+      {/* RSVP Section */}
+      <RSVP 
+        event={event} 
+        setEvent={setEvent} 
+        colors={COLORS} 
+        fontPrimary={fontPrimary}
+        fontSecondary={fontSecondary}
+        isQuinceanera={isQuinceanera}
+        styles={styles}
+      />
+
+      {/* Songs Section */}
+      {isOn("songs") && (
+        <Songs 
+          colors={COLORS} 
+          fontPrimary={fontPrimary}
+          fontSecondary={fontSecondary}
+          isQuinceanera={isQuinceanera}
+          styles={styles}
+        />
+      )}
+
+      {/* Useful Info Section */}
+      {isOn("info") && (
+        <UsefulInfo 
+          event={event} 
+          setEvent={setEvent} 
+          colors={COLORS} 
+          fontPrimary={fontPrimary}
+          fontSecondary={fontSecondary}
+          styles={styles}
+        />
+      )}
+
+      {/* Footer */}
+      <Footer 
+        colors={COLORS} 
+        fontPrimary={fontPrimary}
+        isQuinceanera={isQuinceanera}
+        styles={styles}
       />
     </div>
   );
-};
+}
 
-export default QuinceaneraElegantTemplate;
+/* ===== HELPERS DE COLOR ===== */
+function mixHex(hex1, hex2, ratio) {
+  const r1 = parseInt(hex1.slice(1, 3), 16);
+  const g1 = parseInt(hex1.slice(3, 5), 16);
+  const b1 = parseInt(hex1.slice(5, 7), 16);
+  const r2 = parseInt(hex2.slice(1, 3), 16);
+  const g2 = parseInt(hex2.slice(3, 5), 16);
+  const b2 = parseInt(hex2.slice(5, 7), 16);
+  
+  const r = Math.round(r1 * (1 - ratio) + r2 * ratio);
+  const g = Math.round(g1 * (1 - ratio) + g2 * ratio);
+  const b = Math.round(b1 * (1 - ratio) + b2 * ratio);
+  
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
 
+function toSoft(hex, opacity) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+}
+
+function pickTextColor(bgHex) {
+  const r = parseInt(bgHex.slice(1, 3), 16);
+  const g = parseInt(bgHex.slice(3, 5), 16);
+  const b = parseInt(bgHex.slice(5, 7), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? "#000000" : "#FFFFFF";
+}

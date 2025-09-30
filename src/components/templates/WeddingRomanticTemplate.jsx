@@ -1,36 +1,30 @@
+
 import React from 'react';
+import styles from './WeddingRomanticTemplate.module.css';
 
-// Importar todos los componentes modulares
-import Hero from './components/Hero';
-import Countdown from './components/Countdown';
-import Ceremony from './components/Ceremony';
-import Party from './components/Party';
-import Gallery from './components/Gallery';
-import Gifts from './components/Gifts';
-import Instagram from './components/Instagram';
-import RSVP from './components/RSVP';
-import Songs from './components/Songs';
-import UsefulInfo from './components/UsefulInfo';
-import Footer from './components/Footer';
-import Modal from './components/Modal';
+const Hero = ({ className }) => (
+  <div className={`${styles.heroSection} ${className}`}>
+    <h1>Nuestra Boda</h1>
+    <p>¡Te esperamos!</p>
+  </div>
+);
 
-const WeddingRomanticTemplate = ({ config }) => {
+const Countdown = ({ className }) => (
+  <div className={`${styles.countdownSection} ${className}`}>
+    <h2>Faltan</h2>
+    <p>X días</p>
+  </div>
+);
+
+const WeddingRomanticTemplate = () => {
   return (
-    <div className="wedding-romantic-template">
-      {/* Aquí se renderizarán los componentes modulares */}
-      {/* Ejemplo de cómo se usarían los componentes con la configuración editable */}
-      {config.hero && <Hero {...config.hero} />}
-      {config.countdown && <Countdown {...config.countdown} />}
-      {config.ceremony && <Ceremony {...config.ceremony} />}
-      {config.party && <Party {...config.party} />}
-      {config.gallery && <Gallery {...config.gallery} />}
-      {config.gifts && <Gifts {...config.gifts} />}
-      {config.instagram && <Instagram {...config.instagram} />}
-      {config.rsvp && <RSVP {...config.rsvp} />}
-      {config.songs && <Songs {...config.songs} />}
-      {config.usefulInfo && <UsefulInfo {...config.usefulInfo} />}
-      {config.footer && <Footer {...config.footer} />}
-      {config.modal && <Modal {...config.modal} />}
+    <div className={styles.weddingContainer}>
+      <Hero className={styles.heroStyle} />
+      <Countdown className={styles.countdownStyle} />
+      <div className={styles.detailsSection}>
+        <p className={styles.detailText}>Fecha: 30 de Septiembre, 2025</p>
+        <p className={styles.detailText}>Lugar: Jardín Secreto</p>
+      </div>
     </div>
   );
 };

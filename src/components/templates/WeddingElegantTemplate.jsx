@@ -1,5 +1,6 @@
 // src/components/templates/WeddingElegantTemplate.jsx
 import React, { useMemo } from "react";
+import styles from './WeddingElegantTemplate.module.css';
 import Hero from './components/Hero';
 import Countdown from './components/Countdown';
 import Ceremony from './components/Ceremony';
@@ -55,16 +56,13 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
         --font-primary: ${fontPrimary};
         --font-secondary: ${fontSecondary};
       }
-      .font-primary { font-family: ${fontPrimary} !important; }
-      .font-secondary { font-family: ${fontSecondary} !important; }
-      .editable-text { font-family: inherit !important; }
     `;
   }, [fontPrimary, fontSecondary]);
 
   const isQuinceanera = event.eventType === "quinceanera" || event.templateId?.includes("quinceanera");
 
   return (
-    <div className="wedding-template min-h-screen" dir={event?.direction || "ltr"} style={{ backgroundColor: COLORS.paper }}>
+    <div className={styles.weddingTemplate} dir={event?.direction || "ltr"} style={{ backgroundColor: COLORS.paper }}>
       {/* Inyectar estilos de fuente dinámicos */}
       <style dangerouslySetInnerHTML={{ __html: fontStyles }} />
 
@@ -76,6 +74,7 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
         fontPrimary={fontPrimary}
         fontSecondary={fontSecondary}
         isQuinceanera={isQuinceanera}
+        styles={styles}
       />
 
       {/* Countdown Section */}
@@ -84,13 +83,14 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
         colors={COLORS} 
         fontPrimary={fontPrimary}
         isQuinceanera={isQuinceanera}
+        styles={styles}
       />
 
       {/* Details Section */}
       {(isOn("ceremony") || isOn("reception")) && (
-        <section className="py-16 bg-white" dir="ltr">
-          <div className="max-w-4xl mx-auto px-4">
-            <div className={`grid ${isQuinceanera ? 'md:grid-cols-1' : 'md:grid-cols-2'} gap-12`}>
+        <section className={styles.detailsSection} dir="ltr">
+          <div className={styles.container}>
+            <div className={`${styles.grid} ${isQuinceanera ? styles.gridSingle : styles.gridDouble}`}>
               
               {/* Ceremony - Solo para bodas */}
               {!isQuinceanera && isOn("ceremony") && (
@@ -99,6 +99,7 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
                   setEvent={setEvent} 
                   colors={COLORS} 
                   fontPrimary={fontPrimary}
+                  styles={styles}
                 />
               )}
 
@@ -110,6 +111,7 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
                   colors={COLORS} 
                   fontPrimary={fontPrimary}
                   isQuinceanera={isQuinceanera}
+                  styles={styles}
                 />
               )}
             </div>
@@ -123,6 +125,7 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
           event={event} 
           colors={COLORS} 
           fontSecondary={fontSecondary}
+          styles={styles}
         />
       )}
 
@@ -134,6 +137,7 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
           colors={COLORS} 
           fontPrimary={fontPrimary}
           fontSecondary={fontSecondary}
+          styles={styles}
         />
       )}
 
@@ -146,6 +150,7 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
           fontPrimary={fontPrimary}
           fontSecondary={fontSecondary}
           isQuinceanera={isQuinceanera}
+          styles={styles}
         />
       )}
 
@@ -157,6 +162,7 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
         fontPrimary={fontPrimary}
         fontSecondary={fontSecondary}
         isQuinceanera={isQuinceanera}
+        styles={styles}
       />
 
       {/* Songs Section */}
@@ -166,6 +172,7 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
           fontPrimary={fontPrimary}
           fontSecondary={fontSecondary}
           isQuinceanera={isQuinceanera}
+          styles={styles}
         />
       )}
 
@@ -177,6 +184,7 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
           colors={COLORS} 
           fontPrimary={fontPrimary}
           fontSecondary={fontSecondary}
+          styles={styles}
         />
       )}
 
@@ -185,6 +193,7 @@ export default function WeddingElegantTemplate({ event, ui, setEvent }) {
         colors={COLORS} 
         fontPrimary={fontPrimary}
         isQuinceanera={isQuinceanera}
+        styles={styles}
       />
     </div>
   );

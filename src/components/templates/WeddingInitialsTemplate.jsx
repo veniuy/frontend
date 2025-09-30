@@ -1,37 +1,27 @@
+
 import React from 'react';
-import Hero from './components/Hero';
-import Countdown from './components/Countdown';
-import Ceremony from './components/Ceremony';
-import Party from './components/Party';
-import Gallery from './components/Gallery';
-import Gifts from './components/Gifts';
-import Instagram from './components/Instagram';
-import RSVP from './components/RSVP';
-import Songs from './components/Songs';
-import UsefulInfo from './components/UsefulInfo';
-import Footer from './components/Footer';
-import Modal from './components/Modal';
+import styles from './Template.module.css';
 
-const WeddingInitialsTemplate = ({ config }) => {
-  const { 
-    showHero, showCountdown, showCeremony, showParty, showGallery, showGifts, 
-    showInstagram, showRSVP, showSongs, showUsefulInfo, showFooter, showModal 
-  } = config || {};
+const Hero = ({ title, subtitle, className }) => (
+  <div className={`${styles.hero} ${className}`}>
+    <h1>{title}</h1>
+    <p>{subtitle}</p>
+  </div>
+);
 
+const Countdown = ({ targetDate, className }) => (
+  <div className={`${styles.countdown} ${className}`}>
+    <h2>Countdown to the Big Day!</h2>
+    <p>{targetDate}</p>
+  </div>
+);
+
+const WeddingInitialsTemplate = () => {
   return (
-    <div className="wedding-initials-template">
-      {showHero && <Hero config={config?.hero} />}
-      {showCountdown && <Countdown config={config?.countdown} />}
-      {showCeremony && <Ceremony config={config?.ceremony} />}
-      {showParty && <Party config={config?.party} />}
-      {showGallery && <Gallery config={config?.gallery} />}
-      {showGifts && <Gifts config={config?.gifts} />}
-      {showInstagram && <Instagram config={config?.instagram} />}
-      {showRSVP && <RSVP config={config?.rsvp} />}
-      {showSongs && <Songs config={config?.songs} />}
-      {showUsefulInfo && <UsefulInfo config={config?.usefulInfo} />}
-      {showFooter && <Footer config={config?.footer} />}
-      {showModal && <Modal config={config?.modal} />}
+    <div className={styles.container}>
+      <Hero title="John & Jane" subtitle="Are getting married!" className={styles.heroSection} />
+      <Countdown targetDate="December 31, 2025" className={styles.countdownSection} />
+      <p className={styles.footerText}>Save the Date!</p>
     </div>
   );
 };
