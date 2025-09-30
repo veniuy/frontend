@@ -317,8 +317,8 @@ export default function EditorPanel({ event, setEvent, onSave, isSaving }) {
                         const name = e.target.value;
                         setEvent(prev => ({
                           ...prev,
-                          quinceañera: { ...prev.quinceañera, name },
-                          couple: { ...prev.couple, bride: name }
+                          quinceanera: { ...(prev?.quinceanera || {}), name },
+                          couple: { ...(prev?.couple || {}), bride: name }
                         }));
                       }}
                       placeholder="Nombre de la quinceañera"
