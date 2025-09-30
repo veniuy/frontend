@@ -13,6 +13,7 @@ export default function VisualEditorPage() {
   const [event, setEvent] = useState({
     id: id || "1",
     couple: { bride: "María", groom: "Juan" },
+    heading: "Nuestra Boda",
     date: "15 de Marzo, 2024",
     time: "17:00",
     ceremony: { venue: "Iglesia San Miguel", address: "Calle Mayor 123, Madrid", time: "17:00" },
