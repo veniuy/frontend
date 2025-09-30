@@ -1,712 +1,1418 @@
-// src/components/EditorPanel(7).jsx
-import React, { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+// src/components/EditorPanel.jsx
+import React, { useMemo, useState, useEffect, useCallback } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import {
-  Palette, Type, Image as ImageIcon, Layout, X, Plus, Trash2, 
-  Gift, CreditCard, Hash, Menu, Save as SaveIcon, ChevronRight, 
-  ToggleLeft, ToggleRight, CheckCircle2, AlertTriangle, ImagePlus, 
-  Link as LinkIcon, ChevronDown, ChevronUp, Eye, EyeOff, Smartphone, 
-  Monitor, Tablet, Settings, Zap, Sparkles, Heart, Church, 
-  PartyPopper, Crown, Music, Instagram,
+  Palette,
+  Type,
+  Image as ImageIcon,
+  Layout,
+  X,
+  Plus,
+  Trash2,
+  Gift,
+  CreditCard,
+  Hash,
+  Menu,
+  Save as SaveIcon,
+  ChevronRight,
+  ToggleLeft,
+  ToggleRight,
+  CheckCircle2,
+  AlertTriangle,
+  ImagePlus,
+  Link as LinkIcon,
+  ChevronDown,
+  ChevronUp,
+  Eye,
+  EyeOff,
+  Smartphone,
+  Monitor,
+  Tablet,
+  Settings,
+  Zap,
+  Sparkles,
+  Heart,
+  Church,
+  PartyPopper,
+  Crown,
+  Music,
+  Instagram,
 } from "lucide-react";
+import ImagesPanel from "./ImagesPanel";
 
-// Información de plantillas
-const TEMPLATE_INFO = {
-  wedding: {
-    name: "Bodas",
-    templates: [
-      {
-        id: "wedding-elegant",
-        name: "Boda Elegante",
-        description: "Diseño minimalista con nombres completos",
-        colors: { primary: "#8FAF86", secondary: "#D4B28A" },
-        fonts: { primary: "'Cormorant Garamond', serif", secondary: "'Playfair Display', serif" }
-      },
-      {
-        id: "wedding-initials", 
-        name: "Boda Iniciales",
-        description: "Diseño con iniciales grandes estilo R&T",
-        colors: { primary: "#8FAF86", secondary: "#D4B28A" },
-        fonts: { primary: "'Cormorant Garamond', serif", secondary: "'Great Vibes', cursive" }
-      },
-      {
-        id: "wedding-romantic",
-        name: "Boda Romántica", 
-        description: "Estilo romántico con colores suaves",
-        colors: { primary: "#EEC9C5", secondary: "#C9C9C9" },
-        fonts: { primary: "Cardo, serif", secondary: "'Pinyon Script', cursive" }
-      },
-      {
-        id: "wedding-modern",
-        name: "Boda Moderna",
-        description: "Diseño contemporáneo y vibrante", 
-        colors: { primary: "#245D63", secondary: "#8F9AA7" },
-        fonts: { primary: "Inter, sans-serif", secondary: "'Alex Brush', cursive" }
-      },
-      {
-        id: "wedding-classic",
-        name: "Boda Clásica",
-        description: "Estilo tradicional y elegante",
-        colors: { primary: "#871C2B", secondary: "#EFEAE6" },
-        fonts: { primary: "'Playfair Display', serif", secondary: "'Great Vibes', cursive" }
-      },
-      {
-        id: "wedding-rustic",
-        name: "Boda Rústica", 
-        description: "Diseño natural y campestre",
-        colors: { primary: "#5A6C48", secondary: "#E0C9C9" },
-        fonts: { primary: "'Playfair Display', serif", secondary: "'Dancing Script', cursive" }
-      }
-    ]
-  },
-  quinceanera: {
-    name: "Quinceaños",
-    templates: [
-      {
-        id: "quinceanera-elegant",
-        name: "Quinceaños Elegante",
-        description: "Diseño sofisticado dorado y champagne",
-        colors: { primary: "#D4AF37", secondary: "#F5E6D3" },
-        fonts: { primary: "'Playfair Display', serif", secondary: "'Dancing Script', cursive" }
-      },
-      {
-        id: "quinceanera-creative",
-        name: "Quinceaños Creativo",
-        description: "Diseño juvenil y vibrante",
-        colors: { primary: "#E91E63", secondary: "#FCE4EC" },
-        fonts: { primary: "'Playfair Display', serif", secondary: "'Pacifico', cursive" }
-      },
-      {
-        id: "quinceanera-romantic",
-        name: "Quinceaños Romántico",
-        description: "Estilo suave rosa blush y perla",
-        colors: { primary: "#F8BBD9", secondary: "#FDF2F8" },
-        fonts: { primary: "'Playfair Display', serif", secondary: "'Dancing Script', cursive" }
-      },
-      {
-        id: "quinceanera-modern", 
-        name: "Quinceaños Moderno",
-        description: "Contemporáneo verde oliva y terracota",
-        colors: { primary: "#6B8E23", secondary: "#DEB887" },
-        fonts: { primary: "Inter, sans-serif", secondary: "'Pacifico', cursive" }
-      }
-    ]
-  }
-};
+// Función debounce helper
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
 
-export default function EditorPanel({ event, setEvent, onSave, isSaving }) {
-  const [activeTab, setActiveTab] = useState("templates");
-  const [selectedEventType, setSelectedEventType] = useState(event?.eventType || "wedding");
-  const [expandedSections, setExpandedSections] = useState({
-    colors: true,
-    fonts: true,
-    sections: false
+// Función helper para leer archivos
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
   });
+}
 
-  // Auto-save con debounce
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (event && onSave) {
-        onSave();
+export default function EditorPanel({
+  event,
+  ui,
+  setActiveTab,
+  setShowMobilePanel,
+  handleColorChange,
+  handleFontChange,
+  handleTemplateChange,
+  setEvent,
+  onSave,
+  onFinish, // Nueva prop para manejar finalización
+}) {
+  /* =================== ESTADO MEJORADO =================== */
+  const [errors, setErrors] = useState([]);
+  const [saved, setSaved] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [activeSection, setActiveSection] = useState(null);
+  const [previewMode, setPreviewMode] = useState("desktop"); // desktop, tablet, mobile
+  const [isDragging, setIsDragging] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [recentColors, setRecentColors] = useState([]);
+
+  /* =================== PLANTILLAS MEJORADAS SIN EMOJIS =================== */
+  const templates = useMemo(() => [
+    // QUINCEAÑOS
+    { 
+      id: "quinceanera-elegant", 
+      name: "Quinceaños Elegante", 
+      type: "quinceanera",
+      description: "Diseño sofisticado para celebración de 15 años",
+      colors: { primary: "#E1C1A8", secondary: "#F6E3D4", text: "#2E2E2E" },
+      fonts: { primary: "'Playfair Display', serif", secondary: "'Great Vibes', cursive" }
+    },
+    { 
+      id: "quinceanera-romantic", 
+      name: "Quinceaños Romántico", 
+      type: "quinceanera",
+      description: "Colores suaves y delicados para tu celebración",
+      colors: { primary: "#EEC9C5", secondary: "#C9C9C9", text: "#2E2E2E" },
+      fonts: { primary: "'Cormorant Garamond', serif", secondary: "'Pinyon Script', cursive" }
+    },
+    { 
+      id: "quinceanera-modern", 
+      name: "Quinceaños Moderno", 
+      type: "quinceanera",
+      description: "Diseño contemporáneo y vibrante",
+      colors: { primary: "#B7B79D", secondary: "#C16D4D", text: "#2E2E2E" },
+      fonts: { primary: "Montserrat, sans-serif", secondary: "'Alex Brush', cursive" }
+    },
+    
+    // BODAS
+    { 
+      id: "wedding-elegant", 
+      name: "Boda Elegante", 
+      type: "wedding",
+      description: "Diseño sofisticado y minimalista",
+      colors: { primary: "#8FAF86", secondary: "#D4B28A", text: "#2E2E2E" },
+      fonts: { primary: "'Playfair Display', serif", secondary: "'Great Vibes', cursive" }
+    },
+    { 
+      id: "wedding-romantic", 
+      name: "Boda Romántica", 
+      type: "wedding",
+      description: "Colores suaves y florales",
+      colors: { primary: "#EEC9C5", secondary: "#C9C9C9", text: "#2E2E2E" },
+      fonts: { primary: "Cardo, serif", secondary: "'Pinyon Script', cursive" }
+    },
+    { 
+      id: "wedding-modern", 
+      name: "Boda Moderna", 
+      type: "wedding",
+      description: "Diseño contemporáneo y vibrante",
+      colors: { primary: "#245D63", secondary: "#8F9AA7", text: "#2E2E2E" },
+      fonts: { primary: "Inter, sans-serif", secondary: "'Alex Brush', cursive" }
+    },
+    { 
+      id: "wedding-classic", 
+      name: "Boda Clásica", 
+      type: "wedding",
+      description: "Estilo tradicional y atemporal",
+      colors: { primary: "#871C2B", secondary: "#EFEAE6", text: "#2E2E2E" },
+      fonts: { primary: "Bellefair, serif", secondary: "'Tangerine', cursive" }
+    },
+    { 
+      id: "wedding-rustic", 
+      name: "Boda Rústica", 
+      type: "wedding",
+      description: "Estilo campestre y natural",
+      colors: { primary: "#5A6C48", secondary: "#E0C9C9", text: "#2E2E2E" },
+      fonts: { primary: "'Cormorant Garamond', serif", secondary: "'Great Vibes', cursive" }
+    },
+  ], []);
+
+  /* =================== PALETAS MEJORADAS =================== */
+  const PALETTES = useMemo(
+    () => [
+      { 
+        name: "Champagne Elegance", 
+        category: "Elegante",
+        tones: [
+          { hex: "#F6E3D4", name: "Champagne Claro" }, 
+          { hex: "#E1C1A8", name: "Champagne" }, 
+          { hex: "#D1A880", name: "Dorado Suave" }, 
+          { hex: "#B8997F", name: "Bronce" }
+        ] 
+      },
+      { 
+        name: "Boho Chic", 
+        category: "Bohemio",
+        tones: [
+          { hex: "#EFC4B1", name: "Terracota Claro" }, 
+          { hex: "#E7B7A2", name: "Coral Suave" }, 
+          { hex: "#DBA583", name: "Caramelo" }, 
+          { hex: "#D99873", name: "Terracota" }
+        ] 
+      },
+      { 
+        name: "Sage & Terracotta", 
+        category: "Natural",
+        tones: [
+          { hex: "#B7B79D", name: "Sage Verde" }, 
+          { hex: "#C16D4D", name: "Terracota Oscuro" }, 
+          { hex: "#D57555", name: "Coral Cálido" }, 
+          { hex: "#C96342", name: "Ladrillo" }
+        ] 
+      },
+      { 
+        name: "Blush Romance", 
+        category: "Romántico",
+        tones: [
+          { hex: "#EEC9C5", name: "Rosa Blush" }, 
+          { hex: "#C9C9C9", name: "Gris Perla" }, 
+          { hex: "#B9B9B9", name: "Gris Medio" }, 
+          { hex: "#8B8B8B", name: "Gris Carbón" }
+        ] 
+      },
+      { 
+        name: "Peachy Sunset", 
+        category: "Cálido",
+        tones: [
+          { hex: "#F2C3B1", name: "Durazno Claro" }, 
+          { hex: "#E6B79E", name: "Durazno" }, 
+          { hex: "#E5A88B", name: "Coral Durazno" }, 
+          { hex: "#C8C6A8", name: "Verde Salvia" }
+        ] 
+      },
+      { 
+        name: "Classic Romance", 
+        category: "Clásico",
+        tones: [
+          { hex: "#EFEAE6", name: "Marfil" }, 
+          { hex: "#E7D7D3", name: "Rosa Pálido" }, 
+          { hex: "#B6AFAA", name: "Taupe" }, 
+          { hex: "#871C2B", name: "Borgoña" }
+        ] 
+      },
+      { 
+        name: "Winter Frost", 
+        category: "Frío",
+        tones: [
+          { hex: "#C2C4CA", name: "Gris Hielo" }, 
+          { hex: "#ADB3BB", name: "Azul Gris" }, 
+          { hex: "#8F9AA7", name: "Azul Acero" }, 
+          { hex: "#245D63", name: "Azul Profundo" }
+        ] 
+      },
+      { 
+        name: "Rustic Elegance", 
+        category: "Rústico",
+        tones: [
+          { hex: "#E0C9C9", name: "Rosa Empolvado" }, 
+          { hex: "#C9AFA0", name: "Beige Cálido" }, 
+          { hex: "#D4CAB0", name: "Crema Vintage" }, 
+          { hex: "#5A6C48", name: "Verde Oliva" }
+        ] 
+      },
+    ],
+    []
+  );
+
+  const fontFamilies = useMemo(() => [
+    { name: "Inter", family: "Inter, system-ui, sans-serif", category: "Sans Serif", preview: "Aa" },
+    { name: "Great Vibes", family: "'Great Vibes', cursive", category: "Script", preview: "Aa" },
+    { name: "Playfair Display", family: "'Playfair Display', serif", category: "Serif", preview: "Aa" },
+    { name: "Cardo", family: "Cardo, serif", category: "Serif", preview: "Aa" },
+    { name: "Pinyon Script", family: "'Pinyon Script', cursive", category: "Script", preview: "Aa" },
+    { name: "Cormorant Garamond", family: "'Cormorant Garamond', serif", category: "Serif", preview: "Aa" },
+    { name: "Bellefair", family: "Bellefair, serif", category: "Serif", preview: "Aa" },
+    { name: "Alex Brush", family: "'Alex Brush', cursive", category: "Script", preview: "Aa" },
+    { name: "Tangerine", family: "Tangerine, cursive", category: "Script", preview: "Aa" },
+    { name: "Montserrat", family: "Montserrat, sans-serif", category: "Sans Serif", preview: "Aa" },
+    { name: "Open Sans", family: "Open Sans, sans-serif", category: "Sans Serif", preview: "Aa" },
+    { name: "Lato", family: "Lato, sans-serif", category: "Sans Serif", preview: "Aa" },
+  ], []);
+
+  /* =================== HOOKS MEJORADOS =================== */
+  
+  // Detección de dispositivo mejorada
+  const deviceType = useMemo(() => {
+    if (typeof window === 'undefined') return 'desktop';
+    const width = window.innerWidth;
+    if (width < 768) return 'mobile';
+    if (width < 1024) return 'tablet';
+    return 'desktop';
+  }, []);
+
+  // Auto-save mejorado
+  const debouncedSave = useCallback(
+    debounce(async () => {
+      if (typeof onSave === "function") {
+        try {
+          await onSave(event);
+          setSaved(true);
+          setTimeout(() => setSaved(false), 2000);
+        } catch (error) {
+          console.error("Error saving:", error);
+        }
       }
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [event, onSave]);
+    }, 1000),
+    [event, onSave]
+  );
 
-  const applyTemplate = (templateId) => {
-    const templateInfo = Object.values(TEMPLATE_INFO)
-      .flatMap(category => category.templates)
-      .find(template => template.id === templateId);
-      
-    if (!templateInfo) {
-      console.warn(`Información de plantilla no encontrada: ${templateId}`);
-      return;
-    }
+  useEffect(() => {
+    debouncedSave();
+  }, [event, debouncedSave]);
 
+  // Gestión de colores recientes
+  const addRecentColor = useCallback((color) => {
+    setRecentColors(prev => {
+      const filtered = prev.filter(c => c !== color);
+      return [color, ...filtered].slice(0, 8);
+    });
+  }, []);
+
+  /* =================== HELPERS MEJORADOS =================== */
+  
+  const applyTemplate = useCallback((template) => {
+    // Aplicar plantilla completa
     setEvent(prev => ({
       ...prev,
-      templateId,
-      eventType: templateId.startsWith('wedding') ? 'wedding' : 'quinceanera',
+      template: template.type, // 'quinceanera' o 'wedding'
+      templateId: template.id,
       colors: {
         ...prev.colors,
-        ...templateInfo.colors
+        ...template.colors
       },
       fonts: {
         ...prev.fonts,
-        ...templateInfo.fonts
-      }
-    }));
-  };
-
-  const toggleSection = (section) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [section]: !prev[section]
-    }));
-  };
-
-  const updateEventField = (field, value) => {
-    setEvent(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const updateNestedField = (parent, field, value) => {
-    setEvent(prev => ({
-      ...prev,
-      [parent]: {
-        ...prev[parent],
-        [field]: value
-      }
-    }));
-  };
-
-  const toggleEventSection = (section) => {
-    setEvent(prev => ({
-      ...prev,
+        ...template.fonts
+      },
+      // Configurar secciones según el tipo
       sections: {
         ...prev.sections,
-        [section]: !prev.sections?.[section]
+        ceremony: template.type === 'wedding', // Solo bodas tienen ceremonia
+        reception: true, // Ambos tienen fiesta/celebración
+        bank: true,
+        songs: true,
+        info: true,
+        instagram: true,
+        gallery: true,
       }
     }));
+
+    // Aplicar colores
+    if (template.colors) {
+      Object.entries(template.colors).forEach(([key, value]) => {
+        handleColorChange(key, value);
+        addRecentColor(value);
+      });
+    }
+
+    // Aplicar fuentes
+    if (template.fonts) {
+      Object.entries(template.fonts).forEach(([key, value]) => {
+        handleFontChange(key, value);
+      });
+    }
+
+    if (handleTemplateChange) {
+      handleTemplateChange(template.id);
+    }
+  }, [setEvent, handleColorChange, handleFontChange, handleTemplateChange, addRecentColor]);
+
+  const applyPalette = useCallback((tones) => {
+    const primary = tones[2]?.hex || event.colors?.primary || "#8FAF86";
+    const secondary = tones[3]?.hex || event.colors?.secondary || "#D4B28A";
+    const text = tones[3]?.hex || event.colors?.text || "#2E2E2E";
+    const dark = tones[3]?.hex || event.colors?.dark || "#1F2937";
+    
+    handleColorChange("primary", primary);
+    handleColorChange("secondary", secondary);
+    handleColorChange("text", text);
+    handleColorChange("dark", dark);
+    
+    addRecentColor(primary);
+    addRecentColor(secondary);
+  }, [event.colors, handleColorChange, addRecentColor]);
+
+  const addGift = useCallback(() =>
+    setEvent((p) => ({ ...p, gifts: [...(p.gifts || []), { label: "Mesa de regalos", url: "" }] }))
+  , [setEvent]);
+
+  const updateGift = useCallback((idx, key, value) =>
+    setEvent((p) => {
+      const arr = [...(p.gifts || [])];
+      arr[idx] = { ...arr[idx], [key]: value };
+      return { ...p, gifts: arr };
+    })
+  , [setEvent]);
+
+  const removeGift = useCallback((idx) =>
+    setEvent((p) => {
+      const arr = [...(p.gifts || [])];
+      arr.splice(idx, 1);
+      return { ...p, gifts: arr };
+    })
+  , [setEvent]);
+
+  // Info útil: alojamiento / transporte
+  const addLodging = useCallback(() =>
+    setEvent((p) => ({
+      ...p,
+      info: { ...(p.info || {}), lodging: [...(p.info?.lodging || []), { name: "", url: "" }] },
+    }))
+  , [setEvent]);
+
+  const updateLodging = useCallback((i, k, v) =>
+    setEvent((p) => {
+      const arr = [...(p.info?.lodging || [])];
+      arr[i] = { ...arr[i], [k]: v };
+      return { ...p, info: { ...(p.info || {}), lodging: arr } };
+    })
+  , [setEvent]);
+
+  const removeLodging = useCallback((i) =>
+    setEvent((p) => {
+      const arr = [...(p.info?.lodging || [])];
+      arr.splice(i, 1);
+      return { ...p, info: { ...(p.info || {}), lodging: arr } };
+    })
+  , [setEvent]);
+
+  const addTransport = useCallback(() =>
+    setEvent((p) => ({
+      ...p,
+      info: { ...(p.info || {}), transport: [...(p.info?.transport || []), { name: "", note: "", url: "" }] },
+    }))
+  , [setEvent]);
+
+  const updateTransport = useCallback((i, k, v) =>
+    setEvent((p) => {
+      const arr = [...(p.info?.transport || [])];
+      arr[i] = { ...arr[i], [k]: v };
+      return { ...p, info: { ...(p.info || {}), transport: arr } };
+    })
+  , [setEvent]);
+
+  const removeTransport = useCallback((i) =>
+    setEvent((p) => {
+      const arr = [...(p.info?.transport || [])];
+      arr.splice(i, 1);
+      return { ...p, info: { ...(p.info || {}), transport: arr } };
+    })
+  , [setEvent]);
+
+  /* ===== Galería mejorada ===== */
+  const gallery = (event.images?.gallery || []).slice(0, 6);
+  const setGallery = useCallback((arr) => 
+    setEvent((p) => ({ ...p, images: { ...(p.images || {}), gallery: arr.slice(0, 6) } }))
+  , [setEvent]);
+
+  const setGalleryAtFile = useCallback(async (i, file) => {
+    if (!file) return;
+    const dataUrl = await readFileAsDataURL(file);
+    const arr = [...gallery];
+    arr[i] = dataUrl;
+    setGallery(arr);
+  }, [gallery, setGallery]);
+
+  const removeGalleryItem = useCallback((i) => 
+    setGallery(gallery.filter((_, idx) => idx !== i))
+  , [gallery, setGallery]);
+
+  const SECTION_KEYS = useMemo(() => [
+    { key: "ceremony", label: "Ceremonia", icon: <Church className="w-4 h-4" /> },
+    { key: "reception", label: "Fiesta", icon: <PartyPopper className="w-4 h-4" /> },
+    { key: "bank", label: "Cuenta bancaria", icon: <CreditCard className="w-4 h-4" /> },
+    { key: "songs", label: "Canciones", icon: <Music className="w-4 h-4" /> },
+    { key: "info", label: "Info útil", icon: <AlertTriangle className="w-4 h-4" /> },
+    { key: "instagram", label: "Instagram", icon: <Instagram className="w-4 h-4" /> },
+    { key: "gallery", label: "Galería", icon: <ImageIcon className="w-4 h-4" /> },
+  ], []);
+
+  const isSectionOn = useCallback((k) => {
+    const s = event.sections || {};
+    return s[k] !== false;
+  }, [event.sections]);
+
+  const toggleSection = useCallback((k) =>
+    setEvent((p) => ({ ...p, sections: { ...(p.sections || {}), [k]: !(p.sections?.[k] !== false) } }))
+  , [setEvent]);
+
+  const doSave = useCallback(async () => {
+    try {
+      if (typeof onSave === "function") {
+        await onSave(event);
+      } else if (typeof window !== "undefined") {
+        localStorage.setItem("event-draft", JSON.stringify(event));
+      }
+      setSaved(true);
+      setTimeout(() => setSaved(false), 1500);
+    } catch (e) {
+      setErrors([`No se pudo guardar: ${e?.message || e}`]);
+    }
+  }, [event, onSave]);
+
+  // NUEVO ORDEN: Plantillas, Contenido, Diseño, Imágenes
+  const ORDER = ["templates", "content", "design", "images"];
+  const goNextTab = useCallback(() => {
+    const idx = ORDER.indexOf(ui.activeTab);
+    const next = ORDER[Math.min(ORDER.length - 1, idx + 1)];
+    setActiveTab(next);
+  }, [ui.activeTab, setActiveTab]);
+
+  const validate = useCallback(() => {
+    const errs = [];
+    const c = event || {};
+    const isQuinceanera = c.template === "quinceanera";
+    
+    if (isQuinceanera) {
+      const name = c.couple?.bride || c.quinceañera?.name;
+      if (!name || !name.trim()) errs.push("Falta el nombre de la quinceañera.");
+    } else {
+      const couple = c.couple || {};
+      if (!couple.bride || !couple.bride.trim()) errs.push("Falta el nombre de la novia.");
+      if (!couple.groom || !couple.groom.trim()) errs.push("Falta el nombre del novio.");
+    }
+    
+    if (!c.date || !c.date.trim()) errs.push("Falta la fecha.");
+    if (!c.time || !c.time.trim()) errs.push("Falta la hora.");
+    
+    if (isSectionOn("bank")) {
+      const b = c.bank || {};
+      if (!b.titular && !b.cbu && !b.cuenta) {
+        errs.push("Completa datos bancarios (titular, CBU/IBAN o cuenta).");
+      }
+    }
+    return errs;
+  }, [event, isSectionOn]);
+
+  const handleNext = useCallback(() => {
+    const errs = validate();
+    setErrors(errs);
+    if (errs.length === 0) {
+      if (ui.activeTab === ORDER[ORDER.length - 1]) {
+        // Es la última pestaña, finalizar
+        if (typeof onFinish === "function") {
+          onFinish(event);
+        }
+      } else {
+        goNextTab();
+      }
+    }
+  }, [validate, goNextTab, ui.activeTab, ORDER, onFinish, event]);
+
+  /* =================== COMPONENTES DE UI MEJORADOS =================== */
+  
+  const MobileToolbar = () => (
+    ui.isMobile && !ui.showMobilePanel && (
+      <div className="fixed top-2 left-2 right-2 z-40 flex items-center gap-2">
+        <EnhancedButton
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowMobilePanel(true)}
+          className="rounded-full shadow-lg bg-white/95 backdrop-blur-sm border border-gray-200"
+          aria-label="Abrir editor"
+        >
+          <Menu className="w-5 h-5" />
+        </EnhancedButton>
+
+        <div className="flex items-center gap-2 ml-auto">
+          <PreviewModeToggle />
+          
+          <EnhancedButton
+            variant="ghost"
+            size="sm"
+            onClick={doSave}
+            className="bg-white/95 backdrop-blur-sm border border-gray-200"
+            disabled={saved}
+          >
+            {saved ? <CheckCircle2 className="w-4 h-4 text-green-600" /> : <SaveIcon className="w-4 h-4" />}
+          </EnhancedButton>
+
+          <EnhancedButton
+            size="sm"
+            onClick={handleNext}
+            className="bg-black text-white"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </EnhancedButton>
+        </div>
+      </div>
+    )
+  );
+
+  const PreviewModeToggle = () => (
+    <div className="flex items-center gap-1 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg p-1">
+      {[
+        { mode: "mobile", icon: Smartphone },
+        { mode: "tablet", icon: Tablet },
+        { mode: "desktop", icon: Monitor }
+      ].map(({ mode, icon: Icon }) => (
+        <button
+          key={mode}
+          onClick={() => setPreviewMode(mode)}
+          className={`p-1.5 rounded transition-colors ${
+            previewMode === mode 
+              ? "bg-blue-100 text-blue-600" 
+              : "text-gray-400 hover:text-gray-600"
+          }`}
+          title={`Vista ${mode}`}
+        >
+          <Icon className="w-4 h-4" />
+        </button>
+      ))}
+    </div>
+  );
+
+  const EnhancedButton = ({ 
+    children, 
+    variant = "default", 
+    size = "default", 
+    className = "", 
+    disabled = false,
+    ...props 
+  }) => {
+    const baseClasses = "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
+    
+    const variants = {
+      default: "bg-primary text-primary-foreground hover:bg-primary/90",
+      ghost: "hover:bg-accent hover:text-accent-foreground",
+      outline: "border border-input hover:bg-accent hover:text-accent-foreground",
+    };
+    
+    const sizes = {
+      default: "h-10 py-2 px-4",
+      sm: "h-9 px-3 text-sm",
+      lg: "h-11 px-8",
+    };
+
+    return (
+      <button
+        className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`}
+        disabled={disabled}
+        {...props}
+      >
+        {children}
+      </button>
+    );
   };
 
-  const tabs = [
-    { id: "templates", label: "Plantillas", icon: Layout },
-    { id: "content", label: "Contenido", icon: Type },
-    { id: "design", label: "Diseño", icon: Palette },
-    { id: "images", label: "Imágenes", icon: ImageIcon }
-  ];
-
-  const isQuinceanera = selectedEventType === "quinceanera";
-
-  return (
-    <div className="w-full max-w-md bg-white border-l border-gray-200 flex flex-col h-screen">
-      {/* Header */}
-      <div className="p-4 border-b border-gray-200 bg-gray-50">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Editor</h2>
-          <div className="flex items-center gap-2">
-            {isSaving && (
-              <div className="flex items-center gap-1 text-sm text-blue-600">
-                <SaveIcon className="w-4 h-4 animate-spin" />
-                Guardando...
-              </div>
-            )}
-            <Badge variant="outline" className="text-xs">
-              {event?.templateId || "Sin plantilla"}
-            </Badge>
+  const CollapsibleSection = ({ title, icon, children, defaultOpen = false }) => {
+    const [isOpen, setIsOpen] = useState(defaultOpen);
+    
+    return (
+      <Card className="overflow-hidden">
+        <CardHeader 
+          className="pb-2 cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm flex items-center gap-2">
+              {icon}
+              {title}
+            </CardTitle>
+            {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </div>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex items-center justify-center gap-1 px-2 py-2 rounded-md text-xs font-medium transition-colors ${
-                  activeTab === tab.id
-                    ? "bg-white text-blue-600 shadow-sm"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                <Icon className="w-3 h-3" />
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Content */}
-      <ScrollArea className="flex-1 p-4">
-        {activeTab === "templates" && (
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Tipo de Evento</h3>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => setSelectedEventType("wedding")}
-                  className={`p-3 rounded-lg border-2 transition-colors ${
-                    selectedEventType === "wedding"
-                      ? "border-blue-500 bg-blue-50 text-blue-700"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <Heart className="w-5 h-5 mx-auto mb-1" />
-                  <div className="text-xs font-medium">Bodas</div>
-                </button>
-                <button
-                  onClick={() => setSelectedEventType("quinceanera")}
-                  className={`p-3 rounded-lg border-2 transition-colors ${
-                    selectedEventType === "quinceanera"
-                      ? "border-pink-500 bg-pink-50 text-pink-700"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  <Crown className="w-5 h-5 mx-auto mb-1" />
-                  <div className="text-xs font-medium">Quinceaños</div>
-                </button>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">
-                Plantillas de {TEMPLATE_INFO[selectedEventType].name}
-              </h3>
-              <div className="space-y-2">
-                {TEMPLATE_INFO[selectedEventType].templates.map((template) => (
-                  <button
-                    key={template.id}
-                    onClick={() => applyTemplate(template.id)}
-                    className={`w-full p-3 rounded-lg border-2 text-left transition-colors ${
-                      event?.templateId === template.id
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="text-sm font-medium text-gray-900">
-                        {template.name}
-                      </div>
-                      <div className="flex gap-1">
-                        <div 
-                          className="w-3 h-3 rounded-full border border-gray-300"
-                          style={{ backgroundColor: template.colors.primary }}
-                        />
-                        <div 
-                          className="w-3 h-3 rounded-full border border-gray-300"
-                          style={{ backgroundColor: template.colors.secondary }}
-                        />
-                      </div>
-                    </div>
-                    <div className="text-xs text-gray-600">
-                      {template.description}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
+        </CardHeader>
+        {isOpen && (
+          <CardContent className="pt-0">
+            {children}
+          </CardContent>
         )}
+      </Card>
+    );
+  };
 
-        {activeTab === "content" && (
-          <div className="space-y-6">
-            {/* Información básica */}
-            <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Información Básica</h3>
-              <div className="space-y-3">
-                {isQuinceanera ? (
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Nombre de la Quinceañera
-                    </label>
-                    <Input
-                      value={event?.quinceañera?.name || event?.couple?.bride || ""}
-                      onChange={(e) => {
-                        const name = e.target.value;
-                        setEvent(prev => ({
-                          ...prev,
-                          quinceanera: { ...(prev?.quinceanera || {}), name },
-                          couple: { ...(prev?.couple || {}), bride: name }
-                        }));
-                      }}
-                      placeholder="Nombre de la quinceañera"
-                      className="text-sm"
-                    />
+  const ColorPicker = ({ label, value, onChange, showRecent = false }) => (
+    <div className="space-y-2">
+      <Label className="text-xs font-medium">{label}</Label>
+      <div className="flex items-center gap-2">
+        <div className="relative">
+          <input
+            type="color"
+            value={value || "#000000"}
+            onChange={(e) => {
+              onChange(e.target.value);
+              addRecentColor(e.target.value);
+            }}
+            className="w-10 h-10 rounded border-2 border-gray-200 cursor-pointer"
+          />
+          <div 
+            className="absolute inset-0 rounded border-2 border-gray-200 pointer-events-none"
+            style={{ backgroundColor: value }}
+          />
+        </div>
+        <Input
+          type="text"
+          value={value || ""}
+          onChange={(e) => onChange(e.target.value)}
+          className="text-xs flex-1"
+          placeholder="#000000"
+        />
+      </div>
+      {showRecent && recentColors.length > 0 && (
+        <div className="flex gap-1 flex-wrap">
+          <span className="text-xs text-gray-500 w-full">Recientes:</span>
+          {recentColors.map((color, i) => (
+            <button
+              key={i}
+              className="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform"
+              style={{ backgroundColor: color }}
+              onClick={() => onChange(color)}
+              title={color}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  /* =================== RENDER PRINCIPAL =================== */
+  return (
+    <>
+      <MobileToolbar />
+
+      <div
+        className={
+          ui.isMobile
+            ? `fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-gray-200 transform transition-transform duration-300 ${
+                ui.showMobilePanel ? "translate-x-0" : "-translate-x-full"
+              } flex flex-col`
+            : "w-80 bg-white border-r border-gray-200 flex flex-col"
+        }
+        style={{ height: '100vh', maxHeight: '100vh' }}
+      >
+        {/* Header mejorado */}
+        <div className="flex-shrink-0 bg-white border-b border-gray-200 p-3">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              {ui.isMobile && (
+                <EnhancedButton
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowMobilePanel(false)}
+                >
+                  <X className="h-4 w-4" />
+                </EnhancedButton>
+              )}
+              
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-blue-600" />
+                <span className="font-semibold text-sm">Editor</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {saved && (
+                <Badge variant="secondary" className="text-xs">
+                  <CheckCircle2 className="w-3 h-3 mr-1" />
+                  Guardado
+                </Badge>
+              )}
+              
+              <EnhancedButton
+                size="sm"
+                onClick={doSave}
+                disabled={saved}
+                className="text-xs"
+              >
+                {saved ? <CheckCircle2 className="w-4 h-4" /> : <SaveIcon className="w-4 h-4" />}
+              </EnhancedButton>
+            </div>
+          </div>
+
+          {/* Indicador de progreso */}
+          <div className="flex items-center gap-1 mb-2">
+            {ORDER.map((tab, index) => (
+              <div
+                key={tab}
+                className={`flex-1 h-1 rounded ${
+                  ORDER.indexOf(ui.activeTab) >= index ? "bg-blue-600" : "bg-gray-200"
+                }`}
+              />
+            ))}
+          </div>
+
+          {errors.length > 0 && (
+            <div className="rounded border border-red-200 bg-red-50 p-2 text-xs text-red-700">
+              <div className="flex items-center gap-2 font-medium mb-1">
+                <AlertTriangle className="w-3 h-3" />
+                Revisa estos puntos
+              </div>
+              <ul className="list-disc pl-4 space-y-1">
+                {errors.map((e, i) => (
+                  <li key={i}>{e}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+
+        {/* Tabs mejorados - NUEVO ORDEN */}
+        <Tabs value={ui.activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
+          <div className="flex-shrink-0 px-3 mb-3">
+            <TabsList className="grid w-full grid-cols-4 p-1">
+              <TabsTrigger value="templates" className="flex flex-col items-center gap-1 p-2 text-xs">
+                <Layout className="h-3 w-3" />
+                Plantillas
+              </TabsTrigger>
+              <TabsTrigger value="content" className="flex flex-col items-center gap-1 p-2 text-xs">
+                <Type className="h-3 w-3" />
+                Contenido
+              </TabsTrigger>
+              <TabsTrigger value="design" className="flex flex-col items-center gap-1 p-2 text-xs">
+                <Palette className="h-3 w-3" />
+                Diseño
+              </TabsTrigger>
+              <TabsTrigger value="images" className="flex flex-col items-center gap-1 p-2 text-xs">
+                <ImageIcon className="h-3 w-3" />
+                Imágenes
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          {/* ============ PLANTILLAS (PRIMERA PESTAÑA) ============ */}
+          <TabsContent value="templates" className="flex-1 min-h-0 m-0">
+            <div className="h-full overflow-y-auto px-3 pb-6">
+              <div className="space-y-4">
+                
+                {/* Plantillas de Quinceaños */}
+                <CollapsibleSection 
+                  title="Quinceaños" 
+                  icon={<Crown className="w-4 h-4" />}
+                  defaultOpen={true}
+                >
+                  <div className="space-y-3">
+                    {templates.filter(t => t.type === 'quinceanera').map((template) => (
+                      <div
+                        key={template.id}
+                        className={`border rounded-lg p-3 hover:bg-gray-50 transition-colors cursor-pointer ${
+                          event.templateId === template.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                        }`}
+                        onClick={() => applyTemplate(template)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1">
+                            <h3 className="font-medium text-sm">{template.name}</h3>
+                            <p className="text-xs text-gray-600">{template.description}</p>
+                          </div>
+                          <div className="flex gap-1">
+                            <div 
+                              className="w-4 h-4 rounded-full border"
+                              style={{ backgroundColor: template.colors?.primary }}
+                            />
+                            <div 
+                              className="w-4 h-4 rounded-full border"
+                              style={{ backgroundColor: template.colors?.secondary }}
+                            />
+                          </div>
+                        </div>
+                        {event.templateId === template.id && (
+                          <div className="mt-2 flex items-center gap-1 text-xs text-blue-600">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Plantilla activa
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ) : (
-                  <>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Nombre 1
-                      </label>
-                      <Input
-                        value={event?.couple?.bride || ""}
-                        onChange={(e) => updateNestedField("couple", "bride", e.target.value)}
-                        placeholder="Nombre de la novia"
-                        className="text-sm"
-                      />
+                </CollapsibleSection>
+
+                {/* Plantillas de Bodas */}
+                <CollapsibleSection 
+                  title="Bodas" 
+                  icon={<Heart className="w-4 h-4" />}
+                  defaultOpen={true}
+                >
+                  <div className="space-y-3">
+                    {templates.filter(t => t.type === 'wedding').map((template) => (
+                      <div
+                        key={template.id}
+                        className={`border rounded-lg p-3 hover:bg-gray-50 transition-colors cursor-pointer ${
+                          event.templateId === template.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                        }`}
+                        onClick={() => applyTemplate(template)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1">
+                            <h3 className="font-medium text-sm">{template.name}</h3>
+                            <p className="text-xs text-gray-600">{template.description}</p>
+                          </div>
+                          <div className="flex gap-1">
+                            <div 
+                              className="w-4 h-4 rounded-full border"
+                              style={{ backgroundColor: template.colors?.primary }}
+                            />
+                            <div 
+                              className="w-4 h-4 rounded-full border"
+                              style={{ backgroundColor: template.colors?.secondary }}
+                            />
+                          </div>
+                        </div>
+                        {event.templateId === template.id && (
+                          <div className="mt-2 flex items-center gap-1 text-xs text-blue-600">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Plantilla activa
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </CollapsibleSection>
+
+                {/* Tipo de ceremonia para bodas */}
+                {event.template === 'wedding' && (
+                  <CollapsibleSection 
+                    title="Tipo de Ceremonia" 
+                    icon={<Church className="w-4 h-4" />}
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          id="religious"
+                          name="ceremonyType"
+                          value="religious"
+                          checked={event.ceremony?.type !== "civil"}
+                          onChange={() => setEvent(p => ({ 
+                            ...p, 
+                            ceremony: { ...p.ceremony, type: "religious" } 
+                          }))}
+                        />
+                        <label htmlFor="religious" className="text-sm">Ceremonia Religiosa</label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          id="civil"
+                          name="ceremonyType"
+                          value="civil"
+                          checked={event.ceremony?.type === "civil"}
+                          onChange={() => setEvent(p => ({ 
+                            ...p, 
+                            ceremony: { ...p.ceremony, type: "civil" } 
+                          }))}
+                        />
+                        <label htmlFor="civil" className="text-sm">Ceremonia Civil</label>
+                      </div>
                     </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Nombre 2
-                      </label>
-                      <Input
-                        value={event?.couple?.groom || ""}
-                        onChange={(e) => updateNestedField("couple", "groom", e.target.value)}
-                        placeholder="Nombre del novio"
-                        className="text-sm"
-                      />
-                    </div>
-                  </>
+                  </CollapsibleSection>
                 )}
 
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
-                    Fecha
-                  </label>
-                  <Input
-                    value={event?.date || ""}
-                    onChange={(e) => updateEventField("date", e.target.value)}
-                    placeholder="23 de Noviembre, 2026"
-                    className="text-sm"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
-                    Hora
-                  </label>
-                  <Input
-                    value={event?.time || ""}
-                    onChange={(e) => updateEventField("time", e.target.value)}
-                    placeholder="19:00 hs"
-                    className="text-sm"
-                  />
-                </div>
               </div>
             </div>
+          </TabsContent>
 
-            {/* Ceremonia - Solo para bodas */}
-            {!isQuinceanera && (
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-medium text-gray-900">Ceremonia</h3>
-                  <Switch
-                    checked={event?.sections?.ceremony !== false}
-                    onCheckedChange={() => toggleEventSection("ceremony")}
-                  />
-                </div>
-                {event?.sections?.ceremony !== false && (
+          {/* ============ CONTENIDO ============ */}
+          <TabsContent value="content" className="flex-1 min-h-0 m-0">
+            <div className="h-full overflow-y-auto px-3 pb-6">
+              <div className="space-y-4">
+                
+                {/* Información básica */}
+                <CollapsibleSection 
+                  title="Información Básica" 
+                  icon={<Type className="w-4 h-4" />}
+                  defaultOpen={true}
+                >
+                  <div className="space-y-3">
+                    {event.template === "quinceanera" ? (
+                      <div>
+                        <Label className="text-xs">Nombre de la Quinceañera</Label>
+                        <Input
+                          value={event.quinceañera?.name || ""}
+                          onChange={(e) =>
+                            setEvent((p) => ({ ...p, quinceañera: { ...p.quinceañera, name: e.target.value } }))
+                          }
+                          className="text-xs mt-1"
+                        />
+                      </div>
+                    ) : (
+                      <>
+                        <div>
+                          <Label className="text-xs">Nombre de la Novia</Label>
+                          <Input
+                            value={event.couple?.bride || ""}
+                            onChange={(e) =>
+                              setEvent((p) => ({ ...p, couple: { ...p.couple, bride: e.target.value } }))
+                            }
+                            className="text-xs mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Nombre del Novio</Label>
+                          <Input
+                            value={event.couple?.groom || ""}
+                            onChange={(e) =>
+                              setEvent((p) => ({ ...p, couple: { ...p.couple, groom: e.target.value } }))
+                            }
+                            className="text-xs mt-1"
+                          />
+                        </div>
+                      </>
+                    )}
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <Label className="text-xs">Fecha</Label>
+                        <Input
+                          type="date"
+                          value={event.date || ""}
+                          onChange={(e) => setEvent((p) => ({ ...p, date: e.target.value }))}
+                          className="text-xs mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs">Hora</Label>
+                        <Input
+                          type="time"
+                          value={event.time || ""}
+                          onChange={(e) => setEvent((p) => ({ ...p, time: e.target.value }))}
+                          className="text-xs mt-1"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="text-xs">Hashtag</Label>
+                      <Input
+                        value={event.hashtag || ""}
+                        onChange={(e) => setEvent((p) => ({ ...p, hashtag: e.target.value }))}
+                        className="text-xs mt-1"
+                        placeholder={event.template === "quinceanera" ? "#Mis15Años" : "#NuestraBoda"}
+                      />
+                    </div>
+                  </div>
+                </CollapsibleSection>
+
+                {/* Detalles del evento */}
+                <CollapsibleSection 
+                  title="Detalles del Evento" 
+                  icon={<Church className="w-4 h-4" />}
+                >
+                  <div className="space-y-3">
+                    {/* Ceremonia - Solo para bodas */}
+                    {event.template !== "quinceanera" && (
+                      <>
+                        <div>
+                          <Label className="text-xs">Lugar de Ceremonia</Label>
+                          <Input
+                            value={event.ceremony?.venue || ""}
+                            onChange={(e) =>
+                              setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, venue: e.target.value } }))
+                            }
+                            className="text-xs mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Dirección de Ceremonia</Label>
+                          <Textarea
+                            value={event.ceremony?.address || ""}
+                            onChange={(e) =>
+                              setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, address: e.target.value } }))
+                            }
+                            className="text-xs mt-1 min-h-[60px]"
+                          />
+                        </div>
+                      </>
+                    )}
+
+                    <div>
+                      <Label className="text-xs">{event.template === "quinceanera" ? "Lugar de Celebración" : "Lugar de Recepción"}</Label>
+                      <Input
+                        value={event.reception?.venue || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, reception: { ...p.reception, venue: e.target.value } }))
+                        }
+                        className="text-xs mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">{event.template === "quinceanera" ? "Dirección de Celebración" : "Dirección de Recepción"}</Label>
+                      <Textarea
+                        value={event.reception?.address || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, reception: { ...p.reception, address: e.target.value } }))
+                        }
+                        className="text-xs mt-1 min-h-[60px]"
+                      />
+                    </div>
+                  </div>
+                </CollapsibleSection>
+
+                {/* Información bancaria */}
+                <CollapsibleSection 
+                  title="Información Bancaria" 
+                  icon={<CreditCard className="w-4 h-4" />}
+                >
+                  <div className="grid grid-cols-1 gap-3">
+                    <div>
+                      <Label className="text-xs">Titular</Label>
+                      <Input
+                        value={event.bank?.titular || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), titular: e.target.value } }))
+                        }
+                        className="text-xs mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Banco</Label>
+                      <Input
+                        value={event.bank?.banco || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), banco: e.target.value } }))
+                        }
+                        className="text-xs mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">CBU / IBAN</Label>
+                      <Input
+                        value={event.bank?.cbu || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), cbu: e.target.value } }))
+                        }
+                        className="text-xs mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Alias</Label>
+                      <Input
+                        value={event.bank?.alias || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), alias: e.target.value } }))
+                        }
+                        className="text-xs mt-1"
+                      />
+                    </div>
+                  </div>
+                </CollapsibleSection>
+
+                {/* Mesa de regalos */}
+                <CollapsibleSection 
+                  title="Mesa de Regalos" 
+                  icon={<Gift className="w-4 h-4" />}
+                >
+                  <div className="space-y-3">
+                    {(event.gifts || []).map((g, idx) => (
+                      <div key={idx} className="flex gap-2 items-center">
+                        <Input
+                          className="text-xs flex-1"
+                          placeholder="Nombre"
+                          value={g.label || ""}
+                          onChange={(e) => updateGift(idx, "label", e.target.value)}
+                        />
+                        <Input
+                          className="text-xs flex-1"
+                          placeholder="URL"
+                          value={g.url || ""}
+                          onChange={(e) => updateGift(idx, "url", e.target.value)}
+                        />
+                        <EnhancedButton
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeGift(idx)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </EnhancedButton>
+                      </div>
+                    ))}
+                    <EnhancedButton
+                      variant="outline"
+                      size="sm"
+                      onClick={addGift}
+                      className="w-full text-xs"
+                    >
+                      <Plus className="w-3 h-3 mr-1" />
+                      Agregar enlace
+                    </EnhancedButton>
+                  </div>
+                </CollapsibleSection>
+
+                {/* Textos personalizables */}
+                <CollapsibleSection 
+                  title="Textos Personalizables" 
+                  icon={<Type className="w-4 h-4" />}
+                >
                   <div className="space-y-3">
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Tipo de Ceremonia
-                      </label>
-                      <select
-                        value={event?.ceremony?.type || "religious"}
-                        onChange={(e) => updateNestedField("ceremony", "type", e.target.value)}
-                        className="w-full p-2 border border-gray-300 rounded-md text-sm"
-                      >
-                        <option value="religious">Religiosa</option>
-                        <option value="civil">Civil</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Lugar
-                      </label>
-                      <Input
-                        value={event?.ceremony?.venue || ""}
-                        onChange={(e) => updateNestedField("ceremony", "venue", e.target.value)}
-                        placeholder="Iglesia o Registro Civil"
-                        className="text-sm"
+                      <Label className="text-xs">Nota de Regalos</Label>
+                      <Textarea
+                        className="text-xs mt-1 min-h-[60px]"
+                        value={event.giftsNote || ""}
+                        onChange={(e) => setEvent((p) => ({ ...p, giftsNote: e.target.value }))}
+                        placeholder="Mensaje para la sección de regalos"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-700 mb-1">
-                        Dirección
-                      </label>
-                      <Input
-                        value={event?.ceremony?.location || ""}
-                        onChange={(e) => updateNestedField("ceremony", "location", e.target.value)}
-                        placeholder="Villa Allende, Córdoba"
-                        className="text-sm"
+                      <Label className="text-xs">Nota de RSVP</Label>
+                      <Textarea
+                        className="text-xs mt-1 min-h-[60px]"
+                        value={event.rsvpNote || ""}
+                        onChange={(e) => setEvent((p) => ({ ...p, rsvpNote: e.target.value }))}
+                        placeholder="Mensaje para confirmación de asistencia"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Info Útil</Label>
+                      <Textarea
+                        className="text-xs mt-1 min-h-[60px]"
+                        value={event.info?.help || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, info: { ...(p.info || {}), help: e.target.value } }))
+                        }
+                        placeholder="Información sobre alojamiento, transporte, etc."
                       />
                     </div>
                   </div>
-                )}
+                </CollapsibleSection>
+
+                {/* Secciones visibles */}
+                <CollapsibleSection 
+                  title="Secciones Visibles" 
+                  icon={<Eye className="w-4 h-4" />}
+                >
+                  <div className="grid grid-cols-1 gap-2">
+                    {SECTION_KEYS.map(({ key, label, icon }) => {
+                      // Ocultar ceremonia para quinceaños
+                      if (key === "ceremony" && event.template === "quinceanera") return null;
+                      
+                      return (
+                        <div key={key} className="flex items-center justify-between p-2 border rounded hover:bg-gray-50">
+                          <div className="flex items-center gap-2">
+                            {icon}
+                            <span className="text-sm">{label}</span>
+                          </div>
+                          <Switch
+                            checked={isSectionOn(key)}
+                            onCheckedChange={() => toggleSection(key)}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CollapsibleSection>
+
               </div>
-            )}
-
-            {/* Celebración/Fiesta */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-medium text-gray-900">
-                  {isQuinceanera ? "Celebración" : "Fiesta"}
-                </h3>
-                <Switch
-                  checked={event?.sections?.reception !== false}
-                  onCheckedChange={() => toggleEventSection("reception")}
-                />
-              </div>
-              {event?.sections?.reception !== false && (
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Lugar
-                    </label>
-                    <Input
-                      value={event?.reception?.venue || ""}
-                      onChange={(e) => updateNestedField("reception", "venue", e.target.value)}
-                      placeholder="Salón de Eventos"
-                      className="text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Dirección
-                    </label>
-                    <Input
-                      value={event?.reception?.location || ""}
-                      onChange={(e) => updateNestedField("reception", "location", e.target.value)}
-                      placeholder="Villa Allende, Córdoba"
-                      className="text-sm"
-                    />
-                  </div>
-                </div>
-              )}
             </div>
+          </TabsContent>
 
-            {/* Hashtag */}
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
-                Hashtag
-              </label>
-              <Input
-                value={event?.hashtag || ""}
-                onChange={(e) => updateEventField("hashtag", e.target.value)}
-                placeholder={isQuinceanera ? "#Mis15Años" : "#NuestraBoda"}
-                className="text-sm"
-              />
-            </div>
-
-            {/* Mensaje RSVP */}
-            <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">
-                Mensaje de Confirmación
-              </label>
-              <Textarea
-                value={event?.rsvpNote || ""}
-                onChange={(e) => updateEventField("rsvpNote", e.target.value)}
-                placeholder="Por favor confirmanos tu asistencia antes del 15 de octubre."
-                rows={3}
-                className="text-sm"
-              />
-            </div>
-          </div>
-        )}
-
-        {activeTab === "design" && (
-          <div className="space-y-6">
-            {/* Colores */}
-            <div>
-              <button
-                onClick={() => toggleSection("colors")}
-                className="flex items-center justify-between w-full mb-3"
-              >
-                <h3 className="text-sm font-medium text-gray-900">Colores</h3>
-                {expandedSections.colors ? (
-                  <ChevronUp className="w-4 h-4" />
-                ) : (
-                  <ChevronDown className="w-4 h-4" />
-                )}
-              </button>
-              {expandedSections.colors && (
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Color Primario
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="color"
-                        value={event?.colors?.primary || "#8FAF86"}
-                        onChange={(e) => updateNestedField("colors", "primary", e.target.value)}
-                        className="w-10 h-8 rounded border border-gray-300"
-                      />
-                      <Input
-                        value={event?.colors?.primary || "#8FAF86"}
-                        onChange={(e) => updateNestedField("colors", "primary", e.target.value)}
-                        className="text-sm"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Color Secundario
-                    </label>
-                    <div className="flex gap-2">
-                      <input
-                        type="color"
-                        value={event?.colors?.secondary || "#D4B28A"}
-                        onChange={(e) => updateNestedField("colors", "secondary", e.target.value)}
-                        className="w-10 h-8 rounded border border-gray-300"
-                      />
-                      <Input
-                        value={event?.colors?.secondary || "#D4B28A"}
-                        onChange={(e) => updateNestedField("colors", "secondary", e.target.value)}
-                        className="text-sm"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Fuentes */}
-            <div>
-              <button
-                onClick={() => toggleSection("fonts")}
-                className="flex items-center justify-between w-full mb-3"
-              >
-                <h3 className="text-sm font-medium text-gray-900">Tipografías</h3>
-                {expandedSections.fonts ? (
-                  <ChevronUp className="w-4 h-4" />
-                ) : (
-                  <ChevronDown className="w-4 h-4" />
-                )}
-              </button>
-              {expandedSections.fonts && (
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Fuente Principal
-                    </label>
-                    <select
-                      value={event?.fonts?.primary || "'Cormorant Garamond', serif"}
-                      onChange={(e) => updateNestedField("fonts", "primary", e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded-md text-sm"
-                    >
-                      <option value="'Cormorant Garamond', serif">Cormorant Garamond</option>
-                      <option value="'Playfair Display', serif">Playfair Display</option>
-                      <option value="Cardo, serif">Cardo</option>
-                      <option value="Inter, sans-serif">Inter</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
-                      Fuente Secundaria
-                    </label>
-                    <select
-                      value={event?.fonts?.secondary || "'Playfair Display', serif"}
-                      onChange={(e) => updateNestedField("fonts", "secondary", e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded-md text-sm"
-                    >
-                      <option value="'Playfair Display', serif">Playfair Display</option>
-                      <option value="'Great Vibes', cursive">Great Vibes</option>
-                      <option value="'Dancing Script', cursive">Dancing Script</option>
-                      <option value="'Pinyon Script', cursive">Pinyon Script</option>
-                      <option value="'Alex Brush', cursive">Alex Brush</option>
-                      <option value="'Pacifico', cursive">Pacifico</option>
-                    </select>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Secciones */}
-            <div>
-              <button
-                onClick={() => toggleSection("sections")}
-                className="flex items-center justify-between w-full mb-3"
-              >
-                <h3 className="text-sm font-medium text-gray-900">Secciones</h3>
-                {expandedSections.sections ? (
-                  <ChevronUp className="w-4 h-4" />
-                ) : (
-                  <ChevronDown className="w-4 h-4" />
-                )}
-              </button>
-              {expandedSections.sections && (
-                <div className="space-y-2">
-                  {[
-                    { key: "gallery", label: "Galería", icon: ImageIcon },
-                    { key: "bank", label: "Regalos", icon: Gift },
-                    { key: "instagram", label: "Instagram", icon: Instagram },
-                    { key: "songs", label: "Canciones", icon: Music },
-                    { key: "info", label: "Info Útil", icon: Settings }
-                  ].map(({ key, label, icon: Icon }) => (
-                    <div key={key} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Icon className="w-4 h-4 text-gray-500" />
-                        <span className="text-sm text-gray-700">{label}</span>
+          {/* ============ DISEÑO (PALETAS + PERSONALIZADOS) ============ */}
+          <TabsContent value="design" className="flex-1 min-h-0 m-0">
+            <div className="h-full overflow-y-auto px-3 pb-6">
+              <div className="space-y-4">
+                
+                {/* Paletas de colores mejoradas */}
+                <CollapsibleSection 
+                  title="Paletas de Colores" 
+                  icon={<Palette className="w-4 h-4" />}
+                  defaultOpen={true}
+                >
+                  <div className="space-y-3">
+                    {PALETTES.map((palette) => (
+                      <div key={palette.name} className="border rounded-lg p-3 hover:bg-gray-50 transition-colors">
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <Label className="text-xs font-medium">{palette.name}</Label>
+                            <Badge variant="outline" className="ml-2 text-xs">
+                              {palette.category}
+                            </Badge>
+                          </div>
+                          <EnhancedButton
+                            variant="outline"
+                            size="sm"
+                            onClick={() => applyPalette(palette.tones)}
+                            className="text-xs"
+                          >
+                            Aplicar
+                          </EnhancedButton>
+                        </div>
+                        
+                        <div className="grid grid-cols-4 gap-2">
+                          {palette.tones.map((tone, i) => (
+                            <div key={i} className="text-center">
+                              <button
+                                className="w-full h-8 rounded border-2 border-gray-200 hover:border-gray-400 transition-colors mb-1"
+                                style={{ backgroundColor: tone.hex }}
+                                onClick={() => {
+                                  handleColorChange("primary", tone.hex);
+                                  addRecentColor(tone.hex);
+                                }}
+                                title={`${tone.name} - ${tone.hex}`}
+                              />
+                              <span className="text-xs text-gray-600 block truncate">
+                                {tone.name}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <Switch
-                        checked={event?.sections?.[key] !== false}
-                        onCheckedChange={() => toggleEventSection(key)}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {activeTab === "images" && (
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Imagen de Fondo</h3>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                <ImagePlus className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-600 mb-2">
-                  Arrastra una imagen o haz clic para seleccionar
-                </p>
-                <Button variant="outline" size="sm">
-                  Seleccionar Imagen
-                </Button>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Logo</h3>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
-                <ImagePlus className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm text-gray-600 mb-2">
-                  Logo opcional para la invitación
-                </p>
-                <Button variant="outline" size="sm">
-                  Seleccionar Logo
-                </Button>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Galería</h3>
-              <div className="grid grid-cols-2 gap-2 mb-3">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
-                    <ImagePlus className="w-6 h-6 text-gray-400" />
+                    ))}
                   </div>
-                ))}
-              </div>
-              <Button variant="outline" size="sm" className="w-full">
-                <Plus className="w-4 h-4 mr-2" />
-                Agregar Imágenes
-              </Button>
-            </div>
-          </div>
-        )}
-      </ScrollArea>
+                </CollapsibleSection>
 
-      {/* Footer */}
-      <div className="p-4 border-t border-gray-200 bg-gray-50">
-        <Button 
-          onClick={() => {
-            // Lógica para finalizar y proceder al pago
-            alert("Finalizando evento y procediendo al pago...");
-          }}
-          className="w-full bg-green-600 hover:bg-green-700 text-white"
-        >
-          <CheckCircle2 className="w-4 h-4 mr-2" />
-          Finalizar y Proceder al Pago
-        </Button>
-        <p className="text-xs text-gray-500 text-center mt-2">
-          El evento se guardará automáticamente
-        </p>
+                {/* Colores personalizados */}
+                <CollapsibleSection 
+                  title="Colores Personalizados" 
+                  icon={<Settings className="w-4 h-4" />}
+                >
+                  <div className="space-y-4">
+                    <ColorPicker
+                      label="Color Primario"
+                      value={event.colors?.primary}
+                      onChange={(color) => handleColorChange("primary", color)}
+                      showRecent={true}
+                    />
+                    <ColorPicker
+                      label="Color Secundario"
+                      value={event.colors?.secondary}
+                      onChange={(color) => handleColorChange("secondary", color)}
+                    />
+                    <ColorPicker
+                      label="Color de Texto"
+                      value={event.colors?.text}
+                      onChange={(color) => handleColorChange("text", color)}
+                    />
+                    <ColorPicker
+                      label="Color Oscuro"
+                      value={event.colors?.dark}
+                      onChange={(color) => handleColorChange("dark", color)}
+                    />
+                  </div>
+                </CollapsibleSection>
+
+                {/* Tipografía mejorada */}
+                <CollapsibleSection 
+                  title="Tipografía" 
+                  icon={<Type className="w-4 h-4" />}
+                >
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-xs font-medium mb-2 block">Fuente Principal</Label>
+                      <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto">
+                        {fontFamilies.map((font) => (
+                          <button
+                            key={font.family}
+                            className={`p-2 border rounded text-left hover:bg-gray-50 transition-colors ${
+                              event.fonts?.primary === font.family ? "border-blue-500 bg-blue-50" : "border-gray-200"
+                            }`}
+                            onClick={() => handleFontChange("primary", font.family)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="text-sm font-medium">{font.name}</div>
+                                <div className="text-xs text-gray-500">{font.category}</div>
+                              </div>
+                              <div 
+                                className="text-lg"
+                                style={{ fontFamily: font.family }}
+                              >
+                                {font.preview}
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="text-xs font-medium mb-2 block">Fuente Secundaria</Label>
+                      <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto">
+                        {fontFamilies.filter(f => f.category === "Script" || f.category === "Serif").map((font) => (
+                          <button
+                            key={font.family}
+                            className={`p-2 border rounded text-left hover:bg-gray-50 transition-colors ${
+                              event.fonts?.secondary === font.family ? "border-blue-500 bg-blue-50" : "border-gray-200"
+                            }`}
+                            onClick={() => handleFontChange("secondary", font.family)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="text-sm font-medium">{font.name}</div>
+                                <div className="text-xs text-gray-500">{font.category}</div>
+                              </div>
+                              <div 
+                                className="text-lg"
+                                style={{ fontFamily: font.family }}
+                              >
+                                {font.preview}
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </CollapsibleSection>
+
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* ============ IMÁGENES ============ */}
+          <TabsContent value="images" className="flex-1 min-h-0 m-0">
+            <div className="h-full overflow-y-auto px-3 pb-6">
+              <ImagesPanel
+                event={event}
+                setEvent={setEvent}
+                gallery={gallery}
+                setGallery={setGallery}
+                setGalleryAtFile={setGalleryAtFile}
+                removeGalleryItem={removeGalleryItem}
+              />
+            </div>
+          </TabsContent>
+
+        </Tabs>
+
+        {/* Footer con botón de continuar */}
+        <div className="flex-shrink-0 border-t border-gray-200 p-3">
+          <EnhancedButton
+            onClick={handleNext}
+            className="w-full"
+            disabled={errors.length > 0}
+          >
+            {ui.activeTab === ORDER[ORDER.length - 1] ? "Finalizar" : "Continuar"}
+            <ChevronRight className="w-4 h-4 ml-2" />
+          </EnhancedButton>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
