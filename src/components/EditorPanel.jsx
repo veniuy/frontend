@@ -1,10 +1,14 @@
 // src/components/EditorPanel.jsx
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import {
   Palette,
   Type,
@@ -25,6 +29,22 @@ import {
   AlertTriangle,
   ImagePlus,
   Link as LinkIcon,
+  ChevronDown,
+  ChevronUp,
+  Eye,
+  EyeOff,
+  Smartphone,
+  Monitor,
+  Tablet,
+  Settings,
+  Zap,
+  Sparkles,
+  Heart,
+  Church,
+  PartyPopper,
+  Crown,
+  Music,
+  Instagram,
 } from "lucide-react";
 import ImagesPanel from "./ImagesPanel";
 
@@ -37,152 +57,400 @@ export default function EditorPanel({
   handleFontChange,
   handleTemplateChange,
   setEvent,
-  onSave, // opcional
+  onSave,
+  onFinish, // Nueva prop para manejar finalización
 }) {
-  /* =================== PALETAS =================== */
+  /* =================== ESTADO MEJORADO =================== */
+  const [errors, setErrors] = useState([]);
+  const [saved, setSaved] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [activeSection, setActiveSection] = useState(null);
+  const [previewMode, setPreviewMode] = useState("desktop"); // desktop, tablet, mobile
+  const [isDragging, setIsDragging] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [recentColors, setRecentColors] = useState([]);
+
+  /* =================== PLANTILLAS MEJORADAS SIN EMOJIS =================== */
+  const templates = useMemo(() => [
+    // QUINCEAÑOS
+    { 
+      id: "quinceanera-elegant", 
+      name: "Quinceaños Elegante", 
+      type: "quinceanera",
+      description: "Diseño sofisticado para celebración de 15 años",
+      colors: { primary: "#E1C1A8", secondary: "#F6E3D4", text: "#2E2E2E" },
+      fonts: { primary: "'Playfair Display', serif", secondary: "'Great Vibes', cursive" }
+    },
+    { 
+      id: "quinceanera-romantic", 
+      name: "Quinceaños Romántico", 
+      type: "quinceanera",
+      description: "Colores suaves y delicados para tu celebración",
+      colors: { primary: "#EEC9C5", secondary: "#C9C9C9", text: "#2E2E2E" },
+      fonts: { primary: "'Cormorant Garamond', serif", secondary: "'Pinyon Script', cursive" }
+    },
+    { 
+      id: "quinceanera-modern", 
+      name: "Quinceaños Moderno", 
+      type: "quinceanera",
+      description: "Diseño contemporáneo y vibrante",
+      colors: { primary: "#B7B79D", secondary: "#C16D4D", text: "#2E2E2E" },
+      fonts: { primary: "Montserrat, sans-serif", secondary: "'Alex Brush', cursive" }
+    },
+    
+    // BODAS
+    { 
+      id: "wedding-elegant", 
+      name: "Boda Elegante", 
+      type: "wedding",
+      description: "Diseño sofisticado y minimalista",
+      colors: { primary: "#8FAF86", secondary: "#D4B28A", text: "#2E2E2E" },
+      fonts: { primary: "'Playfair Display', serif", secondary: "'Great Vibes', cursive" }
+    },
+    { 
+      id: "wedding-romantic", 
+      name: "Boda Romántica", 
+      type: "wedding",
+      description: "Colores suaves y florales",
+      colors: { primary: "#EEC9C5", secondary: "#C9C9C9", text: "#2E2E2E" },
+      fonts: { primary: "Cardo, serif", secondary: "'Pinyon Script', cursive" }
+    },
+    { 
+      id: "wedding-modern", 
+      name: "Boda Moderna", 
+      type: "wedding",
+      description: "Diseño contemporáneo y vibrante",
+      colors: { primary: "#245D63", secondary: "#8F9AA7", text: "#2E2E2E" },
+      fonts: { primary: "Inter, sans-serif", secondary: "'Alex Brush', cursive" }
+    },
+    { 
+      id: "wedding-classic", 
+      name: "Boda Clásica", 
+      type: "wedding",
+      description: "Estilo tradicional y atemporal",
+      colors: { primary: "#871C2B", secondary: "#EFEAE6", text: "#2E2E2E" },
+      fonts: { primary: "Bellefair, serif", secondary: "'Tangerine', cursive" }
+    },
+    { 
+      id: "wedding-rustic", 
+      name: "Boda Rústica", 
+      type: "wedding",
+      description: "Estilo campestre y natural",
+      colors: { primary: "#5A6C48", secondary: "#E0C9C9", text: "#2E2E2E" },
+      fonts: { primary: "'Cormorant Garamond', serif", secondary: "'Great Vibes', cursive" }
+    },
+  ], []);
+
+  /* =================== PALETAS MEJORADAS =================== */
   const PALETTES = useMemo(
     () => [
-      { name: "Champagne", tones: [{ hex: "#F6E3D4" }, { hex: "#E1C1A8" }, { hex: "#D1A880" }, { hex: "#B8997F" }] },
-      { name: "Boho Chic", tones: [{ hex: "#EFC4B1" }, { hex: "#E7B7A2" }, { hex: "#DBA583" }, { hex: "#D99873" }] },
-      { name: "Sage & Terracotta", tones: [{ hex: "#B7B79D" }, { hex: "#C16D4D" }, { hex: "#D57555" }, { hex: "#C96342" }] },
-      { name: "Blush and Gray", tones: [{ hex: "#EEC9C5" }, { hex: "#C9C9C9" }, { hex: "#B9B9B9" }, { hex: "#8B8B8B" }] },
-      { name: "Just Peachy", tones: [{ hex: "#F2C3B1" }, { hex: "#E6B79E" }, { hex: "#E5A88B" }, { hex: "#C8C6A8" }] },
-      { name: "Classic Romance", tones: [{ hex: "#EFEAE6" }, { hex: "#E7D7D3" }, { hex: "#B6AFAA" }, { hex: "#871C2B" }] },
-      { name: "Frosted Winter", tones: [{ hex: "#C2C4CA" }, { hex: "#ADB3BB" }, { hex: "#8F9AA7" }, { hex: "#245D63" }] },
-      { name: "Rustic Elegance", tones: [{ hex: "#E0C9C9" }, { hex: "#C9AFA0" }, { hex: "#D4CAB0" }, { hex: "#5A6C48" }] },
+      { 
+        name: "Champagne Elegance", 
+        category: "Elegante",
+        tones: [
+          { hex: "#F6E3D4", name: "Champagne Claro" }, 
+          { hex: "#E1C1A8", name: "Champagne" }, 
+          { hex: "#D1A880", name: "Dorado Suave" }, 
+          { hex: "#B8997F", name: "Bronce" }
+        ] 
+      },
+      { 
+        name: "Boho Chic", 
+        category: "Bohemio",
+        tones: [
+          { hex: "#EFC4B1", name: "Terracota Claro" }, 
+          { hex: "#E7B7A2", name: "Coral Suave" }, 
+          { hex: "#DBA583", name: "Caramelo" }, 
+          { hex: "#D99873", name: "Terracota" }
+        ] 
+      },
+      { 
+        name: "Sage & Terracotta", 
+        category: "Natural",
+        tones: [
+          { hex: "#B7B79D", name: "Sage Verde" }, 
+          { hex: "#C16D4D", name: "Terracota Oscuro" }, 
+          { hex: "#D57555", name: "Coral Cálido" }, 
+          { hex: "#C96342", name: "Ladrillo" }
+        ] 
+      },
+      { 
+        name: "Blush Romance", 
+        category: "Romántico",
+        tones: [
+          { hex: "#EEC9C5", name: "Rosa Blush" }, 
+          { hex: "#C9C9C9", name: "Gris Perla" }, 
+          { hex: "#B9B9B9", name: "Gris Medio" }, 
+          { hex: "#8B8B8B", name: "Gris Carbón" }
+        ] 
+      },
+      { 
+        name: "Peachy Sunset", 
+        category: "Cálido",
+        tones: [
+          { hex: "#F2C3B1", name: "Durazno Claro" }, 
+          { hex: "#E6B79E", name: "Durazno" }, 
+          { hex: "#E5A88B", name: "Coral Durazno" }, 
+          { hex: "#C8C6A8", name: "Verde Salvia" }
+        ] 
+      },
+      { 
+        name: "Classic Romance", 
+        category: "Clásico",
+        tones: [
+          { hex: "#EFEAE6", name: "Marfil" }, 
+          { hex: "#E7D7D3", name: "Rosa Pálido" }, 
+          { hex: "#B6AFAA", name: "Taupe" }, 
+          { hex: "#871C2B", name: "Borgoña" }
+        ] 
+      },
+      { 
+        name: "Winter Frost", 
+        category: "Frío",
+        tones: [
+          { hex: "#C2C4CA", name: "Gris Hielo" }, 
+          { hex: "#ADB3BB", name: "Azul Gris" }, 
+          { hex: "#8F9AA7", name: "Azul Acero" }, 
+          { hex: "#245D63", name: "Azul Profundo" }
+        ] 
+      },
+      { 
+        name: "Rustic Elegance", 
+        category: "Rústico",
+        tones: [
+          { hex: "#E0C9C9", name: "Rosa Empolvado" }, 
+          { hex: "#C9AFA0", name: "Beige Cálido" }, 
+          { hex: "#D4CAB0", name: "Crema Vintage" }, 
+          { hex: "#5A6C48", name: "Verde Oliva" }
+        ] 
+      },
     ],
     []
   );
 
-  const fontFamilies = [
-    "Inter, system-ui, sans-serif",
-    "'Great Vibes', cursive",
-    "'Playfair Display', serif",
-    "Cardo, serif",
-    "'Pinyon Script', cursive",
-    "'Cormorant Garamond', serif",
-    "Bellefair, serif",
-    "'Alex Brush', cursive",
-    "Tangerine, cursive",
-    "Montserrat, sans-serif",
-    "Open Sans, sans-serif",
-    "Lato, sans-serif",
-  ];
+  const fontFamilies = useMemo(() => [
+    { name: "Inter", family: "Inter, system-ui, sans-serif", category: "Sans Serif", preview: "Aa" },
+    { name: "Great Vibes", family: "'Great Vibes', cursive", category: "Script", preview: "Aa" },
+    { name: "Playfair Display", family: "'Playfair Display', serif", category: "Serif", preview: "Aa" },
+    { name: "Cardo", family: "Cardo, serif", category: "Serif", preview: "Aa" },
+    { name: "Pinyon Script", family: "'Pinyon Script', cursive", category: "Script", preview: "Aa" },
+    { name: "Cormorant Garamond", family: "'Cormorant Garamond', serif", category: "Serif", preview: "Aa" },
+    { name: "Bellefair", family: "Bellefair, serif", category: "Serif", preview: "Aa" },
+    { name: "Alex Brush", family: "'Alex Brush', cursive", category: "Script", preview: "Aa" },
+    { name: "Tangerine", family: "Tangerine, cursive", category: "Script", preview: "Aa" },
+    { name: "Montserrat", family: "Montserrat, sans-serif", category: "Sans Serif", preview: "Aa" },
+    { name: "Open Sans", family: "Open Sans, sans-serif", category: "Sans Serif", preview: "Aa" },
+    { name: "Lato", family: "Lato, sans-serif", category: "Sans Serif", preview: "Aa" },
+  ], []);
 
-  const templates = [
-    { id: "elegant", name: "Elegante", description: "Diseño sofisticado y minimalista" },
-    { id: "romantic", name: "Romántico", description: "Colores suaves y florales" },
-    { id: "modern", name: "Moderno", description: "Diseño contemporáneo y vibrante" },
-    { id: "classic", name: "Clásico", description: "Estilo tradicional y atemporal" },
-  ];
+  /* =================== HOOKS MEJORADOS =================== */
+  
+  // Detección de dispositivo mejorada
+  const deviceType = useMemo(() => {
+    if (typeof window === 'undefined') return 'desktop';
+    const width = window.innerWidth;
+    if (width < 768) return 'mobile';
+    if (width < 1024) return 'tablet';
+    return 'desktop';
+  }, []);
 
-  /* =================== Estado local (errores/feedback) =================== */
-  const [errors, setErrors] = useState([]);
-  const [saved, setSaved] = useState(false);
+  // Auto-save mejorado
+  const debouncedSave = useCallback(
+    debounce(async () => {
+      if (typeof onSave === "function") {
+        try {
+          await onSave(event);
+          setSaved(true);
+          setTimeout(() => setSaved(false), 2000);
+        } catch (error) {
+          console.error("Error saving:", error);
+        }
+      }
+    }, 1000),
+    [event, onSave]
+  );
 
-  /* =================== Helpers =================== */
-  const applyPalette = (tones) => {
-    // primary = Intermedio 2 (tones[2])
-    // secondary = Oscuro (tones[3])
-    // text = Oscuro (tones[3])
-    // dark = Oscuro (tones[3])
+  useEffect(() => {
+    debouncedSave();
+  }, [event, debouncedSave]);
+
+  // Gestión de colores recientes
+  const addRecentColor = useCallback((color) => {
+    setRecentColors(prev => {
+      const filtered = prev.filter(c => c !== color);
+      return [color, ...filtered].slice(0, 8);
+    });
+  }, []);
+
+  /* =================== HELPERS MEJORADOS =================== */
+  
+  const applyTemplate = useCallback((template) => {
+    // Aplicar plantilla completa
+    setEvent(prev => ({
+      ...prev,
+      template: template.type, // 'quinceanera' o 'wedding'
+      templateId: template.id,
+      colors: {
+        ...prev.colors,
+        ...template.colors
+      },
+      fonts: {
+        ...prev.fonts,
+        ...template.fonts
+      },
+      // Configurar secciones según el tipo
+      sections: {
+        ...prev.sections,
+        ceremony: template.type === 'wedding', // Solo bodas tienen ceremonia
+        reception: true, // Ambos tienen fiesta/celebración
+        bank: true,
+        songs: true,
+        info: true,
+        instagram: true,
+        gallery: true,
+      }
+    }));
+
+    // Aplicar colores
+    if (template.colors) {
+      Object.entries(template.colors).forEach(([key, value]) => {
+        handleColorChange(key, value);
+        addRecentColor(value);
+      });
+    }
+
+    // Aplicar fuentes
+    if (template.fonts) {
+      Object.entries(template.fonts).forEach(([key, value]) => {
+        handleFontChange(key, value);
+      });
+    }
+
+    if (handleTemplateChange) {
+      handleTemplateChange(template.id);
+    }
+  }, [setEvent, handleColorChange, handleFontChange, handleTemplateChange, addRecentColor]);
+
+  const applyPalette = useCallback((tones) => {
     const primary = tones[2]?.hex || event.colors?.primary || "#8FAF86";
     const secondary = tones[3]?.hex || event.colors?.secondary || "#D4B28A";
     const text = tones[3]?.hex || event.colors?.text || "#2E2E2E";
     const dark = tones[3]?.hex || event.colors?.dark || "#1F2937";
+    
     handleColorChange("primary", primary);
     handleColorChange("secondary", secondary);
     handleColorChange("text", text);
     handleColorChange("dark", dark);
-  };
+    
+    addRecentColor(primary);
+    addRecentColor(secondary);
+  }, [event.colors, handleColorChange, addRecentColor]);
 
-  const addGift = () =>
-    setEvent((p) => ({ ...p, gifts: [...(p.gifts || []), { label: "Mesa de regalos", url: "" }] }));
+  const addGift = useCallback(() =>
+    setEvent((p) => ({ ...p, gifts: [...(p.gifts || []), { label: "Mesa de regalos", url: "" }] }))
+  , [setEvent]);
 
-  const updateGift = (idx, key, value) =>
+  const updateGift = useCallback((idx, key, value) =>
     setEvent((p) => {
       const arr = [...(p.gifts || [])];
       arr[idx] = { ...arr[idx], [key]: value };
       return { ...p, gifts: arr };
-    });
+    })
+  , [setEvent]);
 
-  const removeGift = (idx) =>
+  const removeGift = useCallback((idx) =>
     setEvent((p) => {
       const arr = [...(p.gifts || [])];
       arr.splice(idx, 1);
       return { ...p, gifts: arr };
-    });
+    })
+  , [setEvent]);
 
   // Info útil: alojamiento / transporte
-  const addLodging = () =>
+  const addLodging = useCallback(() =>
     setEvent((p) => ({
       ...p,
       info: { ...(p.info || {}), lodging: [...(p.info?.lodging || []), { name: "", url: "" }] },
-    }));
-  const updateLodging = (i, k, v) =>
+    }))
+  , [setEvent]);
+
+  const updateLodging = useCallback((i, k, v) =>
     setEvent((p) => {
       const arr = [...(p.info?.lodging || [])];
       arr[i] = { ...arr[i], [k]: v };
       return { ...p, info: { ...(p.info || {}), lodging: arr } };
-    });
-  const removeLodging = (i) =>
+    })
+  , [setEvent]);
+
+  const removeLodging = useCallback((i) =>
     setEvent((p) => {
       const arr = [...(p.info?.lodging || [])];
       arr.splice(i, 1);
       return { ...p, info: { ...(p.info || {}), lodging: arr } };
-    });
+    })
+  , [setEvent]);
 
-  const addTransport = () =>
+  const addTransport = useCallback(() =>
     setEvent((p) => ({
       ...p,
       info: { ...(p.info || {}), transport: [...(p.info?.transport || []), { name: "", note: "", url: "" }] },
-    }));
-  const updateTransport = (i, k, v) =>
+    }))
+  , [setEvent]);
+
+  const updateTransport = useCallback((i, k, v) =>
     setEvent((p) => {
       const arr = [...(p.info?.transport || [])];
       arr[i] = { ...arr[i], [k]: v };
       return { ...p, info: { ...(p.info || {}), transport: arr } };
-    });
-  const removeTransport = (i) =>
+    })
+  , [setEvent]);
+
+  const removeTransport = useCallback((i) =>
     setEvent((p) => {
       const arr = [...(p.info?.transport || [])];
       arr.splice(i, 1);
       return { ...p, info: { ...(p.info || {}), transport: arr } };
-    });
+    })
+  , [setEvent]);
 
-  /* ===== Galería (6 fotos) con subida de archivos (base64) ===== */
+  /* ===== Galería mejorada ===== */
   const gallery = (event.images?.gallery || []).slice(0, 6);
-  const setGallery = (arr) => setEvent((p) => ({ ...p, images: { ...(p.images || {}), gallery: arr.slice(0, 6) } }));
+  const setGallery = useCallback((arr) => 
+    setEvent((p) => ({ ...p, images: { ...(p.images || {}), gallery: arr.slice(0, 6) } }))
+  , [setEvent]);
 
-  const setGalleryAtFile = async (i, file) => {
+  const setGalleryAtFile = useCallback(async (i, file) => {
     if (!file) return;
     const dataUrl = await readFileAsDataURL(file);
     const arr = [...gallery];
     arr[i] = dataUrl;
     setGallery(arr);
-  };
-  const removeGalleryItem = (i) => setGallery(gallery.filter((_, idx) => idx !== i));
+  }, [gallery, setGallery]);
 
-  const SECTION_KEYS = [
-    { key: "ceremony", label: "Ceremonia" },
-    { key: "reception", label: "Fiesta" },
-    { key: "bank", label: "Cuenta bancaria" },
-    { key: "songs", label: "Canciones" },
-    { key: "info", label: "Info útil" },
-    { key: "dresscode", label: "Dress code" },
-    { key: "instagram", label: "Instagram" },
-    { key: "gallery", label: "Galería" }, // switch de galería
-  ];
+  const removeGalleryItem = useCallback((i) => 
+    setGallery(gallery.filter((_, idx) => idx !== i))
+  , [gallery, setGallery]);
 
-  const isSectionOn = (k) => {
+  const SECTION_KEYS = useMemo(() => [
+    { key: "ceremony", label: "Ceremonia", icon: <Church className="w-4 h-4" /> },
+    { key: "reception", label: "Fiesta", icon: <PartyPopper className="w-4 h-4" /> },
+    { key: "bank", label: "Cuenta bancaria", icon: <CreditCard className="w-4 h-4" /> },
+    { key: "songs", label: "Canciones", icon: <Music className="w-4 h-4" /> },
+    { key: "info", label: "Info útil", icon: <AlertTriangle className="w-4 h-4" /> },
+    { key: "instagram", label: "Instagram", icon: <Instagram className="w-4 h-4" /> },
+    { key: "gallery", label: "Galería", icon: <ImageIcon className="w-4 h-4" /> },
+  ], []);
+
+  const isSectionOn = useCallback((k) => {
     const s = event.sections || {};
-    return s[k] !== false; // por defecto true
-  };
+    return s[k] !== false;
+  }, [event.sections]);
 
-  const toggleSection = (k) =>
-    setEvent((p) => ({ ...p, sections: { ...(p.sections || {}), [k]: !(p.sections?.[k] !== false) } }));
+  const toggleSection = useCallback((k) =>
+    setEvent((p) => ({ ...p, sections: { ...(p.sections || {}), [k]: !(p.sections?.[k] !== false) } }))
+  , [setEvent]);
 
-  const doSave = async () => {
+  const doSave = useCallback(async () => {
     try {
       if (typeof onSave === "function") {
         await onSave(event);
@@ -194,27 +462,43 @@ export default function EditorPanel({
     } catch (e) {
       setErrors([`No se pudo guardar: ${e?.message || e}`]);
     }
-  };
+  }, [event, onSave]);
 
-  const ORDER = ["design", "content", "images", "layout"];
-  const goNextTab = () => {
+  // NUEVO ORDEN: Plantillas, Contenido, Diseño, Imágenes
+  const ORDER = ["templates", "content", "design", "images"];
+  const goNextTab = useCallback(() => {
     const idx = ORDER.indexOf(ui.activeTab);
     const next = ORDER[Math.min(ORDER.length - 1, idx + 1)];
     setActiveTab(next);
-  };
+  }, [ui.activeTab, setActiveTab]);
 
-  const validate = () => {
+  const validate = useCallback(() => {
     const errs = [];
     const c = event || {};
-    const couple = c.couple || {};
-    const ceremony = c.ceremony || {};
-    const reception = c.reception || {};
-    if (!couple.bride || !couple.bride.trim()) errs.push("Falta el nombre de la novia.");
-    if (!couple.groom || !couple.groom.trim()) errs.push("Falta el nombre del novio.");
+    const isQuinceanera = c.template === "quinceanera";
+    
+    if (isQuinceanera) {
+      const name = c.couple?.bride || c.quinceañera?.name;
+      if (!name || !name.trim()) errs.push("Falta el nombre de la quinceañera.");
+    } else {
+      const couple = c.couple || {};
+      if (!couple.bride || !couple.bride.trim()) errs.push("Falta el nombre de la novia.");
+      if (!couple.groom || !couple.groom.trim()) errs.push("Falta el nombre del novio.");
+    }
+    
     if (!c.date || !c.date.trim()) errs.push("Falta la fecha.");
     if (!c.time || !c.time.trim()) errs.push("Falta la hora.");
-    if (isSectionOn("ceremony") && !ceremony.venue) errs.push("Falta el lugar de la ceremonia.");
-    if (isSectionOn("reception") && !reception.venue) errs.push("Falta el lugar de la fiesta.");
+    
+    if (!isQuinceanera && isSectionOn("ceremony")) {
+      const ceremony = c.ceremony || {};
+      if (!ceremony.venue) errs.push("Falta el lugar de la ceremonia.");
+    }
+    
+    if (isSectionOn("reception")) {
+      const reception = c.reception || {};
+      if (!reception.venue) errs.push("Falta el lugar de la fiesta.");
+    }
+    
     if (isSectionOn("bank")) {
       const b = c.bank || {};
       if (!b.titular && !b.cbu && !b.cuenta) {
@@ -222,126 +506,261 @@ export default function EditorPanel({
       }
     }
     return errs;
-  };
+  }, [event, isSectionOn]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     const errs = validate();
     setErrors(errs);
     if (errs.length === 0) {
-      goNextTab();
+      if (ui.activeTab === ORDER[ORDER.length - 1]) {
+        // Es la última pestaña, finalizar
+        if (typeof onFinish === "function") {
+          onFinish(event);
+        }
+      } else {
+        goNextTab();
+      }
     }
+  }, [validate, goNextTab, ui.activeTab, ORDER, onFinish, event]);
+
+  /* =================== COMPONENTES DE UI MEJORADOS =================== */
+  
+  const MobileToolbar = () => (
+    ui.isMobile && !ui.showMobilePanel && (
+      <div className="fixed top-2 left-2 right-2 z-40 flex items-center gap-2">
+        <EnhancedButton
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowMobilePanel(true)}
+          className="rounded-full shadow-lg bg-white/95 backdrop-blur-sm border border-gray-200"
+          aria-label="Abrir editor"
+        >
+          <Menu className="w-5 h-5" />
+        </EnhancedButton>
+
+        <div className="flex items-center gap-2 ml-auto">
+          <PreviewModeToggle />
+          
+          <EnhancedButton
+            variant="ghost"
+            size="sm"
+            onClick={doSave}
+            className="bg-white/95 backdrop-blur-sm border border-gray-200"
+            disabled={saved}
+          >
+            {saved ? <CheckCircle2 className="w-4 h-4 text-green-600" /> : <SaveIcon className="w-4 h-4" />}
+          </EnhancedButton>
+
+          <EnhancedButton
+            size="sm"
+            onClick={handleNext}
+            className="bg-black text-white"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </EnhancedButton>
+        </div>
+      </div>
+    )
+  );
+
+  const PreviewModeToggle = () => (
+    <div className="flex items-center gap-1 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg p-1">
+      {[
+        { mode: "mobile", icon: Smartphone },
+        { mode: "tablet", icon: Tablet },
+        { mode: "desktop", icon: Monitor }
+      ].map(({ mode, icon: Icon }) => (
+        <button
+          key={mode}
+          onClick={() => setPreviewMode(mode)}
+          className={`p-1.5 rounded transition-colors ${
+            previewMode === mode 
+              ? "bg-blue-100 text-blue-600" 
+              : "text-gray-400 hover:text-gray-600"
+          }`}
+          title={`Vista ${mode}`}
+        >
+          <Icon className="w-4 h-4" />
+        </button>
+      ))}
+    </div>
+  );
+
+  const EnhancedButton = ({ 
+    children, 
+    variant = "default", 
+    size = "default", 
+    className = "", 
+    disabled = false,
+    ...props 
+  }) => {
+    const baseClasses = "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
+    
+    const variants = {
+      default: "bg-primary text-primary-foreground hover:bg-primary/90",
+      ghost: "hover:bg-accent hover:text-accent-foreground",
+      outline: "border border-input hover:bg-accent hover:text-accent-foreground",
+    };
+    
+    const sizes = {
+      default: "h-10 py-2 px-4",
+      sm: "h-9 px-3 text-sm",
+      lg: "h-11 px-8",
+    };
+
+    return (
+      <button
+        className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`}
+        disabled={disabled}
+        {...props}
+      >
+        {children}
+      </button>
+    );
   };
 
-  /* =================== Render =================== */
-  return (
-    <>
-      {/* TOOLBAR MÓVIL EN CANVAS (panel cerrado): Hamburger + Guardar + Siguiente */}
-      {ui.isMobile && !ui.showMobilePanel && (
-        <div className="fixed top-2 left-2 right-2 z-40 flex items-center gap-2">
-          <button
-            className="rounded-full shadow p-3 bg-white border border-gray-200 hover:bg-gray-50 active:scale-95 transition"
-            onClick={() => setShowMobilePanel(true)}
-            aria-label="Abrir editor"
-            title="Abrir editor"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
+  const CollapsibleSection = ({ title, icon, children, defaultOpen = false }) => {
+    const [isOpen, setIsOpen] = useState(defaultOpen);
+    
+    return (
+      <Card className="overflow-hidden">
+        <CardHeader 
+          className="pb-2 cursor-pointer hover:bg-gray-50 transition-colors"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm flex items-center gap-2">
+              {icon}
+              {title}
+            </CardTitle>
+            {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </div>
+        </CardHeader>
+        {isOpen && (
+          <CardContent className="pt-0">
+            {children}
+          </CardContent>
+        )}
+      </Card>
+    );
+  };
 
-          <button
-            className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50"
-            onClick={doSave}
-            aria-label="Guardar cambios"
-            title="Guardar cambios"
-          >
-            <SaveIcon className="w-4 h-4" />
-            Guardar
-          </button>
-
-          <button
-            className="ml-auto inline-flex items-center gap-2 text-sm px-3 py-2 rounded bg-black text-white hover:opacity-90"
-            onClick={handleNext}
-            aria-label="Siguiente"
-            title="Siguiente"
-          >
-            Siguiente
-            <ChevronRight className="w-4 h-4" />
-          </button>
+  const ColorPicker = ({ label, value, onChange, showRecent = false }) => (
+    <div className="space-y-2">
+      <Label className="text-xs font-medium">{label}</Label>
+      <div className="flex items-center gap-2">
+        <div className="relative">
+          <input
+            type="color"
+            value={value || "#000000"}
+            onChange={(e) => {
+              onChange(e.target.value);
+              addRecentColor(e.target.value);
+            }}
+            className="w-10 h-10 rounded border-2 border-gray-200 cursor-pointer"
+          />
+          <div 
+            className="absolute inset-0 rounded border-2 border-gray-200 pointer-events-none"
+            style={{ backgroundColor: value }}
+          />
+        </div>
+        <Input
+          type="text"
+          value={value || ""}
+          onChange={(e) => onChange(e.target.value)}
+          className="text-xs flex-1"
+          placeholder="#000000"
+        />
+      </div>
+      {showRecent && recentColors.length > 0 && (
+        <div className="flex gap-1 flex-wrap">
+          <span className="text-xs text-gray-500 w-full">Recientes:</span>
+          {recentColors.map((color, i) => (
+            <button
+              key={i}
+              className="w-6 h-6 rounded border border-gray-200 hover:scale-110 transition-transform"
+              style={{ backgroundColor: color }}
+              onClick={() => onChange(color)}
+              title={color}
+            />
+          ))}
         </div>
       )}
+    </div>
+  );
+
+  /* =================== RENDER PRINCIPAL =================== */
+  return (
+    <>
+      <MobileToolbar />
 
       <div
         className={
           ui.isMobile
             ? `fixed inset-y-0 left-0 z-50 w-80 bg-white border-r border-gray-200 transform transition-transform duration-300 ${
                 ui.showMobilePanel ? "translate-x-0" : "-translate-x-full"
-              } overflow-y-auto`
-            : "w-80 bg-white border-r border-gray-200 overflow-y-auto"
+              } overflow-hidden flex flex-col`
+            : "w-80 bg-white border-r border-gray-200 overflow-hidden flex flex-col"
         }
       >
-        {/* Barra superior del PANEL:
-            - Móvil: Hamburger(cerrar) + Guardar + Siguiente + estado
-            - Desktop: Guardar + Siguiente + estado (sin hamburger) */}
-        <div className="sticky top-0 z-10 bg-white border-b border-gray-200">
-          <div className="flex items-center justify-between px-3 py-2 gap-2">
+        {/* Header mejorado */}
+        <div className="sticky top-0 z-10 bg-white border-b border-gray-200 p-3">
+          <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               {ui.isMobile && (
-                <button
-                  className="p-2 rounded hover:bg-gray-100"
+                <EnhancedButton
+                  variant="ghost"
+                  size="sm"
                   onClick={() => setShowMobilePanel(false)}
-                  aria-label="Cerrar panel"
-                  title="Cerrar panel"
                 >
-                  <Menu className="h-5 w-5" />
-                </button>
+                  <X className="h-4 w-4" />
+                </EnhancedButton>
               )}
-
-              <button
-                className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50"
-                onClick={doSave}
-                aria-label="Guardar cambios"
-                title="Guardar cambios"
-              >
-                <SaveIcon className="w-4 h-4" />
-                Guardar
-              </button>
-
-              <button
-                className="inline-flex items-center gap-2 text-sm px-3 py-2 rounded bg-black text-white hover:opacity-90"
-                onClick={handleNext}
-                aria-label="Siguiente"
-                title="Siguiente"
-              >
-                Siguiente
-                <ChevronRight className="w-4 h-4" />
-              </button>
+              
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-blue-600" />
+                <span className="font-semibold text-sm">Editor</span>
+              </div>
             </div>
 
             <div className="flex items-center gap-2">
               {saved && (
-                <span className="inline-flex items-center text-xs text-green-600">
-                  <CheckCircle2 className="w-4 h-4 mr-1" />
+                <Badge variant="secondary" className="text-xs">
+                  <CheckCircle2 className="w-3 h-3 mr-1" />
                   Guardado
-                </span>
+                </Badge>
               )}
-              {ui.isMobile && (
-                <button
-                  className="p-1 rounded hover:bg-gray-100"
-                  onClick={() => setShowMobilePanel(false)}
-                  aria-label="Cerrar"
-                  title="Cerrar"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              )}
+              
+              <EnhancedButton
+                size="sm"
+                onClick={doSave}
+                disabled={saved}
+                className="text-xs"
+              >
+                {saved ? <CheckCircle2 className="w-4 h-4" /> : <SaveIcon className="w-4 h-4" />}
+              </EnhancedButton>
             </div>
           </div>
 
+          {/* Indicador de progreso */}
+          <div className="flex items-center gap-1 mb-2">
+            {ORDER.map((tab, index) => (
+              <div
+                key={tab}
+                className={`flex-1 h-1 rounded ${
+                  ORDER.indexOf(ui.activeTab) >= index ? "bg-blue-600" : "bg-gray-200"
+                }`}
+              />
+            ))}
+          </div>
+
           {errors.length > 0 && (
-            <div className="mx-3 mb-2 rounded border border-red-200 bg-red-50 p-2 text-[12px] text-red-700">
-              <div className="flex items-center gap-2 font-medium">
-                <AlertTriangle className="w-4 h-4" /> Revisa estos puntos
+            <div className="rounded border border-red-200 bg-red-50 p-2 text-xs text-red-700">
+              <div className="flex items-center gap-2 font-medium mb-1">
+                <AlertTriangle className="w-3 h-3" />
+                Revisa estos puntos
               </div>
-              <ul className="list-disc pl-5 mt-1 space-y-1">
+              <ul className="list-disc pl-4 space-y-1">
                 {errors.map((e, i) => (
                   <li key={i}>{e}</li>
                 ))}
@@ -350,634 +769,714 @@ export default function EditorPanel({
           )}
         </div>
 
-        <Tabs value={ui.activeTab} onValueChange={setActiveTab} className="h-full">
-          <TabsList className="grid w-full grid-cols-4 p-1 m-4">
-            <TabsTrigger value="design" className="flex flex-col items-center gap-1 p-2">
-              <Palette className="h-4 w-4" />
-              <span className="text-xs">Color</span>
+        {/* Tabs mejorados - NUEVO ORDEN */}
+        <Tabs value={ui.activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+          <TabsList className="grid w-full grid-cols-4 p-1 mx-3 mb-3">
+            <TabsTrigger value="templates" className="flex flex-col items-center gap-1 p-2 text-xs">
+              <Layout className="h-3 w-3" />
+              Plantillas
             </TabsTrigger>
-            <TabsTrigger value="content" className="flex flex-col items-center gap-1 p-2">
-              <Type className="h-4 w-4" />
-              <span className="text-xs">Contenido</span>
+            <TabsTrigger value="content" className="flex flex-col items-center gap-1 p-2 text-xs">
+              <Type className="h-3 w-3" />
+              Contenido
             </TabsTrigger>
-            <TabsTrigger value="images" className="flex flex-col items-center gap-1 p-2">
-              <ImageIcon className="h-4 w-4" />
-              <span className="text-xs">Imágenes</span>
+            <TabsTrigger value="design" className="flex flex-col items-center gap-1 p-2 text-xs">
+              <Palette className="h-3 w-3" />
+              Diseño
             </TabsTrigger>
-            <TabsTrigger value="layout" className="flex flex-col items-center gap-1 p-2">
-              <Layout className="h-4 w-4" />
-              <span className="text-xs">Templates</span>
+            <TabsTrigger value="images" className="flex flex-col items-center gap-1 p-2 text-xs">
+              <ImageIcon className="h-3 w-3" />
+              Imágenes
             </TabsTrigger>
           </TabsList>
 
-          {/* ============ COLOR (PALETAS + PERSONALIZADOS) ============ */}
-          <TabsContent value="design" className="space-y-4 px-4 pb-6">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Paletas de Colores</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {PALETTES.map((p) => (
-                  <div key={p.name} className="border rounded-lg p-3">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-xs font-medium">{p.name}</Label>
-                      <button
-                        className="text-xs px-2 py-1 rounded border border-gray-300 hover:bg-gray-50"
-                        onClick={() => applyPalette(p.tones)}
-                        title="Aplicar paleta completa"
+          {/* ============ PLANTILLAS (PRIMERA PESTAÑA) ============ */}
+          <TabsContent value="templates" className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full px-3 pb-6">
+              <div className="space-y-4">
+                
+                {/* Plantillas de Quinceaños */}
+                <CollapsibleSection 
+                  title="Quinceaños" 
+                  icon={<Crown className="w-4 h-4" />}
+                  defaultOpen={true}
+                >
+                  <div className="space-y-3">
+                    {templates.filter(t => t.type === 'quinceanera').map((template) => (
+                      <div
+                        key={template.id}
+                        className={`border rounded-lg p-3 hover:bg-gray-50 transition-colors cursor-pointer ${
+                          event.templateId === template.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                        }`}
+                        onClick={() => applyTemplate(template)}
                       >
-                        Aplicar
-                      </button>
-                    </div>
-                    <div className="flex gap-2 mt-2">
-                      {p.tones.map((t) => (
-                        <div key={t.hex} className="flex flex-col items-center">
-                          <button
-                            className="w-9 h-9 rounded border-2 border-gray-200 hover:border-gray-400"
-                            style={{ backgroundColor: t.hex }}
-                            onClick={() => handleColorChange("primary", t.hex)}
-                            title={`Usar ${t.hex} como primario`}
-                          />
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1">
+                            <h3 className="font-medium text-sm">{template.name}</h3>
+                            <p className="text-xs text-gray-600">{template.description}</p>
+                          </div>
+                          <div className="flex gap-1">
+                            <div 
+                              className="w-4 h-4 rounded-full border"
+                              style={{ backgroundColor: template.colors?.primary }}
+                            />
+                            <div 
+                              className="w-4 h-4 rounded-full border"
+                              style={{ backgroundColor: template.colors?.secondary }}
+                            />
+                          </div>
                         </div>
-                      ))}
-                    </div>
-                    <div className="text-[10px] text-gray-500 mt-2">
-                      Mapeo al aplicar: <b>Primario</b>=Intermedio 2 · <b>Secundario</b>=Oscuro ·{" "}
-                      <b>Texto</b>=Oscuro · <b>Dark</b>=Oscuro.
-                    </div>
+                        {event.templateId === template.id && (
+                          <div className="mt-2 flex items-center gap-1 text-xs text-blue-600">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Plantilla activa
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </CardContent>
-            </Card>
+                </CollapsibleSection>
 
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Colores Personalizados</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {["primary", "secondary", "text", "dark"].map((key) => (
-                  <div key={key}>
-                    <Label className="text-xs capitalize">Color {key}</Label>
-                    <div className="flex gap-2 mt-1">
-                      <Input
-                        type="color"
-                        value={event.colors?.[key] || "#000000"}
-                        onChange={(e) => handleColorChange(key, e.target.value)}
-                        className="w-12 h-8 p-0 border-0"
-                        aria-label={`Color ${key}`}
-                      />
-                      <Input
-                        value={event.colors?.[key] || ""}
-                        onChange={(e) => handleColorChange(key, e.target.value)}
-                        className="flex-1 text-xs"
-                        placeholder="#RRGGBB"
-                      />
-                    </div>
-                    {key === "dark" && (
-                      <p className="text-[10px] text-gray-500 mt-1">Usado en “Dress code” y “Footer”.</p>
-                    )}
+                {/* Plantillas de Bodas */}
+                <CollapsibleSection 
+                  title="Bodas" 
+                  icon={<Heart className="w-4 h-4" />}
+                  defaultOpen={true}
+                >
+                  <div className="space-y-3">
+                    {templates.filter(t => t.type === 'wedding').map((template) => (
+                      <div
+                        key={template.id}
+                        className={`border rounded-lg p-3 hover:bg-gray-50 transition-colors cursor-pointer ${
+                          event.templateId === template.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                        }`}
+                        onClick={() => applyTemplate(template)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1">
+                            <h3 className="font-medium text-sm">{template.name}</h3>
+                            <p className="text-xs text-gray-600">{template.description}</p>
+                          </div>
+                          <div className="flex gap-1">
+                            <div 
+                              className="w-4 h-4 rounded-full border"
+                              style={{ backgroundColor: template.colors?.primary }}
+                            />
+                            <div 
+                              className="w-4 h-4 rounded-full border"
+                              style={{ backgroundColor: template.colors?.secondary }}
+                            />
+                          </div>
+                        </div>
+                        {event.templateId === template.id && (
+                          <div className="mt-2 flex items-center gap-1 text-xs text-blue-600">
+                            <CheckCircle2 className="w-3 h-3" />
+                            Plantilla activa
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </CardContent>
-            </Card>
+                </CollapsibleSection>
 
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Tipografía</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {["primary", "secondary"].map((t) => (
-                  <div key={t}>
-                    <Label className="text-xs">Fuente {t}</Label>
-                    <select
-                      value={event.fonts?.[t] || ""}
-                      onChange={(e) => handleFontChange(t, e.target.value)}
-                      className="w-full mt-1 p-2 border rounded text-sm"
-                    >
-                      {fontFamilies.map((f) => (
-                        <option key={f} value={f} style={{ fontFamily: f }}>
-                          {f}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+                {/* Tipo de ceremonia para bodas */}
+                {event.template === 'wedding' && (
+                  <CollapsibleSection 
+                    title="Tipo de Ceremonia" 
+                    icon={<Church className="w-4 h-4" />}
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          id="religious"
+                          name="ceremonyType"
+                          value="religious"
+                          checked={event.ceremony?.type !== "civil"}
+                          onChange={() => setEvent(p => ({ 
+                            ...p, 
+                            ceremony: { ...p.ceremony, type: "religious" } 
+                          }))}
+                        />
+                        <label htmlFor="religious" className="text-sm">Ceremonia Religiosa</label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          id="civil"
+                          name="ceremonyType"
+                          value="civil"
+                          checked={event.ceremony?.type === "civil"}
+                          onChange={() => setEvent(p => ({ 
+                            ...p, 
+                            ceremony: { ...p.ceremony, type: "civil" } 
+                          }))}
+                        />
+                        <label htmlFor="civil" className="text-sm">Ceremonia Civil</label>
+                      </div>
+                    </div>
+                  </CollapsibleSection>
+                )}
+
+              </div>
+            </ScrollArea>
           </TabsContent>
 
-          {/* ============ CONTENIDO (BÁSICO + BANCO + REGALOS + INFO ÚTIL + SECCIONES) ============ */}
-          <TabsContent value="content" className="space-y-4 px-4 pb-6">
-            {/* Información de la Pareja */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Información de la Pareja</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <Label className="text-xs">Novia</Label>
-                  <Input
-                    value={event.couple?.bride || ""}
-                    onChange={(e) =>
-                      setEvent((p) => ({ ...p, couple: { ...p.couple, bride: e.target.value } }))
-                    }
-                    className="text-xs mt-1"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">Novio</Label>
-                  <Input
-                    value={event.couple?.groom || ""}
-                    onChange={(e) =>
-                      setEvent((p) => ({ ...p, couple: { ...p.couple, groom: e.target.value } }))
-                    }
-                    className="text-xs mt-1"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">Hashtag</Label>
-                  <div className="flex gap-2 mt-1 items-center">
-                    <Hash className="w-4 h-4 text-gray-500" />
+          {/* ============ CONTENIDO ============ */}
+          <TabsContent value="content" className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full px-3 pb-6">
+              <div className="space-y-4">
+                
+                {/* Información básica */}
+                <CollapsibleSection 
+                  title="Información Básica" 
+                  icon={<Heart className="w-4 h-4" />}
+                  defaultOpen={true}
+                >
+                  {event.template === "quinceanera" ? (
+                    // Layout para Quinceaños
+                    <div className="space-y-3">
+                      <div>
+                        <Label className="text-xs">Nombre de la Quinceañera</Label>
+                        <Input
+                          value={event.couple?.bride || event.quinceañera?.name || ""}
+                          onChange={(e) => setEvent((p) => ({ 
+                            ...p, 
+                            couple: { ...p.couple, bride: e.target.value },
+                            quinceañera: { ...p.quinceañera, name: e.target.value }
+                          }))}
+                          className="text-xs mt-1"
+                          placeholder="Nombre"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    // Layout para Bodas
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <Label className="text-xs">Nombre 1</Label>
+                        <Input
+                          value={event.couple?.bride || ""}
+                          onChange={(e) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: e.target.value } }))}
+                          className="text-xs mt-1"
+                          placeholder="Novia"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs">Nombre 2</Label>
+                        <Input
+                          value={event.couple?.groom || ""}
+                          onChange={(e) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: e.target.value } }))}
+                          className="text-xs mt-1"
+                          placeholder="Novio"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-2 gap-3 mt-3">
+                    <div>
+                      <Label className="text-xs">Fecha</Label>
+                      <Input
+                        value={event.date || ""}
+                        onChange={(e) => setEvent((p) => ({ ...p, date: e.target.value }))}
+                        className="text-xs mt-1"
+                        placeholder="DD/MM/YYYY"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Hora</Label>
+                      <Input
+                        value={event.time || ""}
+                        onChange={(e) => setEvent((p) => ({ ...p, time: e.target.value }))}
+                        className="text-xs mt-1"
+                        placeholder="HH:mm"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label className="text-xs">Hashtag</Label>
                     <Input
                       value={event.hashtag || ""}
                       onChange={(e) => setEvent((p) => ({ ...p, hashtag: e.target.value }))}
-                      className="text-xs"
-                      placeholder="#NuestraBoda"
+                      className="text-xs mt-1"
+                      placeholder={event.template === "quinceanera" ? "#Mis15Años" : "#NuestraBoda"}
                     />
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CollapsibleSection>
 
-            {/* Detalles del Evento */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Detalles del Evento</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <Label className="text-xs">Fecha</Label>
-                  <Input
-                    value={event.date || ""}
-                    onChange={(e) => setEvent((p) => ({ ...p, date: e.target.value }))}
-                    className="text-xs mt-1"
-                  />
-                </div>
-
-                <div>
-                  <Label className="text-xs">Hora</Label>
-                  <Input
-                    value={event.time || ""}
-                    onChange={(e) => setEvent((p) => ({ ...p, time: e.target.value }))}
-                    className="text-xs mt-1"
-                    placeholder="HH:mm"
-                  />
-                </div>
-
-                <div>
-                  <Label className="text-xs">Lugar de Ceremonia</Label>
-                  <Input
-                    value={event.ceremony?.venue || ""}
-                    onChange={(e) =>
-                      setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, venue: e.target.value } }))
-                    }
-                    className="text-xs mt-1"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">Dirección de Ceremonia</Label>
-                  <Textarea
-                    value={event.ceremony?.address || ""}
-                    onChange={(e) =>
-                      setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, address: e.target.value } }))
-                    }
-                    className="text-xs mt-1 min-h-[60px]"
-                  />
-                </div>
-
-                <div>
-                  <Label className="text-xs">Lugar de Recepción</Label>
-                  <Input
-                    value={event.reception?.venue || ""}
-                    onChange={(e) =>
-                      setEvent((p) => ({ ...p, reception: { ...p.reception, venue: e.target.value } }))
-                    }
-                    className="text-xs mt-1"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">Dirección de Recepción</Label>
-                  <Textarea
-                    value={event.reception?.address || ""}
-                    onChange={(e) =>
-                      setEvent((p) => ({ ...p, reception: { ...p.reception, address: e.target.value } }))
-                    }
-                    className="text-xs mt-1 min-h-[60px]"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Transferencias / Banco */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <CreditCard className="w-4 h-4" /> Transferencias / Banco
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 gap-3">
-                <div>
-                  <Label className="text-xs">Titular</Label>
-                  <Input
-                    value={event.bank?.titular || ""}
-                    onChange={(e) =>
-                      setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), titular: e.target.value } }))
-                    }
-                    className="text-xs mt-1"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">Banco</Label>
-                  <Input
-                    value={event.bank?.banco || ""}
-                    onChange={(e) =>
-                      setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), banco: e.target.value } }))
-                    }
-                    className="text-xs mt-1"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">Cuenta</Label>
-                  <Input
-                    value={event.bank?.cuenta || ""}
-                    onChange={(e) =>
-                      setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), cuenta: e.target.value } }))
-                    }
-                    className="text-xs mt-1"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">Alias</Label>
-                  <Input
-                    value={event.bank?.alias || ""}
-                    onChange={(e) =>
-                      setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), alias: e.target.value } }))
-                    }
-                    className="text-xs mt-1"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">CBU / IBAN</Label>
-                  <Input
-                    value={event.bank?.cbu || ""}
-                    onChange={(e) =>
-                      setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), cbu: e.target.value } }))
-                    }
-                    className="text-xs mt-1"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">Nota</Label>
-                  <Textarea
-                    value={event.bank?.nota || ""}
-                    onChange={(e) =>
-                      setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), nota: e.target.value } }))
-                    }
-                    className="text-xs mt-1 min-h-[60px]"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Mesa de Regalos */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Gift className="w-4 h-4" /> Mesa de Regalos (links)
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {(event.gifts || []).map((g, idx) => (
-                  <div key={idx} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
-                    <Input
-                      className="text-xs"
-                      placeholder="Nombre (Amazon, Falabella...)"
-                      value={g.label || ""}
-                      onChange={(e) => updateGift(idx, "label", e.target.value)}
-                    />
-                    <Input
-                      className="text-xs"
-                      placeholder="URL"
-                      value={g.url || ""}
-                      onChange={(e) => updateGift(idx, "url", e.target.value)}
-                    />
-                    <button
-                      className="px-2 py-2 rounded border border-red-300 text-red-700 hover:bg-red-50"
-                      onClick={() => removeGift(idx)}
-                      title="Quitar"
-                      aria-label="Quitar enlace"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-                <button
-                  className="text-xs inline-flex items-center gap-1 px-3 py-2 rounded border border-gray-300 hover:bg-gray-50"
-                  onClick={addGift}
+                {/* Detalles del evento */}
+                <CollapsibleSection 
+                  title="Detalles del Evento" 
+                  icon={<Church className="w-4 h-4" />}
                 >
-                  <Plus className="w-3 h-3" /> Agregar enlace
-                </button>
-              </CardContent>
-            </Card>
-
-            {/* Textos de secciones */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Textos de Secciones</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <Label className="text-xs">Nota de Regalos</Label>
-                  <Textarea
-                    className="text-xs mt-1 min-h-[60px]"
-                    value={event.giftsNote || ""}
-                    onChange={(e) => setEvent((p) => ({ ...p, giftsNote: e.target.value }))}
-                    placeholder="Mensaje para la sección de regalos / transferencias"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">Nota de RSVP</Label>
-                  <Textarea
-                    className="text-xs mt-1 min-h-[60px]"
-                    value={event.rsvpNote || ""}
-                    onChange={(e) => setEvent((p) => ({ ...p, rsvpNote: e.target.value }))}
-                    placeholder="Mensaje para la sección de confirmación"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">Info útil</Label>
-                  <Textarea
-                    className="text-xs mt-1 min-h-[60px]"
-                    value={event.info?.help || ""}
-                    onChange={(e) =>
-                      setEvent((p) => ({ ...p, info: { ...(p.info || {}), help: e.target.value } }))
-                    }
-                    placeholder="Sugerencias de alojamientos, traslados, etc."
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs">Dress code</Label>
-                  <Input
-                    className="text-xs mt-1"
-                    value={event.info?.dresscode || ""}
-                    onChange={(e) =>
-                      setEvent((p) => ({ ...p, info: { ...(p.info || {}), dresscode: e.target.value } }))
-                    }
-                    placeholder="Vestimenta formal, elegante…"
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Info útil → Alojamiento */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Alojamiento recomendado</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {(event.info?.lodging || []).map((h, i) => (
-                  <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
-                    <Input
-                      className="text-xs"
-                      placeholder="Nombre del hotel / lugar"
-                      value={h.name || ""}
-                      onChange={(e) => updateLodging(i, "name", e.target.value)}
-                    />
-                    <div className="flex gap-2">
-                      <Input
-                        className="text-xs flex-1"
-                        placeholder="URL (opcional)"
-                        value={h.url || ""}
-                        onChange={(e) => updateLodging(i, "url", e.target.value)}
-                      />
-                      <a
-                        href={h.url || "#"}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center justify-center px-2 border rounded text-gray-600 hover:bg-gray-50"
-                        title="Abrir"
-                      >
-                        <LinkIcon className="w-4 h-4" />
-                      </a>
-                    </div>
-                    <button
-                      className="px-2 py-2 rounded border border-red-300 text-red-700 hover:bg-red-50"
-                      onClick={() => removeLodging(i)}
-                      title="Quitar"
-                      aria-label="Quitar alojamiento"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-                <button
-                  className="text-xs inline-flex items-center gap-1 px-3 py-2 rounded border border-gray-300 hover:bg-gray-50"
-                  onClick={addLodging}
-                >
-                  <Plus className="w-3 h-3" /> Agregar alojamiento
-                </button>
-              </CardContent>
-            </Card>
-
-            {/* Info útil → Transporte */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Transporte / Traslados</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {(event.info?.transport || []).map((t, i) => (
-                  <div key={i} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-center">
-                    <Input
-                      className="text-xs"
-                      placeholder="Nombre (empresa, taxi, remis...)"
-                      value={t.name || ""}
-                      onChange={(e) => updateTransport(i, "name", e.target.value)}
-                    />
-                    <Input
-                      className="text-xs"
-                      placeholder="Nota (teléfono, horario, tarifa...)"
-                      value={t.note || ""}
-                      onChange={(e) => updateTransport(i, "note", e.target.value)}
-                    />
-                    <button
-                      className="px-2 py-2 rounded border border-red-300 text-red-700 hover:bg-red-50"
-                      onClick={() => removeTransport(i)}
-                      title="Quitar"
-                      aria-label="Quitar transporte"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-                <button
-                  className="text-xs inline-flex items-center gap-1 px-3 py-2 rounded border border-gray-300 hover:bg-gray-50"
-                  onClick={addTransport}
-                >
-                  <Plus className="w-3 h-3" /> Agregar transporte
-                </button>
-              </CardContent>
-            </Card>
-
-            {/* Switches de secciones (encendido/apagado) */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Secciones visibles</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {SECTION_KEYS.map(({ key, label }) => {
-                  const on = isSectionOn(key);
-                  return (
-                    <button
-                      key={key}
-                      className="w-full flex items-center justify-between rounded border border-gray-200 hover:bg-gray-50 px-3 py-2 text-sm"
-                      onClick={() => toggleSection(key)}
-                      aria-label={`Alternar sección ${label}`}
-                      title={`Alternar sección ${label}`}
-                    >
-                      <span>{label}</span>
-                      {on ? (
-                        <span className="inline-flex items-center text-green-600">
-                          <ToggleRight className="w-5 h-5 mr-1" /> ON
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center text-gray-500">
-                          <ToggleLeft className="w-5 h-5 mr-1" /> OFF
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-                <p className="text-[11px] text-gray-500">
-                  * El lienzo debe respetar <code>event.sections</code> para ocultar/mostrar cada bloque.
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* ============ IMÁGENES (fondos/logo + Galería) ============ */}
-          <TabsContent value="images" className="px-4 pb-8 space-y-4">
-            {/* Panel existente (fondos, logo, etc.) */}
-            <ImagesPanel event={event} setEvent={setEvent} />
-
-            {/* Editor de Galería (6 fotos) — subida de archivos + switch ON/OFF */}
-            <Card>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm">Galería (máx. 6 imágenes)</CardTitle>
-                  <button
-                    className="inline-flex items-center gap-2 text-xs px-2 py-1 rounded border border-gray-300 hover:bg-gray-50"
-                    onClick={() => toggleSection("gallery")}
-                    aria-label="Alternar galería"
-                    title="Alternar galería"
-                  >
-                    {isSectionOn("gallery") ? (
+                  <div className="space-y-3">
+                    {/* Ceremonia - Solo para bodas */}
+                    {event.template !== "quinceanera" && (
                       <>
-                        <ToggleRight className="w-4 h-4 text-green-600" /> ON
-                      </>
-                    ) : (
-                      <>
-                        <ToggleLeft className="w-4 h-4 text-gray-500" /> OFF
+                        <div>
+                          <Label className="text-xs">Lugar de Ceremonia</Label>
+                          <Input
+                            value={event.ceremony?.venue || ""}
+                            onChange={(e) =>
+                              setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, venue: e.target.value } }))
+                            }
+                            className="text-xs mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Dirección de Ceremonia</Label>
+                          <Textarea
+                            value={event.ceremony?.address || ""}
+                            onChange={(e) =>
+                              setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, address: e.target.value } }))
+                            }
+                            className="text-xs mt-1 min-h-[60px]"
+                          />
+                        </div>
                       </>
                     )}
-                  </button>
-                </div>
-              </CardHeader>
 
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  {Array.from({ length: 6 }).map((_, i) => {
-                    const url = gallery[i] || "";
-                    return (
-                      <div key={i} className="border rounded-lg p-2">
-                        <div className="aspect-[4/3] bg-gray-50 rounded flex items-center justify-center overflow-hidden">
-                          {url ? (
-                            <img src={url} alt={`img-${i + 1}`} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="text-xs text-gray-400 flex items-center gap-1">
-                              <ImagePlus className="w-4 h-4" /> Sin imagen
-                            </div>
-                          )}
+                    <div>
+                      <Label className="text-xs">{event.template === "quinceanera" ? "Lugar de Celebración" : "Lugar de Recepción"}</Label>
+                      <Input
+                        value={event.reception?.venue || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, reception: { ...p.reception, venue: e.target.value } }))
+                        }
+                        className="text-xs mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">{event.template === "quinceanera" ? "Dirección de Celebración" : "Dirección de Recepción"}</Label>
+                      <Textarea
+                        value={event.reception?.address || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, reception: { ...p.reception, address: e.target.value } }))
+                        }
+                        className="text-xs mt-1 min-h-[60px]"
+                      />
+                    </div>
+                  </div>
+                </CollapsibleSection>
+
+                {/* Información bancaria */}
+                <CollapsibleSection 
+                  title="Información Bancaria" 
+                  icon={<CreditCard className="w-4 h-4" />}
+                >
+                  <div className="grid grid-cols-1 gap-3">
+                    <div>
+                      <Label className="text-xs">Titular</Label>
+                      <Input
+                        value={event.bank?.titular || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), titular: e.target.value } }))
+                        }
+                        className="text-xs mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Banco</Label>
+                      <Input
+                        value={event.bank?.banco || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), banco: e.target.value } }))
+                        }
+                        className="text-xs mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">CBU / IBAN</Label>
+                      <Input
+                        value={event.bank?.cbu || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), cbu: e.target.value } }))
+                        }
+                        className="text-xs mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Alias</Label>
+                      <Input
+                        value={event.bank?.alias || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), alias: e.target.value } }))
+                        }
+                        className="text-xs mt-1"
+                      />
+                    </div>
+                  </div>
+                </CollapsibleSection>
+
+                {/* Mesa de regalos */}
+                <CollapsibleSection 
+                  title="Mesa de Regalos" 
+                  icon={<Gift className="w-4 h-4" />}
+                >
+                  <div className="space-y-3">
+                    {(event.gifts || []).map((g, idx) => (
+                      <div key={idx} className="flex gap-2 items-center">
+                        <Input
+                          className="text-xs flex-1"
+                          placeholder="Nombre"
+                          value={g.label || ""}
+                          onChange={(e) => updateGift(idx, "label", e.target.value)}
+                        />
+                        <Input
+                          className="text-xs flex-1"
+                          placeholder="URL"
+                          value={g.url || ""}
+                          onChange={(e) => updateGift(idx, "url", e.target.value)}
+                        />
+                        <EnhancedButton
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeGift(idx)}
+                          className="text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </EnhancedButton>
+                      </div>
+                    ))}
+                    <EnhancedButton
+                      variant="outline"
+                      size="sm"
+                      onClick={addGift}
+                      className="w-full text-xs"
+                    >
+                      <Plus className="w-3 h-3 mr-1" />
+                      Agregar enlace
+                    </EnhancedButton>
+                  </div>
+                </CollapsibleSection>
+
+                {/* Textos personalizables */}
+                <CollapsibleSection 
+                  title="Textos Personalizables" 
+                  icon={<Type className="w-4 h-4" />}
+                >
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-xs">Nota de Regalos</Label>
+                      <Textarea
+                        className="text-xs mt-1 min-h-[60px]"
+                        value={event.giftsNote || ""}
+                        onChange={(e) => setEvent((p) => ({ ...p, giftsNote: e.target.value }))}
+                        placeholder="Mensaje para la sección de regalos"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Nota de RSVP</Label>
+                      <Textarea
+                        className="text-xs mt-1 min-h-[60px]"
+                        value={event.rsvpNote || ""}
+                        onChange={(e) => setEvent((p) => ({ ...p, rsvpNote: e.target.value }))}
+                        placeholder="Mensaje para confirmación de asistencia"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Info Útil</Label>
+                      <Textarea
+                        className="text-xs mt-1 min-h-[60px]"
+                        value={event.info?.help || ""}
+                        onChange={(e) =>
+                          setEvent((p) => ({ ...p, info: { ...(p.info || {}), help: e.target.value } }))
+                        }
+                        placeholder="Información sobre alojamiento, transporte, etc."
+                      />
+                    </div>
+                  </div>
+                </CollapsibleSection>
+
+                {/* Secciones visibles */}
+                <CollapsibleSection 
+                  title="Secciones Visibles" 
+                  icon={<Eye className="w-4 h-4" />}
+                >
+                  <div className="grid grid-cols-1 gap-2">
+                    {SECTION_KEYS.map(({ key, label, icon }) => {
+                      // Ocultar ceremonia para quinceaños
+                      if (key === "ceremony" && event.template === "quinceanera") return null;
+                      
+                      return (
+                        <div key={key} className="flex items-center justify-between p-2 border rounded hover:bg-gray-50">
+                          <div className="flex items-center gap-2">
+                            {icon}
+                            <span className="text-sm">{label}</span>
+                          </div>
+                          <Switch
+                            checked={isSectionOn(key)}
+                            onCheckedChange={() => toggleSection(key)}
+                          />
                         </div>
+                      );
+                    })}
+                  </div>
+                </CollapsibleSection>
 
-                        <div className="mt-2 flex gap-2">
-                          <label className="inline-flex items-center justify-center text-xs px-3 py-2 rounded border border-gray-300 hover:bg-gray-50 cursor-pointer">
-                            Cargar
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                              onChange={(e) => setGalleryAtFile(i, e.target.files?.[0])}
-                            />
-                          </label>
+              </div>
+            </ScrollArea>
+          </TabsContent>
 
-                          {url && (
-                            <button
-                              className="px-2 py-2 rounded border border-red-300 text-red-700 hover:bg-red-50"
-                              onClick={() => removeGalleryItem(i)}
-                              title="Quitar"
-                              aria-label="Quitar"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
+          {/* ============ DISEÑO (PALETAS + PERSONALIZADOS) ============ */}
+          <TabsContent value="design" className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full px-3 pb-6">
+              <div className="space-y-4">
+                
+                {/* Paletas de colores mejoradas */}
+                <CollapsibleSection 
+                  title="Paletas de Colores" 
+                  icon={<Palette className="w-4 h-4" />}
+                  defaultOpen={true}
+                >
+                  <div className="space-y-3">
+                    {PALETTES.map((palette) => (
+                      <div key={palette.name} className="border rounded-lg p-3 hover:bg-gray-50 transition-colors">
+                        <div className="flex items-center justify-between mb-2">
+                          <div>
+                            <Label className="text-xs font-medium">{palette.name}</Label>
+                            <Badge variant="outline" className="ml-2 text-xs">
+                              {palette.category}
+                            </Badge>
+                          </div>
+                          <EnhancedButton
+                            variant="outline"
+                            size="sm"
+                            onClick={() => applyPalette(palette.tones)}
+                            className="text-xs"
+                          >
+                            Aplicar
+                          </EnhancedButton>
+                        </div>
+                        
+                        <div className="grid grid-cols-4 gap-2">
+                          {palette.tones.map((tone, i) => (
+                            <div key={i} className="text-center">
+                              <button
+                                className="w-full h-8 rounded border-2 border-gray-200 hover:border-gray-400 transition-colors mb-1"
+                                style={{ backgroundColor: tone.hex }}
+                                onClick={() => {
+                                  handleColorChange("primary", tone.hex);
+                                  addRecentColor(tone.hex);
+                                }}
+                                title={`${tone.name} - ${tone.hex}`}
+                              />
+                              <span className="text-xs text-gray-600 block truncate">
+                                {tone.name}
+                              </span>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-                <p className="text-[10px] text-gray-500">
-                  Se guardan como imágenes embebidas (base64) para que persistan al guardar el borrador.
-                </p>
-              </CardContent>
-            </Card>
+                    ))}
+                  </div>
+                </CollapsibleSection>
+
+                {/* Colores personalizados */}
+                <CollapsibleSection 
+                  title="Colores Personalizados" 
+                  icon={<Settings className="w-4 h-4" />}
+                >
+                  <div className="space-y-4">
+                    <ColorPicker
+                      label="Color Primario"
+                      value={event.colors?.primary}
+                      onChange={(color) => handleColorChange("primary", color)}
+                      showRecent={true}
+                    />
+                    <ColorPicker
+                      label="Color Secundario"
+                      value={event.colors?.secondary}
+                      onChange={(color) => handleColorChange("secondary", color)}
+                    />
+                    <ColorPicker
+                      label="Color de Texto"
+                      value={event.colors?.text}
+                      onChange={(color) => handleColorChange("text", color)}
+                    />
+                    <ColorPicker
+                      label="Color Oscuro"
+                      value={event.colors?.dark}
+                      onChange={(color) => handleColorChange("dark", color)}
+                    />
+                  </div>
+                </CollapsibleSection>
+
+                {/* Tipografía mejorada */}
+                <CollapsibleSection 
+                  title="Tipografía" 
+                  icon={<Type className="w-4 h-4" />}
+                >
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-xs font-medium mb-2 block">Fuente Principal</Label>
+                      <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto">
+                        {fontFamilies.map((font) => (
+                          <button
+                            key={font.family}
+                            className={`p-2 border rounded text-left hover:bg-gray-50 transition-colors ${
+                              event.fonts?.primary === font.family ? "border-blue-500 bg-blue-50" : "border-gray-200"
+                            }`}
+                            onClick={() => handleFontChange("primary", font.family)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="text-sm font-medium">{font.name}</div>
+                                <div className="text-xs text-gray-500">{font.category}</div>
+                              </div>
+                              <div 
+                                className="text-lg"
+                                style={{ fontFamily: font.family }}
+                              >
+                                {font.preview}
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div>
+                      <Label className="text-xs font-medium mb-2 block">Fuente Secundaria</Label>
+                      <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto">
+                        {fontFamilies.filter(f => f.category === "Script" || f.category === "Serif").map((font) => (
+                          <button
+                            key={font.family}
+                            className={`p-2 border rounded text-left hover:bg-gray-50 transition-colors ${
+                              event.fonts?.secondary === font.family ? "border-blue-500 bg-blue-50" : "border-gray-200"
+                            }`}
+                            onClick={() => handleFontChange("secondary", font.family)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <div className="text-sm font-medium">{font.name}</div>
+                                <div className="text-xs text-gray-500">{font.category}</div>
+                              </div>
+                              <div 
+                                className="text-lg"
+                                style={{ fontFamily: font.family }}
+                              >
+                                {font.preview}
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </CollapsibleSection>
+
+              </div>
+            </ScrollArea>
           </TabsContent>
 
-          {/* ============ TEMPLATES ============ */}
-          <TabsContent value="layout" className="px-4 pb-8">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm">Plantillas</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {templates.map((t) => (
-                  <div
-                    key={t.id}
-                    className={`p-3 border-2 rounded-lg cursor-pointer ${
-                      ui.selectedTemplate === t.id
-                        ? "border-blue-500 bg-blue-50"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                    onClick={() => handleTemplateChange(t.id)}
-                  >
-                    <h4 className="font-medium text-sm">{t.name}</h4>
-                    <p className="text-xs text-gray-600 mt-1">{t.description}</p>
+          {/* ============ IMÁGENES ============ */}
+          <TabsContent value="images" className="flex-1 overflow-hidden">
+            <ScrollArea className="h-full px-3 pb-6">
+              <div className="space-y-4">
+                
+                {/* Panel de imágenes existente */}
+                <ImagesPanel event={event} setEvent={setEvent} />
+
+                {/* Galería mejorada */}
+                <CollapsibleSection 
+                  title="Galería de Fotos" 
+                  icon={<ImageIcon className="w-4 h-4" />}
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-600">Máximo 6 imágenes</span>
+                      <Switch
+                        checked={isSectionOn("gallery")}
+                        onCheckedChange={() => toggleSection("gallery")}
+                      />
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <div key={i} className="relative aspect-square border-2 border-dashed border-gray-300 rounded-lg overflow-hidden group hover:border-gray-400 transition-colors">
+                          {gallery[i] ? (
+                            <>
+                              <img
+                                src={gallery[i]}
+                                alt={`Galería ${i + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <EnhancedButton
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeGalleryItem(i)}
+                                  className="text-white hover:text-red-400"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </EnhancedButton>
+                              </div>
+                            </>
+                          ) : (
+                            <label className="w-full h-full flex flex-col items-center justify-center cursor-pointer text-gray-400 hover:text-gray-600 transition-colors">
+                              <ImagePlus className="w-6 h-6 mb-1" />
+                              <span className="text-xs">Subir foto</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const file = e.target.files?.[0];
+                                  if (file) setGalleryAtFile(i, file);
+                                }}
+                              />
+                            </label>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </CardContent>
-            </Card>
+                </CollapsibleSection>
+
+              </div>
+            </ScrollArea>
           </TabsContent>
+
         </Tabs>
+
+        {/* Footer con botón de siguiente/finalizar */}
+        <div className="border-t border-gray-200 p-3">
+          <EnhancedButton
+            onClick={handleNext}
+            className="w-full"
+            size="lg"
+          >
+            {ui.activeTab === ORDER[ORDER.length - 1] ? "Finalizar y Proceder al Pago" : "Siguiente"}
+            <ChevronRight className="w-4 h-4 ml-2" />
+          </EnhancedButton>
+        </div>
+
       </div>
     </>
   );
 }
 
-/* ===== helpers ===== */
-function readFileAsDataURL(file) {
-  return new Promise((resolve, reject) => {
-    const fr = new FileReader();
-    fr.onload = () => resolve(fr.result);
-    fr.onerror = (e) => reject(e);
-    fr.readAsDataURL(file);
+/* =================== HELPERS =================== */
+
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+async function readFileAsDataURL(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.readAsDataURL(file);
   });
 }
