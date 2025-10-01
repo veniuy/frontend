@@ -1,44 +1,58 @@
 import React from 'react';
 
-const Ceremony = ({ event, setEvent, colors = {}, fonts = {} }) => {
+const Ceremony = ({ event = {}, setEvent = () => {}, colors = {}, fonts = {} }) => {
+  // Valores por defecto para fuentes y colores
   const defaultFonts = {
     primary: 'serif',
     secondary: 'sans-serif'
   };
   const mergedFonts = { ...defaultFonts, ...fonts };
-  
+
   const defaultColors = {
     background: '#f8f8f8',
     primary: '#333',
     text: '#666'
   };
   const mergedColors = { ...defaultColors, ...colors };
+
+  // Asegurar estructura de ceremony
+  const safeCeremony = {
+    title: '',
+    date: '',
+    time: '',
+    location: '',
+    map_url: '',
+    ...event.ceremony,
+  };
+
+  // Manejador seguro (uso de setEvent funcional para evitar estados inconsistentes)
   const handleInputChange = (e, field) => {
-    setEvent({
-      ...event,
+    const value = e.target.value;
+    setEvent(prev => ({
+      ...prev,
       ceremony: {
-        ...event.ceremony,
-        [field]: e.target.value,
+        ...(prev?.ceremony || safeCeremony),
+        [field]: value,
       },
-    });
+    }));
   };
 
   const sectionStyle = {
-    backgroundColor: mergedColors.background || '#f8f8f8',
+    backgroundColor: mergedColors.background,
     padding: '40px 20px',
     textAlign: 'center',
   };
 
   const titleStyle = {
-    fontFamily: mergedFonts.primary || 'serif',
-    color: mergedColors.primary || '#333',
+    fontFamily: mergedFonts.primary,
+    color: mergedColors.primary,
     fontSize: '2.5em',
     marginBottom: '20px',
   };
 
   const textStyle = {
-    fontFamily: mergedFonts.secondary || 'sans-serif',
-    color: mergedColors.text || '#666',
+    fontFamily: mergedFonts.secondary,
+    color: mergedColors.text,
     fontSize: '1.1em',
     lineHeight: '1.6',
     marginBottom: '15px',
@@ -49,7 +63,7 @@ const Ceremony = ({ event, setEvent, colors = {}, fonts = {} }) => {
     width: '100%',
     maxWidth: '800px',
     margin: '30px auto 0 auto',
-    border: `1px solid ${mergedColors.primary || '#ccc'}`,
+    border: `1px solid ${mergedColors.primary}`,
     borderRadius: '8px',
     overflow: 'hidden',
   };
@@ -60,57 +74,71 @@ const Ceremony = ({ event, setEvent, colors = {}, fonts = {} }) => {
     border: '0',
   };
 
+  // src seguro para iframe: si no hay URL, mostramos un iframe vacío (evita errores de embed)
+  const iframeSrc = safeCeremony.map_url && safeCeremony.map_url.trim()
+    ? safeCeremony.map_url
+    : 'about:blank';
+
   return (
     <section style={sectionStyle}>
       <h2 style={titleStyle}>
         <input
           type="text"
-          value={event.ceremony?.title || 'Ceremonia'}
+          value={safeCeremony.title}
           onChange={(e) => handleInputChange(e, 'title')}
+          placeholder="Ceremonia"
           style={{ ...titleStyle, border: '1px solid #ccc', padding: '5px', width: 'auto' }}
         />
       </h2>
+
       <p style={textStyle}>
         <input
           type="text"
-          value={event.ceremony?.date || 'Fecha de la ceremonia'}
+          value={safeCeremony.date}
           onChange={(e) => handleInputChange(e, 'date')}
+          placeholder="Fecha de la ceremonia"
           style={{ ...textStyle, border: '1px solid #ccc', padding: '5px', width: 'auto' }}
         />
       </p>
+
       <p style={textStyle}>
         <input
           type="text"
-          value={event.ceremony?.time || 'Hora de la ceremonia'}
+          value={safeCeremony.time}
           onChange={(e) => handleInputChange(e, 'time')}
+          placeholder="Hora de la ceremonia"
           style={{ ...textStyle, border: '1px solid #ccc', padding: '5px', width: 'auto' }}
         />
       </p>
+
       <p style={textStyle}>
         <input
           type="text"
-          value={event.ceremony?.location || 'Lugar de la ceremonia'}
+          value={safeCeremony.location}
           onChange={(e) => handleInputChange(e, 'location')}
+          placeholder="Lugar de la ceremonia"
           style={{ ...textStyle, border: '1px solid #ccc', padding: '5px', width: 'auto' }}
         />
       </p>
 
       <div style={mapContainerStyle}>
         <iframe
-          src={event.ceremony?.map_url || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.211667187909!2d-122.41941568468168!3d37.77492947975881!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80858064a3e2e7c5%3A0x28c0c8b6e6f6f6f!2sGolden%20Gate%20Bridge!5e0!3m2!1sen!2sus!4v1633024000000!5m2!1sen!2sus'}
+          src={iframeSrc}
           style={mapIframeStyle}
           allowFullScreen=""
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
           title="Ceremony Location Map"
-        ></iframe>
+        />
       </div>
+
       <p style={textStyle}>
         URL del Mapa:
         <input
           type="text"
-          value={event.ceremony?.map_url || ''}
+          value={safeCeremony.map_url}
           onChange={(e) => handleInputChange(e, 'map_url')}
+          placeholder="https://..."
           style={{ ...textStyle, border: '1px solid #ccc', padding: '5px', width: '100%' }}
         />
       </p>
@@ -119,4 +147,5 @@ const Ceremony = ({ event, setEvent, colors = {}, fonts = {} }) => {
 };
 
 export default Ceremony;
+
 
