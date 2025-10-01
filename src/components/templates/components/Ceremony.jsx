@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Ceremony = ({ event, setEvent, colors, fonts }) => {
+const Ceremony = ({ event, setEvent, colors = {}, fonts = {} }) => {
   const handleInputChange = (e, field) => {
     setEvent({
       ...event,

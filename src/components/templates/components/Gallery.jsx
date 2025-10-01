@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 
-const Gallery = ({ event, setEvent, colors, fonts }) => {
+const Gallery = ({ event, setEvent, colors = {}, fonts = {} }) => {
+  // Valores por defecto para fonts
+  const defaultFonts = {
+    body: "Inter, sans-serif"
+  };
+  
+  const mergedFonts = { ...defaultFonts, ...fonts };
   const [editingImage, setEditingImage] = useState(null);
   const [newImageUrl, setNewImageUrl] = useState('');
 
@@ -34,7 +40,7 @@ const Gallery = ({ event, setEvent, colors, fonts }) => {
   };
 
   const galleryContainerStyle = {
-    fontFamily: fonts.body,
+    fontFamily: mergedFonts.body,
     color: colors.text,
     backgroundColor: colors.background,
     padding: '20px',

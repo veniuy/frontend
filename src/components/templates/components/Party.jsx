@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Party = ({ event, setEvent, colors, fonts }) => {
+const Party = ({ event, setEvent, colors = {}, fonts = {} }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEvent(prevEvent => ({
