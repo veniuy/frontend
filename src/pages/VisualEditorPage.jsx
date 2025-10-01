@@ -23,7 +23,15 @@ export default function VisualEditorPage() {
       hashtag: "#MariaYJuan2024",
       template: "elegant",
       colors: { primary: "#e91e63", secondary: "#ffc0cb", background: "#ffffff", text: "#333333", accent: "#8e44ad" },
-      fonts: { primary: "Playfair Display", secondary: "Inter" },
+      fonts: { 
+        heading: "Playfair Display, serif", 
+        primary: "Playfair Display", 
+        secondary: "Inter",
+        body: "Inter, sans-serif",
+        title: "Playfair Display, serif",
+        subtitle: "Inter, sans-serif",
+        subheading: "Playfair Display, serif"
+      },
       // Añadir otras propiedades que puedan ser necesarias y que no se estén inicializando
       sections: {},
       bank: {},
