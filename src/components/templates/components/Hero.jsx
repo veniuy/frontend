@@ -1,26 +1,35 @@
 import React from 'react';
 
-const Hero = ({ event, setEvent, colors = {}, fonts = {} }) => {
+const Hero = ({ event = {}, setEvent, colors = {}, fonts = {} }) => {
+  // Asegurar que event.hero siempre tenga estructura
+  const safeHero = {
+    logo: '',
+    groomName: '',
+    brideName: '',
+    date: '',
+    ...event.hero,
+  };
+
   const defaultFonts = {
     heading: 'Playfair Display, serif',
     title: 'Playfair Display, serif',
-    subtitle: 'Inter, sans-serif'
+    subtitle: 'Inter, sans-serif',
   };
   const mergedFonts = { ...defaultFonts, ...fonts };
-  
+
   const defaultColors = {
     primary: '#f0f0f0',
     textPrimary: '#333',
     accent: '#8B4513',
-    textSecondary: '#666'
+    textSecondary: '#666',
   };
   const mergedColors = { ...defaultColors, ...colors };
 
   // Estilos inline para el componente Hero
   const heroStyle = {
-    backgroundColor: mergedColors.primary || '#f0f0f0',
-    color: mergedColors.textPrimary || '#333',
-    fontFamily: mergedFonts.heading || 'Arial, sans-serif',
+    backgroundColor: mergedColors.primary,
+    color: mergedColors.textPrimary,
+    fontFamily: mergedFonts.heading,
     padding: '50px 20px',
     textAlign: 'center',
   };
@@ -28,14 +37,14 @@ const Hero = ({ event, setEvent, colors = {}, fonts = {} }) => {
   const titleStyle = {
     fontSize: '3em',
     marginBottom: '10px',
-    fontFamily: mergedFonts.title || 'Georgia, serif',
-    color: mergedColors.accent || '#8B4513',
+    fontFamily: mergedFonts.title,
+    color: mergedColors.accent,
   };
 
   const subtitleStyle = {
     fontSize: '1.5em',
-    fontFamily: mergedFonts.subtitle || 'Arial, sans-serif',
-    color: mergedColors.textSecondary || '#666',
+    fontFamily: mergedFonts.subtitle,
+    color: mergedColors.textSecondary,
   };
 
   const logoStyle = {
@@ -49,7 +58,7 @@ const Hero = ({ event, setEvent, colors = {}, fonts = {} }) => {
     setEvent({
       ...event,
       hero: {
-        ...event.hero,
+        ...safeHero,
         [field]: e.target.value,
       },
     });
@@ -57,9 +66,9 @@ const Hero = ({ event, setEvent, colors = {}, fonts = {} }) => {
 
   return (
     <div style={heroStyle}>
-      {event.hero.logo && (
+      {safeHero.logo && (
         <img
-          src={event.hero.logo}
+          src={safeHero.logo}
           alt="Logo"
           style={logoStyle}
         />
@@ -67,14 +76,14 @@ const Hero = ({ event, setEvent, colors = {}, fonts = {} }) => {
       <h1 style={titleStyle}>
         <input
           type="text"
-          value={event.hero.groomName}
+          value={safeHero.groomName}
           onChange={(e) => handleNameChange(e, 'groomName')}
           style={{ ...titleStyle, border: 'none', background: 'transparent', textAlign: 'center' }}
         />
         {' & '}
         <input
           type="text"
-          value={event.hero.brideName}
+          value={safeHero.brideName}
           onChange={(e) => handleNameChange(e, 'brideName')}
           style={{ ...titleStyle, border: 'none', background: 'transparent', textAlign: 'center' }}
         />
@@ -82,7 +91,7 @@ const Hero = ({ event, setEvent, colors = {}, fonts = {} }) => {
       <p style={subtitleStyle}>
         <input
           type="text"
-          value={event.hero.date}
+          value={safeHero.date}
           onChange={(e) => handleNameChange(e, 'date')}
           style={{ ...subtitleStyle, border: 'none', background: 'transparent', textAlign: 'center' }}
         />
