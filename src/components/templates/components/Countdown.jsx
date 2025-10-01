@@ -1,6 +1,20 @@
 import React, { useState, useEffect } from 'react';
 
-const Countdown = ({ event, setEvent, colors, fonts }) => {
+const Countdown = ({ event, setEvent, colors = {}, fonts = {} }) => {
+  const defaultFonts = {
+    primary: 'Arial, sans-serif',
+    secondary: 'Georgia, serif'
+  };
+  const mergedFonts = { ...defaultFonts, ...fonts };
+
+  const defaultColors = {
+    background: '#f0f0f0',
+    text: '#333',
+    heading: '#000',
+    countdown: '#ff4500'
+  };
+  const mergedColors = { ...defaultColors, ...colors };
+
   const calculateTimeLeft = () => {
     const difference = +new Date(event.date) - +new Date();
     let timeLeft = {};
@@ -44,18 +58,18 @@ const Countdown = ({ event, setEvent, colors, fonts }) => {
     <div style={{
       textAlign: 'center',
       padding: '20px',
-      backgroundColor: colors?.background || '#f0f0f0',
-      color: colors?.text || '#333',
-      fontFamily: fonts?.primary || 'Arial, sans-serif'
+      backgroundColor: mergedColors.background || '#f0f0f0',
+      color: mergedColors.text || '#333',
+      fontFamily: mergedFonts.primary || 'Arial, sans-serif'
     }}>
       <h2 style={{
-        color: colors?.heading || '#000',
-        fontFamily: fonts?.secondary || 'Georgia, serif'
+        color: mergedColors.heading || '#000',
+        fontFamily: mergedFonts.secondary || 'Georgia, serif'
       }}>Cuenta Regresiva para {event?.name}</h2>
       <p style={{
         fontSize: '2em',
         fontWeight: 'bold',
-        color: colors?.countdown || '#ff4500'
+        color: mergedColors.countdown || '#ff4500'
       }}>
         {timerComponents.length ? timerComponents : <span>¡El evento ha comenzado!</span>}
       </p>

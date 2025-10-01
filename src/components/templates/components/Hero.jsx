@@ -1,11 +1,18 @@
 import React from 'react';
 
-const Hero = ({ event, setEvent, colors, fonts }) => {
+const Hero = ({ event, setEvent, colors = {}, fonts = {} }) => {
+  const defaultFonts = {
+    heading: 'Playfair Display, serif',
+    title: 'Playfair Display, serif',
+    subtitle: 'Inter, sans-serif'
+  };
+  const mergedFonts = { ...defaultFonts, ...fonts };
+
   // Estilos inline para el componente Hero
   const heroStyle = {
     backgroundColor: colors.primary || '#f0f0f0',
     color: colors.textPrimary || '#333',
-    fontFamily: fonts.heading || 'Arial, sans-serif',
+    fontFamily: mergedFonts.heading || 'Arial, sans-serif',
     padding: '50px 20px',
     textAlign: 'center',
   };
@@ -13,13 +20,13 @@ const Hero = ({ event, setEvent, colors, fonts }) => {
   const titleStyle = {
     fontSize: '3em',
     marginBottom: '10px',
-    fontFamily: fonts.title || 'Georgia, serif',
+    fontFamily: mergedFonts.title || 'Georgia, serif',
     color: colors.accent || '#8B4513',
   };
 
   const subtitleStyle = {
     fontSize: '1.5em',
-    fontFamily: fonts.subtitle || 'Arial, sans-serif',
+    fontFamily: mergedFonts.subtitle || 'Arial, sans-serif',
     color: colors.textSecondary || '#666',
   };
 
