@@ -8,6 +8,16 @@ const Gifts = ({ event, setEvent, colors = {}, fonts = {}, isEditing }) => {
   };
   
   const mergedFonts = { ...defaultFonts, ...fonts };
+  
+  const defaultColors = {
+    primary: '#333',
+    secondary: '#666',
+    background: '#f0f0f0',
+    text: '#333',
+    accent: '#8e44ad',
+    lightBackground: '#fff'
+  };
+  const mergedColors = { ...defaultColors, ...colors };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEvent(prevEvent => ({
@@ -22,23 +32,23 @@ const Gifts = ({ event, setEvent, colors = {}, fonts = {}, isEditing }) => {
   return (
     <div style={{
       padding: '20px',
-      backgroundColor: colors.background,
-      color: colors.text,
+      backgroundColor: mergedColors.background,
+      color: mergedColors.text,
       textAlign: 'center',
-      border: `1px solid ${colors.primary}`,
+      border: `1px solid ${mergedColors.primary}`,
       borderRadius: '8px',
       margin: '20px 0'
     }}>
       <h2 style={{
         fontFamily: mergedFonts.heading,
-        color: colors.primary,
+        color: mergedColors.primary,
         fontSize: '2.5em',
         marginBottom: '20px'
       }}>Regalos y Datos Bancarios</h2>
 
       <p style={{
         fontFamily: mergedFonts.body,
-        color: colors.text,
+        color: mergedColors.text,
         fontSize: '1.1em',
         marginBottom: '30px'
       }}>
@@ -48,7 +58,7 @@ const Gifts = ({ event, setEvent, colors = {}, fonts = {}, isEditing }) => {
       <div style={{ marginBottom: '30px' }}>
         <h3 style={{
           fontFamily: mergedFonts.heading,
-          color: colors.secondary,
+          color: mergedColors.secondary,
           fontSize: '1.8em',
           marginBottom: '15px'
         }}>Sugerencias de Regalo</h3>
@@ -63,17 +73,17 @@ const Gifts = ({ event, setEvent, colors = {}, fonts = {}, isEditing }) => {
               padding: '10px',
               fontSize: '1em',
               fontFamily: mergedFonts.body,
-              borderColor: colors.accent,
+              borderColor: mergedColors.accent,
               borderRadius: '5px',
-              backgroundColor: colors.lightBackground,
-              color: colors.text
+              backgroundColor: mergedColors.lightBackground,
+              color: mergedColors.text
             }}
             placeholder="Ej: Nuestra luna de miel, un fondo para nuestro futuro..."
           />
         ) : (
           <p style={{
             fontFamily: mergedFonts.body,
-            color: colors.text,
+            color: mergedColors.text,
             fontSize: '1em',
             whiteSpace: 'pre-wrap'
           }}>{event.gifts?.suggestions || 'No hay sugerencias de regalo disponibles.'}</p>
@@ -83,13 +93,13 @@ const Gifts = ({ event, setEvent, colors = {}, fonts = {}, isEditing }) => {
       <div>
         <h3 style={{
           fontFamily: mergedFonts.heading,
-          color: colors.secondary,
+          color: mergedColors.secondary,
           fontSize: '1.8em',
           marginBottom: '15px'
         }}>Datos Bancarios</h3>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ marginBottom: '15px', width: '80%', maxWidth: '400px' }}>
-            <label style={{ fontFamily: mergedFonts.body, color: colors.text, display: 'block', marginBottom: '5px', textAlign: 'left' }}>Banco:</label>
+            <label style={{ fontFamily: mergedFonts.body, color: mergedColors.text, display: 'block', marginBottom: '5px', textAlign: 'left' }}>Banco:</label>
             {isEditing ? (
               <input
                 type="text"
@@ -101,20 +111,20 @@ const Gifts = ({ event, setEvent, colors = {}, fonts = {}, isEditing }) => {
                   padding: '10px',
                   fontSize: '1em',
                   fontFamily: mergedFonts.body,
-                  borderColor: colors.accent,
+                  borderColor: mergedColors.accent,
                   borderRadius: '5px',
-                  backgroundColor: colors.lightBackground,
-                  color: colors.text
+                  backgroundColor: mergedColors.lightBackground,
+                  color: mergedColors.text
                 }}
                 placeholder="Nombre del Banco"
               />
             ) : (
-              <p style={{ fontFamily: mergedFonts.body, color: colors.text, fontSize: '1em', textAlign: 'left' }}>{event.gifts?.bankName || 'No especificado'}</p>
+              <p style={{ fontFamily: mergedFonts.body, color: mergedColors.text, fontSize: '1em', textAlign: 'left' }}>{event.gifts?.bankName || 'No especificado'}</p>
             )}
           </div>
 
           <div style={{ marginBottom: '15px', width: '80%', maxWidth: '400px' }}>
-            <label style={{ fontFamily: mergedFonts.body, color: colors.text, display: 'block', marginBottom: '5px', textAlign: 'left' }}>Número de Cuenta / IBAN:</label>
+            <label style={{ fontFamily: mergedFonts.body, color: mergedColors.text, display: 'block', marginBottom: '5px', textAlign: 'left' }}>Número de Cuenta / IBAN:</label>
             {isEditing ? (
               <input
                 type="text"
@@ -126,20 +136,20 @@ const Gifts = ({ event, setEvent, colors = {}, fonts = {}, isEditing }) => {
                   padding: '10px',
                   fontSize: '1em',
                   fontFamily: mergedFonts.body,
-                  borderColor: colors.accent,
+                  borderColor: mergedColors.accent,
                   borderRadius: '5px',
-                  backgroundColor: colors.lightBackground,
-                  color: colors.text
+                  backgroundColor: mergedColors.lightBackground,
+                  color: mergedColors.text
                 }}
                 placeholder="ESXX XXXX XXXX XXXX XXXX XXXX"
               />
             ) : (
-              <p style={{ fontFamily: mergedFonts.body, color: colors.text, fontSize: '1em', textAlign: 'left' }}>{event.gifts?.accountNumber || 'No especificado'}</p>
+              <p style={{ fontFamily: mergedFonts.body, color: mergedColors.text, fontSize: '1em', textAlign: 'left' }}>{event.gifts?.accountNumber || 'No especificado'}</p>
             )}
           </div>
 
           <div style={{ marginBottom: '15px', width: '80%', maxWidth: '400px' }}>
-            <label style={{ fontFamily: mergedFonts.body, color: colors.text, display: 'block', marginBottom: '5px', textAlign: 'left' }}>Titular de la Cuenta:</label>
+            <label style={{ fontFamily: mergedFonts.body, color: mergedColors.text, display: 'block', marginBottom: '5px', textAlign: 'left' }}>Titular de la Cuenta:</label>
             {isEditing ? (
               <input
                 type="text"
@@ -151,15 +161,15 @@ const Gifts = ({ event, setEvent, colors = {}, fonts = {}, isEditing }) => {
                   padding: '10px',
                   fontSize: '1em',
                   fontFamily: mergedFonts.body,
-                  borderColor: colors.accent,
+                  borderColor: mergedColors.accent,
                   borderRadius: '5px',
-                  backgroundColor: colors.lightBackground,
-                  color: colors.text
+                  backgroundColor: mergedColors.lightBackground,
+                  color: mergedColors.text
                 }}
                 placeholder="Nombre del Titular"
               />
             ) : (
-              <p style={{ fontFamily: mergedFonts.body, color: colors.text, fontSize: '1em', textAlign: 'left' }}>{event.gifts?.accountHolder || 'No especificado'}</p>
+              <p style={{ fontFamily: mergedFonts.body, color: mergedColors.text, fontSize: '1em', textAlign: 'left' }}>{event.gifts?.accountHolder || 'No especificado'}</p>
             )}
           </div>
         </div>

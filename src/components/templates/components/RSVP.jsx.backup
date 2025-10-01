@@ -1,18 +1,6 @@
 import React, { useState } from 'react';
 
 const RSVP = ({ event, setEvent, colors = {}, fonts = {} }) => {
-  const defaultFonts = {
-    primary: 'Arial, sans-serif',
-  };
-  const mergedFonts = { ...defaultFonts, ...fonts };
-  const defaultColors = {
-    primary: '#333',
-    secondary: '#666',
-    background: '#f0f0f0',
-    text: '#333'
-  };
-  const mergedColors = { ...defaultColors, ...colors };
-
   const [name, setName] = useState('');
   const [attending, setAttending] = useState('');
   const [guests, setGuests] = useState(0);
@@ -26,23 +14,23 @@ const RSVP = ({ event, setEvent, colors = {}, fonts = {} }) => {
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: mergedFonts.primary || 'Arial' }}>
-      <h2 style={{ color: mergedColors.primary || '#333', textAlign: 'center' }}>Confirmación de Asistencia</h2>
-      <form onSubmit={handleSubmit} style={{ maxWidth: '500px', margin: '0 auto', padding: '20px', border: `1px solid ${mergedColors.secondary || '#ccc'}`, borderRadius: '8px', backgroundColor: mergedColors.background || '#f9f9f9' }}>
+    <div style={{ padding: '20px', fontFamily: fonts?.primary || 'Arial' }}>
+      <h2 style={{ color: colors?.primary || '#333', textAlign: 'center' }}>Confirmación de Asistencia</h2>
+      <form onSubmit={handleSubmit} style={{ maxWidth: '500px', margin: '0 auto', padding: '20px', border: `1px solid ${colors?.secondary || '#ccc'}`, borderRadius: '8px', backgroundColor: colors?.background || '#f9f9f9' }}>
         <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="name" style={{ display: 'block', marginBottom: '5px', color: mergedColors.text || '#555' }}>Nombre Completo:</label>
+          <label htmlFor="name" style={{ display: 'block', marginBottom: '5px', color: colors?.text || '#555' }}>Nombre Completo:</label>
           <input
             type="text"
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            style={{ width: '100%', padding: '10px', border: `1px solid ${mergedColors.secondary || '#ddd'}`, borderRadius: '4px', boxSizing: 'border-box' }}
+            style={{ width: '100%', padding: '10px', border: `1px solid ${colors?.secondary || '#ddd'}`, borderRadius: '4px', boxSizing: 'border-box' }}
           />
         </div>
 
         <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px', color: mergedColors.text || '#555' }}>¿Asistirás?</label>
+          <label style={{ display: 'block', marginBottom: '5px', color: colors?.text || '#555' }}>¿Asistirás?</label>
           <div style={{ display: 'flex', gap: '15px' }}>
             <label style={{ display: 'flex', alignItems: 'center' }}>
               <input
@@ -72,7 +60,7 @@ const RSVP = ({ event, setEvent, colors = {}, fonts = {} }) => {
 
         {attending === 'yes' && (
           <div style={{ marginBottom: '15px' }}>
-            <label htmlFor="guests" style={{ display: 'block', marginBottom: '5px', color: mergedColors.text || '#555' }}>Número de invitados (incluyéndote):</label>
+            <label htmlFor="guests" style={{ display: 'block', marginBottom: '5px', color: colors?.text || '#555' }}>Número de invitados (incluyéndote):</label>
             <input
               type="number"
               id="guests"
@@ -80,14 +68,14 @@ const RSVP = ({ event, setEvent, colors = {}, fonts = {} }) => {
               onChange={(e) => setGuests(parseInt(e.target.value, 10))}
               min="1"
               required
-              style={{ width: '100%', padding: '10px', border: `1px solid ${mergedColors.secondary || '#ddd'}`, borderRadius: '4px', boxSizing: 'border-box' }}
+              style={{ width: '100%', padding: '10px', border: `1px solid ${colors?.secondary || '#ddd'}`, borderRadius: '4px', boxSizing: 'border-box' }}
             />
           </div>
         )}
 
         <button
           type="submit"
-          style={{ width: '100%', padding: '10px 15px', backgroundColor: mergedColors.buttonPrimary || '#4CAF50', color: mergedColors.buttonText || 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '16px' }}
+          style={{ width: '100%', padding: '10px 15px', backgroundColor: colors?.buttonPrimary || '#4CAF50', color: colors?.buttonText || 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '16px' }}
         >
           Enviar RSVP
         </button>

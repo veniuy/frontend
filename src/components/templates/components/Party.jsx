@@ -1,6 +1,22 @@
 import React from 'react';
 
 const Party = ({ event, setEvent, colors = {}, fonts = {} }) => {
+  const defaultFonts = {
+    primary: 'Arial, sans-serif',
+    secondary: 'Georgia, serif'
+  };
+  const mergedFonts = { ...defaultFonts, ...fonts };
+  
+  const defaultColors = {
+    primary: '#333',
+    textPrimary: '#333',
+    background: '#f0f0f0',
+    shadowColor: 'rgba(0,0,0,0.1)',
+    headingColor: '#333',
+    labelColor: '#333',
+    borderColor: '#ccc'
+  };
+  const mergedColors = { ...defaultColors, ...colors };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setEvent(prevEvent => ({
@@ -11,21 +27,21 @@ const Party = ({ event, setEvent, colors = {}, fonts = {} }) => {
 
   return (
     <div style={{
-      fontFamily: fonts.primary,
-      color: colors.textPrimary,
-      backgroundColor: colors.background,
+      fontFamily: mergedFonts.primary,
+      color: mergedColors.textPrimary,
+      backgroundColor: mergedColors.background,
       padding: '20px',
       borderRadius: '8px',
-      boxShadow: `0 4px 8px ${colors.shadowColor || 'rgba(0,0,0,0.1)'}`
+      boxShadow: `0 4px 8px ${mergedColors.shadowColor || 'rgba(0,0,0,0.1)'}`
     }}>
       <h2 style={{
-        color: colors.headingColor || colors.textPrimary,
-        fontFamily: fonts.secondary || fonts.primary,
+        color: mergedColors.headingColor || mergedColors.textPrimary,
+        fontFamily: mergedFonts.secondary || mergedFonts.primary,
         marginBottom: '15px'
       }}>Componente Fiesta/Celebración</h2>
 
       <div style={{ marginBottom: '10px' }}>
-        <label style={{ display: 'block', marginBottom: '5px', color: colors.labelColor || colors.textPrimary }}>Nombre del evento:</label>
+        <label style={{ display: 'block', marginBottom: '5px', color: mergedColors.labelColor || mergedColors.textPrimary }}>Nombre del evento:</label>
         <input
           type="text"
           name="name"
@@ -34,7 +50,7 @@ const Party = ({ event, setEvent, colors = {}, fonts = {} }) => {
           style={{
             width: '100%',
             padding: '8px',
-            border: `1px solid ${colors.borderColor || '#ccc'}`,
+            border: `1px solid ${mergedColors.borderColor || '#ccc'}`,
             borderRadius: '4px',
             boxSizing: 'border-box'
           }}
@@ -42,7 +58,7 @@ const Party = ({ event, setEvent, colors = {}, fonts = {} }) => {
       </div>
 
       <div style={{ marginBottom: '10px' }}>
-        <label style={{ display: 'block', marginBottom: '5px', color: colors.labelColor || colors.textPrimary }}>Fecha:</label>
+        <label style={{ display: 'block', marginBottom: '5px', color: mergedColors.labelColor || mergedColors.textPrimary }}>Fecha:</label>
         <input
           type="date"
           name="date"
@@ -51,7 +67,7 @@ const Party = ({ event, setEvent, colors = {}, fonts = {} }) => {
           style={{
             width: '100%',
             padding: '8px',
-            border: `1px solid ${colors.borderColor || '#ccc'}`,
+            border: `1px solid ${mergedColors.borderColor || '#ccc'}`,
             borderRadius: '4px',
             boxSizing: 'border-box'
           }}
@@ -59,7 +75,7 @@ const Party = ({ event, setEvent, colors = {}, fonts = {} }) => {
       </div>
 
       <div style={{ marginBottom: '10px' }}>
-        <label style={{ display: 'block', marginBottom: '5px', color: colors.labelColor || colors.textPrimary }}>Lugar:</label>
+        <label style={{ display: 'block', marginBottom: '5px', color: mergedColors.labelColor || mergedColors.textPrimary }}>Lugar:</label>
         <input
           type="text"
           name="location"
@@ -68,7 +84,7 @@ const Party = ({ event, setEvent, colors = {}, fonts = {} }) => {
           style={{
             width: '100%',
             padding: '8px',
-            border: `1px solid ${colors.borderColor || '#ccc'}`,
+            border: `1px solid ${mergedColors.borderColor || '#ccc'}`,
             borderRadius: '4px',
             boxSizing: 'border-box'
           }}

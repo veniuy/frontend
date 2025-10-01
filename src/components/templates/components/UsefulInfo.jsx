@@ -9,6 +9,14 @@ const UsefulInfo = ({ event, setEvent, colors = {}, fonts = {}, editable }) => {
   };
   
   const mergedFonts = { ...defaultFonts, ...fonts };
+  
+  const defaultColors = {
+    primary: '#333',
+    secondary: '#666',
+    text: '#333',
+    accent: '#8e44ad'
+  };
+  const mergedColors = { ...defaultColors, ...colors };
   const handleInfoChange = (e, index) => {
     const newInfo = [...event.usefulInfo];
     newInfo[index].text = e.target.value;
@@ -16,11 +24,11 @@ const UsefulInfo = ({ event, setEvent, colors = {}, fonts = {}, editable }) => {
   };
 
   return (
-    <div style={{ fontFamily: mergedFonts.body, color: colors.text, padding: '20px' }}>
-      <h2 style={{ fontFamily: mergedFonts.heading, color: colors.primary }}>Información Útil</h2>
+    <div style={{ fontFamily: mergedFonts.body, color: mergedColors.text, padding: '20px' }}>
+      <h2 style={{ fontFamily: mergedFonts.heading, color: mergedColors.primary }}>Información Útil</h2>
       {event.usefulInfo.map((info, index) => (
         <div key={index} style={{ marginBottom: '15px' }}>
-          <h3 style={{ fontFamily: mergedFonts.subheading, color: colors.secondary }}>{info.title}</h3>
+          <h3 style={{ fontFamily: mergedFonts.subheading, color: mergedColors.secondary }}>{info.title}</h3>
           {editable ? (
             <textarea
               value={info.text}
@@ -28,10 +36,10 @@ const UsefulInfo = ({ event, setEvent, colors = {}, fonts = {}, editable }) => {
               style={{
                 width: '100%',
                 padding: '8px',
-                border: `1px solid ${colors.accent}`,
+                border: `1px solid ${mergedColors.accent}`,
                 borderRadius: '4px',
                 fontFamily: mergedFonts.body,
-                color: colors.text,
+                color: mergedColors.text,
                 backgroundColor: 'transparent'
               }}
             />

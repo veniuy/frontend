@@ -1,18 +1,6 @@
 import React from 'react';
 
 const Footer = ({ event, setEvent, colors = {}, fonts = {} }) => {
-  const defaultFonts = {
-    body: 'Inter, sans-serif',
-  };
-  const mergedFonts = { ...defaultFonts, ...fonts };
-  const defaultColors = {
-    primary: '#333',
-    secondary: '#666',
-    background: '#f0f0f0',
-    text: '#333'
-  };
-  const mergedColors = { ...defaultColors, ...colors };
-
   // Función para manejar la acción de compartir en diferentes plataformas
   const handleShare = (platform) => {
     // Utiliza la URL del evento si está disponible, de lo contrario, usa la URL actual de la ventana
@@ -46,9 +34,9 @@ const Footer = ({ event, setEvent, colors = {}, fonts = {} }) => {
 
   // Estilos inline para el footer, utilizando las props 'colors' y 'fonts' para personalización
   const footerStyle = {
-    backgroundColor: mergedColors.footerBackground || '#f8f8f8',
-    color: mergedColors.footerText || '#333',
-    fontFamily: mergedFonts.body || 'Arial, sans-serif',
+    backgroundColor: colors?.footerBackground || '#f8f8f8',
+    color: colors?.footerText || '#333',
+    fontFamily: fonts?.body || 'Arial, sans-serif',
     padding: '20px',
     textAlign: 'center',
     marginTop: '40px',
@@ -56,8 +44,8 @@ const Footer = ({ event, setEvent, colors = {}, fonts = {} }) => {
 
   // Estilos inline para los botones de compartir, utilizando las props 'colors'
   const shareButtonStyle = {
-    backgroundColor: mergedColors.primary || '#6a0dad',
-    color: mergedColors.buttonText || '#fff',
+    backgroundColor: colors?.primary || '#6a0dad',
+    color: colors?.buttonText || '#fff',
     border: 'none',
     padding: '10px 15px',
     margin: '0 5px',

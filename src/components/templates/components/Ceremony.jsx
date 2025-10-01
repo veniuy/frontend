@@ -1,6 +1,18 @@
 import React from 'react';
 
 const Ceremony = ({ event, setEvent, colors = {}, fonts = {} }) => {
+  const defaultFonts = {
+    primary: 'serif',
+    secondary: 'sans-serif'
+  };
+  const mergedFonts = { ...defaultFonts, ...fonts };
+  
+  const defaultColors = {
+    background: '#f8f8f8',
+    primary: '#333',
+    text: '#666'
+  };
+  const mergedColors = { ...defaultColors, ...colors };
   const handleInputChange = (e, field) => {
     setEvent({
       ...event,
@@ -12,21 +24,21 @@ const Ceremony = ({ event, setEvent, colors = {}, fonts = {} }) => {
   };
 
   const sectionStyle = {
-    backgroundColor: colors.background || '#f8f8f8',
+    backgroundColor: mergedColors.background || '#f8f8f8',
     padding: '40px 20px',
     textAlign: 'center',
   };
 
   const titleStyle = {
-    fontFamily: fonts.primary || 'serif',
-    color: colors.primary || '#333',
+    fontFamily: mergedFonts.primary || 'serif',
+    color: mergedColors.primary || '#333',
     fontSize: '2.5em',
     marginBottom: '20px',
   };
 
   const textStyle = {
-    fontFamily: fonts.secondary || 'sans-serif',
-    color: colors.text || '#666',
+    fontFamily: mergedFonts.secondary || 'sans-serif',
+    color: mergedColors.text || '#666',
     fontSize: '1.1em',
     lineHeight: '1.6',
     marginBottom: '15px',
@@ -37,7 +49,7 @@ const Ceremony = ({ event, setEvent, colors = {}, fonts = {} }) => {
     width: '100%',
     maxWidth: '800px',
     margin: '30px auto 0 auto',
-    border: `1px solid ${colors.primary || '#ccc'}`,
+    border: `1px solid ${mergedColors.primary || '#ccc'}`,
     borderRadius: '8px',
     overflow: 'hidden',
   };

@@ -1,19 +1,6 @@
 import React from 'react';
 
 const Songs = ({ event, setEvent, colors = {}, fonts = {} }) => {
-  const defaultFonts = {
-    primary: 'Arial, sans-serif',
-    secondary: 'Georgia, serif',
-  };
-  const mergedFonts = { ...defaultFonts, ...fonts };
-  const defaultColors = {
-    primary: '#333',
-    secondary: '#666',
-    background: '#f0f0f0',
-    text: '#333'
-  };
-  const mergedColors = { ...defaultColors, ...colors };
-
   // Función para manejar cambios en las sugerencias musicales
   const handleMusicSuggestionsChange = (e) => {
     setEvent({
@@ -23,8 +10,8 @@ const Songs = ({ event, setEvent, colors = {}, fonts = {} }) => {
   };
 
   const containerStyle = {
-    backgroundColor: mergedColors.background || '#f0f0f0',
-    fontFamily: mergedFonts.primary || 'Arial, sans-serif',
+    backgroundColor: colors?.background || '#f0f0f0',
+    fontFamily: fonts?.primary || 'Arial, sans-serif',
     padding: '20px',
     borderRadius: '8px',
     textAlign: 'center',
@@ -32,13 +19,13 @@ const Songs = ({ event, setEvent, colors = {}, fonts = {} }) => {
   };
 
   const titleStyle = {
-    color: mergedColors.textPrimary || '#333',
+    color: colors?.textPrimary || '#333',
     fontSize: '2em',
     marginBottom: '15px',
   };
 
   const subtitleStyle = {
-    color: mergedColors.textSecondary || '#666',
+    color: colors?.textSecondary || '#666',
     fontSize: '1.2em',
     marginBottom: '25px',
   };
@@ -47,10 +34,10 @@ const Songs = ({ event, setEvent, colors = {}, fonts = {} }) => {
     width: '80%',
     padding: '10px',
     margin: '10px 0',
-    border: `1px solid ${mergedColors.textSecondary || '#ccc'}`,
+    border: `1px solid ${colors?.textSecondary || '#ccc'}`,
     borderRadius: '5px',
     fontSize: '1em',
-    fontFamily: mergedFonts.secondary || 'Arial, sans-serif',
+    fontFamily: fonts?.secondary || 'Arial, sans-serif',
   };
 
   return (
@@ -58,7 +45,7 @@ const Songs = ({ event, setEvent, colors = {}, fonts = {} }) => {
       <h2 style={titleStyle}>Sugerencias Musicales</h2>
       <p style={subtitleStyle}>Ayúdanos a crear la playlist perfecta para tu evento.</p>
       <div>
-        <label htmlFor="musicSuggestions" style={{ color: mergedColors.textPrimary, display: 'block', marginBottom: '5px' }}>
+        <label htmlFor="musicSuggestions" style={{ color: colors?.textPrimary, display: 'block', marginBottom: '5px' }}>
           Tus sugerencias:
         </label>
         <input

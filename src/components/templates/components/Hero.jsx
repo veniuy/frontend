@@ -7,11 +7,19 @@ const Hero = ({ event, setEvent, colors = {}, fonts = {} }) => {
     subtitle: 'Inter, sans-serif'
   };
   const mergedFonts = { ...defaultFonts, ...fonts };
+  
+  const defaultColors = {
+    primary: '#f0f0f0',
+    textPrimary: '#333',
+    accent: '#8B4513',
+    textSecondary: '#666'
+  };
+  const mergedColors = { ...defaultColors, ...colors };
 
   // Estilos inline para el componente Hero
   const heroStyle = {
-    backgroundColor: colors.primary || '#f0f0f0',
-    color: colors.textPrimary || '#333',
+    backgroundColor: mergedColors.primary || '#f0f0f0',
+    color: mergedColors.textPrimary || '#333',
     fontFamily: mergedFonts.heading || 'Arial, sans-serif',
     padding: '50px 20px',
     textAlign: 'center',
@@ -21,13 +29,13 @@ const Hero = ({ event, setEvent, colors = {}, fonts = {} }) => {
     fontSize: '3em',
     marginBottom: '10px',
     fontFamily: mergedFonts.title || 'Georgia, serif',
-    color: colors.accent || '#8B4513',
+    color: mergedColors.accent || '#8B4513',
   };
 
   const subtitleStyle = {
     fontSize: '1.5em',
     fontFamily: mergedFonts.subtitle || 'Arial, sans-serif',
-    color: colors.textSecondary || '#666',
+    color: mergedColors.textSecondary || '#666',
   };
 
   const logoStyle = {

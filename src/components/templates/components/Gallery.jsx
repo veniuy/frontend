@@ -7,6 +7,16 @@ const Gallery = ({ event, setEvent, colors = {}, fonts = {} }) => {
   };
   
   const mergedFonts = { ...defaultFonts, ...fonts };
+  
+  const defaultColors = {
+    primary: '#333',
+    secondary: '#666',
+    background: '#f0f0f0',
+    text: '#333',
+    buttonText: '#fff',
+    danger: '#dc3545'
+  };
+  const mergedColors = { ...defaultColors, ...colors };
   const [editingImage, setEditingImage] = useState(null);
   const [newImageUrl, setNewImageUrl] = useState('');
 
@@ -41,8 +51,8 @@ const Gallery = ({ event, setEvent, colors = {}, fonts = {} }) => {
 
   const galleryContainerStyle = {
     fontFamily: mergedFonts.body,
-    color: colors.text,
-    backgroundColor: colors.background,
+    color: mergedColors.text,
+    backgroundColor: mergedColors.background,
     padding: '20px',
     borderRadius: '8px',
     boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
@@ -51,7 +61,7 @@ const Gallery = ({ event, setEvent, colors = {}, fonts = {} }) => {
   };
 
   const titleStyle = {
-    color: colors.primary,
+    color: mergedColors.primary,
     textAlign: 'center',
     marginBottom: '30px',
     fontSize: '2.5em'
@@ -65,7 +75,7 @@ const Gallery = ({ event, setEvent, colors = {}, fonts = {} }) => {
   };
 
   const imageCardStyle = {
-    border: `1px solid ${colors.secondary}`,
+    border: `1px solid ${mergedColors.secondary}`,
     borderRadius: '8px',
     overflow: 'hidden',
     boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
@@ -84,8 +94,8 @@ const Gallery = ({ event, setEvent, colors = {}, fonts = {} }) => {
     justifyContent: 'center',
     gap: '10px',
     padding: '10px',
-    backgroundColor: colors.secondaryBackground || colors.background,
-    borderTop: `1px solid ${colors.secondary}`
+    backgroundColor: mergedColors.secondaryBackground || mergedColors.background,
+    borderTop: `1px solid ${mergedColors.secondary}`
   };
 
   const buttonStyle = {
@@ -93,8 +103,8 @@ const Gallery = ({ event, setEvent, colors = {}, fonts = {} }) => {
     borderRadius: '5px',
     border: 'none',
     cursor: 'pointer',
-    backgroundColor: colors.primary,
-    color: colors.buttonText || '#fff',
+    backgroundColor: mergedColors.primary,
+    color: mergedColors.buttonText || '#fff',
     fontSize: '0.9em'
   };
 
@@ -109,7 +119,7 @@ const Gallery = ({ event, setEvent, colors = {}, fonts = {} }) => {
     flexGrow: 1,
     padding: '10px',
     borderRadius: '5px',
-    border: `1px solid ${colors.secondary}`,
+    border: `1px solid ${mergedColors.secondary}`,
     maxWidth: '400px'
   };
 
@@ -137,8 +147,8 @@ const Gallery = ({ event, setEvent, colors = {}, fonts = {} }) => {
           <div key={index} style={imageCardStyle}>
             <img src={image} alt={`Gallery Image ${index + 1}`} style={imageStyle} />
             <div style={buttonContainerStyle}>
-              <button onClick={() => handleEditImage(index)} style={{ ...buttonStyle, backgroundColor: colors.secondary }}>Editar</button>
-              <button onClick={() => handleRemoveImage(index)} style={{ ...buttonStyle, backgroundColor: colors.danger || '#dc3545' }}>Eliminar</button>
+              <button onClick={() => handleEditImage(index)} style={{ ...buttonStyle, backgroundColor: mergedColors.secondary }}>Editar</button>
+              <button onClick={() => handleRemoveImage(index)} style={{ ...buttonStyle, backgroundColor: mergedColors.danger || '#dc3545' }}>Eliminar</button>
             </div>
           </div>
         ))}
