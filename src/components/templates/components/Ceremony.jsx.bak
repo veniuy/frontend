@@ -1,7 +1,6 @@
 import React from 'react';
 
 const Ceremony = ({ event = {}, setEvent = () => {}, colors = {}, fonts = {} }) => {
-  const fonts = { primary: fontPrimary, secondary: fontSecondary };
   // Valores por defecto para fuentes y colores
   const defaultFonts = {
     primary: 'serif',

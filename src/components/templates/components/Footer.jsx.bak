@@ -1,7 +1,6 @@
 import React from 'react';
 
-const Footer = ({ event, setEvent, colors = {}, fonts = {}, fontPrimary, fontSecondary }) => {
-  const fonts = { primary: fontPrimary, secondary: fontSecondary };
+const Footer = ({ event, setEvent, colors = {}, fonts = {} }) => {
   const defaultFonts = {
     body: 'Inter, sans-serif',
   };

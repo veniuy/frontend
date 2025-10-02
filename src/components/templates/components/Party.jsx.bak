@@ -1,7 +1,6 @@
 import React from 'react';
 
-const Party = ({ event, setEvent, colors = {}, fonts = {}, fontPrimary, fontSecondary }) => {
-  const fonts = { primary: fontPrimary, secondary: fontSecondary };
+const Party = ({ event, setEvent, colors = {}, fonts = {} }) => {
   const defaultFonts = {
     primary: 'Arial, sans-serif',
     secondary: 'Georgia, serif'

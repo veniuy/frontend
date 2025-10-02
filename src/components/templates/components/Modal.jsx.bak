@@ -1,7 +1,6 @@
 import React from 'react';
 
-const Modal = ({ isOpen, onClose, children, event, setEvent, colors = {}, fonts = {}, fontPrimary, fontSecondary, title = 'Detalles' }) => {
-  const fonts = { primary: fontPrimary, secondary: fontSecondary };
+const Modal = ({ isOpen, onClose, children, event, setEvent, colors = {}, fonts = {}, title = 'Detalles' }) => {
   if (!isOpen) return null;
 
   const defaultColors = {

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const Countdown = ({ event, setEvent, colors = {}, fonts = {}, fontPrimary, fontSecondary }) => {
-  const fonts = { primary: fontPrimary, secondary: fontSecondary };
+const Countdown = ({ event, setEvent, colors = {}, fonts = {} }) => {
   const defaultFonts = {
     primary: 'Arial, sans-serif',
     secondary: 'Georgia, serif'
