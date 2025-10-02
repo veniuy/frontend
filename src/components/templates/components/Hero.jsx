@@ -1,7 +1,6 @@
 import React from 'react';
 
 const Hero = ({ event = {}, setEvent, colors = {}, fonts = {} }) => {
-  const fonts = { primary: fontPrimary, secondary: fontSecondary };
   // Asegurar que event.hero siempre tenga estructura
   const safeHero = {
     logo: '',
@@ -102,4 +101,3 @@ const Hero = ({ event = {}, setEvent, colors = {}, fonts = {} }) => {
 };
 
 export default Hero;
-
