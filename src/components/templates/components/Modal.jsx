@@ -1,7 +1,7 @@
 import React from 'react';
 
 const Modal = ({ isOpen, onClose, children, event, setEvent, colors = {}, fonts = {}, fontPrimary, fontSecondary, title = 'Detalles' }) => {
-  const fonts = { primary: fontPrimary, secondary: fontSecondary };
+  const localFonts = { primary: fontPrimary, secondary: fontSecondary };
   if (!isOpen) return null;
 
   const defaultColors = {
@@ -20,7 +20,7 @@ const Modal = ({ isOpen, onClose, children, event, setEvent, colors = {}, fonts 
   };
 
   const mergedColors = { ...defaultColors, ...colors };
-  const mergedFonts = { ...defaultFonts, ...fonts };
+  const mergedFonts = { ...defaultFonts, ...fonts, ...localFonts };
 
   const handleSave = () => {
     console.log('Guardando evento:', event);

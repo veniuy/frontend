@@ -1,14 +1,14 @@
 import React from 'react';
 
 const UsefulInfo = ({ event = {}, setEvent = () => {}, colors = {}, fonts = {}, editable = false }) => {
-  const fonts = { primary: fontPrimary, secondary: fontSecondary };
+  const localFonts = { primary: fontPrimary, secondary: fontSecondary };
   // Valores por defecto para fonts
   const defaultFonts = {
     heading: "Playfair Display, serif",
     body: "Inter, sans-serif",
     subheading: "Playfair Display, serif"
   };
-  const mergedFonts = { ...defaultFonts, ...fonts };
+  const mergedFonts = { ...defaultFonts, ...fonts, ...localFonts };
 
   const defaultColors = {
     primary: '#333',

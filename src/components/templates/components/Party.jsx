@@ -1,12 +1,12 @@
 import React from 'react';
 
 const Party = ({ event, setEvent, colors = {}, fonts = {}, fontPrimary, fontSecondary }) => {
-  const fonts = { primary: fontPrimary, secondary: fontSecondary };
+  const localFonts = { primary: fontPrimary, secondary: fontSecondary };
   const defaultFonts = {
     primary: 'Arial, sans-serif',
     secondary: 'Georgia, serif'
   };
-  const mergedFonts = { ...defaultFonts, ...fonts };
+  const mergedFonts = { ...defaultFonts, ...fonts, ...localFonts };
   
   const defaultColors = {
     primary: '#333',

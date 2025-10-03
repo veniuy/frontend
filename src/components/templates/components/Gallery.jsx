@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
 const Gallery = ({ event, setEvent, colors = {}, fonts = {}, fontPrimary, fontSecondary }) => {
-  const fonts = { primary: fontPrimary, secondary: fontSecondary };
+  const localFonts = { primary: fontPrimary, secondary: fontSecondary };
   // Valores por defecto para fonts
   const defaultFonts = {
     body: "Inter, sans-serif"
   };
   
-  const mergedFonts = { ...defaultFonts, ...fonts };
+  const mergedFonts = { ...defaultFonts, ...fonts, ...localFonts };
   
   const defaultColors = {
     primary: '#333',

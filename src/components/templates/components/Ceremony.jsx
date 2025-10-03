@@ -1,13 +1,13 @@
 import React from 'react';
 
-const Ceremony = ({ event = {}, setEvent = () => {}, colors = {}, fonts = {} }) => {
-  const fonts = { primary: fontPrimary, secondary: fontSecondary };
+const Ceremony = ({ event = {}, setEvent = () => {}, colors = {}, fonts = {}, fontPrimary, fontSecondary }) => {
+  const localFonts = { primary: fontPrimary, secondary: fontSecondary };
   // Valores por defecto para fuentes y colores
   const defaultFonts = {
     primary: 'serif',
     secondary: 'sans-serif'
   };
-  const mergedFonts = { ...defaultFonts, ...fonts };
+  const mergedFonts = { ...defaultFonts, ...fonts, ...localFonts };
 
   const defaultColors = {
     background: '#f8f8f8',
