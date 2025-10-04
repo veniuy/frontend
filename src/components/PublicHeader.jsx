@@ -23,6 +23,7 @@ export default function PublicHeader({
   const navLinks = [
     { title: 'Plantillas', href: '/products' },
     { title: 'Categorías', href: '#categorias' },
+    { title: 'Asociaciones', href: '/asociaciones' },
     { title: 'Preguntas', href: '/faq' },
     { title: 'Contacto', href: '/contact' },
   ];
@@ -82,7 +83,7 @@ export default function PublicHeader({
                   key={link.title}
                   onClick={() => handleNavClick(link.href)}
                   style={{
-                    fontFamily: "'Poppins', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: '12px',
                     fontWeight: '400',
                     textTransform: 'uppercase',
@@ -228,74 +229,6 @@ export default function PublicHeader({
             <X className="w-7 h-7 text-foreground" />
           </button>
 
-          {/* Iconos de Acción en Mobile - Arriba */}
-          <div className="absolute top-6 left-0 right-0 flex items-center justify-center space-x-6 pr-16">
-            {/* Search */}
-            <button
-              onClick={() => {
-                setIsMenuOpen(false);
-                document.body.style.overflow = '';
-                onSearchClick();
-              }}
-              className="w-5 h-5 text-foreground hover:opacity-70 transition-opacity"
-              aria-label="Buscar"
-            >
-              <Search className="w-5 h-5" />
-            </button>
-
-            {/* Wishlist */}
-            <button
-              onClick={() => {
-                setIsMenuOpen(false);
-                document.body.style.overflow = '';
-                onWishlistClick();
-              }}
-              className="relative w-5 h-5 text-foreground hover:opacity-70 transition-opacity"
-              aria-label="Favoritos"
-            >
-              <Heart 
-                className="w-5 h-5" 
-                fill={wishlistCount > 0 ? 'currentColor' : 'none'}
-              />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-2 -right-3 text-[10px] px-1.5 py-0.5 rounded-full bg-black text-white">
-                  {wishlistCount}
-                </span>
-              )}
-            </button>
-
-            {/* User */}
-            <button
-              onClick={() => {
-                setIsMenuOpen(false);
-                document.body.style.overflow = '';
-                navigate('/login');
-              }}
-              className="w-5 h-5 text-foreground hover:opacity-70 transition-opacity"
-              aria-label="Cuenta"
-            >
-              <User className="w-5 h-5" />
-            </button>
-
-            {/* Cart - Solo si hay items */}
-            {cartCount > 0 && (
-              <button
-                onClick={() => {
-                  setIsMenuOpen(false);
-                  document.body.style.overflow = '';
-                  onCartClick();
-                }}
-                className="relative w-5 h-5 text-foreground hover:opacity-70 transition-opacity"
-                aria-label="Carrito"
-              >
-                <ShoppingCart className="w-5 h-5" />
-                <span className="absolute -top-2 -right-3 text-[10px] px-1.5 py-0.5 rounded-full bg-black text-white">
-                  {cartCount}
-                </span>
-              </button>
-            )}
-          </div>
-
           {/* Enlaces de Navegación */}
           <nav className="flex flex-col items-center space-y-6 mt-16">
             {navLinks.map((link) => (
@@ -303,7 +236,7 @@ export default function PublicHeader({
                 key={link.title}
                 onClick={() => handleNavClick(link.href)}
                 style={{
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: '34px',
                   fontWeight: '400',
                   textTransform: 'uppercase',
@@ -322,6 +255,74 @@ export default function PublicHeader({
               </button>
             ))}
 
+            {/* Iconos de Acción en Mobile - Centrados debajo de los enlaces */}
+            <div className="flex items-center justify-center space-x-8 mt-8 mb-4">
+              {/* Search */}
+              <button
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  document.body.style.overflow = '';
+                  onSearchClick();
+                }}
+                className="w-6 h-6 text-foreground hover:opacity-70 transition-opacity"
+                aria-label="Buscar"
+              >
+                <Search className="w-6 h-6" />
+              </button>
+
+              {/* Wishlist */}
+              <button
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  document.body.style.overflow = '';
+                  onWishlistClick();
+                }}
+                className="relative w-6 h-6 text-foreground hover:opacity-70 transition-opacity"
+                aria-label="Favoritos"
+              >
+                <Heart 
+                  className="w-6 h-6" 
+                  fill={wishlistCount > 0 ? 'currentColor' : 'none'}
+                />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-2 -right-3 text-[10px] px-1.5 py-0.5 rounded-full bg-black text-white">
+                    {wishlistCount}
+                  </span>
+                )}
+              </button>
+
+              {/* User */}
+              <button
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  document.body.style.overflow = '';
+                  navigate('/login');
+                }}
+                className="w-6 h-6 text-foreground hover:opacity-70 transition-opacity"
+                aria-label="Cuenta"
+              >
+                <User className="w-6 h-6" />
+              </button>
+
+              {/* Cart - Solo si hay items */}
+              {cartCount > 0 && (
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    document.body.style.overflow = '';
+                    onCartClick();
+                  }}
+                  className="relative w-6 h-6 text-foreground hover:opacity-70 transition-opacity"
+                  aria-label="Carrito"
+                >
+                  <ShoppingCart className="w-6 h-6" />
+                  <span className="absolute -top-2 -right-3 text-[10px] px-1.5 py-0.5 rounded-full bg-black text-white">
+                    {cartCount}
+                  </span>
+                </button>
+              )}
+            </div>
+
             {/* Botón CTA en Mobile */}
             <button
               onClick={() => {
@@ -329,7 +330,7 @@ export default function PublicHeader({
                 document.body.style.overflow = '';
                 navigate('/register');
               }}
-              className="mt-8 px-10 py-3"
+              className="mt-4 px-10 py-3"
               style={{
                 fontFamily: "'Inter', sans-serif",
                 fontSize: '18px',
