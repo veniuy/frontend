@@ -23,8 +23,7 @@ import {
   Twitter,
   X as CloseIcon,
   Trash2,
-  Crown, 
-  videoSrc,  
+  Crown,  
   ChevronLeft,
   ChevronRight
 } from 'lucide-react'
@@ -741,7 +740,7 @@ function Landing() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative overflow-hidden rounded-lg shadow-warm-lg">
               <img 
-                src={asset('/src/assets/videonovia.mp4')} 
+                src={asset('/src/assets/videonovia.webm')} 
                 alt="Diseño de invitaciones digitales"
                 className="block w-full h-full object-cover"
                 onError={(e) => onImgError(e, 'Diseño de invitaciones digitales')}
