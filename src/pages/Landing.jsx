@@ -740,16 +740,16 @@ function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative overflow-hidden rounded-lg shadow-warm-lg">
-             <video
-                  src={videoSrc}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="block w-full h-full object-cover"
-                >
-                  Tu navegador no soporta el video.
-                </video>
+            <div className="aspect-video overflow-hidden rounded-lg shadow-lg">
+              <video
+                src={videoSrc}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full h-full object-cover"
+            />
+            </div>
             </div>
             <div className="space-y-8">
               <div className="mb-8">
