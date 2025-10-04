@@ -6,6 +6,7 @@ import { Card, CardContent } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Input } from '../components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
+import PublicHeader from '../components/PublicHeader'
 import { 
   Search,
   Grid3X3,
@@ -146,41 +147,7 @@ function Products() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-background border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div
-              className="font-display text-2xl font-medium text-foreground tracking-wide cursor-pointer"
-              onClick={() => navigate('/')}
-            >
-              Venite
-            </div>
-            <nav className="hidden md:flex items-center space-x-8">
-              <button
-                type="button"
-                onClick={() => navigate('/')}
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                Inicio
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/faq')}
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                FAQ
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate('/contact')}
-                className="text-muted-foreground hover:text-primary transition-colors"
-              >
-                Contacto
-              </button>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <PublicHeader />
 
       {/* Hero Section */}
       <section className="bg-gradient-warm py-12">

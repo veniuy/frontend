@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '../../components/ui/button'
 import { Phone, Instagram, Facebook, Twitter, User, Search, Heart, Menu } from 'lucide-react'
 import { CartIcon, ShoppingCartSidebar } from '../../components/ShoppingCart'
+import PublicHeader from '../../components/PublicHeader'
 import SEOHead from '../../components/common/SEOHead'
 import Breadcrumbs from '../../components/common/Breadcrumbs'
 import CategoryHero from '../../components/category/CategoryHero'
@@ -43,58 +44,7 @@ const CategoryBase = ({ categorySlug }) => {
         />
 
         {/* Header */}
-        <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              {/* Contact Info */}
-              <div className="hidden md:flex items-center text-sm text-muted-foreground">
-                <Phone className="w-4 h-4 mr-2" />
-                +34 919 03 36 08
-              </div>
-
-              {/* Logo */}
-              <div
-                className="font-display text-2xl md:text-3xl font-extrabold text-foreground tracking-wide cursor-pointer select-none"
-                onClick={() => navigate('/')}
-              >
-                Venite
-                <span className="hidden md:inline text-[11px] md:text-xs text-muted-foreground ml-2 font-medium align-middle">
-                  Invitaciones que enamoran
-                </span>
-              </div>
-
-              {/* User Actions */}
-              <div className="flex items-center space-x-4">
-                <Search
-                  className="w-5 h-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
-                  onClick={() => navigate('/')}
-                  aria-label="Buscar"
-                />
-                <Heart
-                  className="w-5 h-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
-                  aria-label="Favoritos"
-                />
-                <User
-                  className="w-5 h-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
-                  onClick={() => navigate('/login')}
-                  aria-label="Cuenta"
-                />
-                <CartIcon />
-              </div>
-            </div>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center justify-center space-x-8 py-4 border-t border-border">
-              <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" href="/categorias/boda">Bodas</a>
-              <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" href="/categorias/quinceaneras">Quinceañeras</a>
-              <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" href="/categorias/infantiles">Cumpleaños Infantiles</a>
-              <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" href="/categorias/bautizo">Baby Shower</a>
-              <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" href="/categorias/corporativos">Eventos Corporativos</a>
-              <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" href="/categorias/graduaciones">Graduaciones</a>
-              <a className="block px-3 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors" href="/products">Todas las Plantillas</a>
-            </nav>
-          </div>
-        </header>
+        <PublicHeader />
 
         {/* Breadcrumbs */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">

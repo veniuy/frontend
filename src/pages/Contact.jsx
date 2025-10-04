@@ -6,6 +6,7 @@ import { Input } from '../components/ui/input'
 import { Textarea } from '../components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { Label } from '../components/ui/label'
+import PublicHeader from '../components/PublicHeader'
 import { 
   Phone,
   Mail,
@@ -93,20 +94,7 @@ function Contact() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-background border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="font-display text-2xl font-medium text-foreground tracking-wide cursor-pointer" onClick={() => navigate('/')}>
-              Venite
-            </div>
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="/" className="text-muted-foreground hover:text-primary transition-colors">Inicio</a>
-              <a href="/products" className="text-muted-foreground hover:text-primary transition-colors">Plantillas</a>
-              <a href="/faq" className="text-muted-foreground hover:text-primary transition-colors">FAQ</a>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <PublicHeader />
 
       {/* Hero Section */}
       <section className="bg-gradient-warm py-16">
