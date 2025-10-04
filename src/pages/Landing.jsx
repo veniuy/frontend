@@ -23,7 +23,8 @@ import {
   Twitter,
   X as CloseIcon,
   Trash2,
-  Crown,
+  Crown, 
+  videoSrc,  
   ChevronLeft,
   ChevronRight
 } from 'lucide-react'
