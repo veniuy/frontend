@@ -23,7 +23,6 @@ export default function PublicHeader({
   const navLinks = [
     { title: 'Plantillas', href: '/products' },
     { title: 'Categorías', href: '#categorias' },
-    { title: 'Asociaciones', href: '/asociaciones' },
     { title: 'Preguntas', href: '/faq' },
     { title: 'Contacto', href: '/contact' },
   ];
