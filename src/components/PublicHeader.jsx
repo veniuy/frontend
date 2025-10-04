@@ -75,17 +75,8 @@ export default function PublicHeader({
       <header className="sticky top-0 z-50" style={{ backgroundColor: '#f4f2ed', borderBottom: '1px solid #e1ddd6' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            {/* Logo - Centrado siempre */}
-            <div
-              className="text-2xl md:text-3xl font-normal cursor-pointer select-none flex-1 text-center"
-              style={{ fontFamily: "'Cormorant Garamond', serif", color: '#000000', letterSpacing: '0.02em' }}
-              onClick={() => navigate('/')}
-            >
-              Venite
-            </div>
-
-            {/* Navegación Desktop - Centrada debajo del logo */}
-            <nav className="hidden lg:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2 top-[60px]">
+            {/* Navegación Desktop - A la izquierda */}
+            <nav className="hidden lg:flex items-center space-x-8">
               {navLinks.map((link) => (
                 <button
                   key={link.title}
@@ -110,8 +101,17 @@ export default function PublicHeader({
               ))}
             </nav>
 
+            {/* Logo - Centrado en desktop, centrado en móvil */}
+            <div
+              className="text-2xl md:text-3xl font-normal cursor-pointer select-none flex-1 lg:flex-none text-center"
+              style={{ fontFamily: "'Cormorant Garamond', serif", color: '#000000', letterSpacing: '0.02em' }}
+              onClick={() => navigate('/')}
+            >
+              Venite
+            </div>
+
             {/* Acciones del Usuario - Solo Desktop */}
-            <div className="hidden lg:flex items-center space-x-4 absolute right-4">
+            <div className="hidden lg:flex items-center space-x-4">
               {/* Search */}
               <button
                 onClick={onSearchClick}
@@ -215,8 +215,20 @@ export default function PublicHeader({
       {/* Menú Overlay Mobile - Estilo getguestlist.app */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center lg:hidden" style={{ backgroundColor: '#f4f2ed' }}>
+          {/* Botón Cerrar (X) - Esquina superior derecha */}
+          <button
+            onClick={toggleMenu}
+            className="absolute top-6 right-6 p-2"
+            aria-label="Cerrar menú"
+            style={{ transition: 'opacity 200ms ease' }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+          >
+            <X className="w-7 h-7 text-foreground" />
+          </button>
+
           {/* Iconos de Acción en Mobile - Arriba */}
-          <div className="absolute top-6 left-0 right-0 flex items-center justify-center space-x-6">
+          <div className="absolute top-6 left-0 right-0 flex items-center justify-center space-x-6 pr-16">
             {/* Search */}
             <button
               onClick={() => {
