@@ -1,0 +1,249 @@
+/* Estilos adicionales para el registro responsivo */
+
+/* Mejoras para el layout dividido */
+.register-split-layout {
+  min-height: 100vh;
+  display: flex;
+}
+
+/* Lado izquierdo - Branding */
+.register-brand-side {
+  background: linear-gradient(135deg, #f8f7f5 0%, #f2f0ed 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.register-brand-side::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('../assets/elegant-background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.2;
+  z-index: 1;
+}
+
+.register-brand-side::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(248, 247, 245, 0.9) 0%, rgba(242, 240, 237, 0.9) 100%);
+  z-index: 2;
+}
+
+.register-brand-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 4rem 3rem;
+  text-align: center;
+  height: 100%;
+}
+
+/* Lado derecho - Formulario */
+.register-form-side {
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+}
+
+/* Animaciones y transiciones */
+.register-feature-item {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.register-feature-item:hover {
+  transform: translateY(-2px);
+}
+
+.register-input-group {
+  position: relative;
+}
+
+.register-input-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #7a746b;
+  z-index: 5;
+}
+
+.register-input {
+  padding-left: 2.75rem;
+  height: 3rem;
+  border: 1px solid #e1ddd6;
+  border-radius: 0.5rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.register-input:focus {
+  border-color: #b99564;
+  box-shadow: 0 0 0 3px rgba(185, 149, 100, 0.1);
+  outline: none;
+}
+
+.register-button {
+  height: 3rem;
+  background-color: #3a372f;
+  color: white;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.register-button:hover {
+  background-color: #2d2a24;
+  transform: translateY(-1px);
+}
+
+.register-button:active {
+  transform: translateY(0);
+}
+
+/* Responsive breakpoints */
+@media (max-width: 1024px) {
+  .register-split-layout {
+    flex-direction: column;
+  }
+  
+  .register-brand-side {
+    min-height: auto;
+  }
+  
+  .register-brand-content {
+    padding: 2rem 1.5rem;
+    height: auto;
+  }
+  
+  .register-form-side {
+    flex: 1;
+    padding: 2rem 1.5rem 4rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .register-brand-content {
+    padding: 1.5rem 1rem;
+  }
+  
+  .register-form-side {
+    padding: 1.5rem 1rem 3rem;
+  }
+  
+  .register-input {
+    height: 2.75rem;
+    padding-left: 2.5rem;
+  }
+  
+  .register-input-icon {
+    left: 0.625rem;
+  }
+  
+  .register-button {
+    height: 2.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-brand-content {
+    padding: 1rem 0.75rem;
+  }
+  
+  .register-form-side {
+    padding: 1rem 0.75rem 2rem;
+  }
+}
+
+/* Mejoras visuales */
+.register-testimonial {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 8px 24px rgba(58, 55, 47, 0.06);
+}
+
+.register-feature-icon {
+  background: #e8eee9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+}
+
+.register-divider {
+  width: 6rem;
+  height: 0.25rem;
+  background: #b99564;
+  margin: 0 auto 1.5rem;
+}
+
+/* Estados de carga */
+.register-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.register-button:disabled:hover {
+  background-color: #3a372f;
+  transform: none;
+}
+
+/* Mejoras de accesibilidad */
+.register-input:focus-visible {
+  outline: 2px solid #b99564;
+  outline-offset: 2px;
+}
+
+.register-button:focus-visible {
+  outline: 2px solid #b99564;
+  outline-offset: 2px;
+}
+
+/* Animación de entrada */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.register-form-container {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.register-brand-content > * {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.register-brand-content > *:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.register-brand-content > *:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.register-brand-content > *:nth-child(4) {
+  animation-delay: 0.3s;
+}
