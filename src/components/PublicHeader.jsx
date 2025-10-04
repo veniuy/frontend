@@ -76,34 +76,35 @@ export default function PublicHeader({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Navegación Desktop - A la izquierda */}
-            <nav className="hidden lg:flex items-center space-x-8">
+            <nav className="hidden lg:flex items-center space-x-6">
               {navLinks.map((link) => (
                 <button
                   key={link.title}
                   onClick={() => handleNavClick(link.href)}
                   style={{
                     fontFamily: "'Poppins', sans-serif",
-                    fontSize: '14px',
+                    fontSize: '12px',
                     fontWeight: '400',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.84px',
+                    letterSpacing: '0.72px',
                     color: '#000000',
-                    transition: 'all 200ms ease',
+                    transition: 'opacity 200ms ease',
                     background: 'none',
                     border: 'none',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    textDecoration: 'none'
                   }}
-                  onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
-                  onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
+                  onMouseEnter={(e) => e.target.style.opacity = '0.6'}
+                  onMouseLeave={(e) => e.target.style.opacity = '1'}
                 >
                   {link.title}
                 </button>
               ))}
             </nav>
 
-            {/* Logo - Centrado en desktop, centrado en móvil */}
+            {/* Logo - Centrado absoluto en desktop, centrado en móvil */}
             <div
-              className="text-2xl md:text-3xl font-normal cursor-pointer select-none flex-1 lg:flex-none text-center"
+              className="text-2xl md:text-3xl font-normal cursor-pointer select-none flex-1 lg:flex-none text-center lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2"
               style={{ fontFamily: "'Cormorant Garamond', serif", color: '#000000', letterSpacing: '0.02em' }}
               onClick={() => navigate('/')}
             >
