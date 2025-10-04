@@ -739,20 +739,22 @@ function Landing() {
       <section className="py-16 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="relative overflow-hidden rounded-lg shadow-warm-lg">
-               <div className="aspect-square overflow-hidden rounded-lg shadow-lg mx-auto max-w-md">
-              <video
-                src={videoSrc}
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="w-full h-full object-cover"
-              />
+            <div className="relative overflow-hidden rounded-lg shadow-warm-lg bg-black">
+              <div className="aspect-square overflow-hidden rounded-lg w-full max-w-md mx-auto lg:max-w-none lg:w-full">
+                <video
+                  src={videoSrc}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="auto"
+                  className="w-full h-full object-cover block"
+                />
+              </div>
             </div>
+            
             </div>
-          
-            <div className="space-y-8">
+              <div className="space-y-8">
               <div className="mb-8">
                 <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 md:hidden">NUESTRA TECNOLOGÍA</p>
                 <h2 className="font-display text-3xl font-medium text-foreground mb-4 text-left md:text-left">
