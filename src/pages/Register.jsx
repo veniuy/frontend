@@ -68,11 +68,11 @@ export function Register() {
         {/* Contenido centrado */}
         <div className="relative z-10 flex flex-col justify-center items-center px-12 py-16 text-center h-full">
           {/* Logo y marca */}
-          <div className="mb-8">
-            <div className="font-display text-6xl font-black tracking-wide text-warm-gray-900 mb-4">
+          <div className="mb-8 flex flex-col items-center justify-center">
+            <div className="text-2xl lg:text-3xl font-semibold text-foreground mb-4">
               Venite
             </div>
-            <div className="w-24 h-1 bg-gold-500 mx-auto mb-6"></div>
+            {/* Línea eliminada */}
             <p className="text-xl text-warm-gray-600 font-ui leading-relaxed max-w-md">
               Crea invitaciones digitales únicas que reflejen la elegancia de tus momentos especiales
             </p>
@@ -92,10 +92,10 @@ export function Register() {
           </div>
           
           <div className="text-center">
-            <div className="font-display text-3xl font-black tracking-wide text-warm-gray-900 mb-2">
+            <div className="text-2xl font-semibold text-foreground mb-2">
               Venite
             </div>
-            <div className="w-16 h-1 bg-gold-500 mx-auto mb-3"></div>
+            {/* Línea eliminada aquí también */}
             <p className="text-base text-warm-gray-600 font-ui">
               Invitaciones digitales elegantes
             </p>
