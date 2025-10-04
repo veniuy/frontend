@@ -1,0 +1,313 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  --radius: 0rem;
+  
+  /* Getguestlist.app inspired palette */
+  --background: #ffffff;
+  --foreground: #000000;
+  --card: #ffffff;
+  --card-foreground: #000000;
+  --popover: #ffffff;
+  --popover-foreground: #000000;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --secondary: #f4f2ed;
+  --secondary-foreground: #000000;
+  --muted: #f4f2ed;
+  --muted-foreground: #7a746b;
+  --accent: #f4f2ed;
+  --accent-foreground: #000000;
+  --destructive: #ef4444;
+  --border: #e1ddd6;
+  --input: #f4f2ed;
+  --ring: #000000;
+  
+  /* Custom colors - getguestlist.app style */
+  --beige-light: #f4f2ed;
+  --warm-gray-50: #f8f7f5;
+  --warm-gray-100: #f2f0ed;
+  --warm-gray-300: #e1ddd6;
+  --warm-gray-600: #7a746b;
+  --warm-gray-900: #3a372f;
+  --sage-100: #e8eee9;
+  --sage-400: #9fb2a3;
+  --gold-400: #c7ab7d;
+  --gold-500: #b99564;
+  
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+
+/* Custom typography - getguestlist.app style */
+.font-display {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 400;
+}
+
+.font-ui {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 400;
+}
+
+.font-nav {
+  font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+  font-weight: 400;
+}
+
+/* Custom utilities */
+.text-warm-gray-50 { color: var(--warm-gray-50); }
+.text-warm-gray-100 { color: var(--warm-gray-100); }
+.text-warm-gray-300 { color: var(--warm-gray-300); }
+.text-warm-gray-600 { color: var(--warm-gray-600); }
+.text-warm-gray-900 { color: var(--warm-gray-900); }
+.text-sage-100 { color: var(--sage-100); }
+.text-sage-400 { color: var(--sage-400); }
+.text-gold-400 { color: var(--gold-400); }
+.text-gold-500 { color: var(--gold-500); }
+
+.bg-warm-gray-50 { background-color: var(--warm-gray-50); }
+.bg-warm-gray-100 { background-color: var(--warm-gray-100); }
+.bg-warm-gray-300 { background-color: var(--warm-gray-300); }
+.bg-warm-gray-600 { background-color: var(--warm-gray-600); }
+.bg-warm-gray-900 { background-color: var(--warm-gray-900); }
+.bg-sage-100 { background-color: var(--sage-100); }
+.bg-sage-400 { background-color: var(--sage-400); }
+.bg-gold-400 { background-color: var(--gold-400); }
+.bg-gold-500 { background-color: var(--gold-500); }
+
+.border-warm-gray-300 { border-color: var(--warm-gray-300); }
+
+/* Smooth transitions */
+.transition-all-300 {
+  transition: all 300ms ease-out;
+}
+
+/* Gradient backgrounds */
+.bg-gradient-warm {
+  background: linear-gradient(135deg, #faf9f7 0%, #f2f0ed 100%);
+}
+
+.bg-gradient-sage {
+  background: linear-gradient(135deg, #e8eee9 0%, #f8f7f5 100%);
+}
+
+/* Custom shadows */
+.shadow-warm {
+  box-shadow: 0 8px 24px rgba(58, 55, 47, 0.06);
+}
+
+.shadow-warm-lg {
+  box-shadow: 0 16px 48px rgba(58, 55, 47, 0.08);
+}
+
+/* Hover effects */
+.hover-lift {
+  transition: transform 300ms ease-out;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+}
+
+.hover-scale {
+  transition: transform 300ms ease-out;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+/* Getguestlist.app Navigation Styles */
+.nav-link-guestlist {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.84px;
+  color: #000000;
+  transition: all 200ms ease;
+}
+
+.nav-link-guestlist:hover {
+  text-decoration: underline;
+}
+
+.nav-link-mobile-guestlist {
+  font-family: 'Poppins', sans-serif;
+  font-size: 34px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1.23px;
+  color: #000000;
+  margin: 12px 20px;
+}
+
+.header-guestlist {
+  background-color: #f4f2ed;
+  border-bottom: 1px solid #e1ddd6;
+}
+
+.bg-beige-light {
+  background-color: #f4f2ed;
+}
+
+/* Typography scale - getguestlist.app */
+.text-h1-guestlist {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 44px;
+  font-weight: 400;
+  line-height: 1.07;
+}
+
+.text-h2-guestlist {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 42px;
+  font-weight: 400;
+  line-height: 1.08;
+}
+
+.text-h3-guestlist {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.16;
+}
+
+.text-body-guestlist {
+  font-family: 'Inter', sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .text-h1-guestlist {
+    font-size: 36px;
+  }
+  
+  .text-h2-guestlist {
+    font-size: 32px;
+  }
+  
+  .text-h3-guestlist {
+    font-size: 22px;
+  }
+  
+  .text-body-guestlist {
+    font-size: 16px;
+  }
+}
+
+/* Button styles - getguestlist.app */
+.btn-guestlist {
+  font-family: 'Inter', sans-serif;
+  font-size: 17px;
+  font-weight: 500;
+  padding: 12px 24px;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 0;
+  transition: all 200ms ease;
+}
+
+.btn-guestlist:hover {
+  background-color: #333333;
+}
