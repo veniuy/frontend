@@ -4,6 +4,11 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* Fuentes - getguestlist.app style */
+  --font-display: 'Cormorant Garamond', serif;
+  --font-ui: 'Inter', system-ui, sans-serif;
+  --font-nav: 'Poppins', 'Inter', system-ui, sans-serif;
+  
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -42,29 +47,30 @@
 }
 
 :root {
-  --radius: 0.75rem;
+  --radius: 0rem;
   
-  /* Cotton Bird inspired palette */
+  /* Getguestlist.app inspired palette */
   --background: #ffffff;
-  --foreground: #3a372f;
+  --foreground: #000000;
   --card: #ffffff;
-  --card-foreground: #3a372f;
+  --card-foreground: #000000;
   --popover: #ffffff;
-  --popover-foreground: #3a372f;
-  --primary: #b99564;
+  --popover-foreground: #000000;
+  --primary: #000000;
   --primary-foreground: #ffffff;
-  --secondary: #f8f7f5;
-  --secondary-foreground: #3a372f;
-  --muted: #f2f0ed;
+  --secondary: #f4f2ed;
+  --secondary-foreground: #000000;
+  --muted: #f4f2ed;
   --muted-foreground: #7a746b;
-  --accent: #e8eee9;
-  --accent-foreground: #3a372f;
+  --accent: #f4f2ed;
+  --accent-foreground: #000000;
   --destructive: #ef4444;
   --border: #e1ddd6;
-  --input: #f2f0ed;
-  --ring: #b99564;
+  --input: #f4f2ed;
+  --ring: #000000;
   
-  /* Custom colors */
+  /* Custom colors - getguestlist.app style */
+  --beige-light: #f4f2ed;
   --warm-gray-50: #f8f7f5;
   --warm-gray-100: #f2f0ed;
   --warm-gray-300: #e1ddd6;
@@ -130,17 +136,29 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
   }
 }
 
 
-/* Custom typography */
+/* Custom typography - getguestlist.app style */
 .font-display {
   font-family: 'Cormorant Garamond', serif;
+  font-weight: 400;
 }
 
 .font-ui {
   font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 400;
+}
+
+.font-nav {
+  font-family: 'Poppins', 'Inter', system-ui, sans-serif;
+  font-weight: 400;
 }
 
 /* Custom utilities */
@@ -204,4 +222,102 @@
 
 .hover-scale:hover {
   transform: scale(1.05);
+}
+
+/* Getguestlist.app Navigation Styles */
+.nav-link-guestlist {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.84px;
+  color: #000000;
+  transition: all 200ms ease;
+}
+
+.nav-link-guestlist:hover {
+  text-decoration: underline;
+}
+
+.nav-link-mobile-guestlist {
+  font-family: 'Poppins', sans-serif;
+  font-size: 34px;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1.23px;
+  color: #000000;
+  margin: 12px 20px;
+}
+
+.header-guestlist {
+  background-color: #f4f2ed;
+  border-bottom: 1px solid #e1ddd6;
+}
+
+.bg-beige-light {
+  background-color: #f4f2ed;
+}
+
+/* Typography scale - getguestlist.app */
+.text-h1-guestlist {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 44px;
+  font-weight: 400;
+  line-height: 1.07;
+}
+
+.text-h2-guestlist {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 42px;
+  font-weight: 400;
+  line-height: 1.08;
+}
+
+.text-h3-guestlist {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1.16;
+}
+
+.text-body-guestlist {
+  font-family: 'Inter', sans-serif;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .text-h1-guestlist {
+    font-size: 36px;
+  }
+  
+  .text-h2-guestlist {
+    font-size: 32px;
+  }
+  
+  .text-h3-guestlist {
+    font-size: 22px;
+  }
+  
+  .text-body-guestlist {
+    font-size: 16px;
+  }
+}
+
+/* Button styles - getguestlist.app */
+.btn-guestlist {
+  font-family: 'Inter', sans-serif;
+  font-size: 17px;
+  font-weight: 500;
+  padding: 12px 24px;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 0;
+  transition: all 200ms ease;
+}
+
+.btn-guestlist:hover {
+  background-color: #333333;
 }

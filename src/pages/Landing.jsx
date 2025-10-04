@@ -526,10 +526,10 @@ function Landing() {
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-h2-guestlist text-foreground mb-4">
+            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '42px', fontWeight: '400', lineHeight: '1.08', color: '#000000' }} className="mb-4">
               Nuestras invitaciones más populares
             </h2>
-            <p className="text-body-guestlist text-muted-foreground max-w-2xl mx-auto">
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.4' }} className="text-muted-foreground max-w-2xl mx-auto">
               Diseños digitales que combinan elegancia, interactividad y personalización para hacer de tu evento algo inolvidable.
             </p>
           </div>
@@ -596,10 +596,10 @@ function Landing() {
       <section id="categorias" className="py-16 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-h2-guestlist text-foreground mb-4">
+            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '42px', fontWeight: '400', lineHeight: '1.08', color: '#000000' }} className="mb-4">
               Invitaciones para cada ocasión especial
             </h2>
-            <p className="text-body-guestlist text-muted-foreground max-w-2xl mx-auto">
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.4' }} className="text-muted-foreground max-w-2xl mx-auto">
               Desde bodas elegantes hasta cumpleaños infantiles llenos de diversión. Tenemos el diseño perfecto para tu evento.
             </p>
           </div>
@@ -646,7 +646,7 @@ function Landing() {
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-h2-guestlist text-foreground mb-4">
+            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '42px', fontWeight: '400', lineHeight: '1.08', color: '#000000' }} className="mb-4">
               ¿Por qué elegir invitaciones digitales?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">

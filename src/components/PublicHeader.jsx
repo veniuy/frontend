@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu, X, Phone, Search, Heart, User, ShoppingCart } from 'lucide-react';
 
@@ -41,19 +41,39 @@ export default function PublicHeader({
   };
 
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+    const newState = !isMenuOpen;
+    setIsMenuOpen(newState);
     // Prevenir scroll cuando el menú está abierto
-    if (!isMenuOpen) {
+    if (newState) {
       document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
     }
   };
+
+  // Limpiar el overflow al desmontar el componente
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
+  // Cerrar menú con tecla Escape
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && isMenuOpen) {
+        setIsMenuOpen(false);
+        document.body.style.overflow = '';
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isMenuOpen]);
 
   return (
     <>
       {/* Header Principal */}
-      <header className="sticky top-0 z-50 header-guestlist">
+      <header className="sticky top-0 z-50" style={{ backgroundColor: '#f4f2ed', borderBottom: '1px solid #e1ddd6' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Información de contacto - Solo Desktop */}
@@ -64,7 +84,8 @@ export default function PublicHeader({
 
             {/* Logo - Centro en móvil, izquierda en desktop */}
             <div
-              className="font-display text-2xl md:text-3xl font-normal text-foreground tracking-wide cursor-pointer select-none flex-1 md:flex-none text-center md:text-left"
+              className="text-2xl md:text-3xl font-normal cursor-pointer select-none flex-1 md:flex-none text-center md:text-left"
+              style={{ fontFamily: "'Cormorant Garamond', serif", color: '#000000', letterSpacing: '0.02em' }}
               onClick={() => navigate('/')}
             >
               Venite
@@ -76,7 +97,20 @@ export default function PublicHeader({
                 <button
                   key={link.title}
                   onClick={() => handleNavClick(link.href)}
-                  className="nav-link-guestlist"
+                  style={{
+                    fontFamily: "'Poppins', sans-serif",
+                    fontSize: '14px',
+                    fontWeight: '400',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.84px',
+                    color: '#000000',
+                    transition: 'all 200ms ease',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
+                  onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
                 >
                   {link.title}
                 </button>
@@ -137,7 +171,20 @@ export default function PublicHeader({
               {/* Botón CTA Desktop */}
               <button
                 onClick={() => navigate('/register')}
-                className="hidden lg:block btn-guestlist text-sm px-6 py-2"
+                className="hidden lg:block text-sm px-6 py-2"
+                style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  backgroundColor: '#000000',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '0',
+                  cursor: 'pointer',
+                  transition: 'background-color 200ms ease'
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = '#333333'}
+                onMouseLeave={(e) => e.target.style.backgroundColor = '#000000'}
               >
                 Crear Cuenta
               </button>
@@ -158,7 +205,7 @@ export default function PublicHeader({
 
       {/* Menú Overlay Mobile - Estilo getguestlist.app */}
       {isMenuOpen && (
-        <div className="fixed inset-0 bg-beige-light z-50 flex flex-col items-center justify-center lg:hidden animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center lg:hidden" style={{ backgroundColor: '#f4f2ed' }}>
           {/* Botón Cerrar */}
           <button
             onClick={toggleMenu}
@@ -174,7 +221,21 @@ export default function PublicHeader({
               <button
                 key={link.title}
                 onClick={() => handleNavClick(link.href)}
-                className="nav-link-mobile-guestlist hover:opacity-70 transition-opacity"
+                style={{
+                  fontFamily: "'Poppins', sans-serif",
+                  fontSize: '34px',
+                  fontWeight: '400',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1.23px',
+                  color: '#000000',
+                  margin: '12px 20px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'opacity 200ms ease'
+                }}
+                onMouseEnter={(e) => e.target.style.opacity = '0.7'}
+                onMouseLeave={(e) => e.target.style.opacity = '1'}
               >
                 {link.title}
               </button>
@@ -184,10 +245,23 @@ export default function PublicHeader({
             <button
               onClick={() => {
                 setIsMenuOpen(false);
-                document.body.style.overflow = 'unset';
+                document.body.style.overflow = '';
                 navigate('/register');
               }}
-              className="mt-8 btn-guestlist px-10 py-3 text-lg"
+              className="mt-8 px-10 py-3"
+              style={{
+                fontFamily: "'Inter', sans-serif",
+                fontSize: '18px',
+                fontWeight: '500',
+                backgroundColor: '#000000',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '0',
+                cursor: 'pointer',
+                transition: 'background-color 200ms ease'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#333333'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#000000'}
             >
               Crear Cuenta
             </button>
