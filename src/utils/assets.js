@@ -1,5 +1,5 @@
 // utils/assets.js
-const MAP = import.meta.glob('/src/assets/**/*.{png,jpg,jpeg,webp,svg,gif}', { as: 'url', eager: true });
+const MAP = import.meta.glob('/src/assets/**/*.{png,jpg,jpeg,webm,webp,svg,gif}', { as: 'url', eager: true });
 
 export function asset(p) {
   if (!p) return '';
