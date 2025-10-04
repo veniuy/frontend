@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Input } from '../components/ui/input'
+import videoSrc from '../assets/videonovia.webm';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { CartIcon, ShoppingCartSidebar } from '../components/ShoppingCart'
 import {
@@ -739,8 +740,7 @@ function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative overflow-hidden rounded-lg shadow-warm-lg">
-              <img 
-                src={asset('/src/assets/videonovia.webm')} 
+              <video controls playsInline src={videoSrc} />
                 alt="Diseño de invitaciones digitales"
                 className="block w-full h-full object-cover"
                 onError={(e) => onImgError(e, 'Diseño de invitaciones digitales')}
