@@ -29,6 +29,7 @@ import {
 } from 'lucide-react'
 
 import { asset, onImgError } from '../utils/assets'
+import PublicHeader from '../components/PublicHeader'
 
 function Landing() {
   const navigate = useNavigate()
@@ -348,81 +349,14 @@ function Landing() {
 
   return (
     <div className="min-h-screen bg-background font-ui">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Contact Info */}
-            <div className="hidden md:flex items-center text-sm text-muted-foreground">
-              <Phone className="w-4 h-4 mr-2" />
-              +34 919 03 36 08
-            </div>
-
-            {/* Logo (más grueso) + slogan actualizado; slogan oculto en móviles */}
-            <div
-              className="font-display text-2xl md:text-3xl font-extrabold text-foreground tracking-wide cursor-pointer select-none"
-              onClick={() => navigate('/')}
-            >
-              Venite
-              <span className="hidden md:inline text-[11px] md:text-xs text-muted-foreground ml-2 font-medium align-middle">
-                Invitaciones que enamoran
-              </span>
-            </div>
-
-            {/* User Actions */}
-            <div className="flex items-center space-x-4">
-              <Search
-                className="w-5 h-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
-                onClick={openSearch}
-                aria-label="Buscar (/) "
-              />
-              {/* Wishlist quick-access */}
-              <div className="relative">
-                <Heart
-                  className={`w-5 h-5 cursor-pointer transition-colors ${wishlist.length ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
-                  onClick={() => setWishOpen(true)}
-                  fill={wishlist.length ? 'currentColor' : 'none'}
-                  aria-label="Favoritos"
-                />
-                {wishlist.length > 0 && (
-                  <span className="absolute -top-2 -right-3 text-[10px] px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground">
-                    {wishlist.length}
-                  </span>
-                )}
-              </div>
-
-              <User
-                className="w-5 h-5 text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
-                onClick={() => navigate('/login')}
-                aria-label="Cuenta"
-              />
-              {/* Carrito: solo se muestra si hay items */}
-              {cartCount > 0 && <CartIcon />}
-              {/* Mobile menu toggle */}
-              <Menu
-                className="w-6 h-6 text-muted-foreground cursor-pointer hover:text-foreground transition-colors md:hidden"
-                onClick={() => setMobileMenuOpen((v) => !v)}
-                aria-label="Menú"
-                aria-expanded={mobileMenuOpen}
-              />
-            </div>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center justify-center space-x-8 py-4 border-t border-border">
-            <NavLinks onClick={() => { /* noop for desktop */ }} />
-          </nav>
-
-          {/* Mobile Navigation (desplegable) */}
-          {mobileMenuOpen && (
-            <div className="md:hidden border-t border-border py-2 animate-in fade-in slide-in-from-top-2">
-              <div className="flex flex-col">
-                <NavLinks onClick={() => setMobileMenuOpen(false)} />
-              </div>
-            </div>
-          )}
-        </div>
-      </header>
+      {/* Header - Estilo getguestlist.app */}
+      <PublicHeader 
+        cartCount={cartCount}
+        wishlistCount={wishlist.length}
+        onSearchClick={openSearch}
+        onWishlistClick={() => setWishOpen(true)}
+        onCartClick={() => setCartOpen(true)}
+      />
 
       {/* Hero Slider: desktop (2 paneles por slide, sin botón interno) */}
       <section
@@ -592,10 +526,10 @@ function Landing() {
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="font-display text-3xl font-medium text-foreground mb-4">
+            <h2 className="text-h2-guestlist text-foreground mb-4">
               Nuestras invitaciones más populares
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-body-guestlist text-muted-foreground max-w-2xl mx-auto">
               Diseños digitales que combinan elegancia, interactividad y personalización para hacer de tu evento algo inolvidable.
             </p>
           </div>
@@ -659,13 +593,13 @@ function Landing() {
       </section>
 
       {/* Categories -> ahora navega a /categorias/... */}
-      <section className="py-16 bg-secondary">
+      <section id="categorias" className="py-16 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="font-display text-3xl font-medium text-foreground mb-4">
+            <h2 className="text-h2-guestlist text-foreground mb-4">
               Invitaciones para cada ocasión especial
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-body-guestlist text-muted-foreground max-w-2xl mx-auto">
               Desde bodas elegantes hasta cumpleaños infantiles llenos de diversión. Tenemos el diseño perfecto para tu evento.
             </p>
           </div>
@@ -712,7 +646,7 @@ function Landing() {
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="font-display text-3xl font-medium text-foreground mb-4">
+            <h2 className="text-h2-guestlist text-foreground mb-4">
               ¿Por qué elegir invitaciones digitales?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
