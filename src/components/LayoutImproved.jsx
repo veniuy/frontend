@@ -12,16 +12,9 @@ import {
   Users,
   Gift,
   Building,
-  ClipboardList,
-  Mail,
-  Link as LinkIcon,
-  BarChart3,
   User,
   Settings,
-  Eye,
-  Palette,
-  Image,
-  FileText
+  Palette
 } from 'lucide-react';
 import './Layout.css';
 
@@ -40,10 +33,10 @@ export default function LayoutImproved() {
 
   const navigation = [
     { 
-      name: 'Dashboard', 
+      name: 'Panel Principal', 
       href: `${BASE}/dashboard`, 
       icon: Home,
-      description: 'Panel principal'
+      description: 'Inicio'
     },
     { 
       name: 'Mis Eventos', 
@@ -52,67 +45,28 @@ export default function LayoutImproved() {
       description: 'Gestionar eventos'
     },
     { 
-      name: 'Preview', 
-      href: `${BASE}/preview`, 
-      icon: Eye,
-      description: 'Vista previa'
-    },
-    { 
-      name: 'Registry', 
+      name: 'Lista de Regalos', 
       href: `${BASE}/registry`, 
       icon: Gift,
-      description: 'Lista de regalos'
+      description: 'Regalos'
     },
     { 
-      name: 'Accommodations', 
+      name: 'Alojamientos', 
       href: `${BASE}/accommodations`, 
       icon: Building,
-      description: 'Alojamientos'
+      description: 'Hospedaje'
     },
     { 
-      name: 'Guest Surveys', 
+      name: 'Invitados', 
       href: `${BASE}/guest-surveys`, 
-      icon: ClipboardList,
-      description: 'Encuestas'
+      icon: Users,
+      description: 'Gestión de invitados'
     },
     { 
-      name: 'Custom Emails', 
-      href: `${BASE}/custom-emails`, 
-      icon: Mail,
-      description: 'Emails personalizados'
-    },
-    { 
-      name: 'Shareable Link', 
-      href: `${BASE}/shareable-link`, 
-      icon: LinkIcon,
-      description: 'Enlaces compartibles'
-    },
-    { 
-      name: 'Tracking', 
-      href: `${BASE}/tracking`, 
-      icon: BarChart3,
-      description: 'Seguimiento'
-    }
-  ];
-
-  const quickActions = [
-    {
-      name: 'Crear Evento',
-      href: `${BASE}/events/wizard`,
-      icon: Calendar,
-      color: 'bg-blue-500 hover:bg-blue-600'
-    },
-    {
-      name: 'Editor Visual',
-      href: `${BASE}/visual-editor`,
+      name: 'Editor Visual', 
+      href: `${BASE}/visual-editor`, 
       icon: Palette,
-      color: 'bg-purple-500 hover:bg-purple-600'
-    },
-    {
-      name: 'Galería',
-      href: `${BASE}/gallery`,
-      icon: Image,
-      color: 'bg-green-500 hover:bg-green-600'
+      description: 'Personalizar diseño'
     }
   ];
 
@@ -132,7 +86,7 @@ export default function LayoutImproved() {
           className="fixed inset-0 bg-gray-600 bg-opacity-75"
           onClick={() => setSidebarOpen(false)}
         />
-        <div className="fixed inset-y-0 left-0 flex w-80 flex-col bg-white shadow-xl">
+        <div className="fixed inset-y-0 left-0 flex w-72 flex-col bg-white shadow-xl">
           <div className="flex h-16 items-center justify-between px-4 border-b">
             <div className="flex items-center">
               <Sparkles className="h-8 w-8 text-blue-600" />
@@ -151,49 +105,24 @@ export default function LayoutImproved() {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  className={`group flex items-center px-3 py-3 text-sm rounded-lg transition-colors ${
                     isActive(item.href)
-                      ? 'bg-blue-100 text-blue-900 border-r-2 border-blue-600'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      ? 'bg-blue-50 text-blue-900'
+                      : 'text-gray-700 hover:bg-gray-50'
                   }`}
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <Icon className="mr-3 h-5 w-5 flex-shrink-0" />
+                  <Icon className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                    isActive(item.href) ? 'text-blue-600' : 'text-gray-400'
+                  }`} />
                   <div className="flex-1">
-                    <div className="font-medium">{item.name}</div>
-                    <div className="text-xs text-gray-500">{item.description}</div>
+                    <div className="text-sm">{item.name}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{item.description}</div>
                   </div>
                 </Link>
               );
             })}
           </nav>
-
-          {/* Quick Actions */}
-          <div className="border-t border-gray-200 p-4">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-              Acciones Rápidas
-            </h3>
-            <div className="space-y-2">
-              {quickActions.map((action) => {
-                const Icon = action.icon;
-                return (
-                  <Button
-                    key={action.name}
-                    variant="ghost"
-                    size="sm"
-                    className={`w-full justify-start text-white ${action.color}`}
-                    onClick={() => {
-                      navigate(action.href);
-                      setSidebarOpen(false);
-                    }}
-                  >
-                    <Icon className="mr-2 h-4 w-4" />
-                    {action.name}
-                  </Button>
-                );
-              })}
-            </div>
-          </div>
 
           {/* User Profile */}
           <div className="border-t border-gray-200 p-4">
@@ -248,61 +177,39 @@ export default function LayoutImproved() {
       </div>
 
       {/* Sidebar desktop */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-80 lg:flex-col">
-        <div className="flex flex-col flex-grow bg-white border-r border-gray-200 shadow-sm">
+      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col">
+        <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
           {/* Header */}
-          <div className="flex items-center flex-shrink-0 px-6 py-4 border-b">
+          <div className="flex items-center flex-shrink-0 px-6 py-5 border-b">
             <Sparkles className="h-8 w-8 text-blue-600" />
             <span className="ml-2 text-xl font-bold text-gray-900">Invitaciones</span>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
+          <nav className="flex-1 space-y-1 px-3 py-6 overflow-y-auto">
             {navigation.map((item) => {
               const Icon = item.icon;
               return (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                  className={`group flex items-center px-3 py-3 text-sm rounded-lg transition-all duration-200 ${
                     isActive(item.href)
-                      ? 'bg-blue-100 text-blue-900 border-r-2 border-blue-600 shadow-sm'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 hover:shadow-sm'
+                      ? 'bg-blue-50 text-blue-900'
+                      : 'text-gray-700 hover:bg-gray-50'
                   }`}
                 >
-                  <Icon className="mr-3 h-5 w-5 flex-shrink-0" />
+                  <Icon className={`mr-3 h-5 w-5 flex-shrink-0 ${
+                    isActive(item.href) ? 'text-blue-600' : 'text-gray-400'
+                  }`} />
                   <div className="flex-1">
-                    <div className="font-medium">{item.name}</div>
-                    <div className="text-xs text-gray-500">{item.description}</div>
+                    <div className="text-sm">{item.name}</div>
+                    <div className="text-xs text-gray-500 mt-0.5">{item.description}</div>
                   </div>
                 </Link>
               );
             })}
           </nav>
-
-          {/* Quick Actions */}
-          <div className="border-t border-gray-200 p-4">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-              Acciones Rápidas
-            </h3>
-            <div className="space-y-2">
-              {quickActions.map((action) => {
-                const Icon = action.icon;
-                return (
-                  <Button
-                    key={action.name}
-                    variant="ghost"
-                    size="sm"
-                    className={`w-full justify-start text-white transition-all duration-200 ${action.color}`}
-                    onClick={() => navigate(action.href)}
-                  >
-                    <Icon className="mr-2 h-4 w-4" />
-                    {action.name}
-                  </Button>
-                );
-              })}
-            </div>
-          </div>
 
           {/* User Profile */}
           <div className="border-t border-gray-200 p-4">
@@ -351,7 +258,7 @@ export default function LayoutImproved() {
       </div>
 
       {/* Contenido principal */}
-      <div className="lg:pl-80 flex flex-col flex-1">
+      <div className="lg:pl-72 flex flex-col flex-1">
         <div className="sticky top-0 z-10 lg:hidden pl-1 pt-1 sm:pl-3 sm:pt-3 bg-gray-50">
           <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
