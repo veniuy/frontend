@@ -82,17 +82,8 @@ export default function PublicHeader({
               <span className="font-ui">+34 919 03 36 08</span>
             </div>
 
-            {/* Logo - Centro en móvil, izquierda en desktop */}
-            <div
-              className="text-2xl md:text-3xl font-normal cursor-pointer select-none flex-1 md:flex-none text-center md:text-left"
-              style={{ fontFamily: "'Cormorant Garamond', serif", color: '#000000', letterSpacing: '0.02em' }}
-              onClick={() => navigate('/')}
-            >
-              Venite
-            </div>
-
-            {/* Navegación Desktop - Centrada */}
-            <nav className="hidden lg:flex items-center justify-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
+            {/* Navegación Desktop - A la izquierda */}
+            <nav className="hidden lg:flex items-center space-x-8">
               {navLinks.map((link) => (
                 <button
                   key={link.title}
@@ -116,6 +107,15 @@ export default function PublicHeader({
                 </button>
               ))}
             </nav>
+
+            {/* Logo - Centro en desktop, centro en móvil */}
+            <div
+              className="text-2xl md:text-3xl font-normal cursor-pointer select-none flex-1 text-center"
+              style={{ fontFamily: "'Cormorant Garamond', serif", color: '#000000', letterSpacing: '0.02em' }}
+              onClick={() => navigate('/')}
+            >
+              Venite
+            </div>
 
             {/* Acciones del Usuario */}
             <div className="flex items-center space-x-4">

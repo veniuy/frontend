@@ -47,7 +47,7 @@
 }
 
 :root {
-  --radius: 0rem;
+  --radius: 0.5rem;
   
   /* Getguestlist.app inspired palette */
   --background: #ffffff;

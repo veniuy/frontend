@@ -109,7 +109,7 @@ function Landing() {
         name: 'Invitación Digital Elegante',
         category: 'Bodas',
         image: asset('/src/assets/cotton_bird_images/album_le_petit_quotidien.webp'),
-        price: 'Desde 25,00 €',
+        price: '$75',
         badge: 'Nuevo'
       },
       {
@@ -117,7 +117,7 @@ function Landing() {
         name: 'Invitación Quinceañera Premium',
         category: 'Quinceañeras',
         image: asset('/src/assets/cotton_bird_images/invitacion_creacion_propia.webp'),
-        price: 'Desde 20,00 €',
+        price: '$65',
         badge: 'Popular'
       },
       {
@@ -125,7 +125,7 @@ function Landing() {
         name: 'Invitación Infantil Animada',
         category: 'Cumpleaños Infantiles',
         image: asset('/src/assets/cotton_bird_images/novedades_boda.webp'),
-        price: 'Desde 15,00 €',
+        price: '$50',
         badge: null
       },
       {
@@ -133,7 +133,7 @@ function Landing() {
         name: 'Invitación Corporativa',
         category: 'Eventos Corporativos',
         image: asset('/src/assets/cotton_bird_images/producto_jazmin_cuadro.webp'),
-        price: 'Desde 30,00 €',
+        price: '$90',
         badge: null
       }
     ],
@@ -583,7 +583,7 @@ function Landing() {
                       {product.name}
                     </h3>
                     <p className="text-sm text-muted-foreground mb-2">{product.category}</p>
-                    <p className="font-semibold text-foreground">{product.price}</p>
+                    <p className="text-foreground" style={{ fontFamily: "'Inter', sans-serif", fontSize: '16px', fontWeight: '400' }}>{product.price}</p>
                   </CardContent>
                 </Card>
               )
