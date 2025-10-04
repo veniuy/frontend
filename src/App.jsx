@@ -42,6 +42,7 @@ import Infantiles from './pages/categories/Infantiles';
 import Bautizo from './pages/categories/Bautizo';
 import Corporativos from './pages/categories/Corporativos';
 import Graduaciones from './pages/categories/Graduaciones';
+import Asociaciones from './pages/Asociaciones';
 import './utils/assets';
 
 // Admin
@@ -70,6 +71,7 @@ function App() {
       <Route path="/product/:id" element={<ProductDetail />} />
       <Route path="/faq" element={<FAQ />} />
       <Route path="/contact" element={<Contact />} />
+      <Route path="/asociaciones" element={<Asociaciones />} />
       <Route path="/demo/boda" element={<DemoWedding />} />
       <Route path="/demo/quinceanera" element={<DemoQuinceanera />} />
       <Route path="/demo/black" element={<DemoBlack />} />
