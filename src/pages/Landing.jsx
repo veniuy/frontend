@@ -526,7 +526,7 @@ function Landing() {
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
               Nuestras invitaciones más populares
             </h2>
             <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.4' }} className="text-muted-foreground max-w-2xl mx-auto">
@@ -596,7 +596,7 @@ function Landing() {
       <section id="categorias" className="py-16 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
               Invitaciones para cada ocasión especial
             </h2>
             <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.4' }} className="text-muted-foreground max-w-2xl mx-auto">
@@ -646,7 +646,7 @@ function Landing() {
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
               ¿Por qué elegir invitaciones digitales?
             </h2>
             <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.5', color: '#6b7280' }} className="max-w-2xl mx-auto">
@@ -662,7 +662,7 @@ function Landing() {
                 </div>
                 <h3 
                   style={{ 
-                    fontFamily: "'Cormorant Garamond', serif", 
+                    fontFamily: "'Playfair Display', serif", 
                     fontSize: '24px', 
                     fontWeight: '500',
                     lineHeight: '1.3',
@@ -692,7 +692,7 @@ function Landing() {
       {/* Newsletter */}
       <section className="py-16 bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
             ¡Únete a la revolución digital!
           </h2>
           <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.5', color: '#6b7280' }} className="mb-8 max-w-2xl mx-auto">

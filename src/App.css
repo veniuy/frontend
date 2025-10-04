@@ -4,8 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /* Fuentes - getguestlist.app style */
-  --font-display: 'Cormorant Garamond', serif;
+  /* Fuentes - Elegantes para landing */
+  --font-display: 'Playfair Display', serif;
   --font-ui: 'Inter', system-ui, sans-serif;
   --font-nav: 'Poppins', 'Inter', system-ui, sans-serif;
   
@@ -139,7 +139,7 @@
     font-family: 'Inter', system-ui, sans-serif;
   }
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Playfair Display', serif;
     font-weight: 400;
   }
 }

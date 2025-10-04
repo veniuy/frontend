@@ -8,7 +8,7 @@ import { Menu, X, Phone, Search, Heart, User, ShoppingCart } from 'lucide-react'
  * Características:
  * - Desktop: Header horizontal con fondo beige (#F4F2ED)
  * - Mobile: Menú hamburguesa con overlay a pantalla completa
- * - Tipografía: Poppins para navegación, Cormorant Garamond para logo
+ * - Tipografía: Poppins para navegación, Playfair Display para logo
  */
 export default function PublicHeader({ 
   cartCount = 0, 
@@ -105,7 +105,7 @@ export default function PublicHeader({
             {/* Logo - Centrado absoluto en desktop, centrado en móvil */}
             <div
               className="text-2xl md:text-3xl font-normal cursor-pointer select-none flex-1 lg:flex-none text-center lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2"
-              style={{ fontFamily: "'Cormorant Garamond', serif", color: '#000000', letterSpacing: '0.02em' }}
+              style={{ fontFamily: "'Playfair Display', serif", color: '#000000', letterSpacing: '0.02em', fontWeight: '500' }}
               onClick={() => navigate('/')}
             >
               Venite
