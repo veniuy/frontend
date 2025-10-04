@@ -751,7 +751,6 @@ function Landing() {
                     className="w-full h-full object-cover block"
                   />
                 </div>
-              </div>
              </div>
               <div className="space-y-8">
               <div className="mb-8">
