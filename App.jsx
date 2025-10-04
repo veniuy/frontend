@@ -9,7 +9,7 @@ import ProductDetail from './pages/ProductDetail';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
-import Register from './pages/Register';
+import RegisterResponsive  from './pages/RegisterResponsive';
 import Dashboard from './pages/Dashboard';
 import DashboardFixed from './pages/DashboardFixed';
 import DashboardImproved from './pages/DashboardImproved';
@@ -107,7 +107,7 @@ function App() {
         <Route path="events/:id/guests" element={<GuestManager />} />
         
         {/* New feature pages */}
-        <Route path="registry" element={<Registry />} />
+        <Route path="/register" element={<RegisterResponsive />} />
         <Route path="accommodations" element={<Accommodations />} />
         <Route path="shareable-link" element={<ShareableLink />} />
         
