@@ -21,7 +21,6 @@ export default function PublicHeader({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navLinks = [
-    { title: 'Inicio', href: '/' },
     { title: 'Plantillas', href: '/products' },
     { title: 'Categorías', href: '#categorias' },
     { title: 'Preguntas', href: '/faq' },
@@ -76,14 +75,17 @@ export default function PublicHeader({
       <header className="sticky top-0 z-50" style={{ backgroundColor: '#f4f2ed', borderBottom: '1px solid #e1ddd6' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            {/* Información de contacto - Solo Desktop */}
-            <div className="hidden md:flex items-center text-sm text-foreground">
-              <Phone className="w-4 h-4 mr-2" />
-              <span className="font-ui">+34 919 03 36 08</span>
+            {/* Logo - Centrado siempre */}
+            <div
+              className="text-2xl md:text-3xl font-normal cursor-pointer select-none flex-1 text-center"
+              style={{ fontFamily: "'Cormorant Garamond', serif", color: '#000000', letterSpacing: '0.02em' }}
+              onClick={() => navigate('/')}
+            >
+              Venite
             </div>
 
-            {/* Navegación Desktop - A la izquierda */}
-            <nav className="hidden lg:flex items-center space-x-8">
+            {/* Navegación Desktop - Centrada debajo del logo */}
+            <nav className="hidden lg:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2 top-[60px]">
               {navLinks.map((link) => (
                 <button
                   key={link.title}
@@ -108,17 +110,8 @@ export default function PublicHeader({
               ))}
             </nav>
 
-            {/* Logo - Centro en desktop, centro en móvil */}
-            <div
-              className="text-2xl md:text-3xl font-normal cursor-pointer select-none flex-1 text-center"
-              style={{ fontFamily: "'Cormorant Garamond', serif", color: '#000000', letterSpacing: '0.02em' }}
-              onClick={() => navigate('/')}
-            >
-              Venite
-            </div>
-
-            {/* Acciones del Usuario */}
-            <div className="flex items-center space-x-4">
+            {/* Acciones del Usuario - Solo Desktop */}
+            <div className="hidden lg:flex items-center space-x-4 absolute right-4">
               {/* Search */}
               <button
                 onClick={onSearchClick}
@@ -189,16 +182,32 @@ export default function PublicHeader({
                 Crear Cuenta
               </button>
 
-              {/* Menú Hamburguesa - Solo Mobile/Tablet */}
-              <button
-                onClick={toggleMenu}
-                className="lg:hidden w-6 h-6 text-foreground"
-                aria-label="Menú"
-                aria-expanded={isMenuOpen}
-              >
-                <Menu className="w-6 h-6" />
-              </button>
             </div>
+
+            {/* Menú Hamburguesa - Solo Mobile/Tablet con animación */}
+            <button
+              onClick={toggleMenu}
+              className="lg:hidden absolute right-4 w-6 h-6 text-foreground flex items-center justify-center"
+              aria-label="Menú"
+              aria-expanded={isMenuOpen}
+              style={{ transition: 'transform 300ms ease' }}
+            >
+              <div 
+                style={{
+                  position: 'relative',
+                  width: '24px',
+                  height: '24px',
+                  transition: 'transform 300ms ease',
+                  transform: isMenuOpen ? 'rotate(90deg)' : 'rotate(0deg)'
+                }}
+              >
+                {isMenuOpen ? (
+                  <X className="w-6 h-6" style={{ transition: 'opacity 200ms ease' }} />
+                ) : (
+                  <Menu className="w-6 h-6" style={{ transition: 'opacity 200ms ease' }} />
+                )}
+              </div>
+            </button>
           </div>
         </div>
       </header>
@@ -206,17 +215,76 @@ export default function PublicHeader({
       {/* Menú Overlay Mobile - Estilo getguestlist.app */}
       {isMenuOpen && (
         <div className="fixed inset-0 z-50 flex flex-col items-center justify-center lg:hidden" style={{ backgroundColor: '#f4f2ed' }}>
-          {/* Botón Cerrar */}
-          <button
-            onClick={toggleMenu}
-            className="absolute top-6 right-6 p-2"
-            aria-label="Cerrar menú"
-          >
-            <X className="w-7 h-7 text-foreground" />
-          </button>
+          {/* Iconos de Acción en Mobile - Arriba */}
+          <div className="absolute top-6 left-0 right-0 flex items-center justify-center space-x-6">
+            {/* Search */}
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                document.body.style.overflow = '';
+                onSearchClick();
+              }}
+              className="w-5 h-5 text-foreground hover:opacity-70 transition-opacity"
+              aria-label="Buscar"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
+            {/* Wishlist */}
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                document.body.style.overflow = '';
+                onWishlistClick();
+              }}
+              className="relative w-5 h-5 text-foreground hover:opacity-70 transition-opacity"
+              aria-label="Favoritos"
+            >
+              <Heart 
+                className="w-5 h-5" 
+                fill={wishlistCount > 0 ? 'currentColor' : 'none'}
+              />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-2 -right-3 text-[10px] px-1.5 py-0.5 rounded-full bg-black text-white">
+                  {wishlistCount}
+                </span>
+              )}
+            </button>
+
+            {/* User */}
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                document.body.style.overflow = '';
+                navigate('/login');
+              }}
+              className="w-5 h-5 text-foreground hover:opacity-70 transition-opacity"
+              aria-label="Cuenta"
+            >
+              <User className="w-5 h-5" />
+            </button>
+
+            {/* Cart - Solo si hay items */}
+            {cartCount > 0 && (
+              <button
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  document.body.style.overflow = '';
+                  onCartClick();
+                }}
+                className="relative w-5 h-5 text-foreground hover:opacity-70 transition-opacity"
+                aria-label="Carrito"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                <span className="absolute -top-2 -right-3 text-[10px] px-1.5 py-0.5 rounded-full bg-black text-white">
+                  {cartCount}
+                </span>
+              </button>
+            )}
+          </div>
 
           {/* Enlaces de Navegación */}
-          <nav className="flex flex-col items-center space-y-6">
+          <nav className="flex flex-col items-center space-y-6 mt-16">
             {navLinks.map((link) => (
               <button
                 key={link.title}
@@ -266,12 +334,6 @@ export default function PublicHeader({
               Crear Cuenta
             </button>
           </nav>
-
-          {/* Información de Contacto en Mobile */}
-          <div className="absolute bottom-8 flex items-center text-sm text-foreground font-ui">
-            <Phone className="w-4 h-4 mr-2" />
-            +34 919 03 36 08
-          </div>
         </div>
       )}
     </>
