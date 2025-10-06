@@ -75,25 +75,25 @@ export default function EditorPanel({
     // QUINCEAÑOS
     { 
       id: "quinceanera-elegant", 
-      name: "Quinceaños Elegante", 
+      name: "Elegante", 
       type: "quinceanera",
-      description: "Diseño sofisticado para celebración de 15 años",
+      description: "",
       colors: { primary: "#E1C1A8", secondary: "#F6E3D4", text: "#2E2E2E" },
       fonts: { primary: "'Playfair Display', serif", secondary: "'Great Vibes', cursive" }
     },
     { 
       id: "quinceanera-romantic", 
-      name: "Quinceaños Romántico", 
+      name: "Romántico", 
       type: "quinceanera",
-      description: "Colores suaves y delicados para tu celebración",
+      description: "",
       colors: { primary: "#EEC9C5", secondary: "#C9C9C9", text: "#2E2E2E" },
       fonts: { primary: "'Cormorant Garamond', serif", secondary: "'Pinyon Script', cursive" }
     },
     { 
       id: "quinceanera-modern", 
-      name: "Quinceaños Moderno", 
+      name: "Moderno", 
       type: "quinceanera",
-      description: "Diseño contemporáneo y vibrante",
+      description: "",
       colors: { primary: "#B7B79D", secondary: "#C16D4D", text: "#2E2E2E" },
       fonts: { primary: "Montserrat, sans-serif", secondary: "'Alex Brush', cursive" }
     },
@@ -101,41 +101,41 @@ export default function EditorPanel({
     // BODAS
     { 
       id: "wedding-elegant", 
-      name: "Boda Elegante", 
+      name: "Elegante", 
       type: "wedding",
-      description: "Diseño sofisticado y minimalista",
+      description: "",
       colors: { primary: "#8FAF86", secondary: "#D4B28A", text: "#2E2E2E" },
       fonts: { primary: "'Playfair Display', serif", secondary: "'Great Vibes', cursive" }
     },
     { 
       id: "wedding-romantic", 
-      name: "Boda Romántica", 
+      name: "Romántica", 
       type: "wedding",
-      description: "Colores suaves y florales",
+      description: "",
       colors: { primary: "#EEC9C5", secondary: "#C9C9C9", text: "#2E2E2E" },
       fonts: { primary: "Cardo, serif", secondary: "'Pinyon Script', cursive" }
     },
     { 
       id: "wedding-modern", 
-      name: "Boda Moderna", 
+      name: "Moderna", 
       type: "wedding",
-      description: "Diseño contemporáneo y vibrante",
+      description: "",
       colors: { primary: "#245D63", secondary: "#8F9AA7", text: "#2E2E2E" },
       fonts: { primary: "Inter, sans-serif", secondary: "'Alex Brush', cursive" }
     },
     { 
       id: "wedding-classic", 
-      name: "Boda Clásica", 
+      name: "Clásica", 
       type: "wedding",
-      description: "Estilo tradicional y atemporal",
+      description: "",
       colors: { primary: "#871C2B", secondary: "#EFEAE6", text: "#2E2E2E" },
       fonts: { primary: "Bellefair, serif", secondary: "'Tangerine', cursive" }
     },
     { 
       id: "wedding-rustic", 
-      name: "Boda Rústica", 
+      name: "Rústica", 
       type: "wedding",
-      description: "Estilo campestre y natural",
+      description: "",
       colors: { primary: "#5A6C48", secondary: "#E0C9C9", text: "#2E2E2E" },
       fonts: { primary: "'Cormorant Garamond', serif", secondary: "'Great Vibes', cursive" }
     },
@@ -791,8 +791,8 @@ export default function EditorPanel({
           </TabsList>
 
           {/* ============ PLANTILLAS (PRIMERA PESTAÑA) ============ */}
-          <TabsContent value="templates" className="flex-1 overflow-hidden">
-            <ScrollArea className="h-full px-3 pb-6">
+          <TabsContent value="templates" className="flex-1 overflow-y-auto">
+            <div className="px-3 pb-6">
               <div className="space-y-4">
                 
                 {/* Plantillas de Quinceaños */}
@@ -805,33 +805,24 @@ export default function EditorPanel({
                     {templates.filter(t => t.type === 'quinceanera').map((template) => (
                       <div
                         key={template.id}
-                        className={`border rounded-lg p-3 hover:bg-gray-50 transition-colors cursor-pointer ${
+                        className={`border rounded-lg p-2 hover:bg-gray-50 transition-colors cursor-pointer ${
                           event.templateId === template.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
                         }`}
                         onClick={() => applyTemplate(template)}
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1">
-                            <h3 className="font-medium text-sm">{template.name}</h3>
-                            <p className="text-xs text-gray-600">{template.description}</p>
-                          </div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-sm">{template.name}</span>
                           <div className="flex gap-1">
                             <div 
-                              className="w-4 h-4 rounded-full border"
+                              className="w-5 h-5 rounded-full border-2 border-white shadow-sm"
                               style={{ backgroundColor: template.colors?.primary }}
                             />
                             <div 
-                              className="w-4 h-4 rounded-full border"
+                              className="w-5 h-5 rounded-full border-2 border-white shadow-sm"
                               style={{ backgroundColor: template.colors?.secondary }}
                             />
                           </div>
                         </div>
-                        {event.templateId === template.id && (
-                          <div className="mt-2 flex items-center gap-1 text-xs text-blue-600">
-                            <CheckCircle2 className="w-3 h-3" />
-                            Plantilla activa
-                          </div>
-                        )}
                       </div>
                     ))}
                   </div>
@@ -847,33 +838,24 @@ export default function EditorPanel({
                     {templates.filter(t => t.type === 'wedding').map((template) => (
                       <div
                         key={template.id}
-                        className={`border rounded-lg p-3 hover:bg-gray-50 transition-colors cursor-pointer ${
+                        className={`border rounded-lg p-2 hover:bg-gray-50 transition-colors cursor-pointer ${
                           event.templateId === template.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
                         }`}
                         onClick={() => applyTemplate(template)}
                       >
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1">
-                            <h3 className="font-medium text-sm">{template.name}</h3>
-                            <p className="text-xs text-gray-600">{template.description}</p>
-                          </div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-sm">{template.name}</span>
                           <div className="flex gap-1">
                             <div 
-                              className="w-4 h-4 rounded-full border"
+                              className="w-5 h-5 rounded-full border-2 border-white shadow-sm"
                               style={{ backgroundColor: template.colors?.primary }}
                             />
                             <div 
-                              className="w-4 h-4 rounded-full border"
+                              className="w-5 h-5 rounded-full border-2 border-white shadow-sm"
                               style={{ backgroundColor: template.colors?.secondary }}
                             />
                           </div>
                         </div>
-                        {event.templateId === template.id && (
-                          <div className="mt-2 flex items-center gap-1 text-xs text-blue-600">
-                            <CheckCircle2 className="w-3 h-3" />
-                            Plantilla activa
-                          </div>
-                        )}
                       </div>
                     ))}
                   </div>
@@ -919,12 +901,12 @@ export default function EditorPanel({
                 )}
 
               </div>
-            </ScrollArea>
+            </div>
           </TabsContent>
 
           {/* ============ CONTENIDO ============ */}
-          <TabsContent value="content" className="flex-1 overflow-hidden">
-            <ScrollArea className="h-full px-3 pb-6">
+          <TabsContent value="content" className="flex-1 overflow-y-auto">
+            <div className="px-3 pb-6">
               <div className="space-y-4">
                 
                 {/* Información básica */}
@@ -1217,12 +1199,12 @@ export default function EditorPanel({
                 </CollapsibleSection>
 
               </div>
-            </ScrollArea>
+            </div>
           </TabsContent>
 
           {/* ============ DISEÑO (PALETAS + PERSONALIZADOS) ============ */}
-          <TabsContent value="design" className="flex-1 overflow-hidden">
-            <ScrollArea className="h-full px-3 pb-6">
+          <TabsContent value="design" className="flex-1 overflow-y-auto">
+            <div className="px-3 pb-6">
               <div className="space-y-4">
                 
                 {/* Paletas de colores mejoradas */}
@@ -1233,40 +1215,33 @@ export default function EditorPanel({
                 >
                   <div className="space-y-3">
                     {PALETTES.map((palette) => (
-                      <div key={palette.name} className="border rounded-lg p-3 hover:bg-gray-50 transition-colors">
+                      <div key={palette.name} className="border rounded-lg p-2 hover:bg-gray-50 transition-colors">
                         <div className="flex items-center justify-between mb-2">
-                          <div>
-                            <Label className="text-xs font-medium">{palette.name}</Label>
-                            <Badge variant="outline" className="ml-2 text-xs">
-                              {palette.category}
-                            </Badge>
-                          </div>
+                          <Badge variant="outline" className="text-xs">
+                            {palette.category}
+                          </Badge>
                           <EnhancedButton
                             variant="outline"
                             size="sm"
                             onClick={() => applyPalette(palette.tones)}
-                            className="text-xs"
+                            className="text-xs px-2 py-1"
                           >
                             Aplicar
                           </EnhancedButton>
                         </div>
                         
-                        <div className="grid grid-cols-4 gap-2">
+                        <div className="grid grid-cols-4 gap-1.5">
                           {palette.tones.map((tone, i) => (
-                            <div key={i} className="text-center">
-                              <button
-                                className="w-full h-8 rounded border-2 border-gray-200 hover:border-gray-400 transition-colors mb-1"
-                                style={{ backgroundColor: tone.hex }}
-                                onClick={() => {
-                                  handleColorChange("primary", tone.hex);
-                                  addRecentColor(tone.hex);
-                                }}
-                                title={`${tone.name} - ${tone.hex}`}
-                              />
-                              <span className="text-xs text-gray-600 block truncate">
-                                {tone.name}
-                              </span>
-                            </div>
+                            <button
+                              key={i}
+                              className="w-full h-10 rounded border-2 border-gray-200 hover:border-gray-400 transition-colors"
+                              style={{ backgroundColor: tone.hex }}
+                              onClick={() => {
+                                handleColorChange("primary", tone.hex);
+                                addRecentColor(tone.hex);
+                              }}
+                              title={tone.hex}
+                            />
                           ))}
                         </div>
                       </div>
@@ -1311,27 +1286,24 @@ export default function EditorPanel({
                 >
                   <div className="space-y-4">
                     <div>
-                      <Label className="text-xs font-medium mb-2 block">Fuente Principal</Label>
-                      <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto">
+                      <Label className="text-xs font-medium mb-2 block">Principal</Label>
+                      <div className="grid grid-cols-1 gap-1.5 max-h-40 overflow-y-auto">
                         {fontFamilies.map((font) => (
                           <button
                             key={font.family}
-                            className={`p-2 border rounded text-left hover:bg-gray-50 transition-colors ${
+                            className={`p-1.5 border rounded text-left hover:bg-gray-50 transition-colors ${
                               event.fonts?.primary === font.family ? "border-blue-500 bg-blue-50" : "border-gray-200"
                             }`}
                             onClick={() => handleFontChange("primary", font.family)}
                           >
                             <div className="flex items-center justify-between">
-                              <div>
-                                <div className="text-sm font-medium">{font.name}</div>
-                                <div className="text-xs text-gray-500">{font.category}</div>
-                              </div>
-                              <div 
-                                className="text-lg"
+                              <span className="text-sm">{font.name}</span>
+                              <span 
+                                className="text-base"
                                 style={{ fontFamily: font.family }}
                               >
-                                {font.preview}
-                              </div>
+                                Aa
+                              </span>
                             </div>
                           </button>
                         ))}
@@ -1339,27 +1311,24 @@ export default function EditorPanel({
                     </div>
 
                     <div>
-                      <Label className="text-xs font-medium mb-2 block">Fuente Secundaria</Label>
-                      <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto">
+                      <Label className="text-xs font-medium mb-2 block">Secundaria</Label>
+                      <div className="grid grid-cols-1 gap-1.5 max-h-40 overflow-y-auto">
                         {fontFamilies.filter(f => f.category === "Script" || f.category === "Serif").map((font) => (
                           <button
                             key={font.family}
-                            className={`p-2 border rounded text-left hover:bg-gray-50 transition-colors ${
+                            className={`p-1.5 border rounded text-left hover:bg-gray-50 transition-colors ${
                               event.fonts?.secondary === font.family ? "border-blue-500 bg-blue-50" : "border-gray-200"
                             }`}
                             onClick={() => handleFontChange("secondary", font.family)}
                           >
                             <div className="flex items-center justify-between">
-                              <div>
-                                <div className="text-sm font-medium">{font.name}</div>
-                                <div className="text-xs text-gray-500">{font.category}</div>
-                              </div>
-                              <div 
-                                className="text-lg"
+                              <span className="text-sm">{font.name}</span>
+                              <span 
+                                className="text-base"
                                 style={{ fontFamily: font.family }}
                               >
-                                {font.preview}
-                              </div>
+                                Aa
+                              </span>
                             </div>
                           </button>
                         ))}
@@ -1369,12 +1338,12 @@ export default function EditorPanel({
                 </CollapsibleSection>
 
               </div>
-            </ScrollArea>
+            </div>
           </TabsContent>
 
           {/* ============ IMÁGENES ============ */}
-          <TabsContent value="images" className="flex-1 overflow-hidden">
-            <ScrollArea className="h-full px-3 pb-6">
+          <TabsContent value="images" className="flex-1 overflow-y-auto">
+            <div className="px-3 pb-6">
               <div className="space-y-4">
                 
                 {/* Panel de imágenes existente */}
@@ -1437,7 +1406,7 @@ export default function EditorPanel({
                 </CollapsibleSection>
 
               </div>
-            </ScrollArea>
+            </div>
           </TabsContent>
 
         </Tabs>
