@@ -1,101 +1,169 @@
 import React from 'react';
+import EditableText from '../../EditableText';
 
-const Hero = ({ event = {}, setEvent, colors = {}, fontPrimary, fontSecondary }) => {
-  // Asegurar que event.hero siempre tenga estructura
-  const safeHero = {
-    logo: '',
-    groomName: '',
-    brideName: '',
-    date: '',
-    ...event.hero,
-  };
+// Icono de flecha hacia abajo
+const ChevronDownIcon = ({ className, style }) => (
+  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <polyline points="6 9 12 15 18 9"></polyline>
+  </svg>
+);
 
-  const mergedFonts = {
-    heading: fontPrimary || 'Playfair Display, serif',
-    title: fontPrimary || 'Playfair Display, serif',
-    subtitle: fontSecondary || 'Inter, sans-serif',
-  };
-
-  const defaultColors = {
-    primary: '#f0f0f0',
-    textPrimary: '#333',
-    accent: '#8B4513',
-    textSecondary: '#666',
-  };
-  const mergedColors = { ...defaultColors, ...colors };
-
-  // Estilos inline para el componente Hero
-  const heroStyle = {
-    backgroundColor: mergedColors.primary,
-    color: mergedColors.textPrimary,
-    fontFamily: mergedFonts.heading,
-    padding: '50px 20px',
-    textAlign: 'center',
-  };
-
-  const titleStyle = {
-    fontSize: '3em',
-    marginBottom: '10px',
-    fontFamily: mergedFonts.title,
-    color: mergedColors.accent,
-  };
-
-  const subtitleStyle = {
-    fontSize: '1.5em',
-    fontFamily: mergedFonts.subtitle,
-    color: mergedColors.textSecondary,
-  };
-
-  const logoStyle = {
-    maxWidth: '150px',
-    height: 'auto',
-    margin: '20px auto',
-    display: 'block',
-  };
-
-  const handleNameChange = (e, field) => {
-    setEvent({
-      ...event,
-      hero: {
-        ...safeHero,
-        [field]: e.target.value,
-      },
-    });
-  };
+const Hero = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuinceanera, styles = {} }) => {
+  const heroTexture = event.images?.heroTexture || event.images?.hero || "/assets/portada.webp";
 
   return (
-    <div style={heroStyle}>
-      {safeHero.logo && (
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Imagen de fondo */}
+      <div className="absolute inset-0">
         <img
-          src={safeHero.logo}
-          alt="Logo"
-          style={logoStyle}
+          src={heroTexture}
+          alt="Textura"
+          className="absolute inset-0 w-full h-full object-cover object-center block"
+          onError={(e) => {
+            e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Crect fill='%23f0f0f0' width='800' height='600'/%3E%3C/svg%3E";
+          }}
         />
+      </div>
+
+      {/* Logo opcional */}
+      {event?.images?.logo && (
+        <div className="absolute top-0 left-0 w-[420px] h-[260px] opacity-80 pointer-events-none">
+          <img
+            src={event.images.logo}
+            alt="Logo"
+            className="absolute inset-0 w-full h-full object-contain block"
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
+          />
+        </div>
       )}
-      <h1 style={titleStyle}>
-        <input
-          type="text"
-          value={safeHero.groomName}
-          onChange={(e) => handleNameChange(e, 'groomName')}
-          style={{ ...titleStyle, border: 'none', background: 'transparent', textAlign: 'center' }}
-        />
-        {' & '}
-        <input
-          type="text"
-          value={safeHero.brideName}
-          onChange={(e) => handleNameChange(e, 'brideName')}
-          style={{ ...titleStyle, border: 'none', background: 'transparent', textAlign: 'center' }}
-        />
-      </h1>
-      <p style={subtitleStyle}>
-        <input
-          type="text"
-          value={safeHero.date}
-          onChange={(e) => handleNameChange(e, 'date')}
-          style={{ ...subtitleStyle, border: 'none', background: 'transparent', textAlign: 'center' }}
-        />
-      </p>
-    </div>
+
+      {/* Contenido principal */}
+      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
+        {isQuinceanera ? (
+          // Layout para Quinceañera - Solo un nombre
+          <>
+            <h1
+              className="font-light mb-8 tracking-wider"
+              style={{ 
+                color: colors.ink, 
+                fontSize: "clamp(3rem, 10vw, 7rem)", 
+                fontFamily: fontSecondary 
+              }}
+            >
+              <EditableText
+                value={event.couple?.bride || event.quinceañera?.name || "Isabella"}
+                onChange={(val) => setEvent((p) => ({ 
+                  ...p, 
+                  couple: { ...p.couple, bride: val },
+                  quinceañera: { ...p.quinceañera, name: val }
+                }))}
+                ariaLabel="Nombre de la quinceañera"
+                className="px-1"
+                singleLine
+                style={{ color: colors.ink, fontFamily: fontSecondary }}
+              />
+            </h1>
+            <p
+              className="font-light mb-10 tracking-wide"
+              style={{ 
+                color: colors.muted, 
+                fontSize: "clamp(1.2rem, 4vw, 2rem)", 
+                fontFamily: fontPrimary 
+              }}
+            >
+              MIS 15 AÑOS
+            </p>
+          </>
+        ) : (
+          // Layout para Bodas - Dos nombres
+          <>
+            <h1
+              className="font-light mb-3 tracking-wider"
+              style={{ 
+                color: colors.ink, 
+                fontSize: "clamp(2.75rem, 8vw, 6rem)", 
+                fontFamily: fontSecondary 
+              }}
+            >
+              <EditableText
+                value={event.couple?.bride || "Belén"}
+                onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: val } }))}
+                ariaLabel="Nombre 1"
+                className="px-1"
+                singleLine
+                style={{ color: colors.ink, fontFamily: fontSecondary }}
+              />
+            </h1>
+
+            <div className="flex items-center justify-center my-6">
+              <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
+              <div
+                className="mx-4 font-light"
+                style={{ 
+                  color: colors.primary, 
+                  fontSize: "clamp(1.75rem, 5vw, 3rem)", 
+                  fontFamily: fontSecondary 
+                }}
+              >
+                &
+              </div>
+              <div className="h-px w-16" style={{ backgroundColor: "#CFCFCF" }} />
+            </div>
+
+            <h1
+              className="font-light mb-8 tracking-wider"
+              style={{ 
+                color: colors.ink, 
+                fontSize: "clamp(2.75rem, 8vw, 6rem)", 
+                fontFamily: fontSecondary 
+              }}
+            >
+              <EditableText
+                value={event.couple?.groom || "Amadeo"}
+                onChange={(val) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: val } }))}
+                ariaLabel="Nombre 2"
+                className="px-1"
+                singleLine
+                style={{ color: colors.ink, fontFamily: fontSecondary }}
+              />
+            </h1>
+
+            <p
+              className="font-light mb-10 tracking-wide"
+              style={{ 
+                color: colors.muted, 
+                fontSize: "clamp(1.1rem, 3.5vw, 1.5rem)", 
+                fontFamily: fontPrimary 
+              }}
+            >
+              NOS CASAMOS
+            </p>
+          </>
+        )}
+
+        {/* Animación de flecha */}
+        <div className="animate-bounce">
+          <ChevronDownIcon className="w-8 h-8 mx-auto" style={{ color: colors.primary }} />
+        </div>
+      </div>
+
+      {/* Estilos de animación */}
+      <style jsx>{`
+        @keyframes bounce {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+        .animate-bounce {
+          animation: bounce 2s infinite;
+        }
+      `}</style>
+    </section>
   );
 };
 

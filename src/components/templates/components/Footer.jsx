@@ -1,88 +1,77 @@
 import React from 'react';
+import StyledButton from '../../ui/StyledButton';
 
-const Footer = ({ event, setEvent, colors = {}, fonts = {}, fontPrimary, fontSecondary }) => {
-  const localFonts = { primary: fontPrimary, secondary: fontSecondary };
-  const defaultFonts = {
-    body: 'Inter, sans-serif',
-  };
-  const mergedFonts = { ...defaultFonts, ...fonts, ...localFonts };
-  const defaultColors = {
-    primary: '#333',
-    secondary: '#666',
-    background: '#f0f0f0',
-    text: '#333'
-  };
-  const mergedColors = { ...defaultColors, ...colors };
+// Iconos
+const Share2Icon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="18" cy="5" r="3"></circle>
+    <circle cx="6" cy="12" r="3"></circle>
+    <circle cx="18" cy="19" r="3"></circle>
+    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+  </svg>
+);
 
-  // Función para manejar la acción de compartir en diferentes plataformas
-  const handleShare = (platform) => {
-    // Utiliza la URL del evento si está disponible, de lo contrario, usa la URL actual de la ventana
-    const eventUrl = event?.url || window.location.href;
-    // Utiliza el título del evento si está disponible, de lo contrario, un título predeterminado
-    const eventTitle = event?.title || 'Nuestro Evento Especial';
-    const shareText = `¡Te invitamos a ${eventTitle}! Detalles aquí: ${eventUrl}`;
+const DownloadIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+    <polyline points="7 10 12 15 17 10"></polyline>
+    <line x1="12" y1="15" x2="12" y2="3"></line>
+  </svg>
+);
 
-    switch (platform) {
-      case 'facebook':
-        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventUrl)}`, '_blank');
-        break;
-      case 'twitter':
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`, '_blank');
-        break;
-      case 'whatsapp':
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`, '_blank');
-        break;
-      case 'copy':
-        // Copia el enlace al portapapeles y notifica al usuario
-        navigator.clipboard.writeText(eventUrl).then(() => {
-          alert('Enlace copiado al portapapeles!');
-        }).catch(err => {
-          console.error('Error al copiar el enlace: ', err);
-        });
-        break;
-      default:
-        break;
-    }
-  };
+function pickTextColor(bgHex) {
+  const r = parseInt(bgHex.slice(1, 3), 16);
+  const g = parseInt(bgHex.slice(3, 5), 16);
+  const b = parseInt(bgHex.slice(5, 7), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? "#000000" : "#FFFFFF";
+}
 
-  // Estilos inline para el footer, utilizando las props 'colors' y 'fonts' para personalización
-  const footerStyle = {
-    backgroundColor: mergedColors.footerBackground || '#f8f8f8',
-    color: mergedColors.footerText || '#333',
-    fontFamily: mergedFonts.body || 'Arial, sans-serif',
-    padding: '20px',
-    textAlign: 'center',
-    marginTop: '40px',
-  };
-
-  // Estilos inline para los botones de compartir, utilizando las props 'colors'
-  const shareButtonStyle = {
-    backgroundColor: mergedColors.primary || '#6a0dad',
-    color: mergedColors.buttonText || '#fff',
-    border: 'none',
-    padding: '10px 15px',
-    margin: '0 5px',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    fontSize: '16px',
-  };
-
+const Footer = ({ colors, fontPrimary, isQuinceanera, styles = {} }) => {
   return (
-    <footer style={footerStyle}>
-      {/* Texto del copyright, editable a través de la prop 'event.title' */}
-      <p style={{ fontSize: '14px', marginBottom: '15px' }}>
-        © {new Date().getFullYear()} {event?.title || 'Nuestro Evento'}. Todos los derechos reservados.
-      </p>
-      <div>
-        {/* Botones de compartir, con funcionalidad definida en handleShare */}
-        <button style={shareButtonStyle} onClick={() => handleShare('facebook')}>Compartir en Facebook</button>
-        <button style={shareButtonStyle} onClick={() => handleShare('twitter')}>Compartir en Twitter</button>
-        <button style={shareButtonStyle} onClick={() => handleShare('whatsapp')}>Compartir en WhatsApp</button>
-        <button style={shareButtonStyle} onClick={() => handleShare('copy')}>Copiar Enlace</button>
+    <footer className="py-12" style={{ backgroundColor: colors.dark, color: colors.darkText }}>
+      <div className="max-w-4xl mx-auto px-4 text-center">
+        <p className="text-lg mb-8" style={{ fontFamily: fontPrimary }}>
+          {isQuinceanera ? "¡Gracias por acompañarme en este momento tan importante!" : "¡Gracias por acompañarnos en este momento tan importante!"}
+        </p>
+        <div
+          className="pt-8"
+          style={{
+            borderTop:
+              pickTextColor(colors.dark) === "#FFFFFF" ? "1px solid rgba(255,255,255,.25)" : "1px solid rgba(0,0,0,.25)",
+          }}
+        >
+          <p className="text-sm opacity-70 mb-4" style={{ fontFamily: fontPrimary }}>
+            Invitación digital creada con{" "}
+            <span className="font-medium" style={{ color: colors.primary }}>
+              Venite
+            </span>
+          </p>
+          <div className="flex justify-center gap-3">
+            <StyledButton
+              colors={colors}
+              variant="outline-dark"
+              size="sm"
+              onClick={() => navigator.clipboard?.writeText(window.location.href).catch(() => {})}
+            >
+              <Share2Icon className="w-4 h-4 mr-2" style={{ display: 'inline-block', verticalAlign: 'middle' }} />
+              Compartir
+            </StyledButton>
+            <StyledButton
+              colors={colors}
+              variant="outline-dark"
+              size="sm"
+              onClick={() => {}}
+            >
+              <DownloadIcon className="w-4 h-4 mr-2" style={{ display: 'inline-block', verticalAlign: 'middle' }} />
+              Guardar
+            </StyledButton>
+          </div>
+        </div>
       </div>
     </footer>
   );
 };
 
 export default Footer;
-

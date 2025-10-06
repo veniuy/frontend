@@ -12,7 +12,6 @@ import RSVP from './components/RSVP';
 import Songs from './components/Songs';
 import UsefulInfo from './components/UsefulInfo';
 import Footer from './components/Footer';
-import Modal from './components/Modal';
 
 export default function QuinceaneraRomanticTemplate({ event, ui, setEvent }) {
   if (!event) return null;
@@ -52,17 +51,16 @@ export default function QuinceaneraRomanticTemplate({ event, ui, setEvent }) {
   // Crear estilos CSS dinámicos para aplicar fuentes globalmente
   const fontStyles = useMemo(() => {
     return `
-      :root {
-        --font-primary: ${fontPrimary};
-        --font-secondary: ${fontSecondary};
-      }
+      .font-primary { font-family: ${fontPrimary} !important; }
+      .font-secondary { font-family: ${fontSecondary} !important; }
+      .editable-text { font-family: inherit !important; }
     `;
   }, [fontPrimary, fontSecondary]);
 
   const isQuinceanera = event.eventType === "quinceanera" || event.templateId?.includes("quinceanera");
 
   return (
-    <div className={styles.romanticTemplate} dir={event?.direction || "ltr"} style={{ backgroundColor: COLORS.paper }}>
+    <div className="min-h-screen" dir={event?.direction || "ltr"} style={{ backgroundColor: COLORS.paper }}>
       {/* Inyectar estilos de fuente dinámicos */}
       <style dangerouslySetInnerHTML={{ __html: fontStyles }} />
 
@@ -88,9 +86,9 @@ export default function QuinceaneraRomanticTemplate({ event, ui, setEvent }) {
 
       {/* Details Section */}
       {(isOn("ceremony") || isOn("reception")) && (
-        <section className={styles.detailsSection} dir="ltr">
-          <div className={styles.container}>
-            <div className={`${styles.grid} ${isQuinceanera ? styles.gridSingle : styles.gridDouble}`}>
+        <section className="py-16 bg-white" dir="ltr">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className={`grid ${isQuinceanera ? 'md:grid-cols-1' : 'md:grid-cols-2'} gap-12`}>
               
               {/* Ceremony - Solo para bodas */}
               {!isQuinceanera && isOn("ceremony") && (
@@ -195,6 +193,64 @@ export default function QuinceaneraRomanticTemplate({ event, ui, setEvent }) {
         isQuinceanera={isQuinceanera}
         styles={styles}
       />
+
+      {/* Estilos CSS globales */}
+      <style jsx>{`
+        .min-h-screen {
+          min-height: 100vh;
+        }
+        .py-16 {
+          padding-top: 4rem;
+          padding-bottom: 4rem;
+        }
+        .py-12 {
+          padding-top: 3rem;
+          padding-bottom: 3rem;
+        }
+        .px-4 {
+          padding-left: 1rem;
+          padding-right: 1rem;
+        }
+        .mb-6 {
+          margin-bottom: 1.5rem;
+        }
+        .mb-8 {
+          margin-bottom: 2rem;
+        }
+        .mb-12 {
+          margin-bottom: 3rem;
+        }
+        .max-w-4xl {
+          max-width: 56rem;
+        }
+        .max-w-6xl {
+          max-width: 72rem;
+        }
+        .mx-auto {
+          margin-left: auto;
+          margin-right: auto;
+        }
+        .text-center {
+          text-align: center;
+        }
+        .bg-white {
+          background-color: #ffffff;
+        }
+        .grid {
+          display: grid;
+        }
+        .gap-12 {
+          gap: 3rem;
+        }
+        @media (min-width: 768px) {
+          .md\\:grid-cols-1 {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+          }
+          .md\\:grid-cols-2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+      `}</style>
     </div>
   );
 }

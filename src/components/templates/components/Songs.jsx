@@ -1,79 +1,38 @@
 import React from 'react';
+import StyledButton from '../../ui/StyledButton';
 
-const Songs = ({ event, setEvent, colors = {}, fonts = {}, fontPrimary, fontSecondary }) => {
-  const localFonts = { primary: fontPrimary, secondary: fontSecondary };
-  const defaultFonts = {
-    primary: 'Arial, sans-serif',
-    secondary: 'Georgia, serif',
-  };
-  const mergedFonts = { ...defaultFonts, ...fonts, ...localFonts };
-  const defaultColors = {
-    primary: '#333',
-    secondary: '#666',
-    background: '#f0f0f0',
-    text: '#333'
-  };
-  const mergedColors = { ...defaultColors, ...colors };
+// Icono de música
+const MusicIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M9 18V5l12-2v13"></path>
+    <circle cx="6" cy="18" r="3"></circle>
+    <circle cx="18" cy="16" r="3"></circle>
+  </svg>
+);
 
-  // Función para manejar cambios en las sugerencias musicales
-  const handleMusicSuggestionsChange = (e) => {
-    setEvent({
-      ...event,
-      musicSuggestions: e.target.value,
-    });
-  };
-
-  const containerStyle = {
-    backgroundColor: mergedColors.background || '#f0f0f0',
-    fontFamily: mergedFonts.primary || 'Arial, sans-serif',
-    padding: '20px',
-    borderRadius: '8px',
-    textAlign: 'center',
-    margin: '20px 0',
-  };
-
-  const titleStyle = {
-    color: mergedColors.textPrimary || '#333',
-    fontSize: '2em',
-    marginBottom: '15px',
-  };
-
-  const subtitleStyle = {
-    color: mergedColors.textSecondary || '#666',
-    fontSize: '1.2em',
-    marginBottom: '25px',
-  };
-
-  const inputStyle = {
-    width: '80%',
-    padding: '10px',
-    margin: '10px 0',
-    border: `1px solid ${mergedColors.textSecondary || '#ccc'}`,
-    borderRadius: '5px',
-    fontSize: '1em',
-    fontFamily: mergedFonts.secondary || 'Arial, sans-serif',
-  };
-
+const Songs = ({ colors, fontPrimary, fontSecondary, isQuinceanera, styles = {} }) => {
   return (
-    <div style={containerStyle}>
-      <h2 style={titleStyle}>Sugerencias Musicales</h2>
-      <p style={subtitleStyle}>Ayúdanos a crear la playlist perfecta para tu evento.</p>
-      <div>
-        <label htmlFor="musicSuggestions" style={{ color: mergedColors.textPrimary, display: 'block', marginBottom: '5px' }}>
-          Tus sugerencias:
-        </label>
-        <input
-          id="musicSuggestions"
-          type="text"
-          value={event?.musicSuggestions || ''}
-          onChange={handleMusicSuggestionsChange}
-          style={inputStyle}
-          placeholder="Escribe tus canciones favoritas aquí..."
-        />
+    <section className="py-16 bg-white" dir="ltr">
+      <div className="max-w-4xl mx-auto px-4 text-center">
+        <h2
+          className="text-2xl font-medium mb-6 tracking-wide"
+          style={{ color: colors.ink, fontFamily: fontSecondary }}
+        >
+          ¿QUÉ CANCIONES NO PUEDEN FALTAR?
+        </h2>
+        <p className="mb-8 max-w-2xl mx-auto" style={{ color: colors.body, fontFamily: fontPrimary }}>
+          {isQuinceanera ? "¡Ayudame sugiriendo las canciones que pensás que no pueden faltar!" : "¡Ayudanos sugiriendo las canciones que pensás que no pueden faltar!"}
+        </p>
+        <StyledButton
+          colors={colors}
+          onClick={() => alert("Abrir formulario de canciones (pendiente)")}
+        >
+          <MusicIcon className="w-4 h-4 mr-2" style={{ display: 'inline-block', verticalAlign: 'middle' }} />
+          Sugerir canción
+        </StyledButton>
       </div>
-    </div>
+    </section>
   );
 };
 
 export default Songs;
-

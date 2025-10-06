@@ -1,102 +1,90 @@
 import React from 'react';
+import EditableText from '../../EditableText';
+import StyledButton from '../../ui/StyledButton';
 
-const Party = ({ event, setEvent, colors = {}, fonts = {}, fontPrimary, fontSecondary }) => {
-  const localFonts = { primary: fontPrimary, secondary: fontSecondary };
-  const defaultFonts = {
-    primary: 'Arial, sans-serif',
-    secondary: 'Georgia, serif'
-  };
-  const mergedFonts = { ...defaultFonts, ...fonts, ...localFonts };
-  
-  const defaultColors = {
-    primary: '#333',
-    textPrimary: '#333',
-    background: '#f0f0f0',
-    shadowColor: 'rgba(0,0,0,0.1)',
-    headingColor: '#333',
-    labelColor: '#333',
-    borderColor: '#ccc'
-  };
-  const mergedColors = { ...defaultColors, ...colors };
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEvent(prevEvent => ({
-      ...prevEvent,
-      [name]: value
-    }));
-  };
+// Icono de fiesta
+const PartyPopperIcon = ({ className, style }) => (
+  <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5.8 11.3 2 22l10.7-3.79"></path>
+    <path d="M4 3h.01"></path>
+    <path d="M22 8h.01"></path>
+    <path d="M15 2h.01"></path>
+    <path d="M22 20h.01"></path>
+    <circle cx="12" cy="12" r="2"></circle>
+  </svg>
+);
 
+const DetailIconCard = ({ icon, iconBg, title, titleColor, children, fontPrimary }) => {
   return (
-    <div style={{
-      fontFamily: mergedFonts.primary,
-      color: mergedColors.textPrimary,
-      backgroundColor: mergedColors.background,
-      padding: '20px',
-      borderRadius: '8px',
-      boxShadow: `0 4px 8px ${mergedColors.shadowColor || 'rgba(0,0,0,0.1)'}`
-    }}>
-      <h2 style={{
-        color: mergedColors.headingColor || mergedColors.textPrimary,
-        fontFamily: mergedFonts.secondary || mergedFonts.primary,
-        marginBottom: '15px'
-      }}>Componente Fiesta/Celebración</h2>
-
-      <div style={{ marginBottom: '10px' }}>
-        <label style={{ display: 'block', marginBottom: '5px', color: mergedColors.labelColor || mergedColors.textPrimary }}>Nombre del evento:</label>
-        <input
-          type="text"
-          name="name"
-          value={event.name}
-          onChange={handleInputChange}
-          style={{
-            width: '100%',
-            padding: '8px',
-            border: `1px solid ${mergedColors.borderColor || '#ccc'}`,
-            borderRadius: '4px',
-            boxSizing: 'border-box'
-          }}
-        />
+    <div className="text-center">
+      <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6" style={{ backgroundColor: iconBg }}>
+        {icon}
       </div>
-
-      <div style={{ marginBottom: '10px' }}>
-        <label style={{ display: 'block', marginBottom: '5px', color: mergedColors.labelColor || mergedColors.textPrimary }}>Fecha:</label>
-        <input
-          type="date"
-          name="date"
-          value={event.date}
-          onChange={handleInputChange}
-          style={{
-            width: '100%',
-            padding: '8px',
-            border: `1px solid ${mergedColors.borderColor || '#ccc'}`,
-            borderRadius: '4px',
-            boxSizing: 'border-box'
-          }}
-        />
-      </div>
-
-      <div style={{ marginBottom: '10px' }}>
-        <label style={{ display: 'block', marginBottom: '5px', color: mergedColors.labelColor || mergedColors.textPrimary }}>Lugar:</label>
-        <input
-          type="text"
-          name="location"
-          value={event.location}
-          onChange={handleInputChange}
-          style={{
-            width: '100%',
-            padding: '8px',
-            border: `1px solid ${mergedColors.borderColor || '#ccc'}`,
-            borderRadius: '4px',
-            boxSizing: 'border-box'
-          }}
-        />
-      </div>
-
-      {/* Puedes añadir más campos editables aquí siguiendo el mismo patrón */}
-
+      <h3 
+        className="text-2xl font-medium mb-6 tracking-wide" 
+        style={{ color: titleColor, fontFamily: fontPrimary }}
+      >
+        {title}
+      </h3>
+      {children}
     </div>
   );
 };
 
-export default Party;
+const Party = ({ event, setEvent, colors, fontPrimary, isQuinceanera, styles = {} }) => {
+  return (
+    <DetailIconCard
+      icon={<PartyPopperIcon className="w-8 h-8" style={{ color: colors.primary }} />}
+      iconBg={colors.primarySoft}
+      title={isQuinceanera ? "CELEBRACIÓN" : "FIESTA"}
+      titleColor={colors.ink}
+      fontPrimary={fontPrimary}
+    >
+      <div className="space-y-3 mb-8">
+        <p className="text-lg" style={{ color: colors.body, fontFamily: fontPrimary }}>
+          <EditableText
+            value={event.reception?.time || (isQuinceanera ? event.time || "20:00 hs" : "Después de la ceremonia")}
+            onChange={(v) => setEvent((p) => ({ ...p, reception: { ...p.reception, time: v } }))}
+            className="px-1"
+            singleLine
+            style={{ fontFamily: fontPrimary }}
+          />
+        </p>
+        <p className="font-medium" style={{ color: colors.body, fontFamily: fontPrimary }}>
+          <EditableText
+            value={event.reception?.venue || "Salón de Eventos El Jardín"}
+            onChange={(v) => setEvent((p) => ({ ...p, reception: { ...p.reception, venue: v } }))}
+            className="px-1"
+            singleLine
+            style={{ fontFamily: fontPrimary }}
+          />
+        </p>
+        <p style={{ color: colors.body, fontFamily: fontPrimary }}>
+          <EditableText
+            value={event.reception?.location || "Córdoba Capital"}
+            onChange={(v) => setEvent((p) => ({ ...p, reception: { ...p.reception, location: v } }))}
+            className="px-1"
+            singleLine
+            style={{ fontFamily: fontPrimary }}
+          />
+        </p>
+        <p className="text-sm" style={{ color: colors.muted, fontFamily: fontPrimary }}>
+          Recibí debajo las indicaciones para llegar.
+        </p>
+      </div>
+      <StyledButton
+        colors={colors}
+        onClick={() =>
+          window.open(
+            `https://maps.google.com/?q=${event.reception?.address || "Av. Colón 1234, Córdoba"}`,
+            "_blank"
+          )
+        }
+      >
+        {isQuinceanera ? "LLEGAR A LA CELEBRACIÓN" : "LLEGAR A LA FIESTA"}
+      </StyledButton>
+    </DetailIconCard>
+  );
+};
 
+export default Party;

@@ -1,162 +1,100 @@
-import React, { useState } from 'react';
+import React from 'react';
 
-const Gallery = ({ event, setEvent, colors = {}, fonts = {}, fontPrimary, fontSecondary }) => {
-  const localFonts = { primary: fontPrimary, secondary: fontSecondary };
-  // Valores por defecto para fonts
-  const defaultFonts = {
-    body: "Inter, sans-serif"
-  };
+const Gallery = ({ event, colors, fontSecondary, styles = {} }) => {
+  const defaultGallery = [
+    "/assets/categoria_boda_grid.webp",
+    "/assets/categoria_cumpleanos.webp",
+    "/assets/categoria_invitaciones_digitales.webp",
+    "/assets/categoria_productos_fotos.webp",
+    "/assets/elegant-floral.jpg",
+    "/assets/portada1.webp",
+  ];
   
-  const mergedFonts = { ...defaultFonts, ...fonts, ...localFonts };
-  
-  const defaultColors = {
-    primary: '#333',
-    secondary: '#666',
-    background: '#f0f0f0',
-    text: '#333',
-    buttonText: '#fff',
-    danger: '#dc3545'
-  };
-  const mergedColors = { ...defaultColors, ...colors };
-  const [editingImage, setEditingImage] = useState(null);
-  const [newImageUrl, setNewImageUrl] = useState('');
-
-  const handleAddImage = () => {
-    if (newImageUrl.trim() !== '') {
-      const updatedGallery = event.galleryImages ? [...event.galleryImages, newImageUrl] : [newImageUrl];
-      setEvent({ ...event, galleryImages: updatedGallery });
-      setNewImageUrl('');
-    }
-  };
-
-  const handleRemoveImage = (index) => {
-    const updatedGallery = event.galleryImages.filter((_, i) => i !== index);
-    setEvent({ ...event, galleryImages: updatedGallery });
-  };
-
-  const handleEditImage = (index) => {
-    setEditingImage(index);
-    setNewImageUrl(event.galleryImages[index]);
-  };
-
-  const handleSaveEdit = () => {
-    if (newImageUrl.trim() !== '') {
-      const updatedGallery = event.galleryImages.map((img, i) => 
-        i === editingImage ? newImageUrl : img
-      );
-      setEvent({ ...event, galleryImages: updatedGallery });
-      setEditingImage(null);
-      setNewImageUrl('');
-    }
-  };
-
-  const galleryContainerStyle = {
-    fontFamily: mergedFonts.body,
-    color: mergedColors.text,
-    backgroundColor: mergedColors.background,
-    padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-    maxWidth: '900px',
-    margin: '20px auto'
-  };
-
-  const titleStyle = {
-    color: mergedColors.primary,
-    textAlign: 'center',
-    marginBottom: '30px',
-    fontSize: '2.5em'
-  };
-
-  const imageGridStyle = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-    gap: '15px',
-    marginBottom: '30px'
-  };
-
-  const imageCardStyle = {
-    border: `1px solid ${mergedColors.secondary}`,
-    borderRadius: '8px',
-    overflow: 'hidden',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-    position: 'relative'
-  };
-
-  const imageStyle = {
-    width: '100%',
-    height: '150px',
-    objectFit: 'cover',
-    display: 'block'
-  };
-
-  const buttonContainerStyle = {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '10px',
-    padding: '10px',
-    backgroundColor: mergedColors.secondaryBackground || mergedColors.background,
-    borderTop: `1px solid ${mergedColors.secondary}`
-  };
-
-  const buttonStyle = {
-    padding: '8px 15px',
-    borderRadius: '5px',
-    border: 'none',
-    cursor: 'pointer',
-    backgroundColor: mergedColors.primary,
-    color: mergedColors.buttonText || '#fff',
-    fontSize: '0.9em'
-  };
-
-  const inputGroupStyle = {
-    display: 'flex',
-    gap: '10px',
-    marginBottom: '20px',
-    justifyContent: 'center'
-  };
-
-  const inputStyle = {
-    flexGrow: 1,
-    padding: '10px',
-    borderRadius: '5px',
-    border: `1px solid ${mergedColors.secondary}`,
-    maxWidth: '400px'
-  };
+  const galleryImages = (event.images?.gallery && event.images.gallery.length > 0 
+    ? event.images.gallery 
+    : defaultGallery).slice(0, 6);
 
   return (
-    <div style={galleryContainerStyle}>
-      <h2 style={titleStyle}>Galería de Imágenes</h2>
-
-      <div style={inputGroupStyle}>
-        <input
-          type="text"
-          value={newImageUrl}
-          onChange={(e) => setNewImageUrl(e.target.value)}
-          placeholder="URL de la nueva imagen"
-          style={inputStyle}
-        />
-        {editingImage !== null ? (
-          <button onClick={handleSaveEdit} style={buttonStyle}>Guardar Edición</button>
-        ) : (
-          <button onClick={handleAddImage} style={buttonStyle}>Añadir Imagen</button>
-        )}
-      </div>
-
-      <div style={imageGridStyle}>
-        {event.galleryImages && event.galleryImages.map((image, index) => (
-          <div key={index} style={imageCardStyle}>
-            <img src={image} alt={`Gallery Image ${index + 1}`} style={imageStyle} />
-            <div style={buttonContainerStyle}>
-              <button onClick={() => handleEditImage(index)} style={{ ...buttonStyle, backgroundColor: mergedColors.secondary }}>Editar</button>
-              <button onClick={() => handleRemoveImage(index)} style={{ ...buttonStyle, backgroundColor: mergedColors.danger || '#dc3545' }}>Eliminar</button>
+    <section className="py-16" style={{ backgroundColor: colors.paper }} dir="ltr">
+      <div className="max-w-6xl mx-auto px-4">
+        <h2
+          className="text-2xl font-medium mb-12 tracking-wide text-center"
+          style={{ color: colors.ink, fontFamily: fontSecondary }}
+        >
+          GALERÍA
+        </h2>
+        
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {galleryImages.map((img, i) => (
+            <div
+              key={i}
+              className="relative overflow-hidden rounded-lg shadow-md transition-transform duration-300 hover:scale-105"
+              style={{ 
+                paddingBottom: i === 0 || i === 5 ? "133%" : "100%",
+                gridRow: i === 0 || i === 5 ? "span 2" : "span 1"
+              }}
+            >
+              <img
+                src={img}
+                alt={`Galería ${i + 1}`}
+                className="absolute inset-0 w-full h-full object-cover"
+                onError={(e) => {
+                  e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Crect fill='%23e0e0e0' width='400' height='400'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-size='20'%3EImagen %23" + (i + 1) + "%3C/text%3E%3C/svg%3E";
+                }}
+              />
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+
+      {/* Estilos CSS adicionales */}
+      <style jsx>{`
+        .grid {
+          display: grid;
+        }
+        .grid-cols-2 {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        @media (min-width: 768px) {
+          .md\\:grid-cols-3 {
+            grid-template-columns: repeat(3, 1fr);
+          }
+        }
+        .gap-4 {
+          gap: 1rem;
+        }
+        .relative {
+          position: relative;
+        }
+        .overflow-hidden {
+          overflow: hidden;
+        }
+        .rounded-lg {
+          border-radius: 0.5rem;
+        }
+        .shadow-md {
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .transition-transform {
+          transition-property: transform;
+          transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+          transition-duration: 300ms;
+        }
+        .hover\\:scale-105:hover {
+          transform: scale(1.05);
+        }
+        .absolute {
+          position: absolute;
+        }
+        .inset-0 {
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+        }
+      `}</style>
+    </section>
   );
 };
 
 export default Gallery;
-
