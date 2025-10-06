@@ -1313,7 +1313,7 @@ export default function EditorPanel({
                             className="px-2 py-1 border rounded text-sm"
                             onClick={() => {
                               const current = parseInt((event.fontSizes?.title || "48px").replace("px",""), 10) || 48;
-                              const next = Math.min(120, current + 4);
+                              const next = Math.min(200, current + 4);
                               setEvent(p => ({ ...p, fontSizes: { ...(p.fontSizes||{}), title: `${next}px` } }));
                             }}
                             title="Aumentar"
@@ -1325,7 +1325,7 @@ export default function EditorPanel({
                         <input
                           type="range"
                           min={24}
-                          max={120}
+                          max={200}
                           step={1}
                           value={parseInt((event.fontSizes?.title || "48px").replace("px",""), 10) || 48}
                           onChange={(e) => {
