@@ -141,7 +141,7 @@ export default function EditorPanel({
     },
   ], []);
 
-  /* =================== PALETAS MEJORADAS =================== */
+  /* =================== PALETES MEJORADAS =================== */
   const PALETTES = useMemo(
     () => [
       { 
@@ -354,7 +354,7 @@ export default function EditorPanel({
     setEvent((p) => {
       const arr = [...(p.gifts || [])];
       arr[idx] = { ...arr[idx], [key]: value };
-      return { ...p, gifts: arr };
+      return { ...p, gifts: arr;
     })
   , [setEvent]);
 
@@ -362,7 +362,7 @@ export default function EditorPanel({
     setEvent((p) => {
       const arr = [...(p.gifts || [])];
       arr.splice(idx, 1);
-      return { ...p, gifts: arr };
+      return { ...p, gifts: arr; 
     })
   , [setEvent]);
 
@@ -1334,6 +1334,79 @@ export default function EditorPanel({
                         ))}
                       </div>
                     </div>
+
+                    {/* ----- NUEVO: Control de tamaño para el nombre principal ----- */}
+                    <div className="pt-2 border-t mt-2">
+                      <Label className="text-xs font-medium mb-2 block">Tamaño del nombre principal</Label>
+                      <div className="flex items-center gap-2">
+                        {/* Botones rápidos */}
+                        <div className="flex gap-1">
+                          <button
+                            className="px-2 py-1 border rounded text-sm"
+                            onClick={() => {
+                              const current = parseInt((event.fontSizes?.title || "48px").replace("px",""), 10) || 48;
+                              const next = Math.max(24, current - 4);
+                              setEvent(p => ({ ...p, fontSizes: { ...(p.fontSizes||{}), title: `${next}px` } }));
+                            }}
+                            title="Disminuir"
+                          >
+                            A-
+                          </button>
+                          <button
+                            className="px-2 py-1 border rounded text-sm"
+                            onClick={() => {
+                              const defaultSize = 48;
+                              setEvent(p => ({ ...p, fontSizes: { ...(p.fontSizes||{}), title: `${defaultSize}px` } }));
+                            }}
+                            title="Reset"
+                          >
+                            A
+                          </button>
+                          <button
+                            className="px-2 py-1 border rounded text-sm"
+                            onClick={() => {
+                              const current = parseInt((event.fontSizes?.title || "48px").replace("px",""), 10) || 48;
+                              const next = Math.min(120, current + 4);
+                              setEvent(p => ({ ...p, fontSizes: { ...(p.fontSizes||{}), title: `${next}px` } }));
+                            }}
+                            title="Aumentar"
+                          >
+                            A+
+                          </button>
+                        </div>
+
+                        {/* Slider */}
+                        <input
+                          type="range"
+                          min={24}
+                          max={120}
+                          step={1}
+                          value={parseInt((event.fontSizes?.title || "48px").replace("px",""), 10) || 48}
+                          onChange={(e) => {
+                            const v = parseInt(e.target.value, 10);
+                            setEvent(p => ({ ...p, fontSizes: { ...(p.fontSizes||{}), title: `${v}px` } }));
+                          }}
+                          className="flex-1"
+                        />
+
+                        {/* Número */}
+                        <Input
+                          type="number"
+                          min={24}
+                          max={200}
+                          value={parseInt((event.fontSizes?.title || "48px").replace("px",""), 10) || 48}
+                          onChange={(e) => {
+                            const v = parseInt(e.target.value || "48", 10);
+                            if (Number.isNaN(v)) return;
+                            setEvent(p => ({ ...p, fontSizes: { ...(p.fontSizes||{}), title: `${Math.max(12, Math.min(500, v))}px` } }));
+                          }}
+                          className="w-20 text-xs"
+                        />
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">Este control ajusta el tamaño CSS del nombre principal (se guarda en <code>event.fontSizes.title</code>).</div>
+                    </div>
+                    {/* ----- FIN CONTROL TAMAÑO ----- */}
+
                   </div>
                 </CollapsibleSection>
 
