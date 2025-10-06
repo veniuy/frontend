@@ -1,6 +1,6 @@
 import React from 'react';
 
-const UsefulInfo = ({ event = {}, setEvent = () => {}, colors = {}, fonts = {}, editable = false }) => {
+const UsefulInfo = ({ event = {}, setEvent = () => {}, colors = {}, fonts = {}, fontPrimary, fontSecondary, editable = false }) => {
   const localFonts = { primary: fontPrimary, secondary: fontSecondary };
   // Valores por defecto para fonts
   const defaultFonts = {

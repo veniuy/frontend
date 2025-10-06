@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Gifts = ({ event, setEvent, colors = {}, fonts = {}, isEditing }) => {
+const Gifts = ({ event, setEvent, colors = {}, fonts = {}, fontPrimary, fontSecondary, isEditing }) => {
   const localFonts = { primary: fontPrimary, secondary: fontSecondary };
   // Valores por defecto para fonts
   const defaultFonts = {

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Hero = ({ event = {}, setEvent, colors = {}, fonts = {} }) => {
+const Hero = ({ event = {}, setEvent, colors = {}, fontPrimary, fontSecondary }) => {
   // Asegurar que event.hero siempre tenga estructura
   const safeHero = {
     logo: '',
@@ -10,12 +10,11 @@ const Hero = ({ event = {}, setEvent, colors = {}, fonts = {} }) => {
     ...event.hero,
   };
 
-  const defaultFonts = {
-    heading: 'Playfair Display, serif',
-    title: 'Playfair Display, serif',
-    subtitle: 'Inter, sans-serif',
+  const mergedFonts = {
+    heading: fontPrimary || 'Playfair Display, serif',
+    title: fontPrimary || 'Playfair Display, serif',
+    subtitle: fontSecondary || 'Inter, sans-serif',
   };
-  const mergedFonts = { ...defaultFonts, ...fonts };
 
   const defaultColors = {
     primary: '#f0f0f0',
