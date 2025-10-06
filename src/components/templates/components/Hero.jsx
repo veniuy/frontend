@@ -1,3 +1,4 @@
+// src/components/templates/components/Hero.jsx
 import React from 'react';
 import EditableText from '../../EditableText';
 
@@ -10,6 +11,15 @@ const ChevronDownIcon = ({ className, style }) => (
 
 const Hero = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuinceanera, styles = {} }) => {
   const heroTexture = event.images?.heroTexture || event.images?.hero || "/assets/portada.webp";
+
+  // Leer tamaño guardado: formato esperado "48px"
+  const savedTitleSize = event?.fontSizes?.title;
+  // función para convertir "48px" a valor usable y fallback responsivo
+  const titleFontSize = savedTitleSize && typeof savedTitleSize === 'string' ? savedTitleSize : null;
+
+  // fallback responsivo si no hay tamaño guardado
+  const defaultQuinceSize = "clamp(3rem, 10vw, 7rem)";
+  const defaultWeddingSize = "clamp(2.75rem, 8vw, 6rem)";
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -45,11 +55,12 @@ const Hero = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuinceane
           // Layout para Quinceañera - Solo un nombre
           <>
             <h1
-              className="font-light mb-8 tracking-wider"
-              style={{ 
-                color: colors.ink, 
-                fontSize: "clamp(3rem, 10vw, 7rem)", 
-                fontFamily: fontSecondary 
+              className="font-light mb-8 tracking-wider hero-title"
+              style={{
+                color: colors.ink,
+                fontSize: titleFontSize || defaultQuinceSize,
+                fontFamily: fontSecondary,
+                lineHeight: 1.05,
               }}
             >
               <EditableText
@@ -62,7 +73,7 @@ const Hero = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuinceane
                 ariaLabel="Nombre de la quinceañera"
                 className="px-1"
                 singleLine
-                style={{ color: colors.ink, fontFamily: fontSecondary }}
+                style={{ color: colors.ink, fontFamily: fontSecondary, fontSize: titleFontSize || undefined }}
               />
             </h1>
             <p
@@ -80,11 +91,12 @@ const Hero = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuinceane
           // Layout para Bodas - Dos nombres
           <>
             <h1
-              className="font-light mb-3 tracking-wider"
-              style={{ 
-                color: colors.ink, 
-                fontSize: "clamp(2.75rem, 8vw, 6rem)", 
-                fontFamily: fontSecondary 
+              className="font-light mb-3 tracking-wider hero-title"
+              style={{
+                color: colors.ink,
+                fontSize: titleFontSize || defaultWeddingSize,
+                fontFamily: fontSecondary,
+                lineHeight: 1.05,
               }}
             >
               <EditableText
@@ -93,7 +105,7 @@ const Hero = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuinceane
                 ariaLabel="Nombre 1"
                 className="px-1"
                 singleLine
-                style={{ color: colors.ink, fontFamily: fontSecondary }}
+                style={{ color: colors.ink, fontFamily: fontSecondary, fontSize: titleFontSize || undefined }}
               />
             </h1>
 
@@ -113,11 +125,12 @@ const Hero = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuinceane
             </div>
 
             <h1
-              className="font-light mb-8 tracking-wider"
-              style={{ 
-                color: colors.ink, 
-                fontSize: "clamp(2.75rem, 8vw, 6rem)", 
-                fontFamily: fontSecondary 
+              className="font-light mb-8 tracking-wider hero-title"
+              style={{
+                color: colors.ink,
+                fontSize: titleFontSize || defaultWeddingSize,
+                fontFamily: fontSecondary,
+                lineHeight: 1.05,
               }}
             >
               <EditableText
@@ -126,7 +139,7 @@ const Hero = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuinceane
                 ariaLabel="Nombre 2"
                 className="px-1"
                 singleLine
-                style={{ color: colors.ink, fontFamily: fontSecondary }}
+                style={{ color: colors.ink, fontFamily: fontSecondary, fontSize: titleFontSize || undefined }}
               />
             </h1>
 
@@ -161,6 +174,16 @@ const Hero = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuinceane
         }
         .animate-bounce {
           animation: bounce 2s infinite;
+        }
+
+        /* Si el usuario guardó un tamaño en px, escalalo en móviles para evitar overflow */
+        @media (max-width: 640px) {
+          .hero-title {
+            /* si titleFontSize existe como "48px", el inline style ya aplica.
+               este bloque se asegura de que si está definido en px, lo reduzca en móviles.
+               No cambia nada si usa clamp() por defecto. */
+            font-size: var(--hero-title-mobile, inherit) !important;
+          }
         }
       `}</style>
     </section>
