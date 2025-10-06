@@ -48,14 +48,30 @@ export default function QuinceaneraRomanticTemplate({ event, ui, setEvent }) {
   const fontPrimary = event.fonts?.primary || "'Dancing Script', cursive";
   const fontSecondary = event.fonts?.secondary || "'Playfair Display', serif";
 
+  // Obtener tamaño del título desde event.fontSizes.title (si existe) — valor esperado: "48px"
+  const titleSize = (event.fontSizes && event.fontSizes.title) ? event.fontSizes.title : "48px";
+
   // Crear estilos CSS dinámicos para aplicar fuentes globalmente
   const fontStyles = useMemo(() => {
     return `
       .font-primary { font-family: ${fontPrimary} !important; }
       .font-secondary { font-family: ${fontSecondary} !important; }
       .editable-text { font-family: inherit !important; }
+
+      /* Control de tamaño del nombre principal */
+      .hero-title {
+        font-size: ${titleSize} !important;
+        line-height: 1.05 !important;
+      }
+
+      /* Ajuste responsivo: si el user define un tamaño grande, permitir escalado en móviles */
+      @media (max-width: 640px) {
+        .hero-title {
+          font-size: calc(${titleSize} * 0.62) !important;
+        }
+      }
     `;
-  }, [fontPrimary, fontSecondary]);
+  }, [fontPrimary, fontSecondary, titleSize]);
 
   const isQuinceanera = event.eventType === "quinceanera" || event.templateId?.includes("quinceanera");
 
