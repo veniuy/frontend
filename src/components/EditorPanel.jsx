@@ -1348,7 +1348,6 @@ export default function EditorPanel({
                           className="w-20 text-xs"
                         />
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">Este control ajusta el tamaño CSS del nombre principal (se guarda en <code>event.fontSizes.title</code>).</div>
                     </div>
 
                   </div>
