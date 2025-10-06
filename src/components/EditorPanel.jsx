@@ -770,8 +770,8 @@ export default function EditorPanel({
         </div>
 
         {/* Tabs mejorados - NUEVO ORDEN */}
-        <Tabs value={ui.activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-          <TabsList className="grid w-full grid-cols-4 p-1 mx-3 mb-3">
+        <Tabs value={ui.activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
+          <TabsList className="grid w-full grid-cols-4 p-1 mx-3 mb-3 flex-shrink-0">
             <TabsTrigger value="templates" className="flex flex-col items-center gap-1 p-2 text-xs">
               <Layout className="h-3 w-3" />
               Plantillas
@@ -791,7 +791,7 @@ export default function EditorPanel({
           </TabsList>
 
           {/* ============ PLANTILLAS (PRIMERA PESTAÑA) ============ */}
-          <TabsContent value="templates" className="flex-1 overflow-y-auto">
+          <TabsContent value="templates" className="flex-1 overflow-y-auto min-h-0">
             <div className="px-3 pb-6">
               <div className="space-y-4">
                 
@@ -905,7 +905,7 @@ export default function EditorPanel({
           </TabsContent>
 
           {/* ============ CONTENIDO ============ */}
-          <TabsContent value="content" className="flex-1 overflow-y-auto">
+          <TabsContent value="content" className="flex-1 overflow-y-auto min-h-0">
             <div className="px-3 pb-6">
               <div className="space-y-4">
                 
@@ -1203,7 +1203,7 @@ export default function EditorPanel({
           </TabsContent>
 
           {/* ============ DISEÑO (PALETAS + PERSONALIZADOS) ============ */}
-          <TabsContent value="design" className="flex-1 overflow-y-auto">
+          <TabsContent value="design" className="flex-1 overflow-y-auto min-h-0">
             <div className="px-3 pb-6">
               <div className="space-y-4">
                 
@@ -1342,7 +1342,7 @@ export default function EditorPanel({
           </TabsContent>
 
           {/* ============ IMÁGENES ============ */}
-          <TabsContent value="images" className="flex-1 overflow-y-auto">
+          <TabsContent value="images" className="flex-1 overflow-y-auto min-h-0">
             <div className="px-3 pb-6">
               <div className="space-y-4">
                 
