@@ -18,8 +18,8 @@ const Hero = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuinceane
   const titleFontSize = savedTitleSize && typeof savedTitleSize === 'string' ? savedTitleSize : null;
 
   // fallback responsivo si no hay tamaño guardado
-  const defaultQuinceSize = "clamp(5rem, 10vw, 7rem)";
-  const defaultWeddingSize = "clamp(4rem, 8vw, 6rem)";
+  const defaultQuinceSize = "clamp(3rem, 10vw, 7rem)";
+  const defaultWeddingSize = "clamp(2.75rem, 8vw, 6rem)";
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -80,7 +80,7 @@ const Hero = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuinceane
               className="font-light mb-10 tracking-wide"
               style={{ 
                 color: colors.muted, 
-                fontSize: "clamp(4rem, 4vw, 2rem)", 
+                fontSize: "clamp(1.2rem, 4vw, 2rem)", 
                 fontFamily: fontPrimary 
               }}
             >
@@ -147,7 +147,7 @@ const Hero = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuinceane
               className="font-light mb-10 tracking-wide"
               style={{ 
                 color: colors.muted, 
-                fontSize: "clamp(4rem, 3.5vw, 1.5rem)", 
+                fontSize: "clamp(1.1rem, 3.5vw, 1.5rem)", 
                 fontFamily: fontPrimary 
               }}
             >
