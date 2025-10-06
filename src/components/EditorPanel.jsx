@@ -60,7 +60,6 @@ export default function EditorPanel({
   onSave,
   onFinish, // Nueva prop para manejar finalización
 }) {
-  /* =================== ESTADO MEJORADO =================== */
   const [errors, setErrors] = useState([]);
   const [saved, setSaved] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -70,9 +69,7 @@ export default function EditorPanel({
   const [searchTerm, setSearchTerm] = useState("");
   const [recentColors, setRecentColors] = useState([]);
 
-  /* =================== PLANTILLAS MEJORADAS SIN EMOJIS =================== */
   const templates = useMemo(() => [
-    // QUINCEAÑOS
     { 
       id: "quinceanera-elegant", 
       name: "Elegante", 
@@ -97,8 +94,6 @@ export default function EditorPanel({
       colors: { primary: "#B7B79D", secondary: "#C16D4D", text: "#2E2E2E" },
       fonts: { primary: "Montserrat, sans-serif", secondary: "'Alex Brush', cursive" }
     },
-    
-    // BODAS
     { 
       id: "wedding-elegant", 
       name: "Elegante", 
@@ -141,7 +136,6 @@ export default function EditorPanel({
     },
   ], []);
 
-  /* =================== PALETES MEJORADAS =================== */
   const PALETTES = useMemo(
     () => [
       { 
@@ -243,9 +237,6 @@ export default function EditorPanel({
     { name: "Lato", family: "Lato, sans-serif", category: "Sans Serif", preview: "Aa" },
   ], []);
 
-  /* =================== HOOKS MEJORADOS =================== */
-  
-  // Detección de dispositivo mejorada
   const deviceType = useMemo(() => {
     if (typeof window === 'undefined') return 'desktop';
     const width = window.innerWidth;
@@ -254,7 +245,6 @@ export default function EditorPanel({
     return 'desktop';
   }, []);
 
-  // Auto-save mejorado
   const debouncedSave = useCallback(
     debounce(async () => {
       if (typeof onSave === "function") {
@@ -274,7 +264,6 @@ export default function EditorPanel({
     debouncedSave();
   }, [event, debouncedSave]);
 
-  // Gestión de colores recientes
   const addRecentColor = useCallback((color) => {
     setRecentColors(prev => {
       const filtered = prev.filter(c => c !== color);
@@ -282,13 +271,10 @@ export default function EditorPanel({
     });
   }, []);
 
-  /* =================== HELPERS MEJORADOS =================== */
-  
   const applyTemplate = useCallback((template) => {
-    // Aplicar plantilla completa
     setEvent(prev => ({
       ...prev,
-      template: template.type, // 'quinceanera' o 'wedding'
+      template: template.type,
       templateId: template.id,
       colors: {
         ...prev.colors,
@@ -298,11 +284,10 @@ export default function EditorPanel({
         ...prev.fonts,
         ...template.fonts
       },
-      // Configurar secciones según el tipo
       sections: {
         ...prev.sections,
-        ceremony: template.type === 'wedding', // Solo bodas tienen ceremonia
-        reception: true, // Ambos tienen fiesta/celebración
+        ceremony: template.type === 'wedding',
+        reception: true,
         bank: true,
         songs: true,
         info: true,
@@ -311,7 +296,6 @@ export default function EditorPanel({
       }
     }));
 
-    // Aplicar colores
     if (template.colors) {
       Object.entries(template.colors).forEach(([key, value]) => {
         handleColorChange(key, value);
@@ -319,7 +303,6 @@ export default function EditorPanel({
       });
     }
 
-    // Aplicar fuentes
     if (template.fonts) {
       Object.entries(template.fonts).forEach(([key, value]) => {
         handleFontChange(key, value);
@@ -354,7 +337,7 @@ export default function EditorPanel({
     setEvent((p) => {
       const arr = [...(p.gifts || [])];
       arr[idx] = { ...arr[idx], [key]: value };
-      return { ...p, gifts: arr;
+      return { ...p, gifts: arr };
     })
   , [setEvent]);
 
@@ -362,11 +345,10 @@ export default function EditorPanel({
     setEvent((p) => {
       const arr = [...(p.gifts || [])];
       arr.splice(idx, 1);
-      return { ...p, gifts: arr; 
+      return { ...p, gifts: arr };
     })
   , [setEvent]);
 
-  // Info útil: alojamiento / transporte
   const addLodging = useCallback(() =>
     setEvent((p) => ({
       ...p,
@@ -413,7 +395,6 @@ export default function EditorPanel({
     })
   , [setEvent]);
 
-  /* ===== Galería mejorada ===== */
   const gallery = (event.images?.gallery || []).slice(0, 6);
   const setGallery = useCallback((arr) => 
     setEvent((p) => ({ ...p, images: { ...(p.images || {}), gallery: arr.slice(0, 6) } }))
@@ -464,7 +445,6 @@ export default function EditorPanel({
     }
   }, [event, onSave]);
 
-  // NUEVO ORDEN: Plantillas, Contenido, Diseño, Imágenes
   const ORDER = ["templates", "content", "design", "images"];
   const goNextTab = useCallback(() => {
     const idx = ORDER.indexOf(ui.activeTab);
@@ -513,7 +493,6 @@ export default function EditorPanel({
     setErrors(errs);
     if (errs.length === 0) {
       if (ui.activeTab === ORDER[ORDER.length - 1]) {
-        // Es la última pestaña, finalizar
         if (typeof onFinish === "function") {
           onFinish(event);
         }
@@ -523,8 +502,6 @@ export default function EditorPanel({
     }
   }, [validate, goNextTab, ui.activeTab, ORDER, onFinish, event]);
 
-  /* =================== COMPONENTES DE UI MEJORADOS =================== */
-  
   const MobileToolbar = () => (
     ui.isMobile && !ui.showMobilePanel && (
       <div className="fixed top-2 left-2 right-2 z-40 flex items-center gap-2">
@@ -595,13 +572,11 @@ export default function EditorPanel({
     ...props 
   }) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
-    
     const variants = {
       default: "bg-primary text-primary-foreground hover:bg-primary/90",
       ghost: "hover:bg-accent hover:text-accent-foreground",
       outline: "border border-input hover:bg-accent hover:text-accent-foreground",
     };
-    
     const sizes = {
       default: "h-10 py-2 px-4",
       sm: "h-9 px-3 text-sm",
@@ -689,7 +664,6 @@ export default function EditorPanel({
     </div>
   );
 
-  /* =================== RENDER PRINCIPAL =================== */
   return (
     <>
       <MobileToolbar />
@@ -703,7 +677,6 @@ export default function EditorPanel({
             : "w-80 bg-white border-r border-gray-200 overflow-hidden flex flex-col"
         }
       >
-        {/* Header mejorado */}
         <div className="sticky top-0 z-10 bg-white border-b border-gray-200 p-3">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
@@ -742,7 +715,6 @@ export default function EditorPanel({
             </div>
           </div>
 
-          {/* Indicador de progreso */}
           <div className="flex items-center gap-1 mb-2">
             {ORDER.map((tab, index) => (
               <div
@@ -769,7 +741,6 @@ export default function EditorPanel({
           )}
         </div>
 
-        {/* Tabs mejorados - NUEVO ORDEN */}
         <Tabs value={ui.activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
           <TabsList className="grid w-full grid-cols-4 p-1 mx-3 mb-3 flex-shrink-0">
             <TabsTrigger value="templates" className="flex flex-col items-center gap-1 p-2 text-xs">
@@ -790,12 +761,9 @@ export default function EditorPanel({
             </TabsTrigger>
           </TabsList>
 
-          {/* ============ PLANTILLAS (PRIMERA PESTAÑA) ============ */}
           <TabsContent value="templates" className="flex-1 overflow-y-auto min-h-0">
             <div className="px-3 pb-6">
               <div className="space-y-4">
-                
-                {/* Plantillas de Quinceaños */}
                 <CollapsibleSection 
                   title="Quinceaños" 
                   icon={<Crown className="w-4 h-4" />}
@@ -828,7 +796,6 @@ export default function EditorPanel({
                   </div>
                 </CollapsibleSection>
 
-                {/* Plantillas de Bodas */}
                 <CollapsibleSection 
                   title="Bodas" 
                   icon={<Heart className="w-4 h-4" />}
@@ -861,7 +828,6 @@ export default function EditorPanel({
                   </div>
                 </CollapsibleSection>
 
-                {/* Tipo de ceremonia para bodas */}
                 {event.template === 'wedding' && (
                   <CollapsibleSection 
                     title="Tipo de Ceremonia" 
@@ -904,19 +870,15 @@ export default function EditorPanel({
             </div>
           </TabsContent>
 
-          {/* ============ CONTENIDO ============ */}
           <TabsContent value="content" className="flex-1 overflow-y-auto min-h-0">
             <div className="px-3 pb-6">
               <div className="space-y-4">
-                
-                {/* Información básica */}
                 <CollapsibleSection 
                   title="Información Básica" 
                   icon={<Heart className="w-4 h-4" />}
                   defaultOpen={true}
                 >
                   {event.template === "quinceanera" ? (
-                    // Layout para Quinceaños
                     <div className="space-y-3">
                       <div>
                         <Label className="text-xs">Nombre de la Quinceañera</Label>
@@ -933,7 +895,6 @@ export default function EditorPanel({
                       </div>
                     </div>
                   ) : (
-                    // Layout para Bodas
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <Label className="text-xs">Nombre 1</Label>
@@ -988,13 +949,11 @@ export default function EditorPanel({
                   </div>
                 </CollapsibleSection>
 
-                {/* Detalles del evento */}
                 <CollapsibleSection 
                   title="Detalles del Evento" 
                   icon={<Church className="w-4 h-4" />}
                 >
                   <div className="space-y-3">
-                    {/* Ceremonia - Solo para bodas */}
                     {event.template !== "quinceanera" && (
                       <>
                         <div>
@@ -1043,7 +1002,6 @@ export default function EditorPanel({
                   </div>
                 </CollapsibleSection>
 
-                {/* Información bancaria */}
                 <CollapsibleSection 
                   title="Información Bancaria" 
                   icon={<CreditCard className="w-4 h-4" />}
@@ -1092,7 +1050,6 @@ export default function EditorPanel({
                   </div>
                 </CollapsibleSection>
 
-                {/* Mesa de regalos */}
                 <CollapsibleSection 
                   title="Mesa de Regalos" 
                   icon={<Gift className="w-4 h-4" />}
@@ -1134,7 +1091,6 @@ export default function EditorPanel({
                   </div>
                 </CollapsibleSection>
 
-                {/* Textos personalizables */}
                 <CollapsibleSection 
                   title="Textos Personalizables" 
                   icon={<Type className="w-4 h-4" />}
@@ -1172,14 +1128,12 @@ export default function EditorPanel({
                   </div>
                 </CollapsibleSection>
 
-                {/* Secciones visibles */}
                 <CollapsibleSection 
                   title="Secciones Visibles" 
                   icon={<Eye className="w-4 h-4" />}
                 >
                   <div className="grid grid-cols-1 gap-2">
                     {SECTION_KEYS.map(({ key, label, icon }) => {
-                      // Ocultar ceremonia para quinceaños
                       if (key === "ceremony" && event.template === "quinceanera") return null;
                       
                       return (
@@ -1202,12 +1156,9 @@ export default function EditorPanel({
             </div>
           </TabsContent>
 
-          {/* ============ DISEÑO (PALETAS + PERSONALIZADOS) ============ */}
           <TabsContent value="design" className="flex-1 overflow-y-auto min-h-0">
             <div className="px-3 pb-6">
               <div className="space-y-4">
-                
-                {/* Paletas de colores mejoradas */}
                 <CollapsibleSection 
                   title="Paletas de Colores" 
                   icon={<Palette className="w-4 h-4" />}
@@ -1249,7 +1200,6 @@ export default function EditorPanel({
                   </div>
                 </CollapsibleSection>
 
-                {/* Colores personalizados */}
                 <CollapsibleSection 
                   title="Colores Personalizados" 
                   icon={<Settings className="w-4 h-4" />}
@@ -1279,7 +1229,6 @@ export default function EditorPanel({
                   </div>
                 </CollapsibleSection>
 
-                {/* Tipografía mejorada */}
                 <CollapsibleSection 
                   title="Tipografía" 
                   icon={<Type className="w-4 h-4" />}
@@ -1335,11 +1284,9 @@ export default function EditorPanel({
                       </div>
                     </div>
 
-                    {/* ----- NUEVO: Control de tamaño para el nombre principal ----- */}
                     <div className="pt-2 border-t mt-2">
                       <Label className="text-xs font-medium mb-2 block">Tamaño del nombre principal</Label>
                       <div className="flex items-center gap-2">
-                        {/* Botones rápidos */}
                         <div className="flex gap-1">
                           <button
                             className="px-2 py-1 border rounded text-sm"
@@ -1375,7 +1322,6 @@ export default function EditorPanel({
                           </button>
                         </div>
 
-                        {/* Slider */}
                         <input
                           type="range"
                           min={24}
@@ -1389,7 +1335,6 @@ export default function EditorPanel({
                           className="flex-1"
                         />
 
-                        {/* Número */}
                         <Input
                           type="number"
                           min={24}
@@ -1405,7 +1350,6 @@ export default function EditorPanel({
                       </div>
                       <div className="text-xs text-gray-500 mt-1">Este control ajusta el tamaño CSS del nombre principal (se guarda en <code>event.fontSizes.title</code>).</div>
                     </div>
-                    {/* ----- FIN CONTROL TAMAÑO ----- */}
 
                   </div>
                 </CollapsibleSection>
@@ -1414,15 +1358,11 @@ export default function EditorPanel({
             </div>
           </TabsContent>
 
-          {/* ============ IMÁGENES ============ */}
           <TabsContent value="images" className="flex-1 overflow-y-auto min-h-0">
             <div className="px-3 pb-6">
               <div className="space-y-4">
-                
-                {/* Panel de imágenes existente */}
                 <ImagesPanel event={event} setEvent={setEvent} />
 
-                {/* Galería mejorada */}
                 <CollapsibleSection 
                   title="Galería de Fotos" 
                   icon={<ImageIcon className="w-4 h-4" />}
@@ -1484,7 +1424,6 @@ export default function EditorPanel({
 
         </Tabs>
 
-        {/* Footer con botón de siguiente/finalizar */}
         <div className="border-t border-gray-200 p-3">
           <EnhancedButton
             onClick={handleNext}
@@ -1500,8 +1439,6 @@ export default function EditorPanel({
     </>
   );
 }
-
-/* =================== HELPERS =================== */
 
 function debounce(func, wait) {
   let timeout;
