@@ -182,8 +182,8 @@ export const TEMPLATE_INFO = {
         id: "quinceanera-romantic",
         name: "Quinceaños Romántico",
         description: "Estilo suave rosa blush y perla",
-        colors: { primary: "#F8BBD9", secondary: "#FDF2F8" },
-        fonts: { primary: "'Playfair Display', serif", secondary: "'Dancing Script', cursive" }
+        colors: { primary: "#E91E63", secondary: "#F8BBD9" },
+        fonts: { primary: "'Dancing Script', cursive", secondary: "'Playfair Display', serif" }
       },
       {
         id: "quinceanera-modern", 
