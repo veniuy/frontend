@@ -62,6 +62,53 @@ export default function TemplateRenderer({ event, ui, setEvent }) {
     return <DefaultComponent event={event} ui={ui} setEvent={setEvent} />;
   }
 
+  // Aplicar estilos globales de fuentes y colores
+  const fontPrimary = event.fonts?.primary || "'Playfair Display', serif";
+  const fontSecondary = event.fonts?.secondary || "'Great Vibes', cursive";
+  const colorPrimary = event.colors?.primary || "#8FAF86";
+  const colorSecondary = event.colors?.secondary || "#D4B28A";
+  const colorText = event.colors?.text || "#2E2E2E";
+
+  // Inyectar estilos CSS para asegurar que se apliquen las personalizaciones
+  React.useEffect(() => {
+    const styleId = 'template-custom-styles';
+    let styleElement = document.getElementById(styleId);
+    
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = styleId;
+      document.head.appendChild(styleElement);
+    }
+
+    styleElement.textContent = `
+      :root {
+        --font-primary: ${fontPrimary};
+        --font-secondary: ${fontSecondary};
+        --color-primary: ${colorPrimary};
+        --color-secondary: ${colorSecondary};
+        --color-text: ${colorText};
+      }
+      
+      .font-primary, .font-primary * {
+        font-family: ${fontPrimary} !important;
+      }
+      
+      .font-secondary, .font-secondary * {
+        font-family: ${fontSecondary} !important;
+      }
+      
+      .editable-text {
+        font-family: inherit !important;
+      }
+    `;
+
+    return () => {
+      // Cleanup cuando el componente se desmonte
+      const el = document.getElementById(styleId);
+      if (el) el.remove();
+    };
+  }, [fontPrimary, fontSecondary, colorPrimary, colorSecondary, colorText]);
+
   return <TemplateComponent event={event} ui={ui} setEvent={setEvent} />;
 }
 
