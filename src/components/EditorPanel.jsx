@@ -890,7 +890,6 @@ export default function EditorPanel({
                           }))}
                           className="text-xs mt-1"
                           placeholder="Nombre"
-                          key={event.template + "quinceaneraName"}
                         />
                       </div>
                     </div>
@@ -903,7 +902,6 @@ export default function EditorPanel({
                           onChange={(value) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: value } }))}
                           className="text-xs mt-1"
                           placeholder="Novia"
-                          key={event.template + "bride"}
                         />
                       </div>
                       <div>
@@ -913,7 +911,6 @@ export default function EditorPanel({
                           onChange={(value) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: value } }))}
                           className="text-xs mt-1"
                           placeholder="Novio"
-                          key={event.template + "groom"}
                         />
                       </div>
                     </div>
