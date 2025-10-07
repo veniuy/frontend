@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import EditableText from '../../EditableText'; // Importar EditableText
 
 const Gallery = ({ event, colors, fontSecondary, styles = {} }) => {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -40,7 +41,13 @@ const Gallery = ({ event, colors, fontSecondary, styles = {} }) => {
             className="text-2xl font-medium mb-12 tracking-wide"
             style={{ color: colors.ink, fontFamily: fontSecondary }}
           >
-            GALERÍA
+            <EditableText
+              value={event.sections?.galleryTitle || "GALERÍA"}
+              onChange={(v) => setEvent((p) => ({ ...p, sections: { ...p.sections, galleryTitle: v } }))}
+              className="px-1"
+              singleLine
+              style={{ color: colors.ink, fontFamily: fontSecondary }}
+            />
           </h2>
           
           {/* Nuevo formato de galería - Grid moderno */}
@@ -79,7 +86,7 @@ const Gallery = ({ event, colors, fontSecondary, styles = {} }) => {
           className="lightbox-overlay"
           onClick={closeLightbox}
         >
-          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation())}>
             <button 
               className="lightbox-close"
               onClick={closeLightbox}
@@ -312,6 +319,6 @@ const Gallery = ({ event, colors, fontSecondary, styles = {} }) => {
       `}</style>
     </>
   );
-};
+}; 
 
 export default Gallery;
