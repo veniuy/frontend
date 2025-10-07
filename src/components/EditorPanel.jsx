@@ -415,7 +415,7 @@ export default function EditorPanel({
   , [gallery, setGallery]);
 
   const SECTION_KEYS = useMemo(() => [
-    { key: "ceremony", label: "Ceremonia", icon: <Church className="w-4 h-4" /> },
+    { key: "ceremony", label: event.template?.includes("quinceanera") ? "Fiesta" : "Ceremonia", icon: <Church className="w-4 h-4" /> },
     { key: "reception", label: "Fiesta", icon: <PartyPopper className="w-4 h-4" /> },
     { key: "bank", label: "Cuenta bancaria", icon: <CreditCard className="w-4 h-4" /> },
     { key: "songs", label: "Canciones", icon: <Music className="w-4 h-4" /> },
@@ -471,9 +471,14 @@ export default function EditorPanel({
     if (!c.date || !c.date.trim()) errs.push("Falta la fecha.");
     if (!c.time || !c.time.trim()) errs.push("Falta la hora.");
     
-    if (!isQuinceanera && isSectionOn("ceremony")) {
-      const ceremony = c.ceremony || {};
-      if (!ceremony.venue) errs.push("Falta el lugar de la ceremonia.");
+    if (isSectionOn("ceremony")) {
+      if (isQuinceanera) {
+        const reception = c.reception || {};
+        if (!reception.venue) errs.push("Falta el lugar de la fiesta.");
+      } else {
+        const ceremony = c.ceremony || {};
+        if (!ceremony.venue) errs.push("Falta el lugar de la ceremonia.");
+      }
     }
     
     if (isSectionOn("reception")) {
@@ -959,7 +964,30 @@ export default function EditorPanel({
                   icon={<Church className="w-4 h-4" />}
                 >
                   <div className="space-y-3">
-                    {event.template !== "quinceanera" && (
+                    {event.template?.includes("quinceanera") ? (
+                      <>
+                        <div>
+                          <Label className="text-xs">Lugar de la Fiesta</Label>
+                          <EditableInput
+                            value={event.reception?.venue || ""}
+                            onChange={(e) =>
+                              setEvent((p) => ({ ...p, reception: { ...p.reception, venue: e.target.value } }))
+                            }
+                            className="text-xs mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs">Dirección de la Fiesta</Label>
+                          <EditableTextarea
+                            value={event.reception?.address || ""}
+                            onChange={(e) =>
+                              setEvent((p) => ({ ...p, reception: { ...p.reception, address: e.target.value } }))
+                            }
+                            className="text-xs mt-1 min-h-[60px]"
+                          />
+                        </div>
+                      </>
+                    ) : (
                       <>
                         <div>
                           <Label className="text-xs">Lugar de Ceremonia</Label>

@@ -11,14 +11,8 @@ export default function EditableTextarea({ value, onChange, ...props }) {
 
   const handleChange = (e) => {
     setLocalValue(e.target.value);
+    onChange(e); // Llama a onChange inmediatamente para actualizar el estado global
   };
 
-  const handleBlur = (e) => {
-    if (value !== e.target.value) {
-      onChange(e);
-    }
-  };
-
-  return <Textarea {...props} value={localValue} onChange={handleChange} onBlur={handleBlur} />;
+  return <Textarea {...props} value={localValue} onChange={handleChange} />;
 }
-
