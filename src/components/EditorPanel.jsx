@@ -50,7 +50,7 @@ import {
 } from "lucide-react";
 import ImagesPanel from "./ImagesPanel";
 
-export default function EditorPanel({
+const EditorPanel = React.memo(function EditorPanel({
   event,
   ui,
   setActiveTab,
@@ -1459,7 +1459,9 @@ export default function EditorPanel({
       </div>
     </>
   );
-}
+});
+
+export default EditorPanel;
 
 function debounce(func, wait) {
   let timeout;
