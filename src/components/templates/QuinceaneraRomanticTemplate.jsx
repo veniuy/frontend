@@ -48,28 +48,34 @@ export default function QuinceaneraRomanticTemplate({ event, ui, setEvent }) {
   const fontPrimary = event.fonts?.primary || "'Dancing Script', cursive";
   const fontSecondary = event.fonts?.secondary || "'Playfair Display', serif";
 
-  // Cambiar tamaño del título a 50px (aproximadamente 3.125rem)
-  const titleSize = (event.fontSizes && event.fontSizes.title) ? event.fontSizes.title : "50px";
+  // Aumentar tamaño del título a 5rem (80px) y eliminar sombra
+  const titleSize = (event.fontSizes && event.fontSizes.title) ? event.fontSizes.title : "5rem";
 
   // Crear estilos CSS dinámicos para aplicar fuentes globalmente
   const fontStyles = useMemo(() => {
+    // Determinar el color del texto basado en la luminosidad de la imagen de fondo
+    // Para simplificar, asumimos que la imagen de fondo 'elegantfloral' es oscura, por lo que el texto debe ser blanco.
+    // Si se implementara una selección de imagen dinámica, se necesitaría una función para calcular la luminosidad de la imagen.
+    const heroTextColor = "#FFFFFF"; // Por defecto blanco para fondo oscuro
+    const heroSubtitleColor = "#FFFFFF"; // Por defecto blanco para fondo oscuro
+
     return `
       .font-primary { font-family: ${fontPrimary} !important; }
       .font-secondary { font-family: ${fontSecondary} !important; }
       .editable-text { font-family: inherit !important; }
 
-      /* Control de tamaño del nombre principal - aumentado a 50px */
+      /* Control de tamaño del nombre principal - aumentado a 5rem y sin sombra */
       .hero-title {
         font-size: ${titleSize} !important;
         line-height: 1.05 !important;
-        color: #FFFFFF !important; /* Texto blanco para mejor contraste */
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5) !important; /* Sombra para mejor legibilidad */
+        color: ${heroTextColor} !important; /* Color dinámico */
+        text-shadow: none !important; /* Eliminar sombra */
       }
 
-      /* Mis quince años también en blanco */
+      /* Mis quince años también en blanco y sin sombra */
       .hero-subtitle {
-        color: #FFFFFF !important;
-        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5) !important;
+        color: ${heroSubtitleColor} !important;
+        text-shadow: none !important; /* Eliminar sombra */
       }
 
       /* Ajuste responsivo: si el user define un tamaño grande, permitir escalado en móviles */
@@ -86,7 +92,7 @@ export default function QuinceaneraRomanticTemplate({ event, ui, setEvent }) {
 
       /* Estilos para la imagen de fondo elegantfloral */
       .hero-background {
-        background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2025&q=80') !important;
+        background-image: url('/assets/elegant-floral-C5o6sKUn.jpg') !important; /* Usar la imagen local */
         background-size: cover !important;
         background-position: center !important;
         background-repeat: no-repeat !important;
@@ -101,7 +107,7 @@ export default function QuinceaneraRomanticTemplate({ event, ui, setEvent }) {
         left: 0 !important;
         right: 0 !important;
         bottom: 0 !important;
-        background: rgba(0, 0, 0, 0.3) !important;
+        background: rgba(0, 0, 0, 0.3) !important; /* Ajustar opacidad del overlay */
         z-index: 1 !important;
       }
 
