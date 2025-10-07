@@ -48,7 +48,7 @@ export default function VisualEditorPage() {
   });
 
   const [ui, setUi] = useState({
-    activeTab: "design",
+    activeTab: "templates",
     zoom: 100,
     selectedTemplate: "elegant",
     showMobilePanel: false,
@@ -98,6 +98,7 @@ export default function VisualEditorPage() {
           handleFontChange={handleFontChange}
           handleTemplateChange={handleTemplateChange}
           setEvent={setEvent}
+          setViewMode={setViewMode}
         />
         <div className="flex-1 overflow-auto bg-gray-100">
           <InvitationCanvas

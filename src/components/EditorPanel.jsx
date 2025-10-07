@@ -61,6 +61,7 @@ export default function EditorPanel({
   setEvent,
   onSave,
   onFinish, // Nueva prop para manejar finalización
+  setViewMode,
 }) {
   const [errors, setErrors] = useState([]);
   const [saved, setSaved] = useState(false);
@@ -523,7 +524,7 @@ export default function EditorPanel({
         </EnhancedButton>
 
         <div className="flex items-center gap-2 ml-auto">
-          <PreviewModeToggle />
+          <PreviewModeToggle setViewMode={setViewMode} currentViewMode={ui.viewMode} />
           
           <EnhancedButton
             variant="ghost"
@@ -547,7 +548,7 @@ export default function EditorPanel({
     )
   );
 
-  const PreviewModeToggle = () => (
+  const PreviewModeToggle = ({ setViewMode, currentViewMode }) => (
     <div className="flex items-center gap-1 bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg p-1">
       {[
         { mode: "mobile", icon: Smartphone },
@@ -556,9 +557,9 @@ export default function EditorPanel({
       ].map(({ mode, icon: Icon }) => (
         <button
           key={mode}
-          onClick={() => setPreviewMode(mode)}
+          onClick={() => setViewMode(mode)}
           className={`p-1.5 rounded transition-colors ${
-            previewMode === mode 
+            currentViewMode === mode 
               ? "bg-blue-100 text-blue-600" 
               : "text-gray-400 hover:text-gray-600"
           }`}
@@ -699,7 +700,7 @@ export default function EditorPanel({
               
               <div className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-blue-600" />
-                <span className="font-semibold text-sm">Editor</span>
+                <span className="font-semibold text-sm">Invitación</span>
               </div>
             </div>
 
@@ -722,16 +723,7 @@ export default function EditorPanel({
             </div>
           </div>
 
-          <div className="flex items-center gap-1 mb-2">
-            {ORDER.map((tab, index) => (
-              <div
-                key={tab}
-                className={`flex-1 h-1 rounded ${
-                  ORDER.indexOf(ui.activeTab) >= index ? "bg-blue-600" : "bg-gray-200"
-                }`}
-              />
-            ))}
-          </div>
+
 
           {errors.length > 0 && (
             <div className="rounded border border-red-200 bg-red-50 p-2 text-xs text-red-700">
@@ -749,22 +741,22 @@ export default function EditorPanel({
         </div>
 
         <Tabs value={ui.activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-          <TabsList className="grid w-full grid-cols-4 p-1 mx-3 mb-3 flex-shrink-0">
-            <TabsTrigger value="templates" className="flex flex-col items-center gap-1 p-2 text-xs">
-              <Layout className="h-3 w-3" />
-              Plantillas
+          <TabsList className="grid w-full grid-cols-4 p-1 mx-3 mb-3 flex-shrink-0 h-auto">
+            <TabsTrigger value="templates" className="flex flex-col items-center gap-1 p-2 text-xs h-full">
+              <Layout className="h-5 w-5" />
+              <span className="text-[10px]">Plantillas</span>
             </TabsTrigger>
-            <TabsTrigger value="content" className="flex flex-col items-center gap-1 p-2 text-xs">
-              <Type className="h-3 w-3" />
-              Contenido
+            <TabsTrigger value="content" className="flex flex-col items-center gap-1 p-2 text-xs h-full">
+              <Type className="h-5 w-5" />
+              <span className="text-[10px]">Contenido</span>
             </TabsTrigger>
-            <TabsTrigger value="design" className="flex flex-col items-center gap-1 p-2 text-xs">
-              <Palette className="h-3 w-3" />
-              Diseño
+            <TabsTrigger value="design" className="flex flex-col items-center gap-1 p-2 text-xs h-full">
+              <Palette className="h-5 w-5" />
+              <span className="text-[10px]">Diseño</span>
             </TabsTrigger>
-            <TabsTrigger value="images" className="flex flex-col items-center gap-1 p-2 text-xs">
-              <ImageIcon className="h-3 w-3" />
-              Imágenes
+            <TabsTrigger value="images" className="flex flex-col items-center gap-1 p-2 text-xs h-full">
+              <ImageIcon className="h-5 w-5" />
+              <span className="text-[10px]">Imágenes</span>
             </TabsTrigger>
           </TabsList>
 
@@ -891,10 +883,10 @@ export default function EditorPanel({
                         <Label className="text-xs">Nombre de la Quinceañera</Label>
                         <EditableInput
                           value={event.couple?.bride || event.quinceanera?.name || ""}
-                          onChange={(e) => setEvent((p) => ({
+                          onChange={(value) => setEvent((p) => ({
                             ...p,
-                            couple: { ...p.couple, bride: e.target.value },
-                            quinceanera: { ...p.quinceanera, name: e.target.value }
+                            couple: { ...p.couple, bride: value },
+                            quinceanera: { ...p.quinceanera, name: value }
                           }))}
                           className="text-xs mt-1"
                           placeholder="Nombre"
@@ -908,7 +900,7 @@ export default function EditorPanel({
                         <Label className="text-xs">Nombre 1</Label>
                         <EditableInput
                           value={event.couple?.bride || ""}
-                          onChange={(e) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: e.target.value } }))}
+                          onChange={(value) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: value } }))}
                           className="text-xs mt-1"
                           placeholder="Novia"
                           key={event.template + "bride"}
@@ -918,7 +910,7 @@ export default function EditorPanel({
                         <Label className="text-xs">Nombre 2</Label>
                         <EditableInput
                           value={event.couple?.groom || ""}
-                          onChange={(e) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: e.target.value } }))}
+                          onChange={(value) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: value } }))}
                           className="text-xs mt-1"
                           placeholder="Novio"
                           key={event.template + "groom"}
@@ -932,7 +924,7 @@ export default function EditorPanel({
                       <Label className="text-xs">Fecha</Label>
                       <EditableInput
                         value={event.date || ""}
-                        onChange={(e) => setEvent((p) => ({ ...p, date: e.target.value }))}
+                        onChange={(value) => setEvent((p) => ({ ...p, date: value }))}
                         className="text-xs mt-1"
                         placeholder="DD/MM/YYYY"
                       />
@@ -941,7 +933,7 @@ export default function EditorPanel({
                       <Label className="text-xs">Hora</Label>
                       <EditableInput
                         value={event.time || ""}
-                        onChange={(e) => setEvent((p) => ({ ...p, time: e.target.value }))}
+                        onChange={(value) => setEvent((p) => ({ ...p, time: value }))}
                         className="text-xs mt-1"
                         placeholder="HH:MM"
                       />
@@ -952,7 +944,7 @@ export default function EditorPanel({
                     <Label className="text-xs">Hashtag</Label>
                     <EditableInput
                       value={event.hashtag || ""}
-                      onChange={(e) => setEvent((p) => ({ ...p, hashtag: e.target.value }))}
+                      onChange={(value) => setEvent((p) => ({ ...p, hashtag: value }))}
                       className="text-xs mt-1"
                       placeholder={event.template === "quinceanera" ? "#Mis15Años" : "#NuestraBoda"}
                     />
@@ -970,8 +962,8 @@ export default function EditorPanel({
                           <Label className="text-xs">Lugar de la Fiesta</Label>
                           <EditableInput
                             value={event.reception?.venue || ""}
-                            onChange={(e) =>
-                              setEvent((p) => ({ ...p, reception: { ...p.reception, venue: e.target.value } }))
+                            onChange={(value) =>
+                              setEvent((p) => ({ ...p, reception: { ...p.reception, venue: value } }))
                             }
                             className="text-xs mt-1"
                           />
@@ -980,8 +972,8 @@ export default function EditorPanel({
                           <Label className="text-xs">Dirección de la Fiesta</Label>
                           <EditableTextarea
                             value={event.reception?.address || ""}
-                            onChange={(e) =>
-                              setEvent((p) => ({ ...p, reception: { ...p.reception, address: e.target.value } }))
+                            onChange={(value) =>
+                              setEvent((p) => ({ ...p, reception: { ...p.reception, address: value } }))
                             }
                             className="text-xs mt-1 min-h-[60px]"
                           />
@@ -993,8 +985,8 @@ export default function EditorPanel({
                           <Label className="text-xs">Lugar de Ceremonia</Label>
                           <EditableInput
                             value={event.ceremony?.venue || ""}
-                            onChange={(e) =>
-                              setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, venue: e.target.value } }))
+                            onChange={(value) =>
+                              setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, venue: value } }))
                             }
                             className="text-xs mt-1"
                           />
@@ -1003,8 +995,8 @@ export default function EditorPanel({
                           <Label className="text-xs">Dirección de Ceremonia</Label>
                           <EditableTextarea
                             value={event.ceremony?.address || ""}
-                            onChange={(e) =>
-                              setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, address: e.target.value } }))
+                            onChange={(value) =>
+                              setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, address: value } }))
                             }
                             className="text-xs mt-1 min-h-[60px]"
                           />
@@ -1016,8 +1008,8 @@ export default function EditorPanel({
                       <Label className="text-xs">{event.template === "quinceanera" ? "Lugar de Celebración" : "Lugar de Recepción"}</Label>
                       <EditableInput
                         value={event.reception?.venue || ""}
-                        onChange={(e) =>
-                          setEvent((p) => ({ ...p, reception: { ...p.reception, venue: e.target.value } }))
+                        onChange={(value) =>
+                          setEvent((p) => ({ ...p, reception: { ...p.reception, venue: value } }))
                         }
                         className="text-xs mt-1"
                       />
@@ -1026,8 +1018,8 @@ export default function EditorPanel({
                       <Label className="text-xs">{event.template === "quinceanera" ? "Dirección de Celebración" : "Dirección de Recepción"}</Label>
                       <EditableTextarea
                         value={event.reception?.address || ""}
-                        onChange={(e) =>
-                          setEvent((p) => ({ ...p, reception: { ...p.reception, address: e.target.value } }))
+                        onChange={(value) =>
+                          setEvent((p) => ({ ...p, reception: { ...p.reception, address: value } }))
                         }
                         className="text-xs mt-1 min-h-[60px]"
                       />
@@ -1044,8 +1036,8 @@ export default function EditorPanel({
                       <Label className="text-xs">Titular</Label>
                       <EditableInput
                         value={event.bank?.titular || ""}
-                        onChange={(e) =>
-                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), titular: e.target.value } }))
+                        onChange={(value) =>
+                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), titular: value } }))
                         }
                         className="text-xs mt-1"
                       />
@@ -1054,8 +1046,8 @@ export default function EditorPanel({
                       <Label className="text-xs">Banco</Label>
                       <EditableInput
                         value={event.bank?.banco || ""}
-                        onChange={(e) =>
-                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), banco: e.target.value } }))
+                        onChange={(value) =>
+                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), banco: value } }))
                         }
                         className="text-xs mt-1"
                       />
@@ -1064,8 +1056,8 @@ export default function EditorPanel({
                       <Label className="text-xs">CBU / IBAN</Label>
                       <EditableInput
                         value={event.bank?.cbu || ""}
-                        onChange={(e) =>
-                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), cbu: e.target.value } }))
+                        onChange={(value) =>
+                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), cbu: value } }))
                         }
                         className="text-xs mt-1"
                       />
@@ -1074,8 +1066,8 @@ export default function EditorPanel({
                       <Label className="text-xs">Alias</Label>
                       <EditableInput
                         value={event.bank?.alias || ""}
-                        onChange={(e) =>
-                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), alias: e.target.value } }))
+                        onChange={(value) =>
+                          setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), alias: value } }))
                         }
                         className="text-xs mt-1"
                       />
@@ -1094,13 +1086,13 @@ export default function EditorPanel({
                           className="text-xs flex-1"
                           placeholder="Nombre"
                           value={g.label || ""}
-                          onChange={(e) => updateGift(idx, "label", e.target.value)}
+                          onChange={(value) => updateGift(idx, "label", value)}
                         />
                         <EditableInput
                           className="text-xs flex-1"
                           placeholder="URL"
                           value={g.url || ""}
-                          onChange={(e) => updateGift(idx, "url", e.target.value)}
+                          onChange={(value) => updateGift(idx, "url", value)}
                         />
                         <EnhancedButton
                           variant="ghost"
@@ -1134,7 +1126,7 @@ export default function EditorPanel({
                       <EditableTextarea
                         className="text-xs mt-1 min-h-[60px]"
                         value={event.giftsNote || ""}
-                        onChange={(e) => setEvent((p) => ({ ...p, giftsNote: e.target.value }))}
+                        onChange={(value) => setEvent((p) => ({ ...p, giftsNote: value }))}
                         placeholder="Mensaje para la sección de regalos"
                       />
                     </div>
@@ -1143,7 +1135,7 @@ export default function EditorPanel({
                       <EditableTextarea
                         className="text-xs mt-1 min-h-[60px]"
                         value={event.rsvpNote || ""}
-                        onChange={(e) => setEvent((p) => ({ ...p, rsvpNote: e.target.value }))}
+                        onChange={(value) => setEvent((p) => ({ ...p, rsvpNote: value }))}
                         placeholder="Mensaje para confirmación de asistencia"
                       />
                     </div>
@@ -1152,8 +1144,8 @@ export default function EditorPanel({
                       <EditableTextarea
                         className="text-xs mt-1 min-h-[60px]"
                         value={event.info?.help || ""}
-                        onChange={(e) =>
-                          setEvent((p) => ({ ...p, info: { ...(p.info || {}), help: e.target.value } }))
+                        onChange={(value) =>
+                          setEvent((p) => ({ ...p, info: { ...(p.info || {}), help: value } }))
                         }
                         placeholder="Información sobre alojamiento, transporte, etc."
                       />

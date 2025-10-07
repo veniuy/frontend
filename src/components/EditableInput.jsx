@@ -1,18 +1,13 @@
-// src/components/EditableInput.jsx
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Input } from "@/components/ui/input";
 
-export default function EditableInput({ value, onChange, ...props }) {
-  const [localValue, setLocalValue] = useState(value);
-
-  useEffect(() => {
-    setLocalValue(value);
-  }, [value]);
-
+const EditableInput = ({ value, onChange, ...props }) => {
   const handleChange = (e) => {
-    setLocalValue(e.target.value);
-    onChange(e); // Llama a onChange inmediatamente para actualizar el estado global
+    onChange(e.target.value);
   };
 
-  return <Input {...props} value={localValue} onChange={handleChange} />;
-}
+  return <Input {...props} value={value || ""} onChange={handleChange} />;
+};
+
+export default React.memo(EditableInput);
+

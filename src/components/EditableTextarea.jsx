@@ -1,18 +1,13 @@
-// src/components/EditableTextarea.jsx
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Textarea } from "@/components/ui/textarea";
 
-export default function EditableTextarea({ value, onChange, ...props }) {
-  const [localValue, setLocalValue] = useState(value);
-
-  useEffect(() => {
-    setLocalValue(value);
-  }, [value]);
-
+const EditableTextarea = ({ value, onChange, ...props }) => {
   const handleChange = (e) => {
-    setLocalValue(e.target.value);
-    onChange(e); // Llama a onChange inmediatamente para actualizar el estado global
+    onChange(e.target.value);
   };
 
-  return <Textarea {...props} value={localValue} onChange={handleChange} />;
-}
+  return <Textarea {...props} value={value || ""} onChange={handleChange} />;
+};
+
+export default React.memo(EditableTextarea);
+
