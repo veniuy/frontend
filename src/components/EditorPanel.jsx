@@ -458,7 +458,7 @@ export default function EditorPanel({
     const isQuinceanera = c.template === "quinceanera";
     
     if (isQuinceanera) {
-      const name = c.couple?.bride || c.quinceañera?.name;
+      const name = c.couple?.bride || c.quinceanera?.name;
       if (!name || !name.trim()) errs.push("Falta el nombre de la quinceañera.");
     } else {
       const couple = c.couple || {};
@@ -878,20 +878,21 @@ export default function EditorPanel({
                   icon={<Heart className="w-4 h-4" />}
                   defaultOpen={true}
                 >
-                  {event.template === "quinceanera" ? (
+                  {event.template?.includes("quinceanera") ? (
                     <div className="space-y-3">
                       <div>
                         <Label className="text-xs">Nombre de la Quinceañera</Label>
-                        <Input
-                          value={event.couple?.bride || event.quinceañera?.name || ""}
-                          onChange={(e) => setEvent((p) => ({ 
-                            ...p, 
-                            couple: { ...p.couple, bride: e.target.value },
-                            quinceañera: { ...p.quinceañera, name: e.target.value }
-                          }))}
-                          className="text-xs mt-1"
-                          placeholder="Nombre"
-                        />
+                      <Input
+                        value={event.couple?.bride || event.quinceanera?.name || ""}
+                        onChange={(e) => setEvent((p) => ({
+                          ...p,
+                          couple: { ...p.couple, bride: e.target.value },
+                          quinceanera: { ...p.quinceanera, name: e.target.value }
+                        }))}
+                        className="text-xs mt-1"
+                        placeholder="Nombre"
+                        key={event.template + "quinceaneraName"}
+                      />
                       </div>
                     </div>
                   ) : (
@@ -903,6 +904,8 @@ export default function EditorPanel({
                           onChange={(e) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: e.target.value } }))}
                           className="text-xs mt-1"
                           placeholder="Novia"
+                          // Añadir key para forzar re-render solo cuando el template cambie, no con cada input
+                          key={event.template + "bride"}
                         />
                       </div>
                       <div>
@@ -912,6 +915,8 @@ export default function EditorPanel({
                           onChange={(e) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: e.target.value } }))}
                           className="text-xs mt-1"
                           placeholder="Novio"
+                          // Añadir key para forzar re-render solo cuando el template cambie, no con cada input
+                          key={event.template + "groom"}
                         />
                       </div>
                     </div>
@@ -1134,7 +1139,7 @@ export default function EditorPanel({
                 >
                   <div className="grid grid-cols-1 gap-2">
                     {SECTION_KEYS.map(({ key, label, icon }) => {
-                      if (key === "ceremony" && event.template === "quinceanera") return null;
+                      if (key === "ceremony" && event.template?.includes("quinceanera")) return null;
                       
                       return (
                         <div key={key} className="flex items-center justify-between p-2 border rounded hover:bg-gray-50">

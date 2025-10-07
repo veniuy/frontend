@@ -14,6 +14,7 @@ export default function VisualEditorPage() {
     const initialEvent = {
       id: id || "1",
       couple: { bride: "María", groom: "Juan" },
+      quinceanera: { name: "" },
       heading: "Nuestra Boda", // Asegurar que 'heading' esté siempre definido
       date: "15 de Marzo, 2024",
       time: "17:00",
