@@ -6,7 +6,8 @@ const EditableTextarea = ({ value, onChange, ...props }) => {
     onChange(e.target.value);
   };
 
-  return <Textarea {...props} value={value || ""} onChange={handleChange} />;
+    return <Textarea id={props.id || props.name || Math.random().toString(36).substring(7)} {...props} value={value || ""} onChange={handleChange} />;
+
 };
 
 export default React.memo(EditableTextarea);
