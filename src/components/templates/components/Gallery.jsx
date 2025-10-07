@@ -86,7 +86,7 @@ const Gallery = ({ event, colors, fontSecondary, styles = {} }) => {
           className="lightbox-overlay"
           onClick={closeLightbox}
         >
-          <div className="lightbox-content" onClick={(e) => e.stopPropagation())}>
+          <div className="lightbox-content" onClick={(e) => e.stopPropagation()}>
             <button 
               className="lightbox-close"
               onClick={closeLightbox}
