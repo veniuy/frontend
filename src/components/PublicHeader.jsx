@@ -108,7 +108,7 @@ export default function PublicHeader({
               style={{ fontFamily: "'Playfair Display', serif", color: '#000000', letterSpacing: '0.02em', fontWeight: '500' }}
               onClick={() => navigate('/')}
             >
-              Venite
+              Mandale
             </div>
 
             {/* Acciones del Usuario - Solo Desktop */}
