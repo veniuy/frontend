@@ -3,14 +3,12 @@ import EditableText from '../../EditableText';
 import StyledButton from '../../ui/StyledButton';
 import { Card, CardContent } from '../../ui/card';
 
-// Iconos simples con SVG
-const GiftIcon = ({ className, style }) => (
+// Icono de Fiesta (Party) - Cambiado desde Gift
+const PartyIcon = ({ className, style }) => (
   <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="20 12 20 22 4 22 4 12"></polyline>
-    <rect x="2" y="7" width="20" height="5"></rect>
-    <line x1="12" y1="22" x2="12" y2="7"></line>
-    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
-    <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+    <circle cx="12" cy="12" r="3"></circle>
+    <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"></path>
   </svg>
 );
 
@@ -28,8 +26,16 @@ const XIcon = ({ className }) => (
   </svg>
 );
 
+const CopyIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+  </svg>
+);
+
 const Gifts = ({ event, setEvent, colors, fontPrimary, fontSecondary, styles = {} }) => {
   const [showGifts, setShowGifts] = useState(false);
+  const [copiedField, setCopiedField] = useState('');
 
   const addGift = () =>
     setEvent((p) => ({ ...p, gifts: [...(p.gifts || []), { label: "Mesa de Regalos", url: "" }] }));
@@ -48,12 +54,50 @@ const Gifts = ({ event, setEvent, colors, fontPrimary, fontSecondary, styles = {
       return { ...p, gifts: arr };
     });
 
-  const renderBankLine = (label, value) => {
+  const copyToClipboard = async (text, fieldName) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedField(fieldName);
+      setTimeout(() => setCopiedField(''), 2000);
+    } catch (err) {
+      console.error('Error al copiar:', err);
+    }
+  };
+
+  const renderBankLine = (label, value, fieldKey) => {
     if (!value) return null;
     return (
-      <div className="flex justify-between">
-        <span className="font-medium">{label}:</span>
-        <span>{value}</span>
+      <div className="flex justify-between items-center p-3 rounded-lg" style={{ backgroundColor: '#f9fafb', border: '1px solid #e5e7eb' }}>
+        <span className="font-medium" style={{ color: '#374151' }}>{label}:</span>
+        <div className="flex items-center gap-2">
+          <span 
+            className="font-mono font-semibold px-2 py-1 rounded text-sm"
+            style={{ 
+              backgroundColor: 'white', 
+              color: '#1f2937',
+              border: '1px solid #d1d5db',
+              fontFamily: "'Courier New', monospace"
+            }}
+          >
+            {value}
+          </span>
+          <button
+            onClick={() => copyToClipboard(value, fieldKey)}
+            className="p-1 rounded hover:bg-gray-100 transition-colors"
+            style={{ 
+              background: copiedField === fieldKey ? '#10b981' : colors.primary,
+              color: 'white',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '0.75rem',
+              padding: '0.25rem 0.5rem',
+              borderRadius: '0.25rem'
+            }}
+            title="Copiar"
+          >
+            {copiedField === fieldKey ? '✓' : <CopyIcon className="w-3 h-3" />}
+          </button>
+        </div>
       </div>
     );
   };
@@ -62,12 +106,24 @@ const Gifts = ({ event, setEvent, colors, fontPrimary, fontSecondary, styles = {
     <>
       <section className="py-16 text-center" style={{ backgroundColor: colors.secondary }} dir="ltr">
         <div className="max-w-3xl mx-auto px-4">
-          <GiftIcon className="w-10 h-10 mx-auto mb-6" style={{ color: colors.secondaryText }} />
+          {/* Cambio de icono a Fiesta */}
+          <div className="flex justify-center mb-6">
+            <div 
+              className="w-12 h-12 rounded-full flex items-center justify-center"
+              style={{ 
+                background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
+                animation: 'bounce 2s infinite'
+              }}
+            >
+              <PartyIcon className="w-6 h-6" style={{ color: 'white' }} />
+            </div>
+          </div>
+          
           <h2
             className="text-2xl font-medium mb-6 tracking-wide"
             style={{ color: colors.secondaryText, fontFamily: fontSecondary }}
           >
-            REGALOS
+            FIESTA
           </h2>
           <p
             className="mb-8"
@@ -95,37 +151,48 @@ const Gifts = ({ event, setEvent, colors, fontPrimary, fontSecondary, styles = {
         </div>
       </section>
 
-      {/* Modal de Regalos */}
+      {/* Modal de Regalos Mejorado */}
       {showGifts && (
         <div 
           className="fixed inset-0 flex items-center justify-center z-50 p-4"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+          style={{ backgroundColor: 'rgba(0, 0, 0, 0.6)' }}
           onClick={() => setShowGifts(false)}
         >
-          <Card 
-            className="w-full max-w-2xl"
+          <div
+            className="w-full max-w-lg bg-white rounded-xl shadow-2xl"
             onClick={(e) => e.stopPropagation()}
-            style={{ maxHeight: '90vh', overflowY: 'auto' }}
+            style={{ 
+              maxHeight: '90vh', 
+              overflowY: 'auto',
+              animation: 'slideUp 0.3s ease-out'
+            }}
           >
-            <CardContent className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-medium" style={{ color: colors.ink, fontFamily: fontPrimary }}>
-                  Regalos y Datos Bancarios
-                </h3>
-                <button 
-                  onClick={() => setShowGifts(false)}
-                  className="hover:opacity-70 transition-opacity"
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
-                >
-                  <XIcon className="w-5 h-5" />
-                </button>
-              </div>
+            {/* Header del Modal */}
+            <div className="flex justify-between items-center p-6 border-b border-gray-200">
+              <h3 
+                className="text-xl font-semibold" 
+                style={{ color: colors.ink, fontFamily: fontPrimary }}
+              >
+                Regalos y Datos Bancarios
+              </h3>
+              <button 
+                onClick={() => setShowGifts(false)}
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+              >
+                <XIcon className="w-5 h-5" style={{ color: '#6b7280' }} />
+              </button>
+            </div>
 
-              <div className="space-y-6 text-sm" dir="ltr" style={{ color: colors.body, fontFamily: fontPrimary }}>
+            {/* Contenido del Modal */}
+            <div className="p-6">
+              <div className="space-y-6" dir="ltr" style={{ color: colors.body, fontFamily: fontPrimary }}>
+                
                 {/* Mesas de Regalo */}
                 {(event.gifts || []).length > 0 && (
                   <div>
-                    <h4 className="font-medium mb-3" style={{ color: colors.ink }}>
+                    <h4 className="font-medium mb-3 flex items-center gap-2" style={{ color: colors.ink }}>
+                      <PartyIcon className="w-5 h-5" />
                       Mesas de Regalo
                     </h4>
                     <div className="space-y-2">
@@ -135,14 +202,14 @@ const Gifts = ({ event, setEvent, colors, fontPrimary, fontSecondary, styles = {
                           href={g.url}
                           target="_blank"
                           rel="noreferrer"
-                          className="block p-3 rounded-md transition-all hover:opacity-80"
+                          className="block p-3 rounded-lg transition-all hover:opacity-80"
                           style={{ 
                             backgroundColor: colors.primarySoft,
                             color: colors.primary,
                             textDecoration: 'none'
                           }}
                         >
-                          <GiftIcon className="w-4 h-4 inline mr-2" style={{ verticalAlign: 'middle' }} />
+                          <PartyIcon className="w-4 h-4 inline mr-2" style={{ verticalAlign: 'middle' }} />
                           {g.label || "Mesa de Regalos"}
                         </a>
                       ))}
@@ -150,43 +217,48 @@ const Gifts = ({ event, setEvent, colors, fontPrimary, fontSecondary, styles = {
                   </div>
                 )}
 
-                {/* Datos Bancarios */}
+                {/* Datos Bancarios Mejorados */}
                 {event.bank && (
                   <div>
-                    <h4 className="font-medium mb-3 flex items-center gap-2" style={{ color: colors.ink }}>
+                    <h4 className="font-medium mb-4 flex items-center gap-2" style={{ color: colors.ink }}>
                       <CreditCardIcon className="w-5 h-5" />
                       Datos Bancarios
                     </h4>
-                    <div 
-                      className="p-4 rounded-md space-y-2"
-                      style={{ backgroundColor: colors.paper }}
-                    >
-                      {renderBankLine("Banco", event.bank.name)}
-                      {renderBankLine("Titular", event.bank.holder)}
-                      {renderBankLine("CBU/CVU", event.bank.cbu)}
-                      {renderBankLine("Alias", event.bank.alias)}
-                      {renderBankLine("IBAN", event.bank.iban)}
-                      {renderBankLine("SWIFT/BIC", event.bank.swift)}
+                    <div className="space-y-3">
+                      {renderBankLine("Banco", event.bank.name, 'bank_name')}
+                      {renderBankLine("Titular", event.bank.holder, 'bank_holder')}
+                      {renderBankLine("CBU/CVU", event.bank.cbu, 'bank_cbu')}
+                      {renderBankLine("Alias", event.bank.alias, 'bank_alias')}
+                      {renderBankLine("IBAN", event.bank.iban, 'bank_iban')}
+                      {renderBankLine("SWIFT/BIC", event.bank.swift, 'bank_swift')}
                     </div>
                   </div>
                 )}
 
                 {/* Mensaje adicional */}
                 {event.giftsNote && (
-                  <p className="text-center italic" style={{ color: colors.muted }}>
+                  <div 
+                    className="p-4 rounded-lg text-center italic"
+                    style={{ backgroundColor: colors.paper, color: colors.muted }}
+                  >
                     {event.giftsNote}
-                  </p>
+                  </div>
                 )}
 
                 {/* Si no hay información */}
                 {!(event.gifts || []).length && !event.bank && (
-                  <p className="text-center" style={{ color: colors.muted }}>
-                    No hay información de regalos disponible.
-                  </p>
+                  <div 
+                    className="text-center p-8 rounded-lg"
+                    style={{ backgroundColor: colors.paper, color: colors.muted }}
+                  >
+                    <PartyIcon className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <p>No hay información de regalos disponible.</p>
+                  </div>
                 )}
               </div>
 
-              <div className="mt-6 text-center">
+              {/* Footer del Modal */}
+              <div className="mt-8 text-center">
                 <StyledButton
                   colors={colors}
                   variant="outline"
@@ -195,12 +267,36 @@ const Gifts = ({ event, setEvent, colors, fontPrimary, fontSecondary, styles = {
                   Cerrar
                 </StyledButton>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       )}
+
+      {/* Estilos adicionales para animaciones */}
+      <style jsx>{`
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(50px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes bounce {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+      `}</style>
     </>
   );
 };
 
 export default Gifts;
+
