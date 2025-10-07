@@ -1,5 +1,5 @@
 // src/pages/VisualEditorPage.jsx
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import EditorPanel from "../components/EditorPanel";
 import InvitationCanvas from "../components/InvitationCanvas";
@@ -68,22 +68,29 @@ export default function VisualEditorPage() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Handlers que pasan al Panel
-  const handleColorChange = (property, color) =>
+  // Handlers que pasan al Panel - Memorizados para evitar re-renderizados
+  const handleColorChange = useCallback((property, color) => {
     setEvent((prev) => ({ ...prev, colors: { ...prev.colors, [property]: color } }));
+  }, []);
 
-  const handleFontChange = (type, fontFamily) =>
+  const handleFontChange = useCallback((type, fontFamily) => {
     setEvent((prev) => ({ ...prev, fonts: { ...prev.fonts, [type]: fontFamily } }));
+  }, []);
 
-  const handleTemplateChange = (templateId) => {
+  const handleTemplateChange = useCallback((templateId) => {
     setUi((u) => ({ ...u, selectedTemplate: templateId }));
     setEvent((prev) => ({ ...prev, template: templateId }));
-  };
+  }, []);
 
-  const setActiveTab = (t) => setUi((u) => ({ ...u, activeTab: t }));
-  const setShowMobilePanel = (v) => setUi((u) => ({ ...u, showMobilePanel: v }));
-  const setViewMode = (v) => setUi((u) => ({ ...u, viewMode: v }));
-  const setZoom = (fn) => setUi((u) => ({ ...u, zoom: typeof fn === "function" ? fn(u.zoom) : fn }));
+  const setActiveTab = useCallback((t) => setUi((u) => ({ ...u, activeTab: t })), []);
+  const setShowMobilePanel = useCallback((v) => setUi((u) => ({ ...u, showMobilePanel: v })), []);
+  const setViewMode = useCallback((v) => setUi((u) => ({ ...u, viewMode: v })), []);
+  const setZoom = useCallback((fn) => setUi((u) => ({ ...u, zoom: typeof fn === "function" ? fn(u.zoom) : fn })), []);
+
+  // Memorizar setEvent para evitar re-renderizados innecesarios
+  const memoizedSetEvent = useCallback((updater) => {
+    setEvent(updater);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -97,14 +104,14 @@ export default function VisualEditorPage() {
           handleColorChange={handleColorChange}
           handleFontChange={handleFontChange}
           handleTemplateChange={handleTemplateChange}
-          setEvent={setEvent}
+          setEvent={memoizedSetEvent}
           setViewMode={setViewMode}
         />
         <div className="flex-1 overflow-auto bg-gray-100">
           <InvitationCanvas
             event={event}
             ui={ui}
-            setEvent={setEvent}
+            setEvent={memoizedSetEvent}
             setZoom={setZoom}
           />
         </div>
