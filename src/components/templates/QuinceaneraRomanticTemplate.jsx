@@ -48,8 +48,8 @@ export default function QuinceaneraRomanticTemplate({ event, ui, setEvent }) {
   const fontPrimary = event.fonts?.primary || "'Dancing Script', cursive";
   const fontSecondary = event.fonts?.secondary || "'Playfair Display', serif";
 
-  // Obtener tamaño del título desde event.fontSizes.title (si existe) — valor esperado: "48px"
-  const titleSize = (event.fontSizes && event.fontSizes.title) ? event.fontSizes.title : "48px";
+  // Cambiar tamaño del título a 50px (aproximadamente 3.125rem)
+  const titleSize = (event.fontSizes && event.fontSizes.title) ? event.fontSizes.title : "50px";
 
   // Crear estilos CSS dinámicos para aplicar fuentes globalmente
   const fontStyles = useMemo(() => {
@@ -58,10 +58,18 @@ export default function QuinceaneraRomanticTemplate({ event, ui, setEvent }) {
       .font-secondary { font-family: ${fontSecondary} !important; }
       .editable-text { font-family: inherit !important; }
 
-      /* Control de tamaño del nombre principal */
+      /* Control de tamaño del nombre principal - aumentado a 50px */
       .hero-title {
         font-size: ${titleSize} !important;
         line-height: 1.05 !important;
+        color: #FFFFFF !important; /* Texto blanco para mejor contraste */
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5) !important; /* Sombra para mejor legibilidad */
+      }
+
+      /* Mis quince años también en blanco */
+      .hero-subtitle {
+        color: #FFFFFF !important;
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5) !important;
       }
 
       /* Ajuste responsivo: si el user define un tamaño grande, permitir escalado en móviles */
@@ -70,13 +78,45 @@ export default function QuinceaneraRomanticTemplate({ event, ui, setEvent }) {
           font-size: calc(${titleSize} * 0.62) !important;
         }
       }
+
+      /* Centrar todos los textos por defecto */
+      .text-center-all {
+        text-align: center !important;
+      }
+
+      /* Estilos para la imagen de fondo elegantfloral */
+      .hero-background {
+        background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af2176?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2025&q=80') !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-repeat: no-repeat !important;
+        position: relative !important;
+      }
+
+      /* Overlay para mejorar el contraste del texto */
+      .hero-background::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        background: rgba(0, 0, 0, 0.3) !important;
+        z-index: 1 !important;
+      }
+
+      /* Asegurar que el contenido esté por encima del overlay */
+      .hero-content {
+        position: relative !important;
+        z-index: 2 !important;
+      }
     `;
   }, [fontPrimary, fontSecondary, titleSize]);
 
   const isQuinceanera = event.eventType === "quinceanera" || event.templateId?.includes("quinceanera");
 
   return (
-    <div className="min-h-screen" dir={event?.direction || "ltr"} style={{ backgroundColor: COLORS.paper }}>
+    <div className={`min-h-screen ${styles.textCenterAll}`} dir={event?.direction || "ltr"} style={{ backgroundColor: COLORS.paper }}>
       {/* Inyectar estilos de fuente dinámicos */}
       <style dangerouslySetInnerHTML={{ __html: fontStyles }} />
 
@@ -102,7 +142,7 @@ export default function QuinceaneraRomanticTemplate({ event, ui, setEvent }) {
 
       {/* Details Section */}
       {(isOn("ceremony") || isOn("reception")) && (
-        <section className="py-16 bg-white" dir="ltr">
+        <section className={`py-16 bg-white ${styles.textCenterAll}`} dir="ltr">
           <div className="max-w-4xl mx-auto px-4">
             <div className={`grid ${isQuinceanera ? 'md:grid-cols-1' : 'md:grid-cols-2'} gap-12`}>
               
