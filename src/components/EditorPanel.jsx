@@ -4,7 +4,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import EditableInput from "./EditableInput";
 import { Textarea } from "@/components/ui/textarea";
+import EditableTextarea from "./EditableTextarea";
 import { Switch } from "@/components/ui/switch";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -882,40 +884,38 @@ export default function EditorPanel({
                     <div className="space-y-3">
                       <div>
                         <Label className="text-xs">Nombre de la Quinceañera</Label>
-                      <Input
-                        value={event.couple?.bride || event.quinceanera?.name || ""}
-                        onChange={(e) => setEvent((p) => ({
-                          ...p,
-                          couple: { ...p.couple, bride: e.target.value },
-                          quinceanera: { ...p.quinceanera, name: e.target.value }
-                        }))}
-                        className="text-xs mt-1"
-                        placeholder="Nombre"
-                        key={event.template + "quinceaneraName"}
-                      />
+                        <EditableInput
+                          value={event.couple?.bride || event.quinceanera?.name || ""}
+                          onChange={(e) => setEvent((p) => ({
+                            ...p,
+                            couple: { ...p.couple, bride: e.target.value },
+                            quinceanera: { ...p.quinceanera, name: e.target.value }
+                          }))}
+                          className="text-xs mt-1"
+                          placeholder="Nombre"
+                          key={event.template + "quinceaneraName"}
+                        />
                       </div>
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <Label className="text-xs">Nombre 1</Label>
-                        <Input
+                        <EditableInput
                           value={event.couple?.bride || ""}
                           onChange={(e) => setEvent((p) => ({ ...p, couple: { ...p.couple, bride: e.target.value } }))}
                           className="text-xs mt-1"
                           placeholder="Novia"
-                          // Añadir key para forzar re-render solo cuando el template cambie, no con cada input
                           key={event.template + "bride"}
                         />
                       </div>
                       <div>
                         <Label className="text-xs">Nombre 2</Label>
-                        <Input
+                        <EditableInput
                           value={event.couple?.groom || ""}
                           onChange={(e) => setEvent((p) => ({ ...p, couple: { ...p.couple, groom: e.target.value } }))}
                           className="text-xs mt-1"
                           placeholder="Novio"
-                          // Añadir key para forzar re-render solo cuando el template cambie, no con cada input
                           key={event.template + "groom"}
                         />
                       </div>
@@ -925,7 +925,7 @@ export default function EditorPanel({
                   <div className="grid grid-cols-2 gap-3 mt-3">
                     <div>
                       <Label className="text-xs">Fecha</Label>
-                      <Input
+                      <EditableInput
                         value={event.date || ""}
                         onChange={(e) => setEvent((p) => ({ ...p, date: e.target.value }))}
                         className="text-xs mt-1"
@@ -934,18 +934,18 @@ export default function EditorPanel({
                     </div>
                     <div>
                       <Label className="text-xs">Hora</Label>
-                      <Input
+                      <EditableInput
                         value={event.time || ""}
                         onChange={(e) => setEvent((p) => ({ ...p, time: e.target.value }))}
                         className="text-xs mt-1"
-                        placeholder="HH:mm"
+                        placeholder="HH:MM"
                       />
                     </div>
                   </div>
 
                   <div>
                     <Label className="text-xs">Hashtag</Label>
-                    <Input
+                    <EditableInput
                       value={event.hashtag || ""}
                       onChange={(e) => setEvent((p) => ({ ...p, hashtag: e.target.value }))}
                       className="text-xs mt-1"
@@ -963,7 +963,7 @@ export default function EditorPanel({
                       <>
                         <div>
                           <Label className="text-xs">Lugar de Ceremonia</Label>
-                          <Input
+                          <EditableInput
                             value={event.ceremony?.venue || ""}
                             onChange={(e) =>
                               setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, venue: e.target.value } }))
@@ -973,7 +973,7 @@ export default function EditorPanel({
                         </div>
                         <div>
                           <Label className="text-xs">Dirección de Ceremonia</Label>
-                          <Textarea
+                          <EditableTextarea
                             value={event.ceremony?.address || ""}
                             onChange={(e) =>
                               setEvent((p) => ({ ...p, ceremony: { ...p.ceremony, address: e.target.value } }))
@@ -986,7 +986,7 @@ export default function EditorPanel({
 
                     <div>
                       <Label className="text-xs">{event.template === "quinceanera" ? "Lugar de Celebración" : "Lugar de Recepción"}</Label>
-                      <Input
+                      <EditableInput
                         value={event.reception?.venue || ""}
                         onChange={(e) =>
                           setEvent((p) => ({ ...p, reception: { ...p.reception, venue: e.target.value } }))
@@ -996,7 +996,7 @@ export default function EditorPanel({
                     </div>
                     <div>
                       <Label className="text-xs">{event.template === "quinceanera" ? "Dirección de Celebración" : "Dirección de Recepción"}</Label>
-                      <Textarea
+                      <EditableTextarea
                         value={event.reception?.address || ""}
                         onChange={(e) =>
                           setEvent((p) => ({ ...p, reception: { ...p.reception, address: e.target.value } }))
@@ -1014,7 +1014,7 @@ export default function EditorPanel({
                   <div className="grid grid-cols-1 gap-3">
                     <div>
                       <Label className="text-xs">Titular</Label>
-                      <Input
+                      <EditableInput
                         value={event.bank?.titular || ""}
                         onChange={(e) =>
                           setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), titular: e.target.value } }))
@@ -1024,7 +1024,7 @@ export default function EditorPanel({
                     </div>
                     <div>
                       <Label className="text-xs">Banco</Label>
-                      <Input
+                      <EditableInput
                         value={event.bank?.banco || ""}
                         onChange={(e) =>
                           setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), banco: e.target.value } }))
@@ -1034,7 +1034,7 @@ export default function EditorPanel({
                     </div>
                     <div>
                       <Label className="text-xs">CBU / IBAN</Label>
-                      <Input
+                      <EditableInput
                         value={event.bank?.cbu || ""}
                         onChange={(e) =>
                           setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), cbu: e.target.value } }))
@@ -1044,7 +1044,7 @@ export default function EditorPanel({
                     </div>
                     <div>
                       <Label className="text-xs">Alias</Label>
-                      <Input
+                      <EditableInput
                         value={event.bank?.alias || ""}
                         onChange={(e) =>
                           setEvent((p) => ({ ...p, bank: { ...(p.bank || {}), alias: e.target.value } }))
@@ -1062,13 +1062,13 @@ export default function EditorPanel({
                   <div className="space-y-3">
                     {(event.gifts || []).map((g, idx) => (
                       <div key={idx} className="flex gap-2 items-center">
-                        <Input
+                        <EditableInput
                           className="text-xs flex-1"
                           placeholder="Nombre"
                           value={g.label || ""}
                           onChange={(e) => updateGift(idx, "label", e.target.value)}
                         />
-                        <Input
+                        <EditableInput
                           className="text-xs flex-1"
                           placeholder="URL"
                           value={g.url || ""}
@@ -1103,7 +1103,7 @@ export default function EditorPanel({
                   <div className="space-y-3">
                     <div>
                       <Label className="text-xs">Nota de Regalos</Label>
-                      <Textarea
+                      <EditableTextarea
                         className="text-xs mt-1 min-h-[60px]"
                         value={event.giftsNote || ""}
                         onChange={(e) => setEvent((p) => ({ ...p, giftsNote: e.target.value }))}
@@ -1112,7 +1112,7 @@ export default function EditorPanel({
                     </div>
                     <div>
                       <Label className="text-xs">Nota de RSVP</Label>
-                      <Textarea
+                      <EditableTextarea
                         className="text-xs mt-1 min-h-[60px]"
                         value={event.rsvpNote || ""}
                         onChange={(e) => setEvent((p) => ({ ...p, rsvpNote: e.target.value }))}
@@ -1121,7 +1121,7 @@ export default function EditorPanel({
                     </div>
                     <div>
                       <Label className="text-xs">Info Útil</Label>
-                      <Textarea
+                      <EditableTextarea
                         className="text-xs mt-1 min-h-[60px]"
                         value={event.info?.help || ""}
                         onChange={(e) =>
