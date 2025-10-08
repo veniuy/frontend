@@ -3,7 +3,6 @@ import StyledButton from '../../ui/StyledButton';
 import { Card, CardContent } from '../../ui/card';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 
 // Iconos
 const MusicIcon = ({ className, style }) => (
@@ -21,6 +20,13 @@ const XIcon = ({ className }) => (
   </svg>
 );
 
+const PlusIcon = ({ className }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="5" x2="12" y2="19"></line>
+    <line x1="5" y1="12" x2="19" y2="12"></line>
+  </svg>
+);
+
 const CheckCircleIcon = ({ className, style }) => (
   <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -28,66 +34,37 @@ const CheckCircleIcon = ({ className, style }) => (
   </svg>
 );
 
-// Componente para campos con etiqueta
-const Labeled = ({ label, children, fontFamily, required = false }) => (
-  <div className="space-y-2">
-    <label className="block text-sm font-medium" style={{ fontFamily }}>
-      {label} {required && <span className="text-red-500">*</span>}
-    </label>
-    {children}
-  </div>
-);
-
 const Songs = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuinceanera, styles = {} }) => {
   const [showSongForm, setShowSongForm] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const [songData, setSongData] = useState({
-    songName: '',
-    artist: '',
-    genre: '',
-    userName: '',
-    comment: ''
-  });
+  const [songs, setSongs] = useState(['']);
 
-  const [errors, setErrors] = useState({});
+  // Agregar nueva canción
+  const addSong = () => {
+    setSongs([...songs, '']);
+  };
 
-  // Géneros musicales disponibles
-  const genres = [
-    'Pop',
-    'Rock',
-    'Reggaeton',
-    'Cumbia',
-    'Folklore',
-    'Electrónica',
-    'Balada',
-    'Salsa',
-    'Bachata',
-    'Merengue',
-    'Tango',
-    'Cuarteto',
-    'Otro'
-  ];
+  // Actualizar canción específica
+  const updateSong = (index, value) => {
+    const newSongs = [...songs];
+    newSongs[index] = value;
+    setSongs(newSongs);
+  };
+
+  // Eliminar canción
+  const removeSong = (index) => {
+    if (songs.length > 1) {
+      const newSongs = songs.filter((_, i) => i !== index);
+      setSongs(newSongs);
+    }
+  };
 
   // Validar formulario
   const validateForm = () => {
-    const newErrors = {};
-
-    if (!songData.songName.trim() || songData.songName.trim().length < 2) {
-      newErrors.songName = 'El nombre de la canción es requerido (mínimo 2 caracteres)';
-    }
-
-    if (!songData.artist.trim() || songData.artist.trim().length < 2) {
-      newErrors.artist = 'El nombre del artista es requerido (mínimo 2 caracteres)';
-    }
-
-    if (!songData.userName.trim() || songData.userName.trim().length < 2) {
-      newErrors.userName = 'Tu nombre es requerido (mínimo 2 caracteres)';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const validSongs = songs.filter(song => song.trim().length > 0);
+    return validSongs.length > 0;
   };
 
   // Manejar envío del formulario
@@ -104,16 +81,18 @@ const Songs = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuincean
       // Simular delay de envío
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Guardar sugerencia en el estado del evento
-      const newSuggestion = {
-        ...songData,
-        id: Date.now(),
+      // Filtrar canciones vacías y guardar sugerencias
+      const validSongs = songs.filter(song => song.trim().length > 0);
+      
+      const newSuggestions = validSongs.map(song => ({
+        song: song.trim(),
+        id: Date.now() + Math.random(),
         createdAt: new Date().toISOString()
-      };
+      }));
 
       setEvent((prevEvent) => ({
         ...prevEvent,
-        songSuggestions: [...(prevEvent.songSuggestions || []), newSuggestion]
+        songSuggestions: [...(prevEvent.songSuggestions || []), ...newSuggestions]
       }));
 
       // Mostrar éxito
@@ -127,7 +106,7 @@ const Songs = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuincean
       }, 2000);
 
     } catch (error) {
-      console.error('Error al enviar sugerencia:', error);
+      console.error('Error al enviar sugerencias:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -135,14 +114,7 @@ const Songs = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuincean
 
   // Resetear formulario
   const resetForm = () => {
-    setSongData({
-      songName: '',
-      artist: '',
-      genre: '',
-      userName: '',
-      comment: ''
-    });
-    setErrors({});
+    setSongs(['']);
   };
 
   // Cerrar modal
@@ -193,93 +165,63 @@ const Songs = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuincean
                 <div className="text-center py-8">
                   <CheckCircleIcon className="w-16 h-16 mx-auto mb-4" style={{ color: colors.primary }} />
                   <h4 className="text-lg font-medium mb-2" style={{ color: colors.ink, fontFamily: fontPrimary }}>
-                    ¡Sugerencia Enviada!
+                    ¡Sugerencias Enviadas!
                   </h4>
                   <p style={{ color: colors.body, fontFamily: fontPrimary }}>
-                    Gracias por tu sugerencia musical. {isQuinceanera ? "¡La tendré en cuenta!" : "¡La tendremos en cuenta!"}
+                    Gracias por tus sugerencias musicales. {isQuinceanera ? "¡Las tendré en cuenta!" : "¡Las tendremos en cuenta!"}
                   </p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-4" dir="ltr">
-                  <Labeled label="Nombre de la canción" fontFamily={fontPrimary} required>
-                    <Input
-                      value={songData.songName}
-                      onChange={(e) => setSongData({ ...songData, songName: e.target.value })}
-                      placeholder="Ej: Despacito"
-                      style={{ fontFamily: fontPrimary }}
-                      className={errors.songName ? 'border-red-500' : ''}
-                    />
-                    {errors.songName && (
-                      <p className="text-red-500 text-sm mt-1">{errors.songName}</p>
-                    )}
-                  </Labeled>
-
-                  <Labeled label="Artista" fontFamily={fontPrimary} required>
-                    <Input
-                      value={songData.artist}
-                      onChange={(e) => setSongData({ ...songData, artist: e.target.value })}
-                      placeholder="Ej: Luis Fonsi"
-                      style={{ fontFamily: fontPrimary }}
-                      className={errors.artist ? 'border-red-500' : ''}
-                    />
-                    {errors.artist && (
-                      <p className="text-red-500 text-sm mt-1">{errors.artist}</p>
-                    )}
-                  </Labeled>
-
-                  <Labeled label="Género musical" fontFamily={fontPrimary}>
-                    <select
-                      value={songData.genre}
-                      onChange={(e) => setSongData({ ...songData, genre: e.target.value })}
-                      className="w-full p-2 border border-gray-300 rounded-md"
-                      style={{ fontFamily: fontPrimary }}
-                    >
-                      <option value="">Selecciona un género (opcional)</option>
-                      {genres.map((genre) => (
-                        <option key={genre} value={genre}>
-                          {genre}
-                        </option>
-                      ))}
-                    </select>
-                  </Labeled>
-
-                  <Labeled label="Tu nombre" fontFamily={fontPrimary} required>
-                    <Input
-                      value={songData.userName}
-                      onChange={(e) => setSongData({ ...songData, userName: e.target.value })}
-                      placeholder="Tu nombre completo"
-                      style={{ fontFamily: fontPrimary }}
-                      className={errors.userName ? 'border-red-500' : ''}
-                    />
-                    {errors.userName && (
-                      <p className="text-red-500 text-sm mt-1">{errors.userName}</p>
-                    )}
-                  </Labeled>
-
-                  <Labeled label="Comentario" fontFamily={fontPrimary}>
-                    <Textarea
-                      value={songData.comment}
-                      onChange={(e) => setSongData({ ...songData, comment: e.target.value })}
-                      placeholder="¿Por qué esta canción no puede faltar? (opcional)"
-                      rows={3}
-                      style={{ fontFamily: fontPrimary }}
-                    />
-                  </Labeled>
-
-                  <div className="flex gap-3 pt-4">
-                    <Button
+                  <div className="space-y-3">
+                    <label className="block text-sm font-medium" style={{ fontFamily: fontPrimary, color: colors.ink }}>
+                      ¿Qué canción o artista o banda no puede faltar?
+                    </label>
+                    
+                    {songs.map((song, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <Input
+                          value={song}
+                          onChange={(e) => updateSong(index, e.target.value)}
+                          placeholder=""
+                          style={{ fontFamily: fontPrimary }}
+                          className="flex-1"
+                        />
+                        {songs.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeSong(index)}
+                            className="p-2 rounded-lg hover:bg-red-100 transition-colors"
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'red' }}
+                          >
+                            <XIcon className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    
+                    <button
                       type="button"
-                      variant="outline"
-                      onClick={closeModal}
-                      className="flex-1"
-                      style={{ fontFamily: fontPrimary }}
+                      onClick={addSong}
+                      className="flex items-center gap-2 text-sm hover:opacity-80 transition-colors"
+                      style={{ 
+                        color: colors.primary, 
+                        background: 'none', 
+                        border: 'none', 
+                        cursor: 'pointer',
+                        fontFamily: fontPrimary
+                      }}
                     >
-                      Cancelar
-                    </Button>
+                      <PlusIcon className="w-4 h-4" />
+                      Agregar otra canción
+                    </button>
+                  </div>
+
+                  <div className="pt-4">
                     <StyledButton
                       type="submit"
                       colors={colors}
-                      className="flex-1"
+                      className="w-full"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
@@ -288,10 +230,7 @@ const Songs = ({ event, setEvent, colors, fontPrimary, fontSecondary, isQuincean
                           Enviando...
                         </>
                       ) : (
-                        <>
-                          <MusicIcon className="w-4 h-4 mr-2" />
-                          Enviar Sugerencia
-                        </>
+                        'Enviar'
                       )}
                     </StyledButton>
                   </div>
