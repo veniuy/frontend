@@ -82,23 +82,7 @@ export default function QuinceaneraModernTemplate({ event, ui, setEvent }) {
       {/* Inyectar estilos de fuente dinámicos */}
       <style dangerouslySetInnerHTML={{ __html: fontStyles }} />
 
-      {/* Estrellas animadas de fondo */}
-      <div className={styles.starsBackground}>
-        {[...Array(20)].map((_, i) => (
-          <div 
-            key={i}
-            className={styles.star}
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 2}s`,
-              fontSize: `${Math.random() * 10 + 10}px`
-            }}
-          >
-            ✨
-          </div>
-        ))}
-      </div>
+
 
       {/* Hero Section */}
       <Hero 
@@ -157,35 +141,7 @@ export default function QuinceaneraModernTemplate({ event, ui, setEvent }) {
         </section>
       )}
 
-      {/* Protocol Section - Nuevo para quinceañeras modernas */}
-      {isQuinceanera && isOn("protocol") && (
-        <section className={styles.protocolSection}>
-          <div className={styles.container}>
-            <h2 className={styles.sectionTitle} style={{ color: COLORS.primary }}>
-              Protocolo de la Celebración
-            </h2>
-            <div className={styles.protocolGrid}>
-              {[
-                { time: "19:00", event: "Recepción", description: "Bienvenida a los invitados", icon: "👥" },
-                { time: "20:00", event: "Vals de Honor", description: "Baile tradicional de los 15 años", icon: "💃" },
-                { time: "20:30", event: "Cena", description: "Deliciosa cena de tres tiempos", icon: "🍽️" },
-                { time: "22:00", event: "Fiesta", description: "¡A bailar toda la noche!", icon: "🎉" },
-                { time: "23:00", event: "Sorpresa", description: "Show especial para la quinceañera", icon: "⭐" },
-                { time: "02:00", event: "Cierre", description: "Despedida con recuerdos inolvidables", icon: "📸" }
-              ].map((item, index) => (
-                <div key={index} className={styles.protocolCard}>
-                  <div className={styles.protocolIcon}>{item.icon}</div>
-                  <div className={styles.protocolTime} style={{ color: COLORS.primary }}>
-                    {item.time}
-                  </div>
-                  <h3 className={styles.protocolEvent}>{item.event}</h3>
-                  <p className={styles.protocolDescription}>{item.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+
 
       {/* Gallery Section */}
       {isOn("gallery") && (
