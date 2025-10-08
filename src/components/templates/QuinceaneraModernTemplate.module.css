@@ -27,27 +27,7 @@
   overflow-x: hidden;
 }
 
-/* Estrellas animadas de fondo */
-.starsBackground {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 0;
-}
 
-.star {
-  position: absolute;
-  animation: twinkle 2s infinite alternate;
-  opacity: 0.6;
-}
-
-@keyframes twinkle {
-  0% { opacity: 0.3; transform: scale(0.8); }
-  100% { opacity: 0.8; transform: scale(1.2); }
-}
 
 /* Container principal */
 .container {
@@ -94,13 +74,7 @@
   z-index: 1;
 }
 
-.protocolSection {
-  padding: var(--spacing-2xl) 0;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  position: relative;
-  z-index: 1;
-}
+
 
 /* Títulos de sección */
 .sectionTitle {
@@ -134,68 +108,7 @@
   }
 }
 
-/* Protocol Grid */
-.protocolGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--spacing-lg);
-  margin-top: var(--spacing-xl);
-}
 
-.protocolCard {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-lg);
-  text-align: center;
-  box-shadow: var(--shadow-md);
-  transition: var(--transition);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  position: relative;
-  overflow: hidden;
-}
-
-.protocolCard::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--gradient-primary);
-}
-
-.protocolCard:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-lg);
-}
-
-.protocolIcon {
-  font-size: 3rem;
-  margin-bottom: var(--spacing-sm);
-  display: block;
-}
-
-.protocolTime {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: var(--spacing-xs);
-  font-family: var(--font-primary);
-}
-
-.protocolEvent {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: var(--spacing-xs);
-  color: #1F2937;
-  font-family: var(--font-secondary);
-}
-
-.protocolDescription {
-  font-size: 0.9rem;
-  color: #6B7280;
-  line-height: 1.5;
-}
 
 /* Cards generales */
 .card {
@@ -364,22 +277,7 @@
     --spacing-2xl: 3rem;
   }
   
-  .protocolGrid {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-md);
-  }
-  
-  .protocolCard {
-    padding: var(--spacing-md);
-  }
-  
-  .protocolTime {
-    font-size: 1.5rem;
-  }
-  
-  .protocolEvent {
-    font-size: 1.1rem;
-  }
+
 }
 
 @media (max-width: 480px) {
@@ -434,10 +332,6 @@ html {
 
 /* Print styles */
 @media print {
-  .starsBackground {
-    display: none;
-  }
-  
   .modernTemplate {
     background: white !important;
   }
