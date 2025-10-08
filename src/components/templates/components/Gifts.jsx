@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import EditableText from '../../EditableText';
 import StyledButton from '../../ui/StyledButton';
 import { Card, CardContent } from '../../ui/card';
+import { Button } from "@/components/ui/button";
 
-// Icono de Regalo
+// Iconos
 const GiftIcon = ({ className, style }) => (
   <svg className={className} style={style} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="20 12 20 22 4 22 4 12"></polyline>
@@ -28,50 +29,21 @@ const XIcon = ({ className }) => (
   </svg>
 );
 
-const CopyIcon = ({ className }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-  </svg>
-);
-
-// Función simple para renderizar líneas bancarias (solo lectura)
-const renderBankLine = (label, value, onCopy, copiedField, fieldKey) => {
+// Función para renderizar líneas bancarias (exactamente como en WeddingElegantTemplate)
+function renderBankLine(label, value) {
   if (!value) return null;
-  
   return (
-    <div className="flex justify-between items-center py-2">
-      <span className="font-medium text-gray-600">{label}:</span>
-      <div className="flex items-center gap-2">
-        <span className="font-mono text-gray-900">{value}</span>
-        {onCopy && (
-          <button
-            onClick={() => onCopy(value, fieldKey)}
-            className="p-1 rounded hover:bg-gray-100 transition-colors"
-            style={{
-              background: copiedField === fieldKey ? '#10b981' : '#6b7280',
-              color: 'white',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '0.75rem',
-              padding: '0.25rem 0.5rem',
-              borderRadius: '0.25rem'
-            }}
-            title="Copiar"
-          >
-            {copiedField === fieldKey ? '✓' : <CopyIcon className="w-3 h-3" />}
-          </button>
-        )}
-      </div>
+    <div className="flex justify-between">
+      <span className="font-medium">{label}:</span>
+      <span>{value}</span>
     </div>
   );
-};
+}
 
 const Gifts = ({ event, setEvent, colors, fontPrimary, fontSecondary, styles = {} }) => {
   const [showGifts, setShowGifts] = useState(false);
-  const [copiedField, setCopiedField] = useState('');
 
-  // Funciones para edición FUERA del modal (solo para la sección principal)
+  // Funciones para edición (solo para la sección principal, fuera del modal)
   const addGift = () =>
     setEvent((p) => ({ ...p, gifts: [...(p.gifts || []), { label: "Mesa de Regalos", url: "" }] }));
   
@@ -99,40 +71,14 @@ const Gifts = ({ event, setEvent, colors, fontPrimary, fontSecondary, styles = {
     }));
   };
 
-  const copyToClipboard = async (text, fieldName) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopiedField(fieldName);
-      setTimeout(() => setCopiedField(''), 2000);
-    } catch (err) {
-      console.error('Error al copiar:', err);
-    }
-  };
-
   return (
     <>
+      {/* ===== REGALOS / TRANSFERENCIAS ===== */}
       <section className="py-16 text-center" style={{ backgroundColor: colors.secondary }} dir="ltr">
         <div className="max-w-3xl mx-auto px-4">
-          {/* Icono de Regalo */}
-          <div className="flex justify-center mb-6">
-            <div 
-              className="w-12 h-12 rounded-full flex items-center justify-center"
-              style={{ 
-                background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
-              }}
-            >
-              <GiftIcon className="w-6 h-6" style={{ color: 'white' }} />
-            </div>
-          </div>
-          
-          <h2
-            className="text-2xl font-medium mb-6 tracking-wide"
-            style={{ color: colors.secondaryText, fontFamily: fontSecondary }}
-          >
-            REGALOS
-          </h2>
+          <GiftIcon className="w-10 h-10 mx-auto mb-6" style={{ color: colors.secondaryText }} />
           <p
-            className="mb-8"
+            className="mb-8 font-primary"
             style={{ 
               color: colors.secondaryText, 
               fontSize: "clamp(1rem, 2.5vw, 1.25rem)", 
@@ -140,19 +86,109 @@ const Gifts = ({ event, setEvent, colors, fontPrimary, fontSecondary, styles = {
             }}
           >
             <EditableText
-              value={event.giftsNote || "Tu presencia es nuestro mejor regalo, pero si deseás obsequiarnos algo más, te dejamos nuestros datos."}
+              value={event.giftsNote || "Si deseás realizarnos un regalo podés colaborar con nuestra Luna de Miel…"}
               onChange={(v) => setEvent((p) => ({ ...p, giftsNote: v }))}
-              className="px-1"
+              className="px-1 editable-text"
               singleLine={false}
               style={{ color: colors.secondaryText, fontFamily: fontPrimary }}
             />
           </p>
+          <StyledButton
+            colors={colors}
+            variant="secondary"
+            onClick={() => setShowGifts(true)}
+          >
+            VER DATOS BANCARIOS
+          </StyledButton>
+        </div>
+      </section>
+
+      {/* Sección de edición (fuera del modal) */}
+      <section className="py-8" style={{ backgroundColor: colors.paper }}>
+        <div className="max-w-2xl mx-auto px-4">
+          <h3 className="text-lg font-medium mb-4 text-center" style={{ color: colors.ink, fontFamily: fontPrimary }}>
+            Configurar Datos (Solo visible en edición)
+          </h3>
           
-          {/* Sección editable para mesas de regalos FUERA del modal */}
-          <div className="mb-8">
+          {/* Editar datos bancarios */}
+          <div className="mb-6">
+            <h4 className="font-medium mb-3" style={{ color: colors.ink }}>Datos Bancarios</h4>
+            <div className="space-y-2">
+              <EditableText
+                value={event.bank?.banco || ""}
+                onChange={(v) => updateBankField('banco', v)}
+                className="block p-3 rounded-lg w-full"
+                style={{
+                  backgroundColor: colors.primarySoft,
+                  color: colors.primary,
+                }}
+                singleLine
+                placeholder="Nombre del banco"
+              />
+              <EditableText
+                value={event.bank?.cbu || ""}
+                onChange={(v) => updateBankField('cbu', v)}
+                className="block p-3 rounded-lg w-full"
+                style={{
+                  backgroundColor: colors.primarySoft,
+                  color: colors.primary,
+                }}
+                singleLine
+                placeholder="CBU/IBAN"
+              />
+              <EditableText
+                value={event.bank?.alias || ""}
+                onChange={(v) => updateBankField('alias', v)}
+                className="block p-3 rounded-lg w-full"
+                style={{
+                  backgroundColor: colors.primarySoft,
+                  color: colors.primary,
+                }}
+                singleLine
+                placeholder="Alias"
+              />
+              <EditableText
+                value={event.bank?.titular || ""}
+                onChange={(v) => updateBankField('titular', v)}
+                className="block p-3 rounded-lg w-full"
+                style={{
+                  backgroundColor: colors.primarySoft,
+                  color: colors.primary,
+                }}
+                singleLine
+                placeholder="Titular"
+              />
+              <EditableText
+                value={event.bank?.cuenta || ""}
+                onChange={(v) => updateBankField('cuenta', v)}
+                className="block p-3 rounded-lg w-full"
+                style={{
+                  backgroundColor: colors.primarySoft,
+                  color: colors.primary,
+                }}
+                singleLine
+                placeholder="Número de cuenta"
+              />
+              <EditableText
+                value={event.bank?.nota || ""}
+                onChange={(v) => updateBankField('nota', v)}
+                className="block p-3 rounded-lg w-full"
+                style={{
+                  backgroundColor: colors.primarySoft,
+                  color: colors.primary,
+                }}
+                singleLine
+                placeholder="Nota adicional"
+              />
+            </div>
+          </div>
+
+          {/* Editar mesas de regalos */}
+          <div>
+            <h4 className="font-medium mb-3" style={{ color: colors.ink }}>Mesas de Regalos</h4>
             <div className="space-y-2">
               {(event.gifts || []).map((g, i) => (
-                <div key={i} className="flex items-center gap-2 max-w-md mx-auto">
+                <div key={i} className="flex items-center gap-2">
                   <EditableText
                     value={g.label || "Mesa de Regalos"}
                     onChange={(v) => updateGift(i, 'label', v)}
@@ -160,11 +196,10 @@ const Gifts = ({ event, setEvent, colors, fontPrimary, fontSecondary, styles = {
                     style={{
                       backgroundColor: colors.primarySoft,
                       color: colors.primary,
-                      textDecoration: 'none',
                       flexGrow: 1,
                     }}
                     singleLine
-                    ariaLabel="Nombre de la mesa de regalos"
+                    placeholder="Nombre de la mesa"
                   />
                   <EditableText
                     value={g.url || ""}
@@ -173,11 +208,10 @@ const Gifts = ({ event, setEvent, colors, fontPrimary, fontSecondary, styles = {
                     style={{
                       backgroundColor: colors.primarySoft,
                       color: colors.primary,
-                      textDecoration: 'none',
                       flexGrow: 1,
                     }}
                     singleLine
-                    ariaLabel="URL de la mesa de regalos"
+                    placeholder="URL"
                   />
                   <button
                     onClick={() => removeGift(i)}
@@ -192,128 +226,61 @@ const Gifts = ({ event, setEvent, colors, fontPrimary, fontSecondary, styles = {
                 colors={colors}
                 variant="outline"
                 onClick={addGift}
-                className="mt-2"
+                className="w-full mt-2"
               >
                 Agregar Mesa de Regalos
               </StyledButton>
             </div>
           </div>
-
-          {/* Sección editable para datos bancarios FUERA del modal */}
-          <div className="mb-8 max-w-md mx-auto">
-            <h3 className="text-lg font-medium mb-4" style={{ color: colors.secondaryText }}>
-              Datos Bancarios (Editar)
-            </h3>
-            <div className="space-y-2">
-              <EditableText
-                value={event.bank?.name || ""}
-                onChange={(v) => updateBankField('name', v)}
-                className="block p-3 rounded-lg w-full"
-                style={{
-                  backgroundColor: colors.primarySoft,
-                  color: colors.primary,
-                }}
-                singleLine
-                placeholder="Nombre del banco"
-              />
-              <EditableText
-                value={event.bank?.holder || ""}
-                onChange={(v) => updateBankField('holder', v)}
-                className="block p-3 rounded-lg w-full"
-                style={{
-                  backgroundColor: colors.primarySoft,
-                  color: colors.primary,
-                }}
-                singleLine
-                placeholder="Titular de la cuenta"
-              />
-              <EditableText
-                value={event.bank?.cbu || ""}
-                onChange={(v) => updateBankField('cbu', v)}
-                className="block p-3 rounded-lg w-full"
-                style={{
-                  backgroundColor: colors.primarySoft,
-                  color: colors.primary,
-                }}
-                singleLine
-                placeholder="CBU/CVU"
-              />
-              <EditableText
-                value={event.bank?.alias || ""}
-                onChange={(v) => updateBankField('alias', v)}
-                className="block p-3 rounded-lg w-full"
-                style={{
-                  backgroundColor: colors.primarySoft,
-                  color: colors.primary,
-                }}
-                singleLine
-                placeholder="Alias"
-              />
-            </div>
-          </div>
-
-          <StyledButton
-            colors={colors}
-            variant="secondary"
-            onClick={() => setShowGifts(true)}
-          >
-            VER DATOS BANCARIOS
-          </StyledButton>
         </div>
       </section>
 
-      {/* Modal de Solo Lectura - Basado en WeddingElegantTemplate */}
+      {/* Modal de Regalos - EXACTAMENTE IGUAL AL WEDDING ELEGANT TEMPLATE */}
       {showGifts && (
-        <div 
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-          onClick={() => setShowGifts(false)}
-        >
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <Card className="w-full max-w-md">
             <CardContent className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 
-                  className="text-xl font-medium" 
-                  style={{ color: colors.ink, fontFamily: fontPrimary }}
-                >
+                <h3 className="text-xl font-medium font-primary" style={{ color: colors.ink, fontFamily: fontPrimary }}>
                   Datos Bancarios
                 </h3>
-                <button 
-                  onClick={() => setShowGifts(false)}
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                  style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-                >
-                  <XIcon className="w-5 h-5" style={{ color: '#6b7280' }} />
-                </button>
+                <Button variant="ghost" size="sm" onClick={() => setShowGifts(false)}>
+                  <XIcon className="w-4 h-4" />
+                </Button>
               </div>
 
-              <div className="space-y-4 text-sm" dir="ltr" style={{ fontFamily: fontPrimary }}>
-                <div className="text-center mb-4">
-                  <CreditCard className="w-12 h-12 mx-auto mb-4" style={{ color: colors.primary }} />
+              <div className="space-y-4 text-sm font-primary" dir="ltr" style={{ fontFamily: fontPrimary }}>
+                <div className="text-center mb-2">
+                  <CreditCardIcon className="w-12 h-12 mx-auto mb-4" style={{ color: colors.primary }} />
                   <p style={{ color: colors.body }}>
-                    Si deseás colaborar con nuestra celebración:
+                    Si deseás colaborar con nuestra Luna de Miel:
                   </p>
                 </div>
 
                 <div className="p-4 rounded-lg" style={{ backgroundColor: colors.paper }}>
-                  <h4 className="font-medium mb-3" style={{ color: colors.ink }}>
+                  <h4 className="font-medium mb-2" style={{ color: colors.ink }}>
                     Transferencia Bancaria
                   </h4>
-                  <div className="space-y-2">
-                    {renderBankLine("Banco", event.bank?.name, copyToClipboard, copiedField, 'name')}
-                    {renderBankLine("CBU/CVU", event.bank?.cbu, copyToClipboard, copiedField, 'cbu')}
-                    {renderBankLine("Alias", event.bank?.alias, copyToClipboard, copiedField, 'alias')}
-                    {renderBankLine("Titular", event.bank?.holder, copyToClipboard, copiedField, 'holder')}
-                    {renderBankLine("IBAN", event.bank?.iban, copyToClipboard, copiedField, 'iban')}
-                    {renderBankLine("SWIFT/BIC", event.bank?.swift, copyToClipboard, copiedField, 'swift')}
+                  <div className="space-y-1 text-sm" style={{ color: colors.body }}>
+                    {renderBankLine("Banco", event.bank?.banco)}
+                    {renderBankLine("CBU/IBAN", event.bank?.cbu)}
+                    {renderBankLine("Alias", event.bank?.alias)}
+                    {renderBankLine("Titular", event.bank?.titular)}
+                    {renderBankLine("Cuenta", event.bank?.cuenta)}
+                    {event.bank?.nota ? (
+                      <p className="text-xs" style={{ color: colors.muted }}>
+                        {event.bank?.nota}
+                      </p>
+                    ) : null}
                   </div>
                 </div>
 
                 {(event.gifts || []).length > 0 && (
                   <div className="p-4 rounded-lg" style={{ backgroundColor: colors.paper }}>
-                    <h4 className="font-medium mb-3" style={{ color: colors.ink }}>
+                    <h4 className="font-medium mb-2" style={{ color: colors.ink }}>
                       Mesas de Regalos
                     </h4>
-                    <ul className="space-y-2">
+                    <ul className="list-disc pl-5 space-y-1">
                       {event.gifts.map((g, i) => (
                         <li key={i}>
                           {g.url ? (
@@ -321,38 +288,17 @@ const Gifts = ({ event, setEvent, colors, fontPrimary, fontSecondary, styles = {
                               href={g.url}
                               target="_blank"
                               rel="noreferrer"
-                              className="underline hover:opacity-80 block"
+                              className="underline hover:opacity-80"
                               style={{ color: colors.primary }}
                             >
                               {g.label || g.url}
                             </a>
                           ) : (
-                            <span style={{ color: colors.body }}>{g.label || "Enlace"}</span>
+                            <span>{g.label || "Enlace"}</span>
                           )}
                         </li>
                       ))}
                     </ul>
-                  </div>
-                )}
-
-                {/* Mensaje adicional */}
-                {event.giftsNote && (
-                  <div 
-                    className="p-4 rounded-lg text-center italic"
-                    style={{ backgroundColor: colors.paper, color: colors.muted }}
-                  >
-                    {event.giftsNote}
-                  </div>
-                )}
-
-                {/* Si no hay información */}
-                {!(event.gifts || []).length && !event.bank?.name && !event.bank?.cbu && (
-                  <div 
-                    className="text-center p-8 rounded-lg"
-                    style={{ backgroundColor: colors.paper, color: colors.muted }}
-                  >
-                    <GiftIcon className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>No hay información de regalos disponible.</p>
                   </div>
                 )}
               </div>
@@ -360,20 +306,6 @@ const Gifts = ({ event, setEvent, colors, fontPrimary, fontSecondary, styles = {
           </Card>
         </div>
       )}
-
-      {/* Estilos adicionales para animaciones */}
-      <style jsx>{`
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(50px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </>
   );
 };
