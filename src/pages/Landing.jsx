@@ -768,10 +768,6 @@ function Landing() {
                   <h3 className="font-semibold text-foreground mb-2">Conexión inmediata</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">Tus invitados confirman asistencia, acceden al mapa y viven una experiencia única desde cualquier dispositivo.</p>
                 </div>
-                <div>
-                  <h3 className="font-semibold text-foreground mb-2">Diseño con propósito</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">Personalizamos cada pieza para que refleje tu estilo, mientras reducís el impacto ambiental.</p>
-                </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
