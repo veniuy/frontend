@@ -242,8 +242,8 @@ function Landing() {
   const heroPanels = useMemo(() => ([
     {
       key: 'boda',
-      bg: asset('/src/assets/cotton_bird_images/categoria_boda_grid.webp'),
-      headline: 'Una papelería de boda única',
+      bg: asset('/src/assets/noviosboda.webp'),
+      headline: 'Una boda única',
       sub: '› DESCUBRE LAS INVITACIONES',
       to: '/categorias/boda',
     },
