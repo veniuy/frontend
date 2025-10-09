@@ -5,7 +5,6 @@ import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
 import { Badge } from '../components/ui/badge'
 import { Input } from '../components/ui/input'
-import videoSrc from '../assets/videonovia.webm';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import { CartIcon, ShoppingCartSidebar } from '../components/ShoppingCart'
 import {
@@ -24,7 +23,7 @@ import {
   Twitter,
   X as CloseIcon,
   Trash2,
-  Crown,  
+  Crown,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react'
@@ -526,12 +525,11 @@ function Landing() {
       {/* Featured Products */}
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center md:text-center mb-12">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 md:hidden text-left">NUESTROS DISEÑOS</p>
-            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4 text-left md:text-center">
+          <div className="text-center mb-12">
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
               Nuestras invitaciones más populares
             </h2>
-            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.4' }} className="text-muted-foreground max-w-2xl mx-auto text-left md:text-center">
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.4' }} className="text-muted-foreground max-w-2xl mx-auto">
               Diseños digitales que combinan elegancia, interactividad y personalización para hacer de tu evento algo inolvidable.
             </p>
           </div>
@@ -597,12 +595,11 @@ function Landing() {
       {/* Categories -> ahora navega a /categorias/... */}
       <section id="categorias" className="py-16 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center md:text-center mb-12">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 md:hidden text-left">CATEGORÍAS</p>
-            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4 text-left md:text-center">
+          <div className="text-center mb-12">
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
               Invitaciones para cada ocasión especial
             </h2>
-            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.4' }} className="text-muted-foreground max-w-2xl mx-auto text-left md:text-center">
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.4' }} className="text-muted-foreground max-w-2xl mx-auto">
               Desde bodas elegantes hasta cumpleaños infantiles llenos de diversión. Tenemos el diseño perfecto para tu evento.
             </p>
           </div>
@@ -649,18 +646,17 @@ function Landing() {
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 md:hidden text-left">VENTAJAS DIGITALES</p>
-            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4 text-left md:text-center">
+            <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
               ¿Por qué elegir invitaciones digitales?
             </h2>
-            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.5', color: '#6b7280' }} className="max-w-2xl mx-auto text-left md:text-center">
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.5', color: '#6b7280' }} className="max-w-2xl mx-auto">
               La evolución natural de las invitaciones tradicionales. Más interactivas, ecológicas y convenientes.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {digitalFeatures.map((value, index) => (
-              <div key={index} className="text-center digital-features-mobile">
+              <div key={index} className="text-center">
                 <div className="w-16 h-16 bg-sage-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <value.icon className="w-8 h-8 text-sage-400" />
                 </div>
@@ -695,12 +691,11 @@ function Landing() {
 
       {/* Newsletter */}
       <section className="py-16 bg-background">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-center">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 md:hidden text-left">NEWSLETTER</p>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4 text-left md:text-center">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
             ¡Únete a la revolución digital!
           </h2>
-          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.5', color: '#6b7280' }} className="mb-8 max-w-2xl mx-auto text-left md:text-center">
+          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.5', color: '#6b7280' }} className="mb-8 max-w-2xl mx-auto">
             Suscríbete y recibe plantillas exclusivas, descuentos especiales y las últimas tendencias en invitaciones digitales.
             ¡Además obtén un 20% de descuento en tu primera invitación!
           </p>
@@ -739,26 +734,22 @@ function Landing() {
       <section className="py-16 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="relative overflow-hidden rounded-lg shadow-warm-lg bg-black">
-                <div className="aspect-square overflow-hidden rounded-lg w-full max-w-md mx-auto lg:max-w-none lg:w-full">
-                  <video
-                    src={videoSrc}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    preload="auto"
-                    className="w-full h-full object-cover block"
-                  />
-                </div>
-             </div>
-              <div className="space-y-8">
+            <div className="relative overflow-hidden rounded-lg shadow-warm-lg">
+              <img 
+                src={asset('/src/assets/cotton_bird_images/taller_produccion_cotton_bird.webp')} 
+                alt="Diseño de invitaciones digitales"
+                className="block w-full h-full object-cover"
+                onError={(e) => onImgError(e, 'Diseño de invitaciones digitales')}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div className="space-y-8">
               <div className="mb-8">
-                <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 md:hidden">NUESTRA TECNOLOGÍA</p>
-                <h2 className="font-display text-3xl font-medium text-foreground mb-4 text-left md:text-left">
+                <h2 className="font-display text-3xl font-medium text-foreground mb-4">
                   Tecnología al servicio de tus eventos
                 </h2>
-                <p className="text-muted-foreground text-left md:text-left">
+                <p className="text-muted-foreground">
                   Nuestras invitaciones digitales van más allá del diseño. Son experiencias interactivas que conectan con tus invitados.
                 </p>
               </div>
@@ -789,25 +780,6 @@ function Landing() {
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Nueva sección: Asociaciones */}
-      <section className="py-16 bg-background">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:text-center">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 md:hidden text-left">ASOCIACIONES</p>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-6 text-left md:text-center">
-            ¿Querés que tu fiesta sea mejor?
-          </h2>
-          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.5', color: '#6b7280' }} className="mb-8 max-w-2xl mx-auto text-left md:text-center">
-            Descubrí nuestras asociaciones con los mejores proveedores para hacer de tu evento algo inolvidable.
-          </p>
-          <Button 
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3"
-            onClick={() => navigate('/asociaciones')}
-          >
-            Ver Asociaciones
-          </Button>
         </div>
       </section>
 
