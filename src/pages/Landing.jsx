@@ -736,7 +736,7 @@ function Landing() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative overflow-hidden rounded-lg shadow-warm-lg">
               <img 
-                src={asset('/src/assets/cotton_bird_images/taller_produccion_cotton_bird.webp')} 
+                src={asset('/src/assets/fiestamanos.webp')} 
                 alt="Diseño de invitaciones digitales"
                 className="block w-full h-full object-cover"
                 onError={(e) => onImgError(e, 'Diseño de invitaciones digitales')}
