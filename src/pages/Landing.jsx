@@ -750,21 +750,35 @@ function Landing() {
                   Tecnología al servicio de tus eventos
                 </h2>
                 <p className="text-muted-foreground">
-                  Nuestras invitaciones digitales van más allá del diseño. Son experiencias interactivas que conectan con tus invitados.
+                  Creamos invitaciones digitales que combinan diseño, emoción y conciencia ambiental.
+                  Una nueva forma de invitar, más práctica, moderna y sostenible.
                 </p>
               </div>
               
-              {digitalFeatures.map((feature, index) => (
-                <div key={index}>
-                  <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
+              <div className="space-y-8">
+                <div>
+                  <h3 className="font-semibold text-foreground mb-2">Experiencias que cuentan tu historia</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">Cada invitación es una puesta en escena: animaciones, sonido y movimiento que transmiten la esencia de tu evento.</p>
                 </div>
-              ))}
+                <div>
+                  <h3 className="font-semibold text-foreground mb-2">Rápido, simple, sin huella</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">Olvidate de la impresión y los envíos. En minutos tu invitación está lista para compartir.</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-2">Conexión inmediata</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">Tus invitados confirman asistencia, acceden al mapa y viven una experiencia única desde cualquier dispositivo.</p>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-2">Diseño con propósito</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">Personalizamos cada pieza para que refleje tu estilo, mientras reducís el impacto ambiental.</p>
+                </div>
+              </div>
+
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
                   variant="outline" 
                   className="border-primary text-primary hover:bg-primary/10"
-                  onClick={() => navigate('/demo/boda')}
+                  onClick={() => navigate("/demo/boda")}
                 >
                   <Globe className="w-4 h-4 mr-2" />
                   Demo Boda
@@ -772,7 +786,7 @@ function Landing() {
                 <Button 
                   variant="outline" 
                   className="border-sage-400 text-sage-400 hover:bg-sage-100"
-                  onClick={() => navigate('/demo/quinceanera')}
+                  onClick={() => navigate("/demo/quinceanera")}
                 >
                   <Crown className="w-4 h-4 mr-2" />
                   Demo Quinceañera
