@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Textarea } from '../components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Slider } from '../components/ui/slider';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { Badge } from '../components/ui/badge';
-import { Separator } from '../components/ui/separator';
-import { ScrollArea } from '../components/ui/scroll-area';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { 
   Type, 
   Image, 
@@ -46,10 +46,10 @@ import {
   LogIn
 } from 'lucide-react';
 
-const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange = null, onSave = null }) => {
+const InvitationEditor = () => {
   // Estados principales
   const [selectedTemplate, setSelectedTemplate] = useState(null);
-  const [designData, setDesignData] = useState(initialDesign);
+  const [designData, setDesignData] = useState(null);
   const [selectedElement, setSelectedElement] = useState(null);
   const [canvasZoom, setCanvasZoom] = useState(100);
   const [showGrid, setShowGrid] = useState(false);
@@ -58,137 +58,129 @@ const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange =
   const [isSaving, setIsSaving] = useState(false);
 
   // Estados para herramientas
-  const [activeTab, setActiveTab] = useState(initialDesign ? 'text-styles' : 'templates');
+  const [activeTab, setActiveTab] = useState('templates');
   const [activeTool, setActiveTool] = useState('select');
   const [templates, setTemplates] = useState([]);
+  
+  // Fuentes con preview real (como Paperless Post)
+  const [fonts, setFonts] = useState([
+    { name: 'Futura BT', family: 'Futura, sans-serif', weight: 'Regular' },
+    { name: 'Futura BT', family: 'Futura, sans-serif', weight: 'Bold' },
+    { name: 'Trajan', family: 'Trajan Pro, serif', weight: 'Regular' },
+    { name: 'Trade Gothic', family: 'Trade Gothic, sans-serif', weight: 'Regular' },
+    { name: 'Trade Gothic', family: 'Trade Gothic, sans-serif', weight: 'Bold' },
+    { name: 'MTC-Ngl', family: 'Montserrat, sans-serif', weight: 'Regular' },
+    { name: 'Didot', family: 'Didot, serif', weight: 'Regular' },
+    { name: 'Didot', family: 'Didot, serif', weight: 'Bold' },
+    { name: 'Inter', family: 'Inter, sans-serif', weight: 'Regular' },
+    { name: 'Inter', family: 'Inter, sans-serif', weight: 'Medium' },
+    { name: 'Playfair Display', family: 'Playfair Display, serif', weight: 'Regular' },
+    { name: 'Poppins', family: 'Poppins, sans-serif', weight: 'Regular' }
+  ]);
 
-  // Ref para input de archivos
+  // Colores organizados como círculos (como Paperless Post)
+  const [colorPalette, setColorPalette] = useState([
+    '#3B82F6', // Azul
+    '#F97316', // Naranja
+    '#EC4899', // Rosa
+    '#000000', // Negro
+    '#6B7280', // Gris
+    '#EAB308', // Amarillo
+    '#10B981', // Verde
+    '#8B5CF6', // Púrpura
+    '#EF4444', // Rojo
+    '#FFFFFF'  // Blanco
+  ]);
+
+  // Stickers y elementos decorativos
+  const [stickers, setStickers] = useState([
+    { id: 1, name: 'Corazón', emoji: '❤️' },
+    { id: 2, name: 'Estrella', emoji: '⭐' },
+    { id: 3, name: 'Globo', emoji: '🎈' },
+    { id: 4, name: 'Pastel', emoji: '🎂' },
+    { id: 5, name: 'Regalo', emoji: '🎁' },
+    { id: 6, name: 'Flores', emoji: '🌸' },
+    { id: 7, name: 'Confeti', emoji: '🎊' },
+    { id: 8, name: 'Diamante', emoji: '💎' }
+  ]);
+
+  // Blend modes (como Paperless Post)
+  const [blendModes] = useState([
+    'normal', 'multiply', 'screen', 'overlay', 'soft-light', 'hard-light',
+    'color-dodge', 'color-burn', 'darken', 'lighten', 'difference', 'exclusion'
+  ]);
+
+  // Referencias
+  const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
-
-  // Efecto para inicializar el historial cuando se carga un diseño inicial
-  useEffect(() => {
-    if (initialDesign && initialDesign.design_data) {
-      addToHistory(initialDesign.design_data);
-    } else if (!initialDesign) {
-      // Si no hay diseño inicial, crear uno básico
-      const basicDesign = {
-        id: 'new_design',
-        design_name: 'Nuevo Diseño',
-        design_data: {
-          canvas: {
-            width: 800,
-            height: 1200,
-            background: '#ffffff'
-          },
-          elements: []
-        }
-      };
-      setDesignData(basicDesign);
-      addToHistory(basicDesign.design_data);
-    }
-  }, [initialDesign]);
 
   // Cargar plantillas al montar el componente
   useEffect(() => {
-    if (!initialDesign) {
-      loadTemplates();
-    }
-  }, [initialDesign]);
+    loadTemplates();
+  }, []);
 
   const loadTemplates = async () => {
     try {
       const response = await fetch('/api/templates');
       if (response.ok) {
         const data = await response.json();
-        let templatesList = [];
-        if (data.templates && typeof data.templates === 'object') {
-          Object.values(data.templates).forEach(categoryTemplates => {
-            if (Array.isArray(categoryTemplates)) {
-              templatesList = templatesList.concat(categoryTemplates);
-            }
-          });
-        } else if (Array.isArray(data.templates)) {
-          templatesList = data.templates;
-        }
-        setTemplates(templatesList);
+        setTemplates(data.templates);
       }
     } catch (error) {
-      console.warn('Error loading templates:', error);
-      // Plantillas de fallback
-      setTemplates([
-        {
-          id: 1,
-          name: 'Clásico',
-          description: 'Diseño elegante y atemporal',
-          category: 'wedding',
-          is_premium: false
-        },
-        {
-          id: 2,
-          name: 'Moderno',
-          description: 'Diseño contemporáneo',
-          category: 'wedding',
-          is_premium: false
-        }
-      ]);
+      console.error('Error loading templates:', error);
     }
   };
 
-  // Fuentes disponibles
-  const fonts = [
-    { name: 'Arial', family: 'Arial, sans-serif', weight: 'Regular' },
-    { name: 'Arial Bold', family: 'Arial, sans-serif', weight: 'Bold' },
-    { name: 'Times New Roman', family: 'Times New Roman, serif', weight: 'Regular' },
-    { name: 'Helvetica', family: 'Helvetica, sans-serif', weight: 'Regular' },
-    { name: 'Georgia', family: 'Georgia, serif', weight: 'Regular' },
-    { name: 'Playfair Display', family: 'Playfair Display, serif', weight: 'Regular' },
-    { name: 'Inter', family: 'Inter, sans-serif', weight: 'Regular' },
-    { name: 'Poppins', family: 'Poppins, sans-serif', weight: 'Regular' }
-  ];
+  const handleTemplateSelect = async (template) => {
+    try {
+      setSelectedTemplate(template);
+      
+      // Crear nuevo diseño basado en la plantilla
+      const response = await fetch('/api/designs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          template_id: template.id,
+          design_name: `Mi ${template.name}`
+        }),
+      });
 
-  // Paleta de colores
-  const colorPalette = [
-    '#3B82F6', '#F97316', '#EC4899', '#000000', '#6B7280',
-    '#EAB308', '#10B981', '#8B5CF6', '#EF4444', '#FFFFFF'
-  ];
+      if (response.ok) {
+        const data = await response.json();
+        setDesignData(data.design);
+        addToHistory(data.design.design_data);
+        setActiveTab('text-styles');
+      }
+    } catch (error) {
+      console.error('Error selecting template:', error);
+    }
+  };
 
-  // Stickers
-  const stickers = [
-    { id: 1, name: 'Corazón', emoji: '❤️' },
-    { id: 2, name: 'Estrella', emoji: '⭐' },
-    { id: 3, name: 'Globo', emoji: '🎈' },
-    { id: 4, name: 'Pastel', emoji: '🎂' },
-    { id: 5, name: 'Anillos', emoji: '💍' },
-    { id: 6, name: 'Flores', emoji: '🌸' }
-  ];
-
-  const addToHistory = (designState) => {
+  const addToHistory = (state) => {
     const newHistory = history.slice(0, historyIndex + 1);
-    newHistory.push(JSON.parse(JSON.stringify(designState)));
+    newHistory.push(JSON.parse(JSON.stringify(state)));
     setHistory(newHistory);
     setHistoryIndex(newHistory.length - 1);
   };
 
   const undo = () => {
     if (historyIndex > 0) {
-      const newIndex = historyIndex - 1;
-      setHistoryIndex(newIndex);
-      const previousState = history[newIndex];
+      setHistoryIndex(historyIndex - 1);
       setDesignData(prev => ({
         ...prev,
-        design_data: previousState
+        design_data: history[historyIndex - 1]
       }));
     }
   };
 
   const redo = () => {
     if (historyIndex < history.length - 1) {
-      const newIndex = historyIndex + 1;
-      setHistoryIndex(newIndex);
-      const nextState = history[newIndex];
+      setHistoryIndex(historyIndex + 1);
       setDesignData(prev => ({
         ...prev,
-        design_data: nextState
+        design_data: history[historyIndex + 1]
       }));
     }
   };
@@ -196,17 +188,21 @@ const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange =
   const saveDesign = async () => {
     if (!designData) return;
     
-    // Si hay un callback onSave externo, usarlo
-    if (onSave) {
-      await onSave();
-      return;
-    }
-    
     setIsSaving(true);
     try {
-      // Simular guardado si no hay API disponible
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      console.log('Design saved successfully');
+      const response = await fetch(`/api/designs/${designData.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          design_data: designData.design_data
+        }),
+      });
+
+      if (response.ok) {
+        console.log('Design saved successfully');
+      }
     } catch (error) {
       console.error('Error saving design:', error);
     } finally {
@@ -214,60 +210,124 @@ const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange =
     }
   };
 
-  const handleTemplateSelect = (template) => {
-    setSelectedTemplate(template);
-    
-    // Crear diseño basado en la plantilla
-    const newDesign = {
-      id: `design_${template.id}`,
-      design_name: `Diseño ${template.name}`,
-      template_id: template.id,
-      design_data: {
-        canvas: {
-          width: 800,
-          height: 1200,
-          background: '#ffffff'
-        },
-        elements: [
-          {
-            id: 'title',
-            type: 'text',
-            content: event?.title || 'Título del Evento',
-            x: 100,
-            y: 100,
-            width: 600,
-            height: 80,
-            fontSize: 48,
-            fontFamily: 'Playfair Display, serif',
-            fontWeight: 'Bold',
-            color: '#2c3e50',
-            textAlign: 'center'
-          },
-          {
-            id: 'subtitle',
-            type: 'text',
-            content: event?.description || 'Descripción del evento',
-            x: 100,
-            y: 200,
-            width: 600,
-            height: 60,
-            fontSize: 24,
-            fontFamily: 'Inter, sans-serif',
-            fontWeight: 'Regular',
-            color: '#34495e',
-            textAlign: 'center'
-          }
-        ]
-      }
+  const addTextElement = () => {
+    if (!designData) return;
+
+    const newElement = {
+      id: Date.now().toString(),
+      type: 'text',
+      content: 'Nuevo texto',
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 50,
+      fontSize: 24,
+      fontFamily: 'Inter, sans-serif',
+      fontWeight: 'Regular',
+      color: '#000000',
+      fontStyle: 'normal',
+      textAlign: 'left',
+      rotation: 0,
+      letterSpacing: 0,
+      lineHeight: 1.2,
+      blendMode: 'normal',
+      opacity: 1,
+      zIndex: 1
     };
 
-    setDesignData(newDesign);
-    addToHistory(newDesign.design_data);
-    setActiveTab('text-styles');
-    
-    // Notificar al componente padre
-    if (onDesignChange) {
-      onDesignChange(newDesign);
+    const updatedDesignData = {
+      ...designData.design_data,
+      elements: [...(designData.design_data.elements || []), newElement]
+    };
+
+    setDesignData(prev => ({
+      ...prev,
+      design_data: updatedDesignData
+    }));
+
+    addToHistory(updatedDesignData);
+    setSelectedElement(newElement);
+  };
+
+  const addStickerElement = (sticker) => {
+    if (!designData) return;
+
+    const newElement = {
+      id: Date.now().toString(),
+      type: 'sticker',
+      content: sticker.emoji,
+      name: sticker.name,
+      x: 150,
+      y: 150,
+      width: 60,
+      height: 60,
+      rotation: 0,
+      opacity: 1,
+      zIndex: 1
+    };
+
+    const updatedDesignData = {
+      ...designData.design_data,
+      elements: [...(designData.design_data.elements || []), newElement]
+    };
+
+    setDesignData(prev => ({
+      ...prev,
+      design_data: updatedDesignData
+    }));
+
+    addToHistory(updatedDesignData);
+    setSelectedElement(newElement);
+  };
+
+  const addImageElement = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file || !designData) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await fetch(`/api/designs/${designData.id}/assets`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        const newElement = {
+          id: Date.now().toString(),
+          type: 'image',
+          src: data.asset_url,
+          x: 100,
+          y: 100,
+          width: 200,
+          height: 200,
+          rotation: 0,
+          opacity: 1,
+          zIndex: 1
+        };
+
+        const updatedDesignData = {
+          ...designData.design_data,
+          elements: [...(designData.design_data.elements || []), newElement]
+        };
+
+        setDesignData(prev => ({
+          ...prev,
+          design_data: updatedDesignData
+        }));
+
+        addToHistory(updatedDesignData);
+        setSelectedElement(newElement);
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error);
     }
   };
 
@@ -283,90 +343,38 @@ const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange =
       elements: updatedElements
     };
 
-    const newDesignData = {
-      ...designData,
+    setDesignData(prev => ({
+      ...prev,
       design_data: updatedDesignData
-    };
-
-    setDesignData(newDesignData);
-    
-    // Notificar al componente padre sobre el cambio
-    if (onDesignChange) {
-      onDesignChange(newDesignData);
-    }
+    }));
 
     setSelectedElement(prev => ({ ...prev, ...updates }));
-    addToHistory(updatedDesignData);
   };
 
-  const addTextElement = () => {
-    if (!designData) return;
+  const duplicateSelectedElement = () => {
+    if (!selectedElement || !designData) return;
 
     const newElement = {
-      id: `text_${Date.now()}`,
-      type: 'text',
-      content: 'Nuevo texto',
-      x: 100,
-      y: 300,
-      width: 200,
-      height: 50,
-      fontSize: 24,
-      fontFamily: 'Inter, sans-serif',
-      fontWeight: 'Regular',
-      color: '#000000',
-      textAlign: 'left'
+      ...selectedElement,
+      id: Date.now().toString(),
+      x: selectedElement.x + 20,
+      y: selectedElement.y + 20
     };
+
+    const updatedElements = [...designData.design_data.elements, newElement];
 
     const updatedDesignData = {
       ...designData.design_data,
-      elements: [...(designData.design_data.elements || []), newElement]
+      elements: updatedElements
     };
 
-    const newDesignData = {
-      ...designData,
+    setDesignData(prev => ({
+      ...prev,
       design_data: updatedDesignData
-    };
+    }));
 
-    setDesignData(newDesignData);
     addToHistory(updatedDesignData);
     setSelectedElement(newElement);
-    
-    if (onDesignChange) {
-      onDesignChange(newDesignData);
-    }
-  };
-
-  const addStickerElement = (sticker) => {
-    if (!designData) return;
-
-    const newElement = {
-      id: `sticker_${Date.now()}`,
-      type: 'sticker',
-      content: sticker.emoji,
-      name: sticker.name,
-      x: 150,
-      y: 400,
-      width: 60,
-      height: 60
-    };
-
-    const updatedDesignData = {
-      ...designData.design_data,
-      elements: [...(designData.design_data.elements || []), newElement]
-    };
-
-    const newDesignData = {
-      ...designData,
-      design_data: updatedDesignData
-    };
-
-    setDesignData(newDesignData);
-    addToHistory(updatedDesignData);
-    setSelectedElement(newElement);
-    
-    if (onDesignChange) {
-      onDesignChange(newDesignData);
-    }
   };
 
   const deleteSelectedElement = () => {
@@ -381,18 +389,38 @@ const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange =
       elements: updatedElements
     };
 
-    const newDesignData = {
-      ...designData,
+    setDesignData(prev => ({
+      ...prev,
       design_data: updatedDesignData
-    };
+    }));
 
-    setDesignData(newDesignData);
     addToHistory(updatedDesignData);
     setSelectedElement(null);
+  };
+
+  const moveElementLayer = (direction) => {
+    if (!selectedElement || !designData) return;
+
+    const elements = [...designData.design_data.elements];
+    const elementIndex = elements.findIndex(el => el.id === selectedElement.id);
     
-    if (onDesignChange) {
-      onDesignChange(newDesignData);
+    if (direction === 'up' && elementIndex < elements.length - 1) {
+      [elements[elementIndex], elements[elementIndex + 1]] = [elements[elementIndex + 1], elements[elementIndex]];
+    } else if (direction === 'down' && elementIndex > 0) {
+      [elements[elementIndex], elements[elementIndex - 1]] = [elements[elementIndex - 1], elements[elementIndex]];
     }
+
+    const updatedDesignData = {
+      ...designData.design_data,
+      elements
+    };
+
+    setDesignData(prev => ({
+      ...prev,
+      design_data: updatedDesignData
+    }));
+
+    addToHistory(updatedDesignData);
   };
 
   const renderCanvas = () => {
@@ -408,142 +436,140 @@ const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange =
       );
     }
 
-    const canvas = designData.design_data.canvas || { width: 800, height: 1200, background: '#ffffff' };
+    const canvas = designData.design_data.canvas || { width: 600, height: 800, background_color: '#ffffff' };
     const elements = designData.design_data.elements || [];
 
     return (
-      <div className="flex items-center justify-center h-full p-4">
-        <div 
-          className="relative bg-white shadow-lg border"
-          style={{
-            width: canvas.width * (canvasZoom / 100),
-            height: canvas.height * (canvasZoom / 100),
-            backgroundColor: canvas.background,
-            transform: `scale(${canvasZoom / 100})`,
-            transformOrigin: 'center center'
-          }}
-        >
-          {showGrid && (
-            <div 
-              className="absolute inset-0 opacity-20"
-              style={{
-                backgroundImage: 'linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)',
-                backgroundSize: '20px 20px'
-              }}
-            />
-          )}
-          
-          {elements.map((element) => (
-            <div
-              key={element.id}
-              className={`absolute cursor-pointer border-2 transition-all ${
-                selectedElement?.id === element.id 
-                  ? 'border-blue-500 bg-blue-50' 
-                  : 'border-transparent hover:border-gray-300'
-              }`}
-              style={{
-                left: element.x,
-                top: element.y,
-                width: element.width,
-                height: element.height,
-                fontSize: element.fontSize,
-                fontFamily: element.fontFamily,
-                fontWeight: element.fontWeight,
-                color: element.color,
-                textAlign: element.textAlign,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: element.textAlign === 'center' ? 'center' : 
-                               element.textAlign === 'right' ? 'flex-end' : 'flex-start',
-                padding: '8px',
-                overflow: 'hidden'
-              }}
-              onClick={() => setSelectedElement(element)}
-            >
-              {element.content}
-            </div>
-          ))}
-        </div>
+      <div 
+        className="relative bg-white shadow-lg rounded-lg overflow-hidden"
+        style={{
+          width: `${canvas.width}px`,
+          height: `${canvas.height}px`,
+          backgroundColor: canvas.background_color,
+          transform: `scale(${canvasZoom / 100})`,
+          transformOrigin: 'top left'
+        }}
+      >
+        {showGrid && (
+          <div 
+            className="absolute inset-0 opacity-20"
+            style={{
+              backgroundImage: `
+                linear-gradient(to right, #000 1px, transparent 1px),
+                linear-gradient(to bottom, #000 1px, transparent 1px)
+              `,
+              backgroundSize: '20px 20px'
+            }}
+          />
+        )}
+        
+        {elements.map((element) => (
+          <div
+            key={element.id}
+            className={`absolute cursor-pointer transition-all duration-200 ${
+              selectedElement?.id === element.id ? 'ring-2 ring-blue-500 ring-offset-2' : ''
+            }`}
+            style={{
+              left: `${element.x}px`,
+              top: `${element.y}px`,
+              width: `${element.width}px`,
+              height: `${element.height}px`,
+              transform: `rotate(${element.rotation || 0}deg)`,
+              zIndex: element.zIndex || 1,
+              opacity: element.opacity || 1,
+              mixBlendMode: element.blendMode || 'normal'
+            }}
+            onClick={() => setSelectedElement(element)}
+          >
+            {element.type === 'text' && (
+              <div
+                style={{
+                  fontSize: `${element.fontSize}px`,
+                  fontFamily: element.fontFamily,
+                  fontWeight: element.fontWeight,
+                  color: element.color,
+                  fontStyle: element.fontStyle,
+                  textAlign: element.textAlign,
+                  letterSpacing: `${element.letterSpacing || 0}px`,
+                  lineHeight: element.lineHeight || 1.2,
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  whiteSpace: 'pre-wrap'
+                }}
+              >
+                {element.content}
+              </div>
+            )}
+            
+            {element.type === 'image' && (
+              <img
+                src={element.src}
+                alt="Design element"
+                className="w-full h-full object-cover rounded"
+                draggable={false}
+              />
+            )}
+
+            {element.type === 'sticker' && (
+              <div
+                className="w-full h-full flex items-center justify-center text-4xl"
+                style={{ fontSize: `${element.width * 0.8}px` }}
+              >
+                {element.content}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     );
   };
 
   return (
-    <div className={`${initialDesign ? 'h-full' : 'h-screen'} flex flex-col bg-gray-50`}>
-      {/* Header - Solo mostrar si no hay diseño inicial (modo standalone) */}
-      {!initialDesign && (
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-xl font-semibold">Editor de Invitaciones</h1>
-              {designData && (
-                <Badge variant="outline">{designData.design_name}</Badge>
-              )}
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" onClick={undo} disabled={historyIndex <= 0}>
-                <Undo className="w-4 h-4" />
-              </Button>
-              <Button variant="outline" size="sm" onClick={redo} disabled={historyIndex >= history.length - 1}>
-                <Redo className="w-4 h-4" />
-              </Button>
-              <Separator orientation="vertical" className="h-6" />
-              <Button variant="outline" size="sm" onClick={() => setShowGrid(!showGrid)}>
-                <Grid className="w-4 h-4" />
-              </Button>
-              <Button variant="outline" size="sm">
-                <Eye className="w-4 h-4 mr-2" />
-                Preview
-              </Button>
-              <Button size="sm" onClick={saveDesign} disabled={isSaving}>
-                <Save className="w-4 h-4 mr-2" />
-                {isSaving ? 'Guardando...' : 'Guardar'}
-              </Button>
-            </div>
+    <div className="h-screen flex flex-col bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-xl font-semibold">Editor de Invitaciones</h1>
+            {designData && (
+              <Badge variant="outline">{designData.design_name}</Badge>
+            )}
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Button variant="outline" size="sm" onClick={undo} disabled={historyIndex <= 0}>
+              <Undo className="w-4 h-4" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={redo} disabled={historyIndex >= history.length - 1}>
+              <Redo className="w-4 h-4" />
+            </Button>
+            <Separator orientation="vertical" className="h-6" />
+            <Button variant="outline" size="sm" onClick={() => setShowGrid(!showGrid)}>
+              <Grid className="w-4 h-4" />
+            </Button>
+            <Button variant="outline" size="sm">
+              <Eye className="w-4 h-4 mr-2" />
+              Preview
+            </Button>
+            <Button size="sm" onClick={saveDesign} disabled={isSaving}>
+              <Save className="w-4 h-4 mr-2" />
+              {isSaving ? 'Guardando...' : 'Guardar'}
+            </Button>
           </div>
         </div>
-      )}
-      
-      {/* Controles rápidos para modo integrado */}
-      {initialDesign && (
-        <div className="bg-white border-b border-gray-200 px-6 py-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="sm" onClick={undo} disabled={historyIndex <= 0}>
-                <Undo className="w-4 h-4" />
-              </Button>
-              <Button variant="outline" size="sm" onClick={redo} disabled={historyIndex >= history.length - 1}>
-                <Redo className="w-4 h-4" />
-              </Button>
-              <Separator orientation="vertical" className="h-6" />
-              <Button variant="outline" size="sm" onClick={() => setShowGrid(!showGrid)}>
-                <Grid className="w-4 h-4" />
-              </Button>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-500">Zoom:</span>
-              <Button variant="outline" size="sm" onClick={() => setCanvasZoom(Math.max(25, canvasZoom - 25))}>
-                <ZoomOut className="w-4 h-4" />
-              </Button>
-              <span className="text-sm font-medium min-w-[3rem] text-center">{canvasZoom}%</span>
-              <Button variant="outline" size="sm" onClick={() => setCanvasZoom(Math.min(200, canvasZoom + 25))}>
-                <ZoomIn className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
 
       <div className="flex-1 flex">
-        {/* Sidebar izquierdo */}
+        {/* Sidebar izquierdo - Estilo Paperless Post */}
         <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-            <TabsList className="grid w-full grid-cols-4 m-4">
+            <TabsList className="grid w-full grid-cols-5 m-4">
               <TabsTrigger value="templates">Plantillas</TabsTrigger>
               <TabsTrigger value="text-styles">Texto</TabsTrigger>
               <TabsTrigger value="tools">Herramientas</TabsTrigger>
+              <TabsTrigger value="colors">Colores</TabsTrigger>
               <TabsTrigger value="layers">Capas</TabsTrigger>
             </TabsList>
 
@@ -595,82 +621,112 @@ const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange =
                 </ScrollArea>
               </TabsContent>
 
-              {/* Tab de Texto */}
+              {/* Tab de Text Styles - Estilo Paperless Post */}
               <TabsContent value="text-styles" className="h-full m-0">
                 <ScrollArea className="h-full px-4">
                   <div className="space-y-6 pb-4">
                     <div>
-                      <Button onClick={addTextElement} className="w-full mb-4">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Agregar Texto
-                      </Button>
+                      <h3 className="font-medium mb-3">Text Styles</h3>
+                      <div className="space-y-2">
+                        {fonts.map((font, index) => (
+                          <button
+                            key={index}
+                            className={`w-full p-3 text-left border rounded-lg hover:bg-gray-50 transition-colors ${
+                              selectedElement?.fontFamily === font.family ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                            }`}
+                            onClick={() => selectedElement && updateSelectedElement({ 
+                              fontFamily: font.family,
+                              fontWeight: font.weight 
+                            })}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p 
+                                  className="font-medium text-lg"
+                                  style={{ fontFamily: font.family, fontWeight: font.weight }}
+                                >
+                                  {font.name}
+                                </p>
+                                <p className="text-sm text-gray-500">{font.weight}</p>
+                              </div>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
-                    {selectedElement && selectedElement.type === 'text' && (
-                      <div className="space-y-4">
+                    {selectedElement?.type === 'text' && (
+                      <div className="space-y-4 border-t pt-4">
+                        <h4 className="font-medium">Controles de Texto</h4>
+                        
+                        {/* Letter Spacing */}
                         <div>
-                          <Label htmlFor="content">Contenido</Label>
-                          <Textarea
-                            id="content"
-                            value={selectedElement.content}
-                            onChange={(e) => updateSelectedElement({ content: e.target.value })}
-                            className="mt-1"
-                          />
+                          <Label className="text-sm flex items-center justify-between">
+                            Letter spacing
+                            <div className="flex items-center space-x-1">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="h-6 w-6 p-0"
+                                onClick={() => updateSelectedElement({ 
+                                  letterSpacing: Math.max(-5, (selectedElement.letterSpacing || 0) - 0.5) 
+                                })}
+                              >
+                                <Minus className="w-3 h-3" />
+                              </Button>
+                              <span className="text-xs w-8 text-center">
+                                {selectedElement.letterSpacing || 0}
+                              </span>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="h-6 w-6 p-0"
+                                onClick={() => updateSelectedElement({ 
+                                  letterSpacing: Math.min(10, (selectedElement.letterSpacing || 0) + 0.5) 
+                                })}
+                              >
+                                <Plus className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </Label>
                         </div>
 
+                        {/* Line Height */}
                         <div>
-                          <Label htmlFor="fontSize">Tamaño de fuente</Label>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <Slider
-                              value={[selectedElement.fontSize]}
-                              onValueChange={(value) => updateSelectedElement({ fontSize: value[0] })}
-                              max={72}
-                              min={8}
-                              step={1}
-                              className="flex-1"
-                            />
-                            <span className="text-sm font-medium w-8">{selectedElement.fontSize}</span>
-                          </div>
+                          <Label className="text-sm flex items-center justify-between">
+                            Line height
+                            <div className="flex items-center space-x-1">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="h-6 w-6 p-0"
+                                onClick={() => updateSelectedElement({ 
+                                  lineHeight: Math.max(0.5, (selectedElement.lineHeight || 1.2) - 0.1) 
+                                })}
+                              >
+                                <Minus className="w-3 h-3" />
+                              </Button>
+                              <span className="text-xs w-8 text-center">
+                                {(selectedElement.lineHeight || 1.2).toFixed(1)}
+                              </span>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                className="h-6 w-6 p-0"
+                                onClick={() => updateSelectedElement({ 
+                                  lineHeight: Math.min(3, (selectedElement.lineHeight || 1.2) + 0.1) 
+                                })}
+                              >
+                                <Plus className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </Label>
                         </div>
 
+                        {/* Alignment */}
                         <div>
-                          <Label htmlFor="fontFamily">Fuente</Label>
-                          <Select 
-                            value={selectedElement.fontFamily} 
-                            onValueChange={(value) => updateSelectedElement({ fontFamily: value })}
-                          >
-                            <SelectTrigger className="mt-1">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {fonts.map((font) => (
-                                <SelectItem key={font.family} value={font.family}>
-                                  <span style={{ fontFamily: font.family }}>{font.name}</span>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                        <div>
-                          <Label>Color</Label>
-                          <div className="grid grid-cols-5 gap-2 mt-2">
-                            {colorPalette.map((color) => (
-                              <button
-                                key={color}
-                                className={`w-8 h-8 rounded border-2 ${
-                                  selectedElement.color === color ? 'border-gray-800' : 'border-gray-300'
-                                }`}
-                                style={{ backgroundColor: color }}
-                                onClick={() => updateSelectedElement({ color })}
-                              />
-                            ))}
-                          </div>
-                        </div>
-
-                        <div>
-                          <Label>Alineación</Label>
-                          <div className="flex space-x-1 mt-2">
+                          <Label className="text-sm mb-2 block">Alignment</Label>
+                          <div className="flex space-x-1">
                             <Button
                               variant={selectedElement.textAlign === 'left' ? 'default' : 'outline'}
                               size="sm"
@@ -694,6 +750,26 @@ const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange =
                             </Button>
                           </div>
                         </div>
+
+                        {/* Blend Mode */}
+                        <div>
+                          <Label className="text-sm">Blend mode</Label>
+                          <Select
+                            value={selectedElement.blendMode || 'normal'}
+                            onValueChange={(value) => updateSelectedElement({ blendMode: value })}
+                          >
+                            <SelectTrigger className="mt-1">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {blendModes.map((mode) => (
+                                <SelectItem key={mode} value={mode}>
+                                  {mode}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -703,22 +779,196 @@ const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange =
               {/* Tab de Herramientas */}
               <TabsContent value="tools" className="h-full m-0">
                 <ScrollArea className="h-full px-4">
-                  <div className="space-y-4 pb-4">
+                  <div className="space-y-6 pb-4">
                     <div>
-                      <h3 className="font-medium mb-3">Stickers</h3>
-                      <div className="grid grid-cols-3 gap-2">
-                        {stickers.map((sticker) => (
-                          <Button
-                            key={sticker.id}
-                            variant="outline"
-                            className="h-12 text-2xl"
-                            onClick={() => addStickerElement(sticker)}
+                      <h3 className="font-medium mb-3">Herramientas</h3>
+                      <div className="space-y-3">
+                        {/* Background */}
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start h-12"
+                          onClick={() => {/* Implementar cambio de fondo */}}
+                        >
+                          <Image className="w-5 h-5 mr-3" />
+                          <div className="text-left">
+                            <p className="font-medium">Background</p>
+                            <p className="text-xs text-gray-500">Cambiar fondo</p>
+                          </div>
+                        </Button>
+
+                        {/* Stickers */}
+                        <div>
+                          <Button 
+                            variant="outline" 
+                            className="w-full justify-start h-12 mb-2"
                           >
-                            {sticker.emoji}
+                            <Sticker className="w-5 h-5 mr-3" />
+                            <div className="text-left">
+                              <p className="font-medium">Stickers</p>
+                              <p className="text-xs text-gray-500">{stickers.length} disponibles</p>
+                            </div>
                           </Button>
+                          <div className="grid grid-cols-4 gap-2">
+                            {stickers.map((sticker) => (
+                              <button
+                                key={sticker.id}
+                                className="aspect-square border rounded-lg hover:bg-gray-50 flex items-center justify-center text-2xl transition-colors"
+                                onClick={() => addStickerElement(sticker)}
+                                title={sticker.name}
+                              >
+                                {sticker.emoji}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Add Logo */}
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start h-12"
+                          onClick={addImageElement}
+                        >
+                          <LogIn className="w-5 h-5 mr-3" />
+                          <div className="text-left">
+                            <p className="font-medium">Add logo</p>
+                            <p className="text-xs text-gray-500">Subir imagen</p>
+                          </div>
+                        </Button>
+
+                        {/* Add Text */}
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start h-12"
+                          onClick={addTextElement}
+                        >
+                          <Type className="w-5 h-5 mr-3" />
+                          <div className="text-left">
+                            <p className="font-medium">Add text</p>
+                            <p className="text-xs text-gray-500">Nuevo elemento</p>
+                          </div>
+                        </Button>
+
+                        {/* More */}
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-start h-12"
+                        >
+                          <MoreHorizontal className="w-5 h-5 mr-3" />
+                          <div className="text-left">
+                            <p className="font-medium">More</p>
+                            <p className="text-xs text-gray-500">Más opciones</p>
+                          </div>
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Controles del elemento seleccionado */}
+                    {selectedElement && (
+                      <div className="border-t pt-4 space-y-3">
+                        <h4 className="font-medium">Controles del Elemento</h4>
+                        
+                        {/* Layer ordering */}
+                        <div>
+                          <Label className="text-sm mb-2 block">Layer ordering</Label>
+                          <div className="flex space-x-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => moveElementLayer('up')}
+                            >
+                              Adelante
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => moveElementLayer('down')}
+                            >
+                              Atrás
+                            </Button>
+                          </div>
+                        </div>
+
+                        {/* Duplicate */}
+                        <Button 
+                          variant="outline" 
+                          className="w-full"
+                          onClick={duplicateSelectedElement}
+                        >
+                          <Copy className="w-4 h-4 mr-2" />
+                          Duplicate
+                        </Button>
+
+                        {/* Delete */}
+                        <Button 
+                          variant="outline" 
+                          className="w-full text-red-600 hover:text-red-700"
+                          onClick={deleteSelectedElement}
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </ScrollArea>
+              </TabsContent>
+
+              {/* Tab de Colores - Estilo Paperless Post */}
+              <TabsContent value="colors" className="h-full m-0">
+                <ScrollArea className="h-full px-4">
+                  <div className="space-y-6 pb-4">
+                    <div>
+                      <h3 className="font-medium mb-3">Paleta de Colores</h3>
+                      <div className="grid grid-cols-5 gap-3">
+                        {colorPalette.map((color, index) => (
+                          <button
+                            key={index}
+                            className={`aspect-square rounded-full border-2 transition-all hover:scale-110 ${
+                              selectedElement?.color === color ? 'border-blue-500 ring-2 ring-blue-200' : 'border-gray-200'
+                            }`}
+                            style={{ backgroundColor: color }}
+                            onClick={() => {
+                              if (selectedElement?.type === 'text') {
+                                updateSelectedElement({ color });
+                              } else if (designData) {
+                                // Cambiar color de fondo del canvas
+                                const updatedDesignData = {
+                                  ...designData.design_data,
+                                  canvas: {
+                                    ...designData.design_data.canvas,
+                                    background_color: color
+                                  }
+                                };
+                                setDesignData(prev => ({
+                                  ...prev,
+                                  design_data: updatedDesignData
+                                }));
+                              }
+                            }}
+                          />
                         ))}
                       </div>
                     </div>
+
+                    {selectedElement && (
+                      <div className="border-t pt-4">
+                        <h4 className="font-medium mb-3">Propiedades del Elemento</h4>
+                        
+                        {/* Opacity */}
+                        <div>
+                          <Label className="text-sm">Opacidad</Label>
+                          <Slider
+                            value={[selectedElement.opacity * 100 || 100]}
+                            onValueChange={([value]) => updateSelectedElement({ opacity: value / 100 })}
+                            min={0}
+                            max={100}
+                            step={1}
+                            className="mt-2"
+                          />
+                          <div className="text-xs text-gray-500 mt-1">{Math.round((selectedElement.opacity || 1) * 100)}%</div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </ScrollArea>
               </TabsContent>
@@ -727,37 +977,50 @@ const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange =
               <TabsContent value="layers" className="h-full m-0">
                 <ScrollArea className="h-full px-4">
                   <div className="space-y-4 pb-4">
-                    <div>
-                      <h3 className="font-medium mb-3">Elementos</h3>
+                    <h3 className="font-medium">Capas</h3>
+                    {designData?.design_data?.elements?.length > 0 ? (
                       <div className="space-y-2">
-                        {designData?.design_data?.elements?.map((element) => (
+                        {designData.design_data.elements.map((element, index) => (
                           <div
                             key={element.id}
-                            className={`p-2 border rounded cursor-pointer ${
-                              selectedElement?.id === element.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+                            className={`p-3 border rounded cursor-pointer transition-colors ${
+                              selectedElement?.id === element.id 
+                                ? 'border-blue-500 bg-blue-50' 
+                                : 'border-gray-200 hover:border-gray-300'
                             }`}
                             onClick={() => setSelectedElement(element)}
                           >
                             <div className="flex items-center justify-between">
-                              <span className="text-sm font-medium">
-                                {element.type === 'text' ? element.content.substring(0, 20) + '...' : element.name || element.type}
-                              </span>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedElement(element);
-                                  deleteSelectedElement();
-                                }}
-                              >
-                                <Trash2 className="w-3 h-3" />
-                              </Button>
+                              <div className="flex items-center space-x-2">
+                                {element.type === 'text' ? (
+                                  <Type className="w-4 h-4" />
+                                ) : element.type === 'sticker' ? (
+                                  <Sticker className="w-4 h-4" />
+                                ) : (
+                                  <Image className="w-4 h-4" />
+                                )}
+                                <span className="text-sm font-medium">
+                                  {element.type === 'text' 
+                                    ? element.content.substring(0, 20) + (element.content.length > 20 ? '...' : '')
+                                    : element.type === 'sticker'
+                                    ? element.name
+                                    : 'Imagen'
+                                  }
+                                </span>
+                              </div>
+                              <Badge variant="outline" className="text-xs">
+                                {element.type}
+                              </Badge>
                             </div>
                           </div>
                         ))}
                       </div>
-                    </div>
+                    ) : (
+                      <div className="text-center text-gray-500 py-8">
+                        <Layers className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                        <p>No hay elementos en el diseño</p>
+                      </div>
+                    )}
                   </div>
                 </ScrollArea>
               </TabsContent>
@@ -765,19 +1028,53 @@ const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange =
           </Tabs>
         </div>
 
-        {/* Canvas principal */}
-        <div className="flex-1 overflow-auto bg-gray-100">
-          {renderCanvas()}
+        {/* Área del canvas */}
+        <div className="flex-1 flex flex-col">
+          {/* Toolbar del canvas */}
+          <div className="bg-white border-b border-gray-200 px-4 py-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Button variant="outline" size="sm" onClick={() => setCanvasZoom(Math.max(25, canvasZoom - 25))}>
+                  <ZoomOut className="w-4 h-4" />
+                </Button>
+                <span className="text-sm font-medium w-16 text-center">{canvasZoom}%</span>
+                <Button variant="outline" size="sm" onClick={() => setCanvasZoom(Math.min(200, canvasZoom + 25))}>
+                  <ZoomIn className="w-4 h-4" />
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setCanvasZoom(100)}>
+                  Ajustar
+                </Button>
+              </div>
+
+              {selectedElement && (
+                <div className="flex items-center space-x-2">
+                  <Textarea
+                    value={selectedElement.type === 'text' ? selectedElement.content : ''}
+                    onChange={(e) => selectedElement.type === 'text' && updateSelectedElement({ content: e.target.value })}
+                    className="w-64 h-8 resize-none"
+                    placeholder="Editar texto..."
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Canvas */}
+          <div className="flex-1 p-8 overflow-auto bg-gray-100">
+            <div className="flex items-center justify-center min-h-full">
+              {renderCanvas()}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Input oculto para archivos */}
+      {/* Input oculto para subir archivos */}
       <input
         ref={fileInputRef}
         type="file"
         accept="image/*"
+        onChange={handleImageUpload}
         className="hidden"
-        onChange={() => {}} // Placeholder para funcionalidad futura
       />
     </div>
   );
