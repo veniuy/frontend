@@ -750,8 +750,7 @@ function Landing() {
                   Tecnología al servicio de tus eventos
                 </h2>
                 <p className="text-muted-foreground">
-                  Creamos invitaciones digitales que combinan diseño, emoción y conciencia ambiental.
-                  Una nueva forma de invitar, más práctica, moderna y sostenible.
+                  Invitaciones digitales con diseño y emoción. Una forma práctica y moderna de invitar.
                 </p>
               </div>
               
