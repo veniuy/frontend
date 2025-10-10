@@ -761,7 +761,7 @@ function Landing() {
                   <p className="text-muted-foreground text-sm leading-relaxed">Cada invitación es una puesta en escena: animaciones, sonido y movimiento que transmiten la esencia de tu evento.</p>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-2">Rápido, simple, sin huella</h3>
+                  <h3 className="font-semibold text-foreground mb-2">Simple, facil y rápido</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">Olvidate de la impresión y los envíos. En minutos tu invitación está lista para compartir.</p>
                 </div>
                 <div>
