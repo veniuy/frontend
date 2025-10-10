@@ -46,10 +46,10 @@ import {
   LogIn
 } from 'lucide-react';
 
-const InvitationEditor = () => {
+const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange = null, onSave = null }) => {
   // Estados principales
   const [selectedTemplate, setSelectedTemplate] = useState(null);
-  const [designData, setDesignData] = useState(null);
+  const [designData, setDesignData] = useState(initialDesign);
   const [selectedElement, setSelectedElement] = useState(null);
   const [canvasZoom, setCanvasZoom] = useState(100);
   const [showGrid, setShowGrid] = useState(false);
@@ -58,9 +58,16 @@ const InvitationEditor = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   // Estados para herramientas
-  const [activeTab, setActiveTab] = useState('templates');
+  const [activeTab, setActiveTab] = useState(initialDesign ? 'text-styles' : 'templates');
   const [activeTool, setActiveTool] = useState('select');
   const [templates, setTemplates] = useState([]);
+
+  // Efecto para inicializar el historial cuando se carga un diseño inicial
+  useEffect(() => {
+    if (initialDesign && initialDesign.design_data) {
+      addToHistory(initialDesign.design_data);
+    }
+  }, [initialDesign]);
   
   // Fuentes con preview real (como Paperless Post)
   const [fonts, setFonts] = useState([
@@ -187,6 +194,12 @@ const InvitationEditor = () => {
 
   const saveDesign = async () => {
     if (!designData) return;
+    
+    // Si hay un callback onSave externo, usarlo
+    if (onSave) {
+      await onSave();
+      return;
+    }
     
     setIsSaving(true);
     try {
@@ -343,10 +356,17 @@ const InvitationEditor = () => {
       elements: updatedElements
     };
 
-    setDesignData(prev => ({
-      ...prev,
+    const newDesignData = {
+      ...designData,
       design_data: updatedDesignData
-    }));
+    };
+
+    setDesignData(newDesignData);
+    
+    // Notificar al componente padre sobre el cambio
+    if (onDesignChange) {
+      onDesignChange(newDesignData);
+    }
 
     setSelectedElement(prev => ({ ...prev, ...updates }));
   };
@@ -527,39 +547,72 @@ const InvitationEditor = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-xl font-semibold">Editor de Invitaciones</h1>
-            {designData && (
-              <Badge variant="outline">{designData.design_name}</Badge>
-            )}
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <Button variant="outline" size="sm" onClick={undo} disabled={historyIndex <= 0}>
-              <Undo className="w-4 h-4" />
-            </Button>
-            <Button variant="outline" size="sm" onClick={redo} disabled={historyIndex >= history.length - 1}>
-              <Redo className="w-4 h-4" />
-            </Button>
-            <Separator orientation="vertical" className="h-6" />
-            <Button variant="outline" size="sm" onClick={() => setShowGrid(!showGrid)}>
-              <Grid className="w-4 h-4" />
-            </Button>
-            <Button variant="outline" size="sm">
-              <Eye className="w-4 h-4 mr-2" />
-              Preview
-            </Button>
-            <Button size="sm" onClick={saveDesign} disabled={isSaving}>
-              <Save className="w-4 h-4 mr-2" />
-              {isSaving ? 'Guardando...' : 'Guardar'}
-            </Button>
+    <div className={`${initialDesign ? 'h-full' : 'h-screen'} flex flex-col bg-gray-50`}>
+      {/* Header - Solo mostrar si no hay diseño inicial (modo standalone) */}
+      {!initialDesign && (
+        <div className="bg-white border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <h1 className="text-xl font-semibold">Editor de Invitaciones</h1>
+              {designData && (
+                <Badge variant="outline">{designData.design_name}</Badge>
+              )}
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" size="sm" onClick={undo} disabled={historyIndex <= 0}>
+                <Undo className="w-4 h-4" />
+              </Button>
+              <Button variant="outline" size="sm" onClick={redo} disabled={historyIndex >= history.length - 1}>
+                <Redo className="w-4 h-4" />
+              </Button>
+              <Separator orientation="vertical" className="h-6" />
+              <Button variant="outline" size="sm" onClick={() => setShowGrid(!showGrid)}>
+                <Grid className="w-4 h-4" />
+              </Button>
+              <Button variant="outline" size="sm">
+                <Eye className="w-4 h-4 mr-2" />
+                Preview
+              </Button>
+              <Button size="sm" onClick={saveDesign} disabled={isSaving}>
+                <Save className="w-4 h-4 mr-2" />
+                {isSaving ? 'Guardando...' : 'Guardar'}
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+      
+      {/* Controles rápidos para modo integrado */}
+      {initialDesign && (
+        <div className="bg-white border-b border-gray-200 px-6 py-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" size="sm" onClick={undo} disabled={historyIndex <= 0}>
+                <Undo className="w-4 h-4" />
+              </Button>
+              <Button variant="outline" size="sm" onClick={redo} disabled={historyIndex >= history.length - 1}>
+                <Redo className="w-4 h-4" />
+              </Button>
+              <Separator orientation="vertical" className="h-6" />
+              <Button variant="outline" size="sm" onClick={() => setShowGrid(!showGrid)}>
+                <Grid className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-500">Zoom:</span>
+              <Button variant="outline" size="sm" onClick={() => setCanvasZoom(Math.max(25, canvasZoom - 25))}>
+                <ZoomOut className="w-4 h-4" />
+              </Button>
+              <span className="text-sm font-medium min-w-[3rem] text-center">{canvasZoom}%</span>
+              <Button variant="outline" size="sm" onClick={() => setCanvasZoom(Math.min(200, canvasZoom + 25))}>
+                <ZoomIn className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex-1 flex">
         {/* Sidebar izquierdo - Estilo Paperless Post */}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
@@ -13,7 +13,9 @@ import {
   Palette,
   ArrowLeft,
   ArrowRight,
-  Check
+  Check,
+  Crown,
+  Loader2
 } from 'lucide-react';
 import { api } from '../lib/api';
 
@@ -21,14 +23,16 @@ const EventWizard = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [templatesLoading, setTemplatesLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [templates, setTemplates] = useState([]);
   
   const [eventData, setEventData] = useState({
     title: '',
     description: '',
     event_date: '',
     location: '',
-    template_id: 'classic'
+    template_id: null
   });
 
   const steps = [
@@ -37,26 +41,76 @@ const EventWizard = () => {
     { id: 3, title: 'Diseño y Template', icon: Palette }
   ];
 
-  const templates = [
-    {
-      id: 'classic',
-      name: 'Clásico',
-      description: 'Diseño elegante y atemporal',
-      preview: '/templates/classic-preview.jpg'
-    },
-    {
-      id: 'elegant',
-      name: 'Elegante',
-      description: 'Estilo sofisticado y minimalista',
-      preview: '/templates/elegant-preview.jpg'
-    },
-    {
-      id: 'modern',
-      name: 'Moderno',
-      description: 'Diseño contemporáneo y vibrante',
-      preview: '/templates/modern-preview.jpg'
+  // Cargar plantillas del backend
+  useEffect(() => {
+    loadTemplates();
+  }, []);
+
+  const loadTemplates = async () => {
+    setTemplatesLoading(true);
+    try {
+      const response = await fetch('/api/templates');
+      if (response.ok) {
+        const data = await response.json();
+        // Si las plantillas vienen agrupadas por categoría, las aplanamos
+        let templatesList = [];
+        if (data.templates && typeof data.templates === 'object') {
+          // Si es un objeto con categorías
+          Object.values(data.templates).forEach(categoryTemplates => {
+            if (Array.isArray(categoryTemplates)) {
+              templatesList = templatesList.concat(categoryTemplates);
+            }
+          });
+        } else if (Array.isArray(data.templates)) {
+          // Si es un array directo
+          templatesList = data.templates;
+        }
+        
+        setTemplates(templatesList);
+        
+        // Seleccionar la primera plantilla por defecto si hay plantillas disponibles
+        if (templatesList.length > 0) {
+          setEventData(prev => ({ ...prev, template_id: templatesList[0].id }));
+        }
+      } else {
+        throw new Error('Error al cargar plantillas');
+      }
+    } catch (error) {
+      console.error('Error loading templates:', error);
+      setError('Error al cargar las plantillas. Usando plantillas por defecto.');
+      // Fallback a plantillas estáticas en caso de error
+      const fallbackTemplates = [
+        {
+          id: 1,
+          name: 'Clásico',
+          description: 'Diseño elegante y atemporal',
+          category: 'wedding',
+          is_premium: false,
+          preview_image_url: '/templates/classic-preview.jpg'
+        },
+        {
+          id: 2,
+          name: 'Elegante',
+          description: 'Estilo sofisticado y minimalista',
+          category: 'wedding',
+          is_premium: false,
+          preview_image_url: '/templates/elegant-preview.jpg'
+        },
+        {
+          id: 3,
+          name: 'Moderno',
+          description: 'Diseño contemporáneo y vibrante',
+          category: 'wedding',
+          is_premium: true,
+          preview_image_url: '/templates/modern-preview.jpg'
+        }
+      ];
+      setTemplates(fallbackTemplates);
+      setEventData(prev => ({ ...prev, template_id: fallbackTemplates[0].id }));
+    } finally {
+      setTemplatesLoading(false);
     }
-  ];
+  };
 
   const handleInputChange = (field, value) => {
     setEventData(prev => ({ ...prev, [field]: value }));
@@ -97,7 +151,9 @@ const EventWizard = () => {
 
     try {
       setLoading(true);
-      const response = await api.post('/events', {
+      
+      // Paso 1: Crear el evento
+      const eventResponse = await api.post('/events', {
         title: eventData.title,
         description: eventData.description,
         date_time: eventData.event_date,
@@ -105,8 +161,35 @@ const EventWizard = () => {
         template_id: eventData.template_id
       });
 
-      const eventId = response.data?.id || response.id;
-      navigate(`/dashboard/events/${eventId}/builder`);
+      const eventId = eventResponse.data?.id || eventResponse.id;
+      
+      // Paso 2: Crear el diseño de usuario asociado al evento y plantilla
+      try {
+        const designResponse = await fetch('/api/designs', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            template_id: eventData.template_id,
+            event_id: eventId,
+            design_name: `Diseño para ${eventData.title}`
+          }),
+        });
+
+        if (designResponse.ok) {
+          const designData = await designResponse.json();
+          console.log('Diseño creado exitosamente:', designData);
+        } else {
+          console.warn('No se pudo crear el diseño automáticamente, pero el evento fue creado');
+        }
+      } catch (designError) {
+        console.warn('Error creando el diseño:', designError);
+        // No bloqueamos el flujo si falla la creación del diseño
+      }
+
+      // Redirigir al editor del evento
+      navigate(`/app/events/${eventId}/editor`);
     } catch (err) {
       setError('Error creando el evento. Por favor intente nuevamente.');
       console.error(err);
@@ -209,6 +292,7 @@ const EventWizard = () => {
                 eventData={eventData} 
                 onChange={handleInputChange}
                 templates={templates}
+                templatesLoading={templatesLoading}
               />
             )}
           </CardContent>
@@ -313,44 +397,97 @@ const Step2 = ({ eventData, onChange }) => {
 };
 
 // Paso 3: Diseño y Template
-const Step3 = ({ eventData, onChange, templates }) => {
+const Step3 = ({ eventData, onChange, templates, templatesLoading }) => {
+  if (templatesLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          <span className="ml-2 text-gray-600">Cargando plantillas...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (templates.length === 0) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center py-8">
+          <Palette className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No hay plantillas disponibles</h3>
+          <p className="text-gray-600">Por favor, contacta al administrador.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
-        <Label>Selecciona un Template *</Label>
+        <Label>Selecciona una Plantilla *</Label>
         <p className="text-sm text-gray-500 mb-4">
           Elige el diseño que mejor represente tu evento
         </p>
         
-        <div className="grid gap-4">
+        <div className="grid gap-4 max-h-96 overflow-y-auto">
           {templates.map((template) => (
             <div
               key={template.id}
               className={`
-                border-2 rounded-lg p-4 cursor-pointer transition-all
+                border-2 rounded-lg p-4 cursor-pointer transition-all hover:shadow-md
                 ${eventData.template_id === template.id 
-                  ? 'border-blue-500 bg-blue-50' 
+                  ? 'border-blue-500 bg-blue-50 shadow-md' 
                   : 'border-gray-200 hover:border-gray-300'
                 }
               `}
               onClick={() => onChange('template_id', template.id)}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-lg">{template.name}</h3>
-                  <p className="text-gray-600 text-sm">{template.description}</p>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <h3 className="font-semibold text-lg">{template.name}</h3>
+                    {template.is_premium && (
+                      <Badge className="bg-yellow-500 text-white flex items-center">
+                        <Crown className="w-3 h-3 mr-1" />
+                        Premium
+                      </Badge>
+                    )}
+                  </div>
+                  <p className="text-gray-600 text-sm mb-2">{template.description}</p>
+                  {template.category && (
+                    <Badge variant="outline" className="text-xs">
+                      {template.category}
+                    </Badge>
+                  )}
                 </div>
                 
                 {eventData.template_id === template.id && (
-                  <Badge className="bg-blue-500">
+                  <Badge className="bg-blue-500 ml-4">
+                    <Check className="w-3 h-3 mr-1" />
                     Seleccionado
                   </Badge>
                 )}
               </div>
               
-              {/* Preview placeholder */}
-              <div className="mt-3 h-32 bg-gray-100 rounded border flex items-center justify-center">
-                <span className="text-gray-500 text-sm">Vista previa del template</span>
+              {/* Preview */}
+              <div className="mt-3 h-32 bg-gray-100 rounded border overflow-hidden">
+                {template.preview_image_url ? (
+                  <img 
+                    src={template.preview_image_url} 
+                    alt={template.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div className="w-full h-full flex items-center justify-center" style={{display: template.preview_image_url ? 'none' : 'flex'}}>
+                  <div className="text-center">
+                    <Palette className="w-8 h-8 mx-auto text-gray-400 mb-2" />
+                    <span className="text-gray-500 text-sm">Vista previa del template</span>
+                  </div>
+                </div>
               </div>
             </div>
           ))}

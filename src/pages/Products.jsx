@@ -30,6 +30,26 @@ function Products() {
   const [selectedCategory, setSelectedCategory] = useState('Todas')
   const [sortBy, setSortBy] = useState('popular')
   const [searchTerm, setSearchTerm] = useState('')
+  
+  // Estados para el carrito y lista de deseos
+  const [cartCount, setCartCount] = useState(0)
+  const [wishlistCount, setWishlistCount] = useState(0)
+
+  // Handlers para el PublicHeader
+  const handleSearchClick = () => {
+    // Enfocar el campo de búsqueda existente
+    document.querySelector('input[placeholder="Buscar plantillas..."]')?.focus()
+  }
+
+  const handleWishlistClick = () => {
+    // Navegar a la lista de deseos (implementar según necesidades)
+    console.log('Abrir lista de deseos')
+  }
+
+  const handleCartClick = () => {
+    // Navegar al carrito (implementar según necesidades)
+    console.log('Abrir carrito')
+  }
 
   const categories = [
     'Todas',
@@ -147,7 +167,13 @@ function Products() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <PublicHeader />
+      <PublicHeader 
+        cartCount={cartCount}
+        wishlistCount={wishlistCount}
+        onSearchClick={handleSearchClick}
+        onWishlistClick={handleWishlistClick}
+        onCartClick={handleCartClick}
+      />
 
       {/* Hero Section */}
       <section className="bg-gradient-warm py-12">

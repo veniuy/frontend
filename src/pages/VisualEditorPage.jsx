@@ -1,121 +1,262 @@
 // src/pages/VisualEditorPage.jsx
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import EditorPanel from "../components/EditorPanel";
-import InvitationCanvas from "../components/InvitationCanvas";
-import TemplateRenderer from "../components/TemplateRenderer";
-
+import InvitationEditor from "./InvitationEditor";
+import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
+import { Alert, AlertDescription } from "../components/ui/alert";
+import { 
+  ArrowLeft, 
+  Loader2, 
+  AlertCircle,
+  Save,
+  Eye,
+  Share2
+} from "lucide-react";
 
 export default function VisualEditorPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-
-  const [event, setEvent] = useState(() => {
-    const initialEvent = {
-      id: id || "1",
-      couple: { bride: "María", groom: "Juan" },
-      quinceanera: { name: "" },
-      heading: "Nuestra Boda", // Asegurar que 'heading' esté siempre definido
-      date: "15 de Marzo, 2024",
-      time: "17:00",
-      ceremony: { venue: "Iglesia San Miguel", address: "Calle Mayor 123, Madrid", time: "17:00" },
-      reception: { venue: "Jardín Botánico", address: "Av. Libertador 456, Madrid", time: "19:30" },
-      description: "¡NOS CASAMOS!",
-      hashtag: "#MariaYJuan2024",
-      template: "elegant",
-      colors: { primary: "#e91e63", secondary: "#ffc0cb", background: "#ffffff", text: "#333333", accent: "#8e44ad" },
-      fonts: { 
-        heading: "Playfair Display, serif", 
-        primary: "Playfair Display", 
-        secondary: "Inter",
-        body: "Inter, sans-serif",
-        title: "Playfair Display, serif",
-        subtitle: "Inter, sans-serif",
-        subheading: "Playfair Display, serif"
-      },
-      // Añadir otras propiedades que puedan ser necesarias y que no se estén inicializando
-      sections: {},
-      bank: {},
-      gifts: [],
-      info: {},
-      images: {},
-      rsvpNote: "",
-      giftsNote: "",
-    };
-    // Aquí podrías cargar datos del backend si 'id' existe
-    // Por ahora, solo devolvemos el estado inicial
-    return initialEvent;
-  });
-
-  const [ui, setUi] = useState({
-    activeTab: "templates",
-    zoom: 100,
-    selectedTemplate: "elegant",
-    showMobilePanel: false,
-    viewMode: "desktop",
-    isMobile: false,
-    saving: false,
-    error: null
-  });
+  
+  const [event, setEvent] = useState(null);
+  const [design, setDesign] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const checkMobile = () => {
-      const mobile = window.innerWidth < 768;
-      setUi((u) => ({ ...u, isMobile: mobile, viewMode: mobile ? "mobile" : u.viewMode, zoom: mobile ? 80 : u.zoom }));
-    };
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+    if (id) {
+      loadEventAndDesign();
+    }
+  }, [id]);
 
-  // Handlers que pasan al Panel - Memorizados para evitar re-renderizados
-  const handleColorChange = useCallback((property, color) => {
-    setEvent((prev) => ({ ...prev, colors: { ...prev.colors, [property]: color } }));
-  }, []);
+  const loadEventAndDesign = async () => {
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Cargar datos del evento
+      const eventResponse = await fetch(`/api/events/${id}`);
+      if (!eventResponse.ok) {
+        throw new Error('No se pudo cargar el evento');
+      }
+      const eventData = await eventResponse.json();
+      setEvent(eventData);
 
-  const handleFontChange = useCallback((type, fontFamily) => {
-    setEvent((prev) => ({ ...prev, fonts: { ...prev.fonts, [type]: fontFamily } }));
-  }, []);
+      // Cargar diseño asociado al evento
+      const designResponse = await fetch(`/api/events/${id}/design`);
+      if (designResponse.ok) {
+        const designData = await designResponse.json();
+        if (designData.design) {
+          setDesign(designData.design);
+        } else {
+          // Si no hay diseño, crear uno por defecto
+          await createDefaultDesign(id);
+        }
+      } else {
+        // Si no hay diseño, crear uno por defecto
+        await createDefaultDesign(id);
+      }
+    } catch (err) {
+      console.error('Error loading event and design:', err);
+      setError(err.message || 'Error al cargar los datos del evento');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const handleTemplateChange = useCallback((templateId) => {
-    setUi((u) => ({ ...u, selectedTemplate: templateId }));
-    setEvent((prev) => ({ ...prev, template: templateId }));
-  }, []);
+  const createDefaultDesign = async (eventId) => {
+    try {
+      const response = await fetch('/api/designs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          event_id: eventId,
+          design_name: 'Mi Diseño',
+          template_id: null // Diseño en blanco
+        }),
+      });
 
-  const setActiveTab = useCallback((t) => setUi((u) => ({ ...u, activeTab: t })), []);
-  const setShowMobilePanel = useCallback((v) => setUi((u) => ({ ...u, showMobilePanel: v })), []);
-  const setViewMode = useCallback((v) => setUi((u) => ({ ...u, viewMode: v })), []);
-  const setZoom = useCallback((fn) => setUi((u) => ({ ...u, zoom: typeof fn === "function" ? fn(u.zoom) : fn })), []);
+      if (response.ok) {
+        const data = await response.json();
+        setDesign(data.design);
+      }
+    } catch (err) {
+      console.error('Error creating default design:', err);
+    }
+  };
 
-  // Memorizar setEvent para evitar re-renderizados innecesarios
-  const memoizedSetEvent = useCallback((updater) => {
-    setEvent(updater);
-  }, []);
+  const handleSave = async () => {
+    if (!design) return;
+    
+    setSaving(true);
+    try {
+      const response = await fetch(`/api/designs/${design.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          design_data: design.design_data
+        }),
+      });
+
+      if (response.ok) {
+        console.log('Diseño guardado exitosamente');
+      } else {
+        throw new Error('Error al guardar el diseño');
+      }
+    } catch (err) {
+      console.error('Error saving design:', err);
+      setError('Error al guardar el diseño');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handlePublish = async () => {
+    if (!design || !event) return;
+    
+    try {
+      // Primero publicar el diseño
+      const designResponse = await fetch(`/api/designs/${design.id}/publish`, {
+        method: 'POST'
+      });
+
+      if (designResponse.ok) {
+        // Luego publicar el evento
+        const eventResponse = await fetch(`/api/publish/${event.id}`, {
+          method: 'POST'
+        });
+
+        if (eventResponse.ok) {
+          const publishData = await eventResponse.json();
+          if (publishData.payment_url) {
+            // Redirigir a la pasarela de pago
+            window.location.href = publishData.payment_url;
+          } else {
+            // Publicación exitosa sin pago
+            navigate(`/app/events/${id}/preview`);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error publishing:', err);
+      setError('Error al publicar la invitación');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-4" />
+          <p className="text-gray-600">Cargando editor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <Alert className="border-red-200 bg-red-50">
+            <AlertCircle className="h-4 w-4 text-red-600" />
+            <AlertDescription className="text-red-800">
+              {error}
+            </AlertDescription>
+          </Alert>
+          <div className="mt-4 flex space-x-2">
+            <Button onClick={() => navigate('/app/dashboard')} variant="outline">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Volver al Dashboard
+            </Button>
+            <Button onClick={loadEventAndDesign}>
+              Reintentar
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Encabezado y controles rápidos… (puedes conservar los del archivo original) */}
-      <div className="flex h-[calc(100vh-80px)]">
-        <EditorPanel
-          event={event}
-          ui={ui}
-          setActiveTab={setActiveTab}
-          setShowMobilePanel={setShowMobilePanel}
-          handleColorChange={handleColorChange}
-          handleFontChange={handleFontChange}
-          handleTemplateChange={handleTemplateChange}
-          setEvent={memoizedSetEvent}
-          setViewMode={setViewMode}
-        />
-        <div className="flex-1 overflow-auto bg-gray-100">
-          <InvitationCanvas
-            event={event}
-            ui={ui}
-            setEvent={memoizedSetEvent}
-            setZoom={setZoom}
-          />
+      {/* Header mejorado */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => navigate('/app/dashboard')}
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Dashboard
+            </Button>
+            <div>
+              <h1 className="text-xl font-semibold">Editor de Invitaciones</h1>
+              {event && (
+                <div className="flex items-center space-x-2 mt-1">
+                  <Badge variant="outline">{event.title}</Badge>
+                  {design && (
+                    <Badge variant="secondary">{design.design_name}</Badge>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => navigate(`/app/events/${id}/preview`)}
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              Vista Previa
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4 mr-2" />
+              )}
+              Guardar
+            </Button>
+            <Button 
+              size="sm" 
+              onClick={handlePublish}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Share2 className="w-4 h-4 mr-2" />
+              Publicar
+            </Button>
+          </div>
         </div>
       </div>
+
+      {/* Editor */}
+      {design ? (
+        <InvitationEditor 
+          initialDesign={design}
+          event={event}
+          onDesignChange={setDesign}
+          onSave={handleSave}
+        />
+      ) : (
+        <div className="flex items-center justify-center h-64">
+          <p className="text-gray-600">No se pudo cargar el diseño</p>
+        </div>
+      )}
     </div>
   );
 }

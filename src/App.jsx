@@ -10,8 +10,6 @@ import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import DashboardFixed from './pages/DashboardFixed';
 import DashboardImproved from './pages/DashboardImproved';
 import CreateEvent from './pages/CreateEvent';
 import EventWizard from './pages/EventWizard';
