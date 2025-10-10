@@ -93,7 +93,7 @@ function Landing() {
   const categories = useMemo(
     () => [
       { id: 'cat-bodas', slug: 'boda',          href: '/categorias/boda',          name: 'Bodas',                 image: asset('/src/assets/cotton_bird_images/categoria_boda_grid.webp') },
-      { id: 'cat-quince', slug: 'quinceaneras', href: '/categorias/quinceaneras',  name: 'Quinceañeras',          image: asset('/src/assets/cotton_bird_images/quince.webp') },
+      { id: 'cat-quince', slug: 'quinceaneras', href: '/categorias/quinceaneras',  name: 'Quinceañeras',          image: asset('/src/assets/quince.webp') },
       { id: 'cat-infant', slug: 'infantiles',   href: '/categorias/infantiles',    name: 'Cumpleaños Infantiles', image: asset('/src/assets/cotton_bird_images/categoria_cumpleanos.webp') },
       { id: 'cat-baby',   slug: 'bautizo',      href: '/categorias/bautizo',       name: 'Baby Shower / Bautizo', image: asset('/src/assets/cotton_bird_images/categoria_bautizo.webp') },
       { id: 'cat-corp',   slug: 'corporativos', href: '/categorias/corporativos',  name: 'Eventos Corporativos',  image: asset('/src/assets/cotton_bird_images/categoria_productos_fotos.webp') },
@@ -249,7 +249,7 @@ function Landing() {
     },
     {
       key: 'quince',
-      bg: asset('/src/assets/cotton_bird_images/quince.webp'),
+      bg: asset('/src/assets/quince.webp'),
       headline: '¡Quinceañeras que brillan!',
       sub: '› DESCUBRE NUESTRA COLECCIÓN',
       to: '/categorias/quinceaneras',
