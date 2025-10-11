@@ -349,7 +349,7 @@
 .floating-label-container {
   position: relative;
   width: 100%;
-  margin-bottom: 0;
+  margin-bottom: 1.5rem;
 }
 
 /* Estilos base para inputs con floating label */
@@ -575,5 +575,21 @@
 .dark .floating-select-trigger.has-value ~ .floating-label {
   color: var(--primary);
   background-color: var(--background);
+}
+
+
+
+/* Bordes negros para Register */
+.floating-input.border-black {
+  border-color: #000000;
+}
+
+.floating-input.border-black:focus {
+  border-color: #000000;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.floating-input.border-black:focus ~ .floating-label {
+  color: #000000;
 }
 
