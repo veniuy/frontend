@@ -82,10 +82,10 @@ export function Register() {
 
       {/* Lado Derecho - Formulario */}
       <div className="w-full lg:w-1/2 flex flex-col">
-        {/* Header móvil */}
-        <div className="lg:hidden bg-gradient-to-r from-warm-gray-50 to-warm-gray-100 px-6 py-6">
+        {/* Header con botón volver */}
+        <div className="bg-gradient-to-r from-warm-gray-50 to-warm-gray-100 px-6 py-6">
           <div className="flex items-center justify-between mb-4">
-            <Link to="/" className="flex items-center text-warm-gray-700 hover:text-warm-gray-900">
+            <Link to="/" className="flex items-center text-warm-gray-700 hover:text-warm-gray-900 transition-colors">
               <ArrowLeft className="w-5 h-5 mr-2" />
               <span className="text-sm font-medium">Volver</span>
             </Link>
@@ -95,7 +95,6 @@ export function Register() {
             <div className="text-2xl font-semibold text-foreground mb-2">
               Venite
             </div>
-            {/* Línea eliminada aquí también */}
             <p className="text-base text-warm-gray-600 font-ui">
               Invitaciones digitales elegantes
             </p>
