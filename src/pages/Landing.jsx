@@ -700,60 +700,16 @@ function Landing() {
             ¡Además obtén un 20% de descuento en tu primera invitación!
           </p>
 
-          <div className="max-w-md mx-auto space-y-4">
+          <div className="max-w-md mx-auto">
             <div className="floating-label-container">
               <input 
                 type="email" 
-                id="newsletter-email-1"
+                id="newsletter-email"
                 placeholder=" " 
                 className="floating-input border-border" 
               />
-              <label htmlFor="newsletter-email-1" className="floating-label">
+              <label htmlFor="newsletter-email" className="floating-label">
                 Correo electrónico
-              </label>
-            </div>
-            
-            <div className="floating-label-container">
-              <input 
-                type="email" 
-                id="newsletter-email-2"
-                placeholder=" " 
-                className="floating-input border-border" 
-              />
-              <label htmlFor="newsletter-email-2" className="floating-label">
-                Repetir correo
-              </label>
-            </div>
-            
-            <div className="floating-label-container">
-              <Select>
-                <SelectTrigger className="floating-select-trigger border-border">
-                  <SelectValue placeholder=" " />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="boda">Boda</SelectItem>
-                  <SelectItem value="quinceanera">Quinceañera</SelectItem>
-                  <SelectItem value="infantil">Cumpleaños Infantil</SelectItem>
-                  <SelectItem value="baby-shower">Baby Shower</SelectItem>
-                  <SelectItem value="corporativo">Evento Corporativo</SelectItem>
-                  <SelectItem value="graduacion">Graduación</SelectItem>
-                  <SelectItem value="otro">Otro evento</SelectItem>
-                </SelectContent>
-              </Select>
-              <label className="floating-label for-select">
-                Tipo de evento
-              </label>
-            </div>
-            
-            <div className="floating-label-container">
-              <input 
-                type="date" 
-                id="newsletter-date"
-                placeholder=" " 
-                className="floating-input border-border" 
-              />
-              <label htmlFor="newsletter-date" className="floating-label">
-                Fecha del evento
               </label>
             </div>
             

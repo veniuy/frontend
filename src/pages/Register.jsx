@@ -131,7 +131,7 @@ export function Register() {
                   name="username"
                   type="text"
                   required
-                  className={`floating-input has-icon border-warm-gray-300 focus:border-gold-500 ${formData.username ? 'has-value' : ''}`}
+                  className={`floating-input has-icon border-black ${formData.username ? 'has-value' : ''}`}
                   style={{ height: '3rem' }}
                   placeholder=" "
                   value={formData.username}
@@ -151,7 +151,7 @@ export function Register() {
                   name="email"
                   type="email"
                   required
-                  className={`floating-input has-icon border-warm-gray-300 focus:border-gold-500 ${formData.email ? 'has-value' : ''}`}
+                  className={`floating-input has-icon border-black ${formData.email ? 'has-value' : ''}`}
                   style={{ height: '3rem' }}
                   placeholder=" "
                   value={formData.email}
@@ -170,7 +170,7 @@ export function Register() {
                   id="nombre_completo"
                   name="nombre_completo"
                   type="text"
-                  className={`floating-input has-icon border-warm-gray-300 focus:border-gold-500 ${formData.nombre_completo ? 'has-value' : ''}`}
+                  className={`floating-input has-icon border-black ${formData.nombre_completo ? 'has-value' : ''}`}
                   style={{ height: '3rem' }}
                   placeholder=" "
                   value={formData.nombre_completo}
@@ -189,7 +189,7 @@ export function Register() {
                   id="telefono"
                   name="telefono"
                   type="tel"
-                  className={`floating-input has-icon border-warm-gray-300 focus:border-gold-500 ${formData.telefono ? 'has-value' : ''}`}
+                  className={`floating-input has-icon border-black ${formData.telefono ? 'has-value' : ''}`}
                   style={{ height: '3rem' }}
                   placeholder=" "
                   value={formData.telefono}
@@ -212,7 +212,7 @@ export function Register() {
                   name="password"
                   type="password"
                   required
-                  className={`floating-input has-icon border-warm-gray-300 focus:border-gold-500 ${formData.password ? 'has-value' : ''}`}
+                  className={`floating-input has-icon border-black ${formData.password ? 'has-value' : ''}`}
                   style={{ height: '3rem' }}
                   placeholder=" "
                   value={formData.password}
