@@ -133,7 +133,7 @@ export function Register() {
                   required
                   className={`floating-input has-icon border-warm-gray-300 focus:border-gold-500 ${formData.username ? 'has-value' : ''}`}
                   style={{ height: '3rem' }}
-                  placeholder="usuario123"
+                  placeholder=" "
                   value={formData.username}
                   onChange={handleChange}
                   autoComplete="username"
@@ -153,7 +153,7 @@ export function Register() {
                   required
                   className={`floating-input has-icon border-warm-gray-300 focus:border-gold-500 ${formData.email ? 'has-value' : ''}`}
                   style={{ height: '3rem' }}
-                  placeholder="tu@email.com"
+                  placeholder=" "
                   value={formData.email}
                   onChange={handleChange}
                   autoComplete="email"
@@ -172,7 +172,7 @@ export function Register() {
                   type="text"
                   className={`floating-input has-icon border-warm-gray-300 focus:border-gold-500 ${formData.nombre_completo ? 'has-value' : ''}`}
                   style={{ height: '3rem' }}
-                  placeholder="Tu nombre y apellido"
+                  placeholder=" "
                   value={formData.nombre_completo}
                   onChange={handleChange}
                   autoComplete="name"
@@ -191,7 +191,7 @@ export function Register() {
                   type="tel"
                   className={`floating-input has-icon border-warm-gray-300 focus:border-gold-500 ${formData.telefono ? 'has-value' : ''}`}
                   style={{ height: '3rem' }}
-                  placeholder="+598 099123456"
+                  placeholder=" "
                   value={formData.telefono}
                   onChange={handleChange}
                   autoComplete="tel"
@@ -214,7 +214,7 @@ export function Register() {
                   required
                   className={`floating-input has-icon border-warm-gray-300 focus:border-gold-500 ${formData.password ? 'has-value' : ''}`}
                   style={{ height: '3rem' }}
-                  placeholder="••••••••"
+                  placeholder=" "
                   value={formData.password}
                   onChange={handleChange}
                   autoComplete="new-password"

@@ -116,7 +116,7 @@ export function Login() {
                   type="email"
                   required
                   className={`floating-input has-icon ${formData.username ? 'has-value' : ''}`}
-                  placeholder="tucorreo@ejemplo.com"
+                  placeholder=" "
                   value={formData.username}
                   onChange={handleChange}
                   autoComplete="email"
@@ -134,7 +134,7 @@ export function Login() {
                   type="password"
                   required
                   className={`floating-input has-icon ${formData.password ? 'has-value' : ''}`}
-                  placeholder="••••••••"
+                  placeholder=" "
                   value={formData.password}
                   onChange={handleChange}
                   autoComplete="current-password"

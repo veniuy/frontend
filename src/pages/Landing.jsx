@@ -705,7 +705,7 @@ function Landing() {
               <input 
                 type="email" 
                 id="newsletter-email-1"
-                placeholder="Correo electrónico" 
+                placeholder=" " 
                 className="floating-input border-border" 
               />
               <label htmlFor="newsletter-email-1" className="floating-label">
@@ -717,7 +717,7 @@ function Landing() {
               <input 
                 type="email" 
                 id="newsletter-email-2"
-                placeholder="Repetir correo" 
+                placeholder=" " 
                 className="floating-input border-border" 
               />
               <label htmlFor="newsletter-email-2" className="floating-label">
@@ -728,7 +728,7 @@ function Landing() {
             <div className="floating-label-container">
               <Select>
                 <SelectTrigger className="floating-select-trigger border-border">
-                  <SelectValue placeholder="Tipo de evento" />
+                  <SelectValue placeholder=" " />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="boda">Boda</SelectItem>
@@ -749,7 +749,7 @@ function Landing() {
               <input 
                 type="date" 
                 id="newsletter-date"
-                placeholder="Fecha del evento" 
+                placeholder=" " 
                 className="floating-input border-border" 
               />
               <label htmlFor="newsletter-date" className="floating-label">

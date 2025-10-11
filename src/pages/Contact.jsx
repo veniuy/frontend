@@ -184,7 +184,7 @@ function Contact() {
                       onChange={(e) => handleInputChange('name', e.target.value)}
                       required
                       className={`floating-input ${formData.name ? 'has-value' : ''}`}
-                      placeholder="Nombre completo *"
+                      placeholder=" "
                     />
                     <label htmlFor="name" className="floating-label">
                       Nombre completo *
@@ -198,7 +198,7 @@ function Contact() {
                       onChange={(e) => handleInputChange('email', e.target.value)}
                       required
                       className={`floating-input ${formData.email ? 'has-value' : ''}`}
-                      placeholder="Email *"
+                      placeholder=" "
                     />
                     <label htmlFor="email" className="floating-label">
                       Email *
@@ -209,7 +209,7 @@ function Contact() {
                 <div className="floating-label-container">
                   <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
                     <SelectTrigger className={`floating-select-trigger ${formData.category ? 'has-value' : ''}`}>
-                      <SelectValue placeholder="Selecciona el tipo de consulta" />
+                      <SelectValue placeholder=" " />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="customer-service">Soporte Técnico</SelectItem>
@@ -234,7 +234,7 @@ function Contact() {
                     onChange={(e) => handleInputChange('subject', e.target.value)}
                     required
                     className={`floating-input ${formData.subject ? 'has-value' : ''}`}
-                    placeholder="Asunto *"
+                    placeholder=" "
                   />
                   <label htmlFor="subject" className="floating-label">
                     Asunto *
@@ -249,7 +249,7 @@ function Contact() {
                     required
                     rows={6}
                     className={`floating-textarea ${formData.message ? 'has-value' : ''}`}
-                    placeholder="Mensaje *"
+                    placeholder=" "
                   />
                   <label htmlFor="message" className="floating-label for-textarea">
                     Mensaje *
