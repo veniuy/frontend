@@ -342,21 +342,21 @@
 
 
 /* ============================================
-   FLOATING LABEL STYLES
+   FLOATING LABEL STYLES (CORREGIDO)
    ============================================ */
 
 /* Contenedor para el campo con floating label */
 .floating-label-container {
   position: relative;
   width: 100%;
+  margin-bottom: 0;
 }
 
 /* Estilos base para inputs con floating label */
 .floating-input,
-.floating-textarea,
-.floating-select {
+.floating-textarea {
   width: 100%;
-  padding: 1.25rem 0.75rem 0.5rem 0.75rem;
+  padding: 1rem 0.75rem;
   font-size: 1rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -367,12 +367,11 @@
 }
 
 /* Input con icono a la izquierda */
-.floating-input.has-icon,
-.floating-textarea.has-icon {
-  padding-left: 2.5rem;
+.floating-input.has-icon {
+  padding-left: 2.75rem;
 }
 
-/* Label flotante */
+/* Label flotante - posición inicial DENTRO del campo */
 .floating-label {
   position: absolute;
   left: 0.75rem;
@@ -381,108 +380,106 @@
   font-size: 1rem;
   color: var(--muted-foreground);
   pointer-events: none;
-  transition: all 200ms ease;
-  background-color: transparent;
-  padding: 0 0.25rem;
-  z-index: 1;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: var(--background);
+  padding: 0 0.35rem;
+  z-index: 2;
+  white-space: nowrap;
 }
 
-/* Label con icono */
+/* Label con icono - se posiciona después del icono */
 .floating-label.has-icon {
-  left: 2.5rem;
+  left: 2.75rem;
 }
 
-/* Label para textarea (ajuste vertical) */
+/* Label para textarea */
 .floating-label.for-textarea {
   top: 1.25rem;
   transform: translateY(0);
+}
+
+/* Estado flotante del label - SOBRE LA LÍNEA DEL BORDE */
+.floating-input:focus ~ .floating-label,
+.floating-input:not(:placeholder-shown) ~ .floating-label,
+.floating-input.has-value ~ .floating-label,
+.floating-textarea:focus ~ .floating-label,
+.floating-textarea:not(:placeholder-shown) ~ .floating-label,
+.floating-textarea.has-value ~ .floating-label {
+  top: -0.625rem;
+  left: 0.625rem;
+  font-size: 0.75rem;
+  color: var(--primary);
+  background-color: var(--background);
+  transform: translateY(0);
+  font-weight: 500;
+  padding: 0 0.35rem;
+}
+
+/* Ajuste para labels con icono en estado flotante - NO desplazar por icono */
+.floating-input:focus ~ .floating-label.has-icon,
+.floating-input:not(:placeholder-shown) ~ .floating-label.has-icon,
+.floating-input.has-value ~ .floating-label.has-icon {
+  left: 0.625rem;
+}
+
+/* Focus states */
+.floating-input:focus,
+.floating-textarea:focus {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Placeholder COMPLETAMENTE invisible */
+.floating-input::placeholder,
+.floating-textarea::placeholder {
+  opacity: 0;
+  color: transparent;
+}
+
+/* Icono dentro del campo */
+.floating-icon {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted-foreground);
+  pointer-events: none;
+  z-index: 1;
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Icono para textarea */
+.floating-icon.for-textarea {
+  top: 1.125rem;
+  transform: translateY(0);
+}
+
+/* SELECT - Estilos para compatibilidad con shadcn/ui */
+.floating-select-trigger {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+  min-height: 3rem;
 }
 
 /* Label para select */
 .floating-label.for-select {
   top: 50%;
   transform: translateY(-50%);
-}
-
-/* Estado flotante del label (cuando hay focus o contenido) */
-.floating-input:focus ~ .floating-label,
-.floating-input:not(:placeholder-shown) ~ .floating-label,
-.floating-input.has-value ~ .floating-label,
-.floating-textarea:focus ~ .floating-label,
-.floating-textarea:not(:placeholder-shown) ~ .floating-label,
-.floating-textarea.has-value ~ .floating-label,
-.floating-select:focus ~ .floating-label,
-.floating-select.has-value ~ .floating-label {
-  top: 0.25rem;
-  left: 0.75rem;
-  font-size: 0.75rem;
-  color: var(--primary);
-  background-color: var(--background);
-  transform: translateY(0);
-  font-weight: 500;
-}
-
-/* Ajuste para labels con icono en estado flotante */
-.floating-input:focus ~ .floating-label.has-icon,
-.floating-input:not(:placeholder-shown) ~ .floating-label.has-icon,
-.floating-input.has-value ~ .floating-label.has-icon {
   left: 0.75rem;
 }
 
-/* Focus states */
-.floating-input:focus,
-.floating-textarea:focus,
-.floating-select:focus {
-  border-color: var(--ring);
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
-}
-
-/* Placeholder invisible (se usa para detectar contenido con :placeholder-shown) */
-.floating-input::placeholder,
-.floating-textarea::placeholder {
-  opacity: 0;
-  transition: opacity 200ms ease;
-}
-
-/* Mostrar placeholder solo cuando hay focus */
-.floating-input:focus::placeholder,
-.floating-textarea:focus::placeholder {
-  opacity: 0.5;
-}
-
-/* Icono dentro del campo */
-.floating-icon {
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: var(--muted-foreground);
-  pointer-events: none;
-  z-index: 2;
-}
-
-/* Icono para textarea */
-.floating-icon.for-textarea {
-  top: 1rem;
-  transform: translateY(0);
-}
-
-/* Ajuste para select (compatibilidad con shadcn/ui) */
-.floating-select-trigger {
-  padding-top: 1.25rem !important;
-  padding-bottom: 0.5rem !important;
-  min-height: 3rem;
-}
-
-/* Select con valor */
+/* Select con valor o abierto - label flotante */
 .floating-select-trigger[data-state="open"] ~ .floating-label,
 .floating-select-trigger.has-value ~ .floating-label {
-  top: 0.25rem;
+  top: -0.625rem;
+  left: 0.625rem;
   font-size: 0.75rem;
   color: var(--primary);
   background-color: var(--background);
   transform: translateY(0);
   font-weight: 500;
+  padding: 0 0.35rem;
 }
 
 /* Variante para inputs con bordes personalizados (warm-gray, gold, etc.) */
@@ -497,59 +494,54 @@
 
 /* Ajuste para campos de fecha */
 .floating-input[type="date"] {
-  padding-top: 1.25rem;
-  padding-bottom: 0.5rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
 }
 
 .floating-input[type="date"]::-webkit-calendar-picker-indicator {
-  position: absolute;
-  right: 0.75rem;
   cursor: pointer;
 }
 
-/* Label siempre flotante para campos de fecha (porque siempre muestran algo) */
+/* Label siempre flotante para campos de fecha */
 .floating-input[type="date"] ~ .floating-label {
-  top: 0.25rem;
+  top: -0.625rem;
+  left: 0.625rem;
   font-size: 0.75rem;
   color: var(--primary);
   background-color: var(--background);
   transform: translateY(0);
   font-weight: 500;
+  padding: 0 0.35rem;
 }
 
 /* Estados de error/validación */
 .floating-input.error,
-.floating-textarea.error,
-.floating-select.error {
+.floating-textarea.error {
   border-color: var(--destructive);
 }
 
 .floating-input.error:focus ~ .floating-label,
-.floating-textarea.error:focus ~ .floating-label,
-.floating-select.error:focus ~ .floating-label {
+.floating-textarea.error:focus ~ .floating-label {
   color: var(--destructive);
 }
 
 /* Disabled state */
 .floating-input:disabled,
-.floating-textarea:disabled,
-.floating-select:disabled {
+.floating-textarea:disabled {
   opacity: 0.5;
   cursor: not-allowed;
   background-color: var(--muted);
 }
 
 .floating-input:disabled ~ .floating-label,
-.floating-textarea:disabled ~ .floating-label,
-.floating-select:disabled ~ .floating-label {
+.floating-textarea:disabled ~ .floating-label {
   opacity: 0.5;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .floating-input,
-  .floating-textarea,
-  .floating-select {
+  .floating-textarea {
     font-size: 16px; /* Previene zoom en iOS */
   }
   
@@ -562,9 +554,7 @@
   .floating-input.has-value ~ .floating-label,
   .floating-textarea:focus ~ .floating-label,
   .floating-textarea:not(:placeholder-shown) ~ .floating-label,
-  .floating-textarea.has-value ~ .floating-label,
-  .floating-select:focus ~ .floating-label,
-  .floating-select.has-value ~ .floating-label {
+  .floating-textarea.has-value ~ .floating-label {
     font-size: 0.75rem;
   }
 }
@@ -572,6 +562,7 @@
 /* Dark mode support */
 .dark .floating-label {
   color: var(--muted-foreground);
+  background-color: var(--background);
 }
 
 .dark .floating-input:focus ~ .floating-label,
@@ -580,8 +571,8 @@
 .dark .floating-textarea:focus ~ .floating-label,
 .dark .floating-textarea:not(:placeholder-shown) ~ .floating-label,
 .dark .floating-textarea.has-value ~ .floating-label,
-.dark .floating-select:focus ~ .floating-label,
-.dark .floating-select.has-value ~ .floating-label {
+.dark .floating-select-trigger[data-state="open"] ~ .floating-label,
+.dark .floating-select-trigger.has-value ~ .floating-label {
   color: var(--primary);
   background-color: var(--background);
 }
