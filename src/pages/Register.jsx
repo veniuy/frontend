@@ -90,15 +90,6 @@ export function Register() {
               <span className="text-sm font-medium">Volver</span>
             </Link>
           </div>
-          
-          <div className="text-center">
-            <div className="text-2xl font-semibold text-foreground mb-2">
-              Venite
-            </div>
-            <p className="text-base text-warm-gray-600 font-ui">
-              Invitaciones digitales elegantes
-            </p>
-          </div>
         </div>
 
         {/* Contenedor del formulario */}
