@@ -108,40 +108,40 @@ export function Login() {
                 </Alert>
               )}
 
-              <div className="space-y-2">
-                <Label htmlFor="username" className="text-foreground">Correo electrónico</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="username"
-                    name="username"
-                    type="email"
-                    required
-                    className="pl-10"
-                    placeholder="tucorreo@ejemplo.com"
-                    value={formData.username}
-                    onChange={handleChange}
-                    autoComplete="email"
-                  />
-                </div>
+              <div className="floating-label-container">
+                <Mail className="floating-icon" />
+                <input
+                  id="username"
+                  name="username"
+                  type="email"
+                  required
+                  className={`floating-input has-icon ${formData.username ? 'has-value' : ''}`}
+                  placeholder="tucorreo@ejemplo.com"
+                  value={formData.username}
+                  onChange={handleChange}
+                  autoComplete="email"
+                />
+                <label htmlFor="username" className="floating-label has-icon">
+                  Correo electrónico
+                </label>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-foreground">Contraseña</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    className="pl-10"
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={handleChange}
-                    autoComplete="current-password"
-                  />
-                </div>
+              <div className="floating-label-container">
+                <Lock className="floating-icon" />
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  className={`floating-input has-icon ${formData.password ? 'has-value' : ''}`}
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={handleChange}
+                  autoComplete="current-password"
+                />
+                <label htmlFor="password" className="floating-label has-icon">
+                  Contraseña
+                </label>
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>

@@ -176,34 +176,39 @@ function Contact() {
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="name">Nombre completo *</Label>
-                    <Input
+                  <div className="floating-label-container">
+                    <input
                       id="name"
                       type="text"
                       value={formData.name}
                       onChange={(e) => handleInputChange('name', e.target.value)}
                       required
-                      className="mt-1"
+                      className={`floating-input ${formData.name ? 'has-value' : ''}`}
+                      placeholder="Nombre completo *"
                     />
+                    <label htmlFor="name" className="floating-label">
+                      Nombre completo *
+                    </label>
                   </div>
-                  <div>
-                    <Label htmlFor="email">Email *</Label>
-                    <Input
+                  <div className="floating-label-container">
+                    <input
                       id="email"
                       type="email"
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
                       required
-                      className="mt-1"
+                      className={`floating-input ${formData.email ? 'has-value' : ''}`}
+                      placeholder="Email *"
                     />
+                    <label htmlFor="email" className="floating-label">
+                      Email *
+                    </label>
                   </div>
                 </div>
 
-                <div>
-                  <Label htmlFor="category">Tipo de consulta *</Label>
+                <div className="floating-label-container">
                   <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
-                    <SelectTrigger className="mt-1">
+                    <SelectTrigger className={`floating-select-trigger ${formData.category ? 'has-value' : ''}`}>
                       <SelectValue placeholder="Selecciona el tipo de consulta" />
                     </SelectTrigger>
                     <SelectContent>
@@ -216,32 +221,39 @@ function Contact() {
                       <SelectItem value="other">Otros</SelectItem>
                     </SelectContent>
                   </Select>
+                  <label className={`floating-label for-select ${formData.category ? 'has-value' : ''}`}>
+                    Tipo de consulta *
+                  </label>
                 </div>
 
-                <div>
-                  <Label htmlFor="subject">Asunto *</Label>
-                  <Input
+                <div className="floating-label-container">
+                  <input
                     id="subject"
                     type="text"
                     value={formData.subject}
                     onChange={(e) => handleInputChange('subject', e.target.value)}
                     required
-                    className="mt-1"
-                    placeholder="Describe brevemente tu consulta"
+                    className={`floating-input ${formData.subject ? 'has-value' : ''}`}
+                    placeholder="Asunto *"
                   />
+                  <label htmlFor="subject" className="floating-label">
+                    Asunto *
+                  </label>
                 </div>
 
-                <div>
-                  <Label htmlFor="message">Mensaje *</Label>
-                  <Textarea
+                <div className="floating-label-container">
+                  <textarea
                     id="message"
                     value={formData.message}
                     onChange={(e) => handleInputChange('message', e.target.value)}
                     required
                     rows={6}
-                    className="mt-1"
-                    placeholder="Cuéntanos sobre tu evento, fecha, número de invitados, estilo que buscas..."
+                    className={`floating-textarea ${formData.message ? 'has-value' : ''}`}
+                    placeholder="Mensaje *"
                   />
+                  <label htmlFor="message" className="floating-label for-textarea">
+                    Mensaje *
+                  </label>
                 </div>
 
                 <Button 

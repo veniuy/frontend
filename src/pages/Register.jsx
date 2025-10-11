@@ -124,110 +124,105 @@ export function Register() {
               )}
 
               {/* Nombre de Usuario */}
-              <div className="space-y-2">
-                <Label htmlFor="username" className="text-foreground font-medium">
+              <div className="floating-label-container">
+                <User className="floating-icon" />
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  required
+                  className={`floating-input has-icon border-warm-gray-300 focus:border-gold-500 ${formData.username ? 'has-value' : ''}`}
+                  style={{ height: '3rem' }}
+                  placeholder="usuario123"
+                  value={formData.username}
+                  onChange={handleChange}
+                  autoComplete="username"
+                />
+                <label htmlFor="username" className="floating-label has-icon">
                   Nombre de Usuario
-                </Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="username"
-                    name="username"
-                    type="text"
-                    required
-                    className="pl-10 h-12 border-warm-gray-300 focus:border-gold-500 focus:ring-gold-500"
-                    placeholder="usuario123"
-                    value={formData.username}
-                    onChange={handleChange}
-                    autoComplete="username"
-                  />
-                </div>
+                </label>
               </div>
 
               {/* Email */}
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-foreground font-medium">
+              <div className="floating-label-container">
+                <Mail className="floating-icon" />
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  className={`floating-input has-icon border-warm-gray-300 focus:border-gold-500 ${formData.email ? 'has-value' : ''}`}
+                  style={{ height: '3rem' }}
+                  placeholder="tu@email.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  autoComplete="email"
+                />
+                <label htmlFor="email" className="floating-label has-icon">
                   Email
-                </Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    className="pl-10 h-12 border-warm-gray-300 focus:border-gold-500 focus:ring-gold-500"
-                    placeholder="tu@email.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    autoComplete="email"
-                  />
-                </div>
+                </label>
               </div>
 
               {/* Nombre Completo */}
-              <div className="space-y-2">
-                <Label htmlFor="nombre_completo" className="text-foreground font-medium">
+              <div className="floating-label-container">
+                <User className="floating-icon" />
+                <input
+                  id="nombre_completo"
+                  name="nombre_completo"
+                  type="text"
+                  className={`floating-input has-icon border-warm-gray-300 focus:border-gold-500 ${formData.nombre_completo ? 'has-value' : ''}`}
+                  style={{ height: '3rem' }}
+                  placeholder="Tu nombre y apellido"
+                  value={formData.nombre_completo}
+                  onChange={handleChange}
+                  autoComplete="name"
+                />
+                <label htmlFor="nombre_completo" className="floating-label has-icon">
                   Nombre Completo
-                </Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="nombre_completo"
-                    name="nombre_completo"
-                    type="text"
-                    className="pl-10 h-12 border-warm-gray-300 focus:border-gold-500 focus:ring-gold-500"
-                    placeholder="Tu nombre y apellido"
-                    value={formData.nombre_completo}
-                    onChange={handleChange}
-                    autoComplete="name"
-                  />
-                </div>
+                </label>
               </div>
 
               {/* Teléfono */}
-              <div className="space-y-2">
-                <Label htmlFor="telefono" className="text-foreground font-medium">
+              <div className="floating-label-container">
+                <Phone className="floating-icon" />
+                <input
+                  id="telefono"
+                  name="telefono"
+                  type="tel"
+                  className={`floating-input has-icon border-warm-gray-300 focus:border-gold-500 ${formData.telefono ? 'has-value' : ''}`}
+                  style={{ height: '3rem' }}
+                  placeholder="+598 099123456"
+                  value={formData.telefono}
+                  onChange={handleChange}
+                  autoComplete="tel"
+                />
+                <label htmlFor="telefono" className="floating-label has-icon">
                   Teléfono
-                </Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="telefono"
-                    name="telefono"
-                    type="tel"
-                    className="pl-10 h-12 border-warm-gray-300 focus:border-gold-500 focus:ring-gold-500"
-                    placeholder="+598 099123456"
-                    value={formData.telefono}
-                    onChange={handleChange}
-                    autoComplete="tel"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
+                </label>
+                <p className="text-xs text-muted-foreground mt-1">
                   Ejemplo: +598 099123456
                 </p>
               </div>
 
               {/* Contraseña */}
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-foreground font-medium">
+              <div className="floating-label-container">
+                <Lock className="floating-icon" />
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  className={`floating-input has-icon border-warm-gray-300 focus:border-gold-500 ${formData.password ? 'has-value' : ''}`}
+                  style={{ height: '3rem' }}
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={handleChange}
+                  autoComplete="new-password"
+                />
+                <label htmlFor="password" className="floating-label has-icon">
                   Contraseña
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    className="pl-10 h-12 border-warm-gray-300 focus:border-gold-500 focus:ring-gold-500"
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={handleChange}
-                    autoComplete="new-password"
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
+                </label>
+                <p className="text-xs text-muted-foreground mt-1">
                   Mínimo 6 caracteres
                 </p>
               </div>

@@ -701,23 +701,62 @@ function Landing() {
           </p>
 
           <div className="max-w-md mx-auto space-y-4">
-            <Input type="email" placeholder="Correo electrónico" className="border-border" />
-            <Input type="email" placeholder="Repetir correo" className="border-border" />
-            <Select>
-              <SelectTrigger className="border-border">
-                <SelectValue placeholder="Tipo de evento" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="boda">Boda</SelectItem>
-                <SelectItem value="quinceanera">Quinceañera</SelectItem>
-                <SelectItem value="infantil">Cumpleaños Infantil</SelectItem>
-                <SelectItem value="baby-shower">Baby Shower</SelectItem>
-                <SelectItem value="corporativo">Evento Corporativo</SelectItem>
-                <SelectItem value="graduacion">Graduación</SelectItem>
-                <SelectItem value="otro">Otro evento</SelectItem>
-              </SelectContent>
-            </Select>
-            <Input type="date" placeholder="Fecha del evento" className="border-border" />
+            <div className="floating-label-container">
+              <input 
+                type="email" 
+                id="newsletter-email-1"
+                placeholder="Correo electrónico" 
+                className="floating-input border-border" 
+              />
+              <label htmlFor="newsletter-email-1" className="floating-label">
+                Correo electrónico
+              </label>
+            </div>
+            
+            <div className="floating-label-container">
+              <input 
+                type="email" 
+                id="newsletter-email-2"
+                placeholder="Repetir correo" 
+                className="floating-input border-border" 
+              />
+              <label htmlFor="newsletter-email-2" className="floating-label">
+                Repetir correo
+              </label>
+            </div>
+            
+            <div className="floating-label-container">
+              <Select>
+                <SelectTrigger className="floating-select-trigger border-border">
+                  <SelectValue placeholder="Tipo de evento" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="boda">Boda</SelectItem>
+                  <SelectItem value="quinceanera">Quinceañera</SelectItem>
+                  <SelectItem value="infantil">Cumpleaños Infantil</SelectItem>
+                  <SelectItem value="baby-shower">Baby Shower</SelectItem>
+                  <SelectItem value="corporativo">Evento Corporativo</SelectItem>
+                  <SelectItem value="graduacion">Graduación</SelectItem>
+                  <SelectItem value="otro">Otro evento</SelectItem>
+                </SelectContent>
+              </Select>
+              <label className="floating-label for-select">
+                Tipo de evento
+              </label>
+            </div>
+            
+            <div className="floating-label-container">
+              <input 
+                type="date" 
+                id="newsletter-date"
+                placeholder="Fecha del evento" 
+                className="floating-input border-border" 
+              />
+              <label htmlFor="newsletter-date" className="floating-label">
+                Fecha del evento
+              </label>
+            </div>
+            
             <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
               <Send className="w-4 h-4 mr-2" />
               Quiero mi descuento del 20%
