@@ -599,3 +599,15 @@
   color: #000000;
 }
 
+
+
+/* Ocultar scrollbar en carrusel de categorías */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
