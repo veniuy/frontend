@@ -334,6 +334,11 @@
     text-align: left !important;
   }
   
+  /* Descripciones (párrafos) a la izquierda en móvil */
+  section p[style*="Inter"] {
+    text-align: left !important;
+  }
+  
   /* Mantener centrado para elementos con iconos */
   .digital-features-mobile {
     text-align: center !important;
