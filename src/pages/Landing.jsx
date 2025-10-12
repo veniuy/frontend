@@ -429,17 +429,7 @@ function Landing() {
             <ChevronRight className="w-6 h-6" />
           </button>
 
-          {/* Bullets */}
-          <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-            {Array.from({ length: totalDesktopSlides }).map((_, i) => (
-              <button
-                key={`dot-${i}`}
-                onClick={() => setSlide(i)}
-                aria-label={`Ir al slide ${i + 1}`}
-                className={`h-2.5 w-2.5 rounded-full ${i === slide ? 'bg-white' : 'bg-white/50 hover:bg-white/80'} transition-colors`}
-              />
-            ))}
-          </div>
+
         </div>
       </section>
 
@@ -509,23 +499,14 @@ function Landing() {
           <ChevronRight className="w-6 h-6" />
         </button>
 
-        {/* Bullets */}
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-          {Array.from({ length: totalMobileSlides }).map((_, i) => (
-            <button
-              key={`mdot-${i}`}
-              onClick={() => setMSlide(i)}
-              aria-label={`Ir al slide ${i + 1}`}
-              className={`h-2.5 w-2.5 rounded-full ${i === mSlide ? 'bg-white' : 'bg-white/50 hover:bg-white/80'} transition-colors`}
-            />
-          ))}
-        </div>
+
       </section>
 
       {/* Featured Products */}
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
+            <p className="text-xs font-bold tracking-wider uppercase text-muted-foreground mb-3">PLANTILLAS</p>
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
               Nuestras invitaciones más populares
             </h2>
@@ -596,6 +577,7 @@ function Landing() {
       <section id="categorias" className="py-16 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
+            <p className="text-xs font-bold tracking-wider uppercase text-muted-foreground mb-3">CATEGORÍAS</p>
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
               Invitaciones para cada ocasión especial
             </h2>
@@ -604,40 +586,50 @@ function Landing() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map((category) => (
-              <Card
-                key={category.id}
-                className="group cursor-pointer hover-lift shadow-warm overflow-hidden rounded-lg p-0"
-                onClick={() => navigate(category.href)}
-              >
-                <div className="aspect-[4/3] relative">
-                  <img
-                    src={category.image}
-                    alt={category.name}
-                    className="absolute inset-0 w-full h-full object-cover object-center block transition-transform duration-300 group-hover:scale-[1.03]"
-                    onError={(e) => onImgError(e, category.name)}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300" />
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <h3 className="font-display text-xl font-medium text-white mb-2">
-                      {category.name}
-                    </h3>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="bg-white/90 text-foreground hover:bg-white"
-                      onClick={(e) => { e.stopPropagation(); navigate(category.href) }}
+          {/* Carrusel de categorías */}
+          <div className="relative">
+            <div className="overflow-x-auto scrollbar-hide">
+              <div className="flex gap-6 pb-4" style={{ scrollSnapType: 'x mandatory' }}>
+                {categories.map((category) => (
+                  <div
+                    key={category.id}
+                    className="flex-shrink-0 w-[85%] sm:w-[45%] lg:w-[30%]"
+                    style={{ scrollSnapAlign: 'start' }}
+                  >
+                    <Card
+                      className="group cursor-pointer hover-lift shadow-warm overflow-hidden rounded-lg p-0 h-full"
+                      onClick={() => navigate(category.href)}
                     >
-                      <Globe className="w-3 h-3 mr-2" />
-                      Ver Diseños
-                    </Button>
+                      <div className="aspect-[4/3] relative">
+                        <img
+                          src={category.image}
+                          alt={category.name}
+                          className="absolute inset-0 w-full h-full object-cover object-center block transition-transform duration-300 group-hover:scale-[1.03]"
+                          onError={(e) => onImgError(e, category.name)}
+                          loading="lazy"
+                          decoding="async"
+                        />
+                        <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors duration-300" />
+                        <div className="absolute bottom-4 left-4 right-4">
+                          <h3 className="font-display text-xl font-medium text-white mb-2">
+                            {category.name}
+                          </h3>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            className="bg-white/90 text-foreground hover:bg-white"
+                            onClick={(e) => { e.stopPropagation(); navigate(category.href) }}
+                          >
+                            <Globe className="w-3 h-3 mr-2" />
+                            Ver Diseños
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
                   </div>
-                </div>
-              </Card>
-            ))}
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
