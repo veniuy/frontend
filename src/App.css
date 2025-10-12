@@ -329,6 +329,11 @@
     text-align: left !important;
   }
   
+  /* Subtítulos en mayúsculas a la izquierda en móvil */
+  .text-center > p.uppercase {
+    text-align: left !important;
+  }
+  
   /* Títulos de secciones principales en móvil - solo en contenedores con text-center */
   .text-center > h2[style*="Playfair Display"] {
     text-align: left !important;
