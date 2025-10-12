@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
@@ -7,7 +6,7 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { Mail, Lock, User, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, User, ArrowLeft, Eye, EyeOff } from 'lucide-react'; // Importar Eye y EyeOff
 import '../App.css';
 import backgroundImage from '../assets/wedding-cake.webp'; // Importar la imagen
 
@@ -28,6 +27,7 @@ export function AuthScreen() {
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // Nuevo estado para mostrar/ocultar contraseña
 
   const { login, register, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
@@ -90,7 +90,7 @@ export function AuthScreen() {
     <div className="auth-container">
       {/* Botón volver (posicionado absolutamente en la esquina superior izquierda de toda la pantalla) */}
       <div className="absolute top-4 left-4 z-50">
-        <Link to="/" className="flex items-center text-muted-foreground hover:text-foreground transition-colors">
+        <Link to="/" className="flex items-center text-white hover:text-gray-200 transition-colors">
           <ArrowLeft className="w-5 h-5 mr-2" />
           <span className="text-sm font-medium">Volver</span>
         </Link>
@@ -112,18 +112,18 @@ export function AuthScreen() {
           {/* Marca (visible solo en mobile, ya que en desktop está en la imagen) */}
           <div className="text-center md:hidden">
             <div className="font-display text-4xl font-black tracking-wide text-foreground">Venite</div>
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-1 text-sm text-foreground">
               {isLoginView ? 'Accede a tu cuenta para gestionar tus invitaciones' : 'Únete y comienza a crear invitaciones únicas'}
             </p>
           </div>
 
           {/* Card */}
-          <Card>
+          <Card className="border-none shadow-none">
             <CardHeader>
               <CardTitle className="text-foreground">
                 {isLoginView ? 'Bienvenido de vuelta' : 'Crear Cuenta'}
               </CardTitle>
-              <CardDescription className="text-muted-foreground">
+              <CardDescription className="text-foreground">
                 {isLoginView ? 'Ingresa tus credenciales para continuar' : 'Ingresa tus datos para crear una cuenta'}
               </CardDescription>
             </CardHeader>
@@ -188,12 +188,12 @@ export function AuthScreen() {
                   </label>
                 </div>
 
-                <div className="floating-label-container">
+                <div className="floating-label-container relative">
                   <Lock className="floating-icon" />
                   <input
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'} // Cambiar tipo dinámicamente
                     required
                     className={`floating-input has-icon ${formData.password ? 'has-value' : ''}`}
                     placeholder=" "
@@ -204,6 +204,14 @@ export function AuthScreen() {
                   <label htmlFor="password" className="floating-label has-icon">
                     Contraseña
                   </label>
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground z-30"
+                    aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                  >
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
                   {!isLoginView && (
                     <p className="text-xs text-muted-foreground mt-1">
                       Mínimo 6 caracteres
@@ -217,7 +225,7 @@ export function AuthScreen() {
               </form>
 
               <div className="mt-6 text-center">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-foreground">
                   {isLoginView ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'} {' '}
                   <button
                     onClick={toggleView}
