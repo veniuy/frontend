@@ -499,123 +499,6 @@
   box-shadow: 0 0 0 2px rgba(185, 149, 100, 0.1);
 }
 
-.floating-input.border-warm-gray-300:focus ~ .floating-label {
-  color: var(--gold-500);
-}
-
-/* Ajuste para campos de fecha */
-.floating-input[type="date"] {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-}
-
-.floating-input[type="date"]::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-}
-
-/* Label siempre flotante para campos de fecha */
-.floating-input[type="date"] ~ .floating-label {
-  top: -0.625rem;
-  left: 0.625rem;
-  font-size: 0.75rem;
-  color: var(--primary);
-  background-color: var(--background);
-  transform: translateY(0);
-  font-weight: 500;
-  padding: 0 0.35rem;
-}
-
-/* Estados de error/validación */
-.floating-input.error,
-.floating-textarea.error {
-  border-color: var(--destructive);
-}
-
-.floating-input.error:focus ~ .floating-label,
-.floating-textarea.error:focus ~ .floating-label {
-  color: var(--destructive);
-}
-
-/* Disabled state */
-.floating-input:disabled,
-.floating-textarea:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  background-color: var(--muted);
-}
-
-.floating-input:disabled ~ .floating-label,
-.floating-textarea:disabled ~ .floating-label {
-  opacity: 0.5;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .floating-input,
-  .floating-textarea {
-    font-size: 16px; /* Previene zoom en iOS */
-  }
-  
-  .floating-label {
-    font-size: 16px;
-  }
-  
-  .floating-input:focus ~ .floating-label,
-  .floating-input:not(:placeholder-shown) ~ .floating-label,
-  .floating-input.has-value ~ .floating-label,
-  .floating-textarea:focus ~ .floating-label,
-  .floating-textarea:not(:placeholder-shown) ~ .floating-label,
-  .floating-textarea.has-value ~ .floating-label {
-    font-size: 0.75rem;
-  }
-}
-
-/* Dark mode support */
-.dark .floating-label {
-  color: var(--muted-foreground);
-  background-color: var(--background);
-}
-
-.dark .floating-input:focus ~ .floating-label,
-.dark .floating-input:not(:placeholder-shown) ~ .floating-label,
-.dark .floating-input.has-value ~ .floating-label,
-.dark .floating-textarea:focus ~ .floating-label,
-.dark .floating-textarea:not(:placeholder-shown) ~ .floating-label,
-.dark .floating-textarea.has-value ~ .floating-label,
-.dark .floating-select-trigger[data-state="open"] ~ .floating-label,
-.dark .floating-select-trigger.has-value ~ .floating-label {
-  color: var(--primary);
-  background-color: var(--background);
-}
-
-
-
-/* Bordes negros para Register */
-.floating-input.border-black {
-  border-color: #000000;
-}
-
-.floating-input.border-black:focus {
-  border-color: #000000;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
-}
-
-.floating-input.border-black:focus ~ .floating-label {
-  color: #000000;
-}
-
-
-
-/* Ocultar scrollbar en carrusel de categorías */
-.scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari and Opera */
-}
-
 /* Layout de AuthScreen */
 .auth-container {
   display: flex;
@@ -678,4 +561,6 @@
     flex: none;
     width: 100%;
   }
+}
+
 
