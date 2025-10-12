@@ -506,7 +506,7 @@ function Landing() {
       <section className="py-16 bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-xs font-bold tracking-wider uppercase text-muted-foreground mb-3">PLANTILLAS</p>
+            <p className="text-xs font-bold tracking-wider uppercase text-black mb-3">PLANTILLAS</p>
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
               Nuestras invitaciones más populares
             </h2>
@@ -577,7 +577,7 @@ function Landing() {
       <section id="categorias" className="py-16 bg-secondary">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-xs font-bold tracking-wider uppercase text-muted-foreground mb-3">CATEGORÍAS</p>
+            <p className="text-xs font-bold tracking-wider uppercase text-black mb-3">CATEGORÍAS</p>
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
               Invitaciones para cada ocasión especial
             </h2>
