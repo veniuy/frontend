@@ -329,18 +329,19 @@
     text-align: left !important;
   }
   
-  /* Títulos de secciones principales en móvil */
-  section h2[style*="Playfair Display"] {
+  /* Títulos de secciones principales en móvil - solo en contenedores con text-center */
+  .text-center > h2[style*="Playfair Display"] {
     text-align: left !important;
   }
   
-  /* Descripciones (párrafos) a la izquierda en móvil */
-  section p[style*="Inter"] {
+  /* Descripciones (párrafos) a la izquierda en móvil - solo en contenedores con text-center */
+  .text-center > p[style*="Inter"] {
     text-align: left !important;
   }
   
-  /* Mantener centrado para elementos con iconos */
-  .digital-features-mobile {
+  /* Mantener centrado para elementos individuales con text-center (como las tarjetas con iconos) */
+  div.text-center h3,
+  div.text-center p {
     text-align: center !important;
   }
 }
