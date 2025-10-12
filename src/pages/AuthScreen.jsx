@@ -101,9 +101,6 @@ export function AuthScreen() {
         className="auth-image-section hidden md:flex"
         style={{ backgroundImage: `url(${backgroundImage})` }}
       >
-        <div className="auth-logo-overlay">
-          <div className="font-display text-4xl font-black tracking-wide">Venite</div>
-        </div>
       </div>
 
       {/* Sección del formulario (mitad derecha en desktop) */}
@@ -111,7 +108,7 @@ export function AuthScreen() {
         <div className="max-w-md w-full space-y-8 p-4 md:p-0">
           {/* Marca (visible solo en mobile, ya que en desktop está en la imagen) */}
           <div className="text-center md:hidden">
-            <div className="font-display text-4xl font-black tracking-wide text-foreground">Venite</div>
+            <div className="font-display text-4xl font-black tracking-wide text-foreground">Invitaciones</div>
             <p className="mt-1 text-sm text-foreground">
               {isLoginView ? 'Accede a tu cuenta para gestionar tus invitaciones' : 'Únete y comienza a crear invitaciones únicas'}
             </p>
