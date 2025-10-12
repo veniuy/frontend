@@ -529,7 +529,7 @@ function Landing() {
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
               Nuestras invitaciones más populares
             </h2>
-            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.4' }} className="text-muted-foreground max-w-2xl mx-auto">
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.4' }} className="text-muted-foreground max-w-2xl mx-auto text-center md:text-center">
               Diseños digitales que combinan elegancia, interactividad y personalización para hacer de tu evento algo inolvidable.
             </p>
           </div>
@@ -599,7 +599,7 @@ function Landing() {
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
               Invitaciones para cada ocasión especial
             </h2>
-            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.4' }} className="text-muted-foreground max-w-2xl mx-auto">
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.4' }} className="text-muted-foreground max-w-2xl mx-auto text-center md:text-center">
               Desde bodas elegantes hasta cumpleaños infantiles llenos de diversión. Tenemos el diseño perfecto para tu evento.
             </p>
           </div>
@@ -649,7 +649,7 @@ function Landing() {
             <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
               ¿Por qué elegir invitaciones digitales?
             </h2>
-            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.5', color: '#6b7280' }} className="max-w-2xl mx-auto">
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.5', color: '#6b7280' }} className="max-w-2xl mx-auto text-center md:text-center">
               La evolución natural de las invitaciones tradicionales. Más interactivas, ecológicas y convenientes.
             </p>
           </div>
@@ -695,7 +695,7 @@ function Landing() {
           <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 'clamp(32px, 5vw, 48px)', fontWeight: '400', lineHeight: '1.1', color: '#000000' }} className="mb-4">
             ¡Únete a la revolución digital!
           </h2>
-          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.5', color: '#6b7280' }} className="mb-8 max-w-2xl mx-auto">
+          <p style={{ fontFamily: "'Inter', sans-serif", fontSize: '17px', fontWeight: '400', lineHeight: '1.5', color: '#6b7280' }} className="mb-8 max-w-2xl mx-auto text-center md:text-center">
             Suscríbete y recibe plantillas exclusivas, descuentos especiales y las últimas tendencias en invitaciones digitales.
             ¡Además obtén un 20% de descuento en tu primera invitación!
           </p>
