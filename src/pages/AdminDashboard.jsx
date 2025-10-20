@@ -21,24 +21,37 @@ import {
   Trash2, 
   Eye, 
   Search,
-  Filter,
   Download,
-  Upload,
   Crown,
   Shield,
   Activity
 } from 'lucide-react';
 
+/** ================================
+ *  Config y helper de API
+ *  ================================ */
+const API_BASE = import.meta.env.VITE_BACKEND_URL || "https://backend-xtqe.onrender.com";
+
+const api = (path: string, options: RequestInit = {}) =>
+  fetch(`${API_BASE}${path}`, {
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    },
+    ...options,
+  });
+
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [dashboardStats, setDashboardStats] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [templates, setTemplates] = useState([]);
-  const [userDesigns, setUserDesigns] = useState([]);
+  const [dashboardStats, setDashboardStats] = useState<any>(null);
+  const [users, setUsers] = useState<any[]>([]);
+  const [templates, setTemplates] = useState<any[]>([]);
+  const [userDesigns, setUserDesigns] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
 
   // Estados para formularios
   const [newTemplate, setNewTemplate] = useState({
@@ -58,34 +71,33 @@ const AdminDashboard = () => {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      // Cargar estadísticas del dashboard
-      const statsResponse = await fetch('/admin/dashboard/stats');
-      if (statsResponse.ok) {
-        const statsData = await statsResponse.json();
+      const [statsRes, usersRes, templatesRes, designsRes] = await Promise.all([
+        // Stats
+        api('/api/admin/admin/dashboard/stats'),
+        // Usuarios
+        api('/api/admin/admin/users'),
+        // Plantillas
+        api('/api/admin/admin/templates'),
+        // Diseños de usuario
+        api('/api/admin/admin/user-designs'),
+      ]);
+
+      if (statsRes.ok) {
+        const statsData = await statsRes.json();
         setDashboardStats(statsData.stats);
       }
-
-      // Cargar usuarios
-      const usersResponse = await fetch('/admin/users');
-      if (usersResponse.ok) {
-        const usersData = await usersResponse.json();
-        setUsers(usersData.users);
+      if (usersRes.ok) {
+        const usersData = await usersRes.json();
+        setUsers(usersData.users || []);
       }
-
-      // Cargar plantillas
-      const templatesResponse = await fetch('/admin/templates');
-      if (templatesResponse.ok) {
-        const templatesData = await templatesResponse.json();
-        setTemplates(templatesData.templates);
+      if (templatesRes.ok) {
+        const templatesData = await templatesRes.json();
+        setTemplates(templatesData.templates || []);
       }
-
-      // Cargar diseños de usuarios
-      const designsResponse = await fetch('/admin/user-designs');
-      if (designsResponse.ok) {
-        const designsData = await designsResponse.json();
-        setUserDesigns(designsData.designs);
+      if (designsRes.ok) {
+        const designsData = await designsRes.json();
+        setUserDesigns(designsData.designs || []);
       }
-
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -93,32 +105,29 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleUpdateUserSubscription = async (userId, newSubscription) => {
+  const handleUpdateUserSubscription = async (userId: number, newSubscription: string) => {
     try {
-      const response = await fetch(`/admin/users/${userId}/subscription`, {
+      const response = await api(`/api/admin/admin/users/${userId}/subscription`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ tipo_suscripcion: newSubscription }),
       });
 
       if (response.ok) {
-        loadDashboardData(); // Recargar datos
+        loadDashboardData();
       }
     } catch (error) {
       console.error('Error updating user subscription:', error);
     }
   };
 
-  const handleToggleUserStatus = async (userId) => {
+  const handleToggleUserStatus = async (userId: number) => {
     try {
-      const response = await fetch(`/admin/users/${userId}/toggle-status`, {
+      const response = await api(`/api/admin/admin/users/${userId}/toggle-status`, {
         method: 'PUT',
       });
 
       if (response.ok) {
-        loadDashboardData(); // Recargar datos
+        loadDashboardData();
       }
     } catch (error) {
       console.error('Error toggling user status:', error);
@@ -127,11 +136,8 @@ const AdminDashboard = () => {
 
   const handleCreateTemplate = async () => {
     try {
-      const response = await fetch('/admin/templates', {
+      const response = await api('/api/admin/admin/templates', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(newTemplate),
       });
 
@@ -145,35 +151,35 @@ const AdminDashboard = () => {
           is_active: true,
           sort_order: 0
         });
-        loadDashboardData(); // Recargar datos
+        loadDashboardData();
       }
     } catch (error) {
       console.error('Error creating template:', error);
     }
   };
 
-  const handleDeleteTemplate = async (templateId) => {
+  const handleDeleteTemplate = async (templateId: number) => {
     try {
-      const response = await fetch(`/admin/templates/${templateId}`, {
+      const response = await api(`/api/admin/admin/templates/${templateId}`, {
         method: 'DELETE',
       });
 
       if (response.ok) {
-        loadDashboardData(); // Recargar datos
+        loadDashboardData();
       }
     } catch (error) {
       console.error('Error deleting template:', error);
     }
   };
 
-  const getSubscriptionBadge = (subscription) => {
-    const variants = {
+  const getSubscriptionBadge = (subscription: string) => {
+    const variants: Record<string, any> = {
       'gratuita': 'secondary',
       'premium': 'default',
       'admin': 'destructive'
     };
     
-    const icons = {
+    const icons: Record<string, JSX.Element | null> = {
       'gratuita': null,
       'premium': <Crown className="w-3 h-3 mr-1" />,
       'admin': <Shield className="w-3 h-3 mr-1" />
@@ -187,15 +193,15 @@ const AdminDashboard = () => {
     );
   };
 
-  const filteredUsers = users.filter(user =>
-    user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.nombre_completo?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = users.filter((user) =>
+    (user.username || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (user.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (user.nombre_completo || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const filteredTemplates = templates.filter(template =>
-    template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    template.category.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredTemplates = templates.filter((template) =>
+    (template.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (template.category || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -301,7 +307,7 @@ const AdminDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {dashboardStats.popular_templates.map((template, index) => (
+                      {dashboardStats.popular_templates.map((template: any, index: number) => (
                         <div key={template.id} className="flex items-center justify-between">
                           <div>
                             <p className="font-medium">{template.name}</p>
@@ -320,7 +326,7 @@ const AdminDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {dashboardStats.active_users.map((user, index) => (
+                      {dashboardStats.active_users.map((user: any) => (
                         <div key={user.user_id} className="flex items-center justify-between">
                           <div>
                             <p className="font-medium">{user.username}</p>
@@ -369,7 +375,7 @@ const AdminDashboard = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredUsers.map((user) => (
+                  {filteredUsers.map((user: any) => (
                     <TableRow key={user.id}>
                       <TableCell>
                         <div>
@@ -526,7 +532,7 @@ const AdminDashboard = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredTemplates.map((template) => (
+                  {filteredTemplates.map((template: any) => (
                     <TableRow key={template.id}>
                       <TableCell>
                         <div>
@@ -622,7 +628,7 @@ const AdminDashboard = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {userDesigns.map((design) => (
+                  {userDesigns.map((design: any) => (
                     <TableRow key={design.id}>
                       <TableCell>
                         <div>
@@ -649,7 +655,7 @@ const AdminDashboard = () => {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {new Date(design.last_saved_at).toLocaleDateString()}
+                        {design.last_saved_at ? new Date(design.last_saved_at).toLocaleDateString() : '-'}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
