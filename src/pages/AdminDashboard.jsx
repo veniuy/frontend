@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,15 +28,15 @@ import {
 } from 'lucide-react';
 
 /** ================================
- *  Config y helper de API
+ *  Config y helper de API (JS puro)
  *  ================================ */
-const API_BASE = import.meta.env.VITE_BACKEND_URL || "https://backend-xtqe.onrender.com";
+const API_BASE = import.meta.env.VITE_BACKEND_URL || 'https://backend-xtqe.onrender.com';
 
-const api = (path: string, options: RequestInit = {}) =>
+const api = (path, options = {}) =>
   fetch(`${API_BASE}${path}`, {
-    credentials: "include",
+    credentials: 'include',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...(options.headers || {})
     },
     ...options,
@@ -44,14 +44,14 @@ const api = (path: string, options: RequestInit = {}) =>
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [dashboardStats, setDashboardStats] = useState<any>(null);
-  const [users, setUsers] = useState<any[]>([]);
-  const [templates, setTemplates] = useState<any[]>([]);
-  const [userDesigns, setUserDesigns] = useState<any[]>([]);
+  const [dashboardStats, setDashboardStats] = useState(null);
+  const [users, setUsers] = useState([]);
+  const [templates, setTemplates] = useState([]);
+  const [userDesigns, setUserDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedUser, setSelectedUser] = useState<any>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
 
   // Estados para formularios
   const [newTemplate, setNewTemplate] = useState({
@@ -72,13 +72,9 @@ const AdminDashboard = () => {
     setLoading(true);
     try {
       const [statsRes, usersRes, templatesRes, designsRes] = await Promise.all([
-        // Stats
         api('/api/admin/admin/dashboard/stats'),
-        // Usuarios
         api('/api/admin/admin/users'),
-        // Plantillas
         api('/api/admin/admin/templates'),
-        // Diseños de usuario
         api('/api/admin/admin/user-designs'),
       ]);
 
@@ -105,30 +101,24 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleUpdateUserSubscription = async (userId: number, newSubscription: string) => {
+  const handleUpdateUserSubscription = async (userId, newSubscription) => {
     try {
       const response = await api(`/api/admin/admin/users/${userId}/subscription`, {
         method: 'PUT',
         body: JSON.stringify({ tipo_suscripcion: newSubscription }),
       });
-
-      if (response.ok) {
-        loadDashboardData();
-      }
+      if (response.ok) loadDashboardData();
     } catch (error) {
       console.error('Error updating user subscription:', error);
     }
   };
 
-  const handleToggleUserStatus = async (userId: number) => {
+  const handleToggleUserStatus = async (userId) => {
     try {
       const response = await api(`/api/admin/admin/users/${userId}/toggle-status`, {
         method: 'PUT',
       });
-
-      if (response.ok) {
-        loadDashboardData();
-      }
+      if (response.ok) loadDashboardData();
     } catch (error) {
       console.error('Error toggling user status:', error);
     }
@@ -140,7 +130,6 @@ const AdminDashboard = () => {
         method: 'POST',
         body: JSON.stringify(newTemplate),
       });
-
       if (response.ok) {
         setNewTemplate({
           key: '',
@@ -158,37 +147,32 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleDeleteTemplate = async (templateId: number) => {
+  const handleDeleteTemplate = async (templateId) => {
     try {
       const response = await api(`/api/admin/admin/templates/${templateId}`, {
         method: 'DELETE',
       });
-
-      if (response.ok) {
-        loadDashboardData();
-      }
+      if (response.ok) loadDashboardData();
     } catch (error) {
       console.error('Error deleting template:', error);
     }
   };
 
-  const getSubscriptionBadge = (subscription: string) => {
-    const variants: Record<string, any> = {
-      'gratuita': 'secondary',
-      'premium': 'default',
-      'admin': 'destructive'
+  const getSubscriptionBadge = (subscription) => {
+    const variants = {
+      gratuita: 'secondary',
+      premium: 'default',
+      admin: 'destructive',
     };
-    
-    const icons: Record<string, JSX.Element | null> = {
-      'gratuita': null,
-      'premium': <Crown className="w-3 h-3 mr-1" />,
-      'admin': <Shield className="w-3 h-3 mr-1" />
-    };
+    const icon = subscription === 'premium'
+      ? <Crown className="w-3 h-3 mr-1" />
+      : subscription === 'admin'
+      ? <Shield className="w-3 h-3 mr-1" />
+      : null;
 
     return (
       <Badge variant={variants[subscription]} className="flex items-center">
-        {icons[subscription]}
-        {subscription}
+        {icon}{subscription}
       </Badge>
     );
   };
@@ -207,7 +191,7 @@ const AdminDashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600" />
       </div>
     );
   }
@@ -242,7 +226,7 @@ const AdminDashboard = () => {
           </TabsTrigger>
         </TabsList>
 
-        {/* Dashboard Tab */}
+        {/* Dashboard */}
         <TabsContent value="dashboard" className="space-y-6">
           {dashboardStats && (
             <>
@@ -254,9 +238,7 @@ const AdminDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">{dashboardStats.users.total}</div>
-                    <p className="text-xs text-muted-foreground">
-                      +{dashboardStats.users.new_30d} en los últimos 30 días
-                    </p>
+                    <p className="text-xs text-muted-foreground">+{dashboardStats.users.new_30d} en los últimos 30 días</p>
                   </CardContent>
                 </Card>
 
@@ -280,9 +262,7 @@ const AdminDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">{dashboardStats.templates.active}</div>
-                    <p className="text-xs text-muted-foreground">
-                      {dashboardStats.templates.premium} premium
-                    </p>
+                    <p className="text-xs text-muted-foreground">{dashboardStats.templates.premium} premium</p>
                   </CardContent>
                 </Card>
 
@@ -293,9 +273,7 @@ const AdminDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">{dashboardStats.designs.published}</div>
-                    <p className="text-xs text-muted-foreground">
-                      +{dashboardStats.designs.new_30d} nuevos este mes
-                    </p>
+                    <p className="text-xs text-muted-foreground">+{dashboardStats.designs.new_30d} nuevos este mes</p>
                   </CardContent>
                 </Card>
               </div>
@@ -307,7 +285,7 @@ const AdminDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {dashboardStats.popular_templates.map((template: any, index: number) => (
+                      {dashboardStats.popular_templates.map((template, index) => (
                         <div key={template.id} className="flex items-center justify-between">
                           <div>
                             <p className="font-medium">{template.name}</p>
@@ -326,7 +304,7 @@ const AdminDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {dashboardStats.active_users.map((user: any) => (
+                      {dashboardStats.active_users.map((user) => (
                         <div key={user.user_id} className="flex items-center justify-between">
                           <div>
                             <p className="font-medium">{user.username}</p>
@@ -343,7 +321,7 @@ const AdminDashboard = () => {
           )}
         </TabsContent>
 
-        {/* Users Tab */}
+        {/* Users */}
         <TabsContent value="users" className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -375,7 +353,7 @@ const AdminDashboard = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredUsers.map((user: any) => (
+                  {filteredUsers.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell>
                         <div>
@@ -429,7 +407,7 @@ const AdminDashboard = () => {
           </Card>
         </TabsContent>
 
-        {/* Templates Tab */}
+        {/* Templates */}
         <TabsContent value="templates" className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -462,7 +440,7 @@ const AdminDashboard = () => {
                     <Input
                       id="template-key"
                       value={newTemplate.key}
-                      onChange={(e) => setNewTemplate({...newTemplate, key: e.target.value})}
+                      onChange={(e) => setNewTemplate({ ...newTemplate, key: e.target.value })}
                       placeholder="wedding-elegant"
                     />
                   </div>
@@ -471,7 +449,7 @@ const AdminDashboard = () => {
                     <Input
                       id="template-name"
                       value={newTemplate.name}
-                      onChange={(e) => setNewTemplate({...newTemplate, name: e.target.value})}
+                      onChange={(e) => setNewTemplate({ ...newTemplate, name: e.target.value })}
                       placeholder="Boda Elegante"
                     />
                   </div>
@@ -480,7 +458,7 @@ const AdminDashboard = () => {
                     <Textarea
                       id="template-description"
                       value={newTemplate.description}
-                      onChange={(e) => setNewTemplate({...newTemplate, description: e.target.value})}
+                      onChange={(e) => setNewTemplate({ ...newTemplate, description: e.target.value })}
                       placeholder="Descripción de la plantilla..."
                     />
                   </div>
@@ -488,7 +466,7 @@ const AdminDashboard = () => {
                     <Label htmlFor="template-category">Categoría</Label>
                     <Select
                       value={newTemplate.category}
-                      onValueChange={(value) => setNewTemplate({...newTemplate, category: value})}
+                      onValueChange={(value) => setNewTemplate({ ...newTemplate, category: value })}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Seleccionar categoría" />
@@ -506,7 +484,7 @@ const AdminDashboard = () => {
                     <Switch
                       id="template-premium"
                       checked={newTemplate.is_premium}
-                      onCheckedChange={(checked) => setNewTemplate({...newTemplate, is_premium: checked})}
+                      onCheckedChange={(checked) => setNewTemplate({ ...newTemplate, is_premium: checked })}
                     />
                     <Label htmlFor="template-premium">Plantilla Premium</Label>
                   </div>
@@ -532,7 +510,7 @@ const AdminDashboard = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredTemplates.map((template: any) => (
+                  {filteredTemplates.map((template) => (
                     <TableRow key={template.id}>
                       <TableCell>
                         <div>
@@ -582,9 +560,7 @@ const AdminDashboard = () => {
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDeleteTemplate(template.id)}
-                                >
+                                <AlertDialogAction onClick={() => handleDeleteTemplate(template.id)}>
                                   Eliminar
                                 </AlertDialogAction>
                               </AlertDialogFooter>
@@ -600,7 +576,7 @@ const AdminDashboard = () => {
           </Card>
         </TabsContent>
 
-        {/* Designs Tab */}
+        {/* Designs */}
         <TabsContent value="designs" className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -628,7 +604,7 @@ const AdminDashboard = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {userDesigns.map((design: any) => (
+                  {userDesigns.map((design) => (
                     <TableRow key={design.id}>
                       <TableCell>
                         <div>
