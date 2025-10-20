@@ -1,7 +1,8 @@
+// src/lib/api.js
 // API client para comunicarse con el backend
 
-// Usa variable de entorno en prod; si no existe, apunta al backend de Render.
-const API_BASE_URL =
+// Usa variable de entorno en producción; si no existe, apunta al backend de Render.
+export const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'https://backend-xtqe.onrender.com/api';
 
 class ApiClient {
@@ -17,10 +18,7 @@ class ApiClient {
       ...options,
     };
 
-    // Normaliza el body:
-    // - Si es FormData: no tocar (y quitar Content-Type para que lo ponga el navegador).
-    // - Si es objeto plano: JSON.stringify.
-    // - Si es string/Blob/etc.: dejar tal cual.
+    // Normaliza el body
     if (config.body instanceof FormData) {
       // El navegador setea 'Content-Type: multipart/form-data; boundary=...'
       if (config.headers && config.headers['Content-Type']) {
