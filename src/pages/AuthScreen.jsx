@@ -2,13 +2,11 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth.jsx';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { Mail, Lock, User, ArrowLeft, Eye, EyeOff } from 'lucide-react'; // Importar Eye y EyeOff
+import { Mail, Lock, User, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import '../App.css';
-import backgroundImage from '../assets/wedding-cake.webp'; // Importar la imagen
+import backgroundImage from '../assets/wedding-cake.webp';
 
 // Icono oficial “G” de Google (inline SVG, escalable)
 function GoogleIcon({ className = 'w-5 h-5' }) {
@@ -23,11 +21,11 @@ function GoogleIcon({ className = 'w-5 h-5' }) {
 }
 
 export function AuthScreen() {
-  const [isLoginView, setIsLoginView] = useState(true); // true for login, false for register
+  const [isLoginView, setIsLoginView] = useState(true); // true = login, false = registro
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showPassword, setShowPassword] = useState(false); // Nuevo estado para mostrar/ocultar contraseña
+  const [showPassword, setShowPassword] = useState(false);
 
   const { login, register, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
@@ -37,8 +35,8 @@ export function AuthScreen() {
 
   const toggleView = () => {
     setIsLoginView(!isLoginView);
-    setFormData({ username: '', email: '', password: '' }); // Clear form data on view switch
-    setError(''); // Clear errors on view switch
+    setFormData({ username: '', email: '', password: '' });
+    setError('');
   };
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -50,20 +48,25 @@ export function AuthScreen() {
 
     try {
       if (isLoginView) {
-        // Login logic
-        await login({ email: formData.email, password: formData.password }); // Usar 'email' para login
+        // IMPORTANTe: el backend espera { username, password }.
+        // Usamos el email del formulario como "username".
+        await login({ username: formData.email, password: formData.password });
       } else {
-        // Register logic (simplified)
+        // Registro
         if (!formData.password || formData.password.length < 6) {
           setError('La contraseña debe tener al menos 6 caracteres');
           setLoading(false);
           return;
         }
-        await register({ username: formData.username, email: formData.email, password: formData.password });
+        await register({
+          username: formData.username || formData.email.split('@')[0],
+          email: formData.email,
+          password: formData.password,
+        });
       }
       navigate(redirectTo);
     } catch (err) {
-      setError(err.message || `No se pudo ${isLoginView ? 'iniciar sesión' : 'crear la cuenta'}`);
+      setError(err?.message || `No se pudo ${isLoginView ? 'iniciar sesión' : 'crear la cuenta'}`);
     } finally {
       setLoading(false);
     }
@@ -80,7 +83,7 @@ export function AuthScreen() {
         window.location.href = '/oauth/google';
       }
     } catch (err) {
-      setError(err.message || 'No se pudo iniciar sesión con Google');
+      setError(err?.message || 'No se pudo iniciar sesión con Google');
     } finally {
       setLoading(false);
     }
@@ -88,7 +91,7 @@ export function AuthScreen() {
 
   return (
     <div className="auth-container">
-      {/* Botón volver (posicionado absolutamente en la esquina superior izquierda de toda la pantalla) */}
+      {/* Botón volver */}
       <div className="absolute top-4 left-4 z-50">
         <Link to="/" className="flex items-center text-white hover:text-gray-200 transition-colors">
           <ArrowLeft className="w-5 h-5 mr-2" />
@@ -96,17 +99,16 @@ export function AuthScreen() {
         </Link>
       </div>
 
-      {/* Sección de la imagen (mitad izquierda en desktop) */}
+      {/* Imagen lateral (desktop) */}
       <div
         className="auth-image-section hidden md:flex"
         style={{ backgroundImage: `url(${backgroundImage})` }}
-      >
-      </div>
+      />
 
-      {/* Sección del formulario (mitad derecha en desktop) */}
+      {/* Formulario */}
       <div className="auth-form-section">
         <div className="max-w-md w-full space-y-8 p-4 md:p-0">
-          {/* Marca (visible solo en mobile, ya que en desktop está en la imagen) */}
+          {/* Marca (mobile) */}
           <div className="text-center md:hidden">
             <div className="font-display text-4xl font-black tracking-wide text-foreground">Invitaciones</div>
             <p className="mt-1 text-sm text-foreground">
@@ -114,7 +116,6 @@ export function AuthScreen() {
             </p>
           </div>
 
-          {/* Card */}
           <Card className="border-none shadow-none">
             <CardHeader>
               <CardTitle className="text-foreground">
@@ -190,7 +191,7 @@ export function AuthScreen() {
                   <input
                     id="password"
                     name="password"
-                    type={showPassword ? 'text' : 'password'} // Cambiar tipo dinámicamente
+                    type={showPassword ? 'text' : 'password'}
                     required
                     className={`floating-input has-icon ${formData.password ? 'has-value' : ''}`}
                     placeholder=" "
@@ -217,13 +218,15 @@ export function AuthScreen() {
                 </div>
 
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? (isLoginView ? 'Iniciando sesión...' : 'Creando cuenta...') : (isLoginView ? 'Iniciar Sesión' : 'Crear Cuenta')}
+                  {loading
+                    ? (isLoginView ? 'Iniciando sesión...' : 'Creando cuenta...')
+                    : (isLoginView ? 'Iniciar Sesión' : 'Crear Cuenta')}
                 </Button>
               </form>
 
               <div className="mt-6 text-center">
                 <p className="text-sm text-foreground">
-                  {isLoginView ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'} {' '}
+                  {isLoginView ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?'}{' '}
                   <button
                     onClick={toggleView}
                     className="font-medium underline underline-offset-4 text-foreground hover:opacity-80"
@@ -241,4 +244,3 @@ export function AuthScreen() {
 }
 
 export default AuthScreen;
-
