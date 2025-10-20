@@ -1,3 +1,4 @@
+// src/pages/EventWizard.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -17,7 +18,7 @@ import {
   Crown,
   Loader2
 } from 'lucide-react';
-import { api } from '../lib/api';
+import { api, API_BASE_URL } from '../lib/api';
 
 const EventWizard = () => {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ const EventWizard = () => {
   const [eventData, setEventData] = useState({
     title: '',
     description: '',
-    event_date: '',
+    event_date: '',    // viene del input datetime-local -> "YYYY-MM-DDTHH:MM"
     location: '',
     template_id: null
   });
@@ -41,7 +42,6 @@ const EventWizard = () => {
     { id: 3, title: 'Diseño y Template', icon: Palette }
   ];
 
-  // Cargar plantillas del backend
   useEffect(() => {
     loadTemplates();
   }, []);
@@ -49,36 +49,34 @@ const EventWizard = () => {
   const loadTemplates = async () => {
     setTemplatesLoading(true);
     try {
-      const response = await fetch('/api/templates');
-      if (response.ok) {
-        const data = await response.json();
-        // Si las plantillas vienen agrupadas por categoría, las aplanamos
-        let templatesList = [];
-        if (data.templates && typeof data.templates === 'object') {
-          // Si es un objeto con categorías
-          Object.values(data.templates).forEach(categoryTemplates => {
-            if (Array.isArray(categoryTemplates)) {
-              templatesList = templatesList.concat(categoryTemplates);
-            }
-          });
-        } else if (Array.isArray(data.templates)) {
-          // Si es un array directo
-          templatesList = data.templates;
-        }
-        
-        setTemplates(templatesList);
-        
-        // Seleccionar la primera plantilla por defecto si hay plantillas disponibles
-        if (templatesList.length > 0) {
-          setEventData(prev => ({ ...prev, template_id: templatesList[0].id }));
-        }
-      } else {
-        throw new Error('Error al cargar plantillas');
+      // Usamos el backend real SIEMPRE (evita el 304/HTML del frontend host)
+      const res = await fetch(`${API_BASE_URL}/templates`, {
+        credentials: 'include',
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+
+      // data.templates puede ser objeto {categoria: []} o array []
+      let templatesList = [];
+      if (data.templates && typeof data.templates === 'object' && !Array.isArray(data.templates)) {
+        Object.values(data.templates).forEach(catList => {
+          if (Array.isArray(catList)) templatesList = templatesList.concat(catList);
+        });
+      } else if (Array.isArray(data.templates)) {
+        templatesList = data.templates;
       }
-    } catch (error) {
-      console.error('Error loading templates:', error);
+
+      setTemplates(templatesList);
+
+      if (templatesList.length > 0) {
+        setEventData(prev => ({ ...prev, template_id: templatesList[0].id }));
+      }
+    } catch (err) {
+      console.error('Error loading templates:', err);
       setError('Error al cargar las plantillas. Usando plantillas por defecto.');
-      // Fallback a plantillas estáticas en caso de error
+
+      // Fallback con imágenes ABSOLUTAS para evitar 404 en /templates/*.jpg
       const fallbackTemplates = [
         {
           id: 1,
@@ -86,7 +84,7 @@ const EventWizard = () => {
           description: 'Diseño elegante y atemporal',
           category: 'wedding',
           is_premium: false,
-          preview_image_url: '/templates/classic-preview.jpg'
+          preview_image_url: 'https://picsum.photos/seed/classic/600/400'
         },
         {
           id: 2,
@@ -94,7 +92,7 @@ const EventWizard = () => {
           description: 'Estilo sofisticado y minimalista',
           category: 'wedding',
           is_premium: false,
-          preview_image_url: '/templates/elegant-preview.jpg'
+          preview_image_url: 'https://picsum.photos/seed/elegant/600/400'
         },
         {
           id: 3,
@@ -102,7 +100,7 @@ const EventWizard = () => {
           description: 'Diseño contemporáneo y vibrante',
           category: 'wedding',
           is_premium: true,
-          preview_image_url: '/templates/modern-preview.jpg'
+          preview_image_url: 'https://picsum.photos/seed/modern/600/400'
         }
       ];
       setTemplates(fallbackTemplates);
@@ -123,7 +121,7 @@ const EventWizard = () => {
       case 2:
         return eventData.event_date !== '' && eventData.location.trim() !== '';
       case 3:
-        return eventData.template_id !== '';
+        return !!eventData.template_id;
       default:
         return false;
     }
@@ -151,47 +149,54 @@ const EventWizard = () => {
 
     try {
       setLoading(true);
-      
-      // Paso 1: Crear el evento
-      const eventResponse = await api.post('/events', {
+
+      // Enviar 'event_date' para que el backend lo parsee (_parse_event_datetime)
+      const payload = {
         title: eventData.title,
         description: eventData.description,
-        date_time: eventData.event_date,
+        event_date: eventData.event_date, // ej: "2025-10-21T18:30"
         location: eventData.location,
         template_id: eventData.template_id
-      });
+      };
 
-      const eventId = eventResponse.data?.id || eventResponse.id;
-      
-      // Paso 2: Crear el diseño de usuario asociado al evento y plantilla
+      // api.post devuelve el body ya parseado
+      const eventResponse = await api.post('events', payload);
+
+      // Extraemos el id de distintas formas según cómo responda el backend
+      const eventId =
+        eventResponse?.event?.id ??
+        eventResponse?.data?.event?.id ??
+        eventResponse?.id ??
+        eventResponse?.event_id;
+
+      if (!eventId) {
+        console.warn('Respuesta de creación de evento sin id reconocible:', eventResponse);
+      }
+
+      // Intentar crear el diseño asociado (no bloquea el flujo si falla)
       try {
-        const designResponse = await fetch('/api/designs', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            template_id: eventData.template_id,
-            event_id: eventId,
-            design_name: `Diseño para ${eventData.title}`
-          }),
+        await api.post('designs', {
+          template_id: eventData.template_id,
+          event_id: eventId,
+          design_name: `Diseño para ${eventData.title}`
         });
-
-        if (designResponse.ok) {
-          const designData = await designResponse.json();
-          console.log('Diseño creado exitosamente:', designData);
-        } else {
-          console.warn('No se pudo crear el diseño automáticamente, pero el evento fue creado');
-        }
-      } catch (designError) {
-        console.warn('Error creando el diseño:', designError);
-        // No bloqueamos el flujo si falla la creación del diseño
+      } catch (designErr) {
+        console.warn('No se pudo crear el diseño automáticamente:', designErr);
       }
 
       // Redirigir al editor del evento
-      navigate(`/app/events/${eventId}/editor`);
+      if (eventId) {
+        navigate(`/app/events/${eventId}/editor`);
+      } else {
+        // Fallback: ir al listado
+        navigate('/app/events');
+      }
     } catch (err) {
-      setError('Error creando el evento. Por favor intente nuevamente.');
+      setError(
+        err?.body?.error ||
+        err?.body?.message ||
+        'Error creando el evento. Por favor intente nuevamente.'
+      );
       console.error(err);
     } finally {
       setLoading(false);
@@ -477,12 +482,17 @@ const Step3 = ({ eventData, onChange, templates, templatesLoading }) => {
                     alt={template.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
+                      e.currentTarget.style.display = 'none';
+                      if (e.currentTarget.nextSibling) {
+                        e.currentTarget.nextSibling.style.display = 'flex';
+                      }
                     }}
                   />
                 ) : null}
-                <div className="w-full h-full flex items-center justify-center" style={{display: template.preview_image_url ? 'none' : 'flex'}}>
+                <div
+                  className="w-full h-full flex items-center justify-center"
+                  style={{ display: template.preview_image_url ? 'none' : 'flex' }}
+                >
                   <div className="text-center">
                     <Palette className="w-8 h-8 mx-auto text-gray-400 mb-2" />
                     <span className="text-gray-500 text-sm">Vista previa del template</span>
