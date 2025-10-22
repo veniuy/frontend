@@ -65,10 +65,10 @@ const AdminDashboard = () => {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      const [statsRes, templatesRes, designsRes] = await Promise.all([
-        api('/api/admin/admin/dashboard/stats'),
-        api('/api/admin/admin/templates'),
-        api('/api/admin/admin/user-designs'),
+      const [statsRes, templatesRes] = await Promise.all([
+        api('/api/admin/dashboard/stats'),
+        api('/api/admin/templates')
+        // TODO: Agregar api('/api/admin/user-designs') cuando exista en backend
       ]);
 
       if (statsRes.ok) {
@@ -79,10 +79,11 @@ const AdminDashboard = () => {
         const templatesData = await templatesRes.json();
         setTemplates(templatesData.templates || []);
       }
-      if (designsRes.ok) {
-        const designsData = await designsRes.json();
-        setUserDesigns(designsData.designs || []);
-      }
+      // TODO: Cargar user designs cuando exista el endpoint
+      // if (designsRes.ok) {
+      //   const designsData = await designsRes.json();
+      //   setUserDesigns(designsData.designs || []);
+      // }
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
