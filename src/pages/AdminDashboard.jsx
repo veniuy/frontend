@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import UserManagement from '@/components/UserManagement';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,9 +28,6 @@ import {
   Activity
 } from 'lucide-react';
 
-/** ================================
- *  Config y helper de API (JS puro)
- *  ================================ */
 const API_BASE = import.meta.env.VITE_BACKEND_URL || 'https://backend-xtqe.onrender.com';
 
 const api = (path, options = {}) =>
@@ -45,15 +43,11 @@ const api = (path, options = {}) =>
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [dashboardStats, setDashboardStats] = useState(null);
-  const [users, setUsers] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [userDesigns, setUserDesigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedTemplate, setSelectedTemplate] = useState(null);
 
-  // Estados para formularios
   const [newTemplate, setNewTemplate] = useState({
     key: '',
     name: '',
@@ -71,9 +65,8 @@ const AdminDashboard = () => {
   const loadDashboardData = async () => {
     setLoading(true);
     try {
-      const [statsRes, usersRes, templatesRes, designsRes] = await Promise.all([
+      const [statsRes, templatesRes, designsRes] = await Promise.all([
         api('/api/admin/admin/dashboard/stats'),
-        api('/api/admin/admin/users'),
         api('/api/admin/admin/templates'),
         api('/api/admin/admin/user-designs'),
       ]);
@@ -81,10 +74,6 @@ const AdminDashboard = () => {
       if (statsRes.ok) {
         const statsData = await statsRes.json();
         setDashboardStats(statsData.stats);
-      }
-      if (usersRes.ok) {
-        const usersData = await usersRes.json();
-        setUsers(usersData.users || []);
       }
       if (templatesRes.ok) {
         const templatesData = await templatesRes.json();
@@ -98,29 +87,6 @@ const AdminDashboard = () => {
       console.error('Error loading dashboard data:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleUpdateUserSubscription = async (userId, newSubscription) => {
-    try {
-      const response = await api(`/api/admin/admin/users/${userId}/subscription`, {
-        method: 'PUT',
-        body: JSON.stringify({ tipo_suscripcion: newSubscription }),
-      });
-      if (response.ok) loadDashboardData();
-    } catch (error) {
-      console.error('Error updating user subscription:', error);
-    }
-  };
-
-  const handleToggleUserStatus = async (userId) => {
-    try {
-      const response = await api(`/api/admin/admin/users/${userId}/toggle-status`, {
-        method: 'PUT',
-      });
-      if (response.ok) loadDashboardData();
-    } catch (error) {
-      console.error('Error toggling user status:', error);
     }
   };
 
@@ -158,31 +124,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const getSubscriptionBadge = (subscription) => {
-    const variants = {
-      gratuita: 'secondary',
-      premium: 'default',
-      admin: 'destructive',
-    };
-    const icon = subscription === 'premium'
-      ? <Crown className="w-3 h-3 mr-1" />
-      : subscription === 'admin'
-      ? <Shield className="w-3 h-3 mr-1" />
-      : null;
-
-    return (
-      <Badge variant={variants[subscription]} className="flex items-center">
-        {icon}{subscription}
-      </Badge>
-    );
-  };
-
-  const filteredUsers = users.filter((user) =>
-    (user.username || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (user.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (user.nombre_completo || '').toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   const filteredTemplates = templates.filter((template) =>
     (template.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     (template.category || '').toLowerCase().includes(searchTerm.toLowerCase())
@@ -207,7 +148,7 @@ const AdminDashboard = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="dashboard" className="flex items-center gap-2">
             <BarChart3 className="w-4 h-4" />
             Dashboard
@@ -215,6 +156,10 @@ const AdminDashboard = () => {
           <TabsTrigger value="users" className="flex items-center gap-2">
             <Users className="w-4 h-4" />
             Usuarios
+          </TabsTrigger>
+          <TabsTrigger value="events" className="flex items-center gap-2">
+            <FileText className="w-4 h-4" />
+            Eventos
           </TabsTrigger>
           <TabsTrigger value="templates" className="flex items-center gap-2">
             <FileText className="w-4 h-4" />
@@ -323,88 +268,7 @@ const AdminDashboard = () => {
 
         {/* Users */}
         <TabsContent value="users" className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <Search className="w-4 h-4" />
-              <Input
-                placeholder="Buscar usuarios..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-64"
-              />
-            </div>
-            <Button>
-              <Download className="w-4 h-4 mr-2" />
-              Exportar
-            </Button>
-          </div>
-
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Usuario</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Suscripción</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead>Estadísticas</TableHead>
-                    <TableHead>Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredUsers.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">{user.username}</p>
-                          <p className="text-sm text-muted-foreground">{user.nombre_completo}</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{getSubscriptionBadge(user.tipo_suscripcion)}</TableCell>
-                      <TableCell>
-                        <Badge variant={user.activo ? 'default' : 'secondary'}>
-                          {user.activo ? 'Activo' : 'Inactivo'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-sm">
-                          <p>{user.stats?.total_events || 0} eventos</p>
-                          <p>{user.stats?.total_designs || 0} diseños</p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <Select
-                            value={user.tipo_suscripcion}
-                            onValueChange={(value) => handleUpdateUserSubscription(user.id, value)}
-                          >
-                            <SelectTrigger className="w-32">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="gratuita">Gratuita</SelectItem>
-                              <SelectItem value="premium">Premium</SelectItem>
-                              <SelectItem value="admin">Admin</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleToggleUserStatus(user.id)}
-                          >
-                            {user.activo ? 'Desactivar' : 'Activar'}
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <UserManagement />
         </TabsContent>
 
         {/* Templates */}
@@ -473,25 +337,39 @@ const AdminDashboard = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="wedding">Boda</SelectItem>
-                        <SelectItem value="birthday">Cumpleaños</SelectItem>
                         <SelectItem value="quince">Quinceañera</SelectItem>
-                        <SelectItem value="corporate">Corporativo</SelectItem>
                         <SelectItem value="kids">Infantil</SelectItem>
+                        <SelectItem value="other">Otro</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="template-premium">Premium</Label>
                     <Switch
                       id="template-premium"
                       checked={newTemplate.is_premium}
                       onCheckedChange={(checked) => setNewTemplate({ ...newTemplate, is_premium: checked })}
                     />
-                    <Label htmlFor="template-premium">Plantilla Premium</Label>
                   </div>
-                  <Button onClick={handleCreateTemplate} className="w-full">
-                    Crear Plantilla
-                  </Button>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="template-active">Activa</Label>
+                    <Switch
+                      id="template-active"
+                      checked={newTemplate.is_active}
+                      onCheckedChange={(checked) => setNewTemplate({ ...newTemplate, is_active: checked })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="template-sort">Orden</Label>
+                    <Input
+                      id="template-sort"
+                      type="number"
+                      value={newTemplate.sort_order}
+                      onChange={(e) => setNewTemplate({ ...newTemplate, sort_order: parseInt(e.target.value, 10) || 0 })}
+                    />
+                  </div>
                 </div>
+                <Button onClick={handleCreateTemplate} className="w-full mt-4">Crear Plantilla</Button>
               </DialogContent>
             </Dialog>
           </div>
@@ -503,7 +381,6 @@ const AdminDashboard = () => {
                   <TableRow>
                     <TableHead>Plantilla</TableHead>
                     <TableHead>Categoría</TableHead>
-                    <TableHead>Tipo</TableHead>
                     <TableHead>Estado</TableHead>
                     <TableHead>Orden</TableHead>
                     <TableHead>Acciones</TableHead>
@@ -518,21 +395,12 @@ const AdminDashboard = () => {
                           <p className="text-sm text-muted-foreground">{template.key}</p>
                         </div>
                       </TableCell>
+                      <TableCell>{template.category}</TableCell>
                       <TableCell>
-                        <Badge variant="outline">{template.category}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        {template.is_premium ? (
-                          <Badge className="flex items-center w-fit">
-                            <Crown className="w-3 h-3 mr-1" />
-                            Premium
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary">Gratuita</Badge>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={template.is_active ? 'default' : 'secondary'}>
+                        <Badge variant={template.is_premium ? 'default' : 'secondary'}>
+                          {template.is_premium ? 'Premium' : 'Estándar'}
+                        </Badge>
+                        <Badge variant={template.is_active ? 'default' : 'secondary'} className="ml-2">
                           {template.is_active ? 'Activa' : 'Inactiva'}
                         </Badge>
                       </TableCell>
@@ -575,7 +443,6 @@ const AdminDashboard = () => {
             </CardContent>
           </Card>
         </TabsContent>
-
         {/* Designs */}
         <TabsContent value="designs" className="space-y-6">
           <div className="flex items-center justify-between">
@@ -589,7 +456,6 @@ const AdminDashboard = () => {
               />
             </div>
           </div>
-
           <Card>
             <CardContent className="p-0">
               <Table>
@@ -651,5 +517,4 @@ const AdminDashboard = () => {
     </div>
   );
 };
-
 export default AdminDashboard;
