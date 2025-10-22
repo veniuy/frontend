@@ -116,7 +116,7 @@ const AdminDashboard = () => {
 
   const handleDeleteTemplate = async (templateId) => {
     try {
-      const response = await api(`/api/admin/admin/templates/${templateId}`, {
+      const response = await api(`/api/admin/templates/${templateId}`, {
         method: 'DELETE',
       });
       if (response.ok) loadDashboardData();

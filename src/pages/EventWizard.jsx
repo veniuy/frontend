@@ -160,7 +160,7 @@ const EventWizard = () => {
       };
 
       // api.post devuelve el body ya parseado
-      const eventResponse = await api.post('events', payload);
+      const eventResponse = await api.post('/events', payload);
 
       // Extraemos el id de distintas formas según cómo responda el backend
       const eventId =
@@ -175,7 +175,7 @@ const EventWizard = () => {
 
       // Intentar crear el diseño asociado (no bloquea el flujo si falla)
       try {
-        await api.post('designs', {
+        await api.post('/designs', {
           template_id: eventData.template_id,
           event_id: eventId,
           design_name: `Diseño para ${eventData.title}`
