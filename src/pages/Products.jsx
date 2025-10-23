@@ -7,6 +7,7 @@ import { Badge } from '../components/ui/badge'
 import { Input } from '../components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select'
 import PublicHeader from '../components/PublicHeader'
+import ImageScrollSection from './ImageScrollSection';
 import { 
   Search,
   Grid3X3,
@@ -166,6 +167,9 @@ function Products() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Image Scroll Section */}
+      <ImageScrollSection />
+
       {/* Header */}
       <PublicHeader 
         cartCount={cartCount}
