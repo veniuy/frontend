@@ -167,9 +167,6 @@ function Products() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Image Scroll Section */}
-      <ImageScrollSection />
-
       {/* Header */}
       <PublicHeader 
         cartCount={cartCount}
@@ -178,6 +175,9 @@ function Products() {
         onWishlistClick={handleWishlistClick}
         onCartClick={handleCartClick}
       />
+
+      {/* Image Scroll Section */}
+      <ImageScrollSection />
 
       {/* Hero Section */}
       <section className="bg-gradient-warm py-12">
