@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { asset } from './utils/assets';
+import { asset } from '../utils/assets';
 
 const ImageScrollSection = () => {
   const scrollRefLeft = useRef(null);
@@ -74,4 +74,6 @@ const ImageScrollSection = () => {
 };
 
 export default ImageScrollSection;
+
+
 
