@@ -713,7 +713,7 @@
 
 .image-wrapper {
   width: 256px;
-  height: 192px; /* Altura fija para las imágenes para mantener la proporción */
+  height: 384px; /* Ajustado para una relación de aspecto 2x3 (256px ancho * 3/2 = 384px alto) */
   border-radius: 0.5rem;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
