@@ -21,7 +21,7 @@ function GoogleIcon({ className = 'w-5 h-5' }) {
 }
 
 export function AuthScreen() {
-  const [isLoginView, setIsLoginView] = useState(true); // true = login, false = registro
+  const [isLoginView, setIsLoginView] = useState(true);
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -118,6 +118,7 @@ export function AuthScreen() {
                 {isLoginView ? 'Ingresa tus credenciales para continuar' : 'Ingresa tus datos para crear una cuenta'}
               </CardDescription>
             </CardHeader>
+
             <CardContent>
               <Button
                 type="button"
@@ -190,6 +191,7 @@ export function AuthScreen() {
                     value={formData.password}
                     onChange={handleChange}
                     autoComplete={isLoginView ? 'current-password' : 'new-password'}
+                    style={{ height: '48px', lineHeight: '48px' }}
                   />
                   <label htmlFor="password" className="floating-label has-icon">
                     Contraseña
@@ -202,19 +204,21 @@ export function AuthScreen() {
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
-                  {isLoginView && (
-                    <div className="text-right mt-2">
-                      <Link to="/forgot-password" className="text-sm font-medium underline underline-offset-4 text-foreground hover:opacity-80">
-                        ¿Olvidaste tu contraseña?
-                      </Link>
-                    </div>
-                  )}
-                  {!isLoginView && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Mínimo 6 caracteres
-                    </p>
-                  )}
                 </div>
+
+                {isLoginView && (
+                  <div className="text-right -mt-2">
+                    <Link to="/forgot-password" className="text-sm font-medium underline underline-offset-4 text-foreground hover:opacity-80">
+                      ¿Olvidaste tu contraseña?
+                    </Link>
+                  </div>
+                )}
+
+                {!isLoginView && (
+                  <p className="text-xs text-muted-foreground -mt-2">
+                    Mínimo 6 caracteres
+                  </p>
+                )}
 
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading
