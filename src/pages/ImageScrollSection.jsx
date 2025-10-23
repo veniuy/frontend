@@ -75,5 +75,3 @@ const ImageScrollSection = () => {
 
 export default ImageScrollSection;
 
-
-
