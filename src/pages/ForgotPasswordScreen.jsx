@@ -1,38 +1,38 @@
 import React, { useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '../components/ui/card';
+import { Link, useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
+import { Mail, ArrowLeft } from 'lucide-react';
 
-export default function ResetPasswordScreen() {
-  const { token } = useParams();
-  const navigate = useNavigate();
-  const [pw, setPw] = useState('');
-  const [pw2, setPw2] = useState('');
-  const [msg, setMsg] = useState('');
-  const [err, setErr] = useState('');
+export function ForgotPasswordScreen() {
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const submit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setErr(''); setMsg('');
-    if (!pw || pw.length < 6) return setErr('La contraseña debe tener al menos 6 caracteres');
-    if (pw !== pw2) return setErr('Las contraseñas no coinciden');
     setLoading(true);
+    setMessage('');
+    setError('');
+
     try {
-      const res = await fetch('/api/auth/reset-password', {
+      const response = await fetch('/api/auth/request-password-reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, password: pw }),
+        body: JSON.stringify({ email }),
       });
-      const data = await res.json();
-      if (res.ok) {
-        setMsg(data.message || 'Contraseña actualizada. Inicia sesión.');
-        setTimeout(() => navigate('/auth'), 1200);
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage(data.message || 'Se ha enviado un enlace de recuperación a tu correo electrónico.');
       } else {
-        setErr(data.message || 'No se pudo restablecer la contraseña');
+        setError(data.message || 'Error al solicitar la recuperación de contraseña.');
       }
-    } catch {
-      setErr('Error de red o servidor');
+    } catch (err) {
+      setError('Ocurrió un error de red o del servidor.');
     } finally {
       setLoading(false);
     }
@@ -42,54 +42,44 @@ export default function ResetPasswordScreen() {
     <div className="auth-container">
       <div className="absolute top-4 left-4 z-50">
         <Link to="/auth" className="flex items-center text-white hover:text-gray-200 transition-colors">
-          <span className="text-sm font-medium">Volver</span>
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          <span className="text-sm font-medium">Volver al inicio de sesión</span>
         </Link>
       </div>
-
       <div className="auth-form-section">
         <div className="max-w-md w-full space-y-8 p-4 md:p-0">
           <Card className="border-none shadow-none">
             <CardHeader>
-              <CardTitle className="text-foreground">Restablecer contraseña</CardTitle>
+              <CardTitle className="text-foreground">Recuperar Contraseña</CardTitle>
               <CardDescription className="text-foreground">
-                Ingresa tu nueva contraseña para completar el proceso.
+                Ingresa tu correo electrónico para recibir un enlace de recuperación.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={submit} className="space-y-4" noValidate>
-                {msg && <p className="text-green-500 text-sm">{msg}</p>}
-                {err && <p className="text-red-500 text-sm">{err}</p>}
+              <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+                {message && <p className="text-green-500 text-sm">{message}</p>}
+                {error && <p className="text-red-500 text-sm">{error}</p>}
 
                 <div className="floating-label-container">
+                  <Mail className="floating-icon" />
                   <input
-                    id="password"
-                    type="password"
-                    className={`floating-input ${pw ? 'has-value' : ''}`}
-                    placeholder=" "
-                    value={pw}
-                    onChange={(e) => setPw(e.target.value)}
-                    autoComplete="new-password"
+                    id="email"
+                    name="email"
+                    type="email"
                     required
-                  />
-                  <label htmlFor="password" className="floating-label">Nueva contraseña</label>
-                </div>
-
-                <div className="floating-label-container">
-                  <input
-                    id="password2"
-                    type="password"
-                    className={`floating-input ${pw2 ? 'has-value' : ''}`}
+                    className={`floating-input has-icon ${email ? 'has-value' : ''}`}
                     placeholder=" "
-                    value={pw2}
-                    onChange={(e) => setPw2(e.target.value)}
-                    autoComplete="new-password"
-                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
                   />
-                  <label htmlFor="password2" className="floating-label">Repetir contraseña</label>
+                  <label htmlFor="email" className="floating-label has-icon">
+                    Correo electrónico
+                  </label>
                 </div>
 
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Actualizando...' : 'Actualizar contraseña'}
+                  {loading ? 'Enviando...' : 'Enviar enlace de recuperación'}
                 </Button>
               </form>
             </CardContent>
@@ -100,3 +90,4 @@ export default function ResetPasswordScreen() {
   );
 }
 
+export default ForgotPasswordScreen;
