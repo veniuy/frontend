@@ -199,6 +199,13 @@ export function AuthScreen() {
                     onChange={handleChange}
                     autoComplete={isLoginView ? 'current-password' : 'new-password'}
                   />
+                  {isLoginView && (
+                    <div className="text-right mt-2">
+                      <Link to="/forgot-password" className="text-sm font-medium underline underline-offset-4 text-foreground hover:opacity-80">
+                        ¿Olvidaste tu contraseña?
+                      </Link>
+                    </div>
+                  )}
                   <label htmlFor="password" className="floating-label has-icon">
                     Contraseña
                   </label>
@@ -211,7 +218,7 @@ export function AuthScreen() {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                   {!isLoginView && (
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-xs text-muted-foreground mt-1 w-full">
                       Mínimo 6 caracteres
                     </p>
                   )}
