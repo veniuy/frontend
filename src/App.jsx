@@ -9,6 +9,8 @@ import ProductDetail from './pages/ProductDetail';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
 import Login from './pages/AuthScreen';
+import ForgotPasswordScreen from './pages/ForgotPasswordScreen';
+import ResetPasswordScreen from './pages/ResetPasswordScreen';
 import Register from './pages/AuthScreen';
 import DashboardImproved from './pages/DashboardImproved';
 import CreateEvent from './pages/CreateEvent';
@@ -75,6 +77,11 @@ function App() {
       <Route path="/demo/black" element={<DemoBlack />} />
       <Route path="/demo/premium" element={<DemoPremium />} />
       <Route path="/demo/clasica" element={<DemoClassic />} />
+
+      {/* Auth */}
+      <Route path="/auth" element={!user ? <AuthScreen /> : <Navigate to="/app/dashboard" />} />
+      <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
+      <Route path="/reset-password/:token" element={<ResetPasswordScreen />} />
       
       {/* Category routes */}
       <Route path="/categorias/boda" element={<Boda />} />
