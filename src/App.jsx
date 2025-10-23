@@ -8,6 +8,7 @@ import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
 import FAQ from './pages/FAQ';
 import Contact from './pages/Contact';
+import AuthScreen from './pages/AuthScreen';             // ← Faltaba este import
 import Login from './pages/AuthScreen';
 import ForgotPasswordScreen from './pages/ForgotPasswordScreen';
 import ResetPasswordScreen from './pages/ResetPasswordScreen';
@@ -82,7 +83,7 @@ function App() {
       <Route path="/auth" element={!user ? <AuthScreen /> : <Navigate to="/app/dashboard" />} />
       <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
       <Route path="/reset-password/:token" element={<ResetPasswordScreen />} />
-      
+
       {/* Category routes */}
       <Route path="/categorias/boda" element={<Boda />} />
       <Route path="/categorias/quinceaneras" element={<Quinceaneras />} />
@@ -90,21 +91,21 @@ function App() {
       <Route path="/categorias/bautizo" element={<Bautizo />} />
       <Route path="/categorias/corporativos" element={<Corporativos />} />
       <Route path="/categorias/graduaciones" element={<Graduaciones />} />
-      
+
       {/* Public event route */}
       <Route path="/p/:slug" element={<PublicEvent />} />
-      
-      {/* Auth routes */}
+
+      {/* Auth routes (compat) */}
       <Route path="/login" element={!user ? <Login /> : <Navigate to="/app/dashboard" />} />
       <Route path="/register" element={!user ? <Register /> : <Navigate to="/app/dashboard" />} />
 
       {/* Protected app routes */}
       <Route path="/app" element={user ? <LayoutImproved /> : <Navigate to="/login" />}>
         <Route index element={<Navigate to="/app/dashboard" />} />
-        
+
         {/* Main dashboard - using improved version */}
         <Route path="dashboard" element={<DashboardImproved />} />
-        
+
         {/* Event management */}
         <Route path="events/create" element={<CreateEvent />} />
         <Route path="events/wizard" element={<EventWizard />} />
@@ -112,35 +113,32 @@ function App() {
         <Route path="events/:id/editor" element={<VisualEditorPage />} />
         <Route path="events/:id/preview" element={<EventPreview />} />
         <Route path="events/:id/guests" element={<GuestManager />} />
-        
+
         {/* New feature pages */}
         <Route path="registry" element={<Registry />} />
         <Route path="accommodations" element={<Accommodations />} />
         <Route path="shareable-link" element={<ShareableLink />} />
-        
+
         {/* Guest management */}
         <Route path="guest-manager" element={<GuestManager />} />
         <Route path="guest-surveys" element={<GuestSurveys />} />
-        
+
         {/* Customization tools */}
         <Route path="visual-editor" element={<VisualEditorPage />} />
         <Route path="color-palette" element={<div className="p-8"><h1 className="text-2xl font-bold">Paletas de Colores - Próximamente</h1></div>} />
         <Route path="typography" element={<div className="p-8"><h1 className="text-2xl font-bold">Tipografías - Próximamente</h1></div>} />
         <Route path="gallery" element={<div className="p-8"><h1 className="text-2xl font-bold">Galería de Imágenes - Próximamente</h1></div>} />
-        
-        {/* Communication */}
-        <Route path="custom-emails" element={<div className="p-8"><h1 className="text-2xl font-bold">Emails Personalizados - Próximamente</h1></div>} />
-        
+
         {/* Analytics and tracking */}
         <Route path="tracking" element={<Tracking />} />
-        
+
         {/* User management */}
         <Route path="profile" element={<div className="p-8"><h1 className="text-2xl font-bold">Perfil de Usuario - Próximamente</h1></div>} />
         <Route path="settings" element={<div className="p-8"><h1 className="text-2xl font-bold">Configuración - Próximamente</h1></div>} />
-        
+
         {/* Preview functionality */}
         <Route path="preview" element={<div className="p-8"><h1 className="text-2xl font-bold">Vista Previa - Próximamente</h1></div>} />
-        
+
         {/* Payment routes */}
         <Route path="payment/transfer/:eventId" element={<PaymentTransfer />} />
         <Route path="payment/code/:eventId" element={<PaymentCode />} />
