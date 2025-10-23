@@ -28,44 +28,47 @@ const ImageScrollSection = () => {
     const scrollRight = scrollRefRight.current;
 
     if (scrollLeft) {
-      scrollLeft.innerHTML += scrollLeft.innerHTML; // Duplicate content for seamless loop
-      scrollLeft.style.animationDuration = `${scrollLeft.children.length * 2}s`;
+      // Duplicar el contenido para un bucle continuo sin interrupciones
+      scrollLeft.innerHTML += scrollLeft.innerHTML;
+      // La duración de la animación se define en CSS, aquí solo nos aseguramos de que el contenido esté duplicado.
     }
     if (scrollRight) {
-      scrollRight.innerHTML += scrollRight.innerHTML; // Duplicate content for seamless loop
-      scrollRight.style.animationDuration = `${scrollRight.children.length * 2}s`;
+      // Duplicar el contenido para un bucle continuo sin interrupciones
+      scrollRight.innerHTML += scrollRight.innerHTML;
+      // La duración de la animación se define en CSS, aquí solo nos aseguramos de que el contenido esté duplicado.
     }
   }, []);
 
   return (
-    <div className="header76_content-right mw-overlay-gradient relative overflow-hidden py-12">
-      <div className="header76_images-layout mw-overlay-gradient relative flex justify-center items-center h-[500px]">
-        <div className="absolute inset-0 flex justify-center items-center">
-          {/* Contenedor de texto central */}
-          <div className="z-10 text-center p-8 bg-white bg-opacity-70 rounded-lg shadow-lg max-w-md">
-            <h2 className="text-4xl font-display font-medium text-foreground mb-4">
-              Crea momentos inolvidables
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Diseños únicos y personalizados para cada ocasión especial.
-            </p>
-          </div>
+    <div className="image-scroll-section-container relative overflow-hidden py-12 md:py-24 bg-gradient-warm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-8">
+        {/* Sección de texto a la izquierda en PC, arriba en móvil */}
+        <div className="text-content md:w-1/2 text-center md:text-left">
+          <h2 className="text-4xl lg:text-5xl font-display font-medium text-foreground mb-4">
+            Crea momentos inolvidables
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-lg md:max-w-none mx-auto md:mx-0">
+            Diseños únicos y personalizados para cada ocasión especial.
+          </p>
         </div>
 
-        <div className="header76_image-list-container flex space-x-4">
-          <div ref={scrollRefLeft} className="header76_image-list-left flex flex-col space-y-4 animate-scroll-up">
-            {imagesLeft.map((src, index) => (
-              <div key={`left-${index}`} className="header76_image-wrapper w-64 h-auto rounded-lg overflow-hidden shadow-md">
-                <img src={src} alt={`Imagen ${index + 1}`} className="header76_image w-full h-full object-cover" loading="lazy" />
-              </div>
-            ))}
-          </div>
-          <div ref={scrollRefRight} className="header76_image-list-right flex flex-col space-y-4 animate-scroll-down">
-            {imagesRight.map((src, index) => (
-              <div key={`right-${index}`} className="header76_image-wrapper w-64 h-auto rounded-lg overflow-hidden shadow-md">
-                <img src={src} alt={`Imagen ${index + 1}`} className="header76_image w-full h-full object-cover" loading="lazy" />
-              </div>
-            ))}
+        {/* Contenedor de las listas de imágenes a la derecha en PC, abajo en móvil */}
+        <div className="image-lists-wrapper md:w-1/2 flex justify-center md:justify-end items-center relative h-[400px] md:h-[500px] overflow-hidden">
+          <div className="image-scroll-list-group flex space-x-4 h-full">
+            <div ref={scrollRefLeft} className="image-scroll-list image-scroll-list-left flex flex-col space-y-4 animate-scroll-up">
+              {imagesLeft.map((src, index) => (
+                <div key={`left-${index}`} className="image-wrapper w-64 h-auto rounded-lg overflow-hidden shadow-md">
+                  <img src={src} alt={`Imagen ${index + 1}`} className="image-item w-full h-full object-cover" loading="lazy" />
+                </div>
+              ))}
+            </div>
+            <div ref={scrollRefRight} className="image-scroll-list image-scroll-list-right flex flex-col space-y-4 animate-scroll-down">
+              {imagesRight.map((src, index) => (
+                <div key={`right-${index}`} className="image-wrapper w-64 h-auto rounded-lg overflow-hidden shadow-md">
+                  <img src={src} alt={`Imagen ${index + 1}`} className="image-item w-full h-full object-cover" loading="lazy" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
