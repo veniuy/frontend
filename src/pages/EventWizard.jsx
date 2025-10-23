@@ -184,12 +184,14 @@ const EventWizard = () => {
         console.warn('No se pudo crear el diseño automáticamente:', designErr);
       }
 
-      // Redirigir al editor del evento
+      // Redirigir al editor del evento (sin pago)
       if (eventId) {
-        navigate(`/app/events/${eventId}/editor`);
+        // Mostrar mensaje de éxito
+        alert('¡Evento creado exitosamente! Ahora puedes personalizarlo.');
+        navigate(`/events/${eventId}/editor`);
       } else {
         // Fallback: ir al listado
-        navigate('/app/events');
+        navigate('/events');
       }
     } catch (err) {
       setError(
