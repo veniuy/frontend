@@ -665,52 +665,61 @@
   width: 50%; /* Asegura que ocupe la mitad del ancho */
 }
 
-/* Estilos para la sección de desplazamiento de imágenes */
-.header76_content-right {
+/* Nuevos estilos para la sección de desplazamiento de imágenes */
+.image-scroll-section-container {
   position: relative;
   overflow: hidden;
 }
 
-.header76_images-layout {
+.image-lists-wrapper {
   position: relative;
+  height: 400px; /* Altura para móvil */
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 500px; /* Altura fija para la sección */
 }
 
-.header76_image-list-container {
+@media (min-width: 768px) {
+  .image-lists-wrapper {
+    height: 500px; /* Altura para escritorio */
+  }
+}
+
+.image-scroll-list-group {
   display: flex;
-  gap: 1rem; /* Espacio entre las columnas de imágenes */
+  gap: 1rem;
+  height: 100%;
 }
 
-.header76_image-list-left,
-.header76_image-list-right {
+.image-scroll-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem; /* Espacio entre las imágenes dentro de cada columna */
+  gap: 1rem;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
   animation-play-state: running;
+  /* Ajustar la duración de la animación aquí para un control más preciso */
+  animation-duration: 40s; /* Duración por defecto, se puede ajustar en JS si es necesario */
 }
 
-.header76_image-list-left {
+.image-scroll-list-left {
   animation-name: scroll-up;
 }
 
-.header76_image-list-right {
+.image-scroll-list-right {
   animation-name: scroll-down;
 }
 
-.header76_image-wrapper {
-  width: 256px; /* Ancho fijo para las imágenes */
-  height: auto;
+.image-wrapper {
+  width: 256px;
+  height: 192px; /* Altura fija para las imágenes para mantener la proporción */
   border-radius: 0.5rem;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.header76_image {
+.image-item {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -722,13 +731,13 @@
     transform: translateY(0%);
   }
   100% {
-    transform: translateY(-50%); /* Desplaza la mitad del contenido para un bucle sin fin */
+    transform: translateY(-100%); /* Desplaza el 100% del contenido para un bucle sin fin */
   }
 }
 
 @keyframes scroll-down {
   0% {
-    transform: translateY(-50%); /* Empieza desde la mitad para que el bucle sea inverso */
+    transform: translateY(-100%); /* Empieza desde el final para que el bucle sea inverso */
   }
   100% {
     transform: translateY(0%);
