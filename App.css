@@ -337,3 +337,75 @@
 .floating-label-container .text-right {
   margin-top: 4px;
 }
+
+
+/* Estilos para la sección de desplazamiento de imágenes */
+.header76_content-right {
+  position: relative;
+  overflow: hidden;
+}
+
+.header76_images-layout {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 500px; /* Altura fija para la sección */
+}
+
+.header76_image-list-container {
+  display: flex;
+  gap: 1rem; /* Espacio entre las columnas de imágenes */
+}
+
+.header76_image-list-left,
+.header76_image-list-right {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* Espacio entre las imágenes dentro de cada columna */
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  animation-play-state: running;
+}
+
+.header76_image-list-left {
+  animation-name: scroll-up;
+}
+
+.header76_image-list-right {
+  animation-name: scroll-down;
+}
+
+.header76_image-wrapper {
+  width: 256px; /* Ancho fijo para las imágenes */
+  height: auto;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.header76_image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Keyframes para el desplazamiento */
+@keyframes scroll-up {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(-50%); /* Desplaza la mitad del contenido para un bucle sin fin */
+  }
+}
+
+@keyframes scroll-down {
+  0% {
+    transform: translateY(-50%); /* Empieza desde la mitad para que el bucle sea inverso */
+  }
+  100% {
+    transform: translateY(0%);
+  }
+}
+
