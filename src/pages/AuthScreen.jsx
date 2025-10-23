@@ -48,11 +48,8 @@ export function AuthScreen() {
 
     try {
       if (isLoginView) {
-        // IMPORTANTe: el backend espera { username, password }.
-        // Usamos el email del formulario como "username".
         await login({ username: formData.email, password: formData.password });
       } else {
-        // Registro
         if (!formData.password || formData.password.length < 6) {
           setError('La contraseña debe tener al menos 6 caracteres');
           setLoading(false);
@@ -91,7 +88,6 @@ export function AuthScreen() {
 
   return (
     <div className="auth-container">
-      {/* Botón volver */}
       <div className="absolute top-4 left-4 z-50">
         <Link to="/" className="flex items-center text-white hover:text-gray-200 transition-colors">
           <ArrowLeft className="w-5 h-5 mr-2" />
@@ -99,16 +95,13 @@ export function AuthScreen() {
         </Link>
       </div>
 
-      {/* Imagen lateral (desktop) */}
       <div
         className="auth-image-section hidden md:flex"
         style={{ backgroundImage: `url(${backgroundImage})` }}
       />
 
-      {/* Formulario */}
       <div className="auth-form-section">
         <div className="max-w-md w-full space-y-8 p-4 md:p-0">
-          {/* Marca (mobile) */}
           <div className="text-center md:hidden">
             <div className="font-display text-4xl font-black tracking-wide text-foreground">Invitaciones</div>
             <p className="mt-1 text-sm text-foreground">
@@ -126,7 +119,6 @@ export function AuthScreen() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {/* Google */}
               <Button
                 type="button"
                 variant="outline"
@@ -199,13 +191,6 @@ export function AuthScreen() {
                     onChange={handleChange}
                     autoComplete={isLoginView ? 'current-password' : 'new-password'}
                   />
-                  {isLoginView && (
-                    <div className="text-right mt-2">
-                      <Link to="/forgot-password" className="text-sm font-medium underline underline-offset-4 text-foreground hover:opacity-80">
-                        ¿Olvidaste tu contraseña?
-                      </Link>
-                    </div>
-                  )}
                   <label htmlFor="password" className="floating-label has-icon">
                     Contraseña
                   </label>
@@ -217,7 +202,16 @@ export function AuthScreen() {
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
-                  {!isLoginView &&                     <p className="text-xs text-muted-foreground mt-1">                  Mínimo 6 caracteres
+                  {isLoginView && (
+                    <div className="text-right mt-2">
+                      <Link to="/forgot-password" className="text-sm font-medium underline underline-offset-4 text-foreground hover:opacity-80">
+                        ¿Olvidaste tu contraseña?
+                      </Link>
+                    </div>
+                  )}
+                  {!isLoginView && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Mínimo 6 caracteres
                     </p>
                   )}
                 </div>
@@ -249,3 +243,5 @@ export function AuthScreen() {
 }
 
 export default AuthScreen;
+
+
