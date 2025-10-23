@@ -217,9 +217,7 @@ export function AuthScreen() {
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
-                  {!isLoginView && (
-                    <p className="text-xs text-muted-foreground mt-1 w-full">
-                      Mínimo 6 caracteres
+                  {!isLoginView &&                     <p className="text-xs text-muted-foreground mt-1">                  Mínimo 6 caracteres
                     </p>
                   )}
                 </div>
