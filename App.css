@@ -7,8 +7,8 @@
   /* Fuentes - Elegantes para landing */
   --font-display: 'Playfair Display', serif;
   --font-ui: 'Inter', system-ui, sans-serif;
-  --font-nav: 'Inter', system-ui, sans-serif;
-  
+  --font-nav: 'Poppins', 'Inter', system-ui, sans-serif;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -48,7 +48,7 @@
 
 :root {
   --radius: 0.5rem;
-  
+
   /* Getguestlist.app inspired palette */
   --background: #ffffff;
   --foreground: #000000;
@@ -68,7 +68,7 @@
   --border: #e1ddd6;
   --input: #f4f2ed;
   --ring: #000000;
-  
+
   /* Custom colors - getguestlist.app style */
   --beige-light: #f4f2ed;
   --warm-gray-50: #f8f7f5;
@@ -80,7 +80,7 @@
   --sage-400: #9fb2a3;
   --gold-400: #c7ab7d;
   --gold-500: #b99564;
-  
+
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -145,7 +145,7 @@
 }
 
 
-/* Custom typography - Solo 2 fuentes principales */
+/* Custom typography - getguestlist.app style */
 .font-display {
   font-family: 'Playfair Display', serif;
   font-weight: 400;
@@ -157,7 +157,7 @@
 }
 
 .font-nav {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Poppins', 'Inter', system-ui, sans-serif;
   font-weight: 400;
 }
 
@@ -226,7 +226,7 @@
 
 /* Getguestlist.app Navigation Styles */
 .nav-link-guestlist {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 14px;
   font-weight: 400;
   text-transform: uppercase;
@@ -240,7 +240,7 @@
 }
 
 .nav-link-mobile-guestlist {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
   font-size: 34px;
   font-weight: 400;
   text-transform: uppercase;
@@ -258,7 +258,7 @@
   background-color: #f4f2ed;
 }
 
-/* Typography scale - Solo 2 fuentes principales */
+/* Typography scale - getguestlist.app */
 .text-h1-guestlist {
   font-family: 'Playfair Display', serif;
   font-size: 44px;
@@ -291,15 +291,15 @@
   .text-h1-guestlist {
     font-size: 36px;
   }
-  
+
   .text-h2-guestlist {
     font-size: 32px;
   }
-  
+
   .text-h3-guestlist {
     font-size: 22px;
   }
-  
+
   .text-body-guestlist {
     font-size: 16px;
   }
@@ -322,69 +322,359 @@
   background-color: #333333;
 }
 
+/* Mobile title alignment - títulos grandes a la izquierda */
+@media (max-width: 768px) {
+  /* Hero slider mobile - títulos a la izquierda */
+  .mobile-hero-title {
+    text-align: left !important;
+  }
+
+  /* Subtítulos en mayúsculas a la izquierda en móvil */
+  .text-center > p.uppercase {
+    text-align: left !important;
+  }
+
+  /* Títulos de secciones principales en móvil - solo en contenedores con text-center */
+  .text-center > h2[style*="Playfair Display"] {
+    text-align: left !important;
+  }
+
+  /* Descripciones (párrafos) a la izquierda en móvil - solo en contenedores con text-center */
+  .text-center > p[style*="Inter"] {
+    text-align: left !important;
+  }
+
+  /* Mantener centrado para elementos individuales con text-center (como las tarjetas con iconos) */
+  div.text-center h3,
+  div.text-center p {
+    text-align: center !important;
+  }
+}
+
+
+/* ============================================
+   FLOATING LABEL STYLES (CORREGIDO)
+   ============================================ */
+
+/* Contenedor para el campo con floating label */
 .floating-label-container {
   position: relative;
-  margin-bottom: 1.5rem; /* espacio uniforme entre celdas */
+  width: 100%;
+  margin-bottom: 1.5rem;
 }
 
-.floating-label-container input {
-  height: 48px; /* altura fija igual para todos */
-  line-height: 48px;
-  padding-right: 2.5rem; /* espacio para el ícono del ojo */
+/* Estilos base para inputs con floating label */
+.floating-input,
+.floating-textarea {
+  width: 100%;
+  padding: 1rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--background);
+  color: var(--foreground);
+  transition: all 200ms ease;
+  outline: none;
+  height: 3.5rem; /* Altura fija para todos los inputs */
 }
 
-.floating-label-container .text-xs,
-.floating-label-container .text-right {
-  margin-top: 4px;
+/* Input con icono a la izquierda */
+.floating-input.has-icon {
+  padding-left: 2.75rem;
+}
+
+/* Label flotante - posición inicial DENTRO del campo */
+.floating-label {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: var(--muted-foreground);
+  pointer-events: none;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: var(--background);
+  padding: 0 0.35rem;
+  z-index: 2;
+  white-space: nowrap;
+}
+
+/* Label con icono - se posiciona después del icono */
+.floating-label.has-icon {
+  left: 2.75rem;
+}
+
+/* Label para textarea */
+.floating-label.for-textarea {
+  top: 1.25rem;
+  transform: translateY(0);
+}
+
+/* Estado flotante del label - SOBRE LA LÍNEA DEL BORDE */
+.floating-input:focus ~ .floating-label,
+.floating-input:not(:placeholder-shown) ~ .floating-label,
+.floating-input.has-value ~ .floating-label,
+.floating-textarea:focus ~ .floating-label,
+.floating-textarea:not(:placeholder-shown) ~ .floating-label,
+.floating-textarea.has-value ~ .floating-label {
+  top: -0.625rem;
+  left: 0.625rem;
+  font-size: 0.75rem;
+  color: var(--primary);
+  background-color: var(--background);
+  transform: translateY(0);
+  font-weight: 500;
+  padding: 0 0.35rem;
+}
+
+/* Ajuste para labels con icono en estado flotante - NO desplazar por icono */
+.floating-input:focus ~ .floating-label.has-icon,
+.floating-input:not(:placeholder-shown) ~ .floating-label.has-icon,
+.floating-input.has-value ~ .floating-label.has-icon {
+  left: 0.625rem;
+}
+
+/* Focus states */
+.floating-input:focus,
+.floating-textarea:focus {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Placeholder COMPLETAMENTE invisible */
+.floating-input::placeholder,
+.floating-textarea::placeholder {
+  opacity: 0;
+  color: transparent;
+}
+
+/* Icono dentro del campo */
+.floating-icon {
+  position: absolute;
+  left: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted-foreground);
+  pointer-events: none;
+  z-index: 1;
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Icono para textarea */
+.floating-icon.for-textarea {
+  top: 1.125rem;
+  transform: translateY(0);
+}
+
+/* SELECT - Estilos para compatibilidad con shadcn/ui */
+.floating-select-trigger {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+  min-height: 3.5rem; /* Ajustar para que coincida con la altura de los inputs */
+}
+
+/* Label para select */
+.floating-label.for-select {
+  top: 50%;
+  transform: translateY(-50%);
+  left: 0.75rem;
+}
+
+/* Select con valor o abierto - label flotante */
+.floating-select-trigger[data-state="open"] ~ .floating-label,
+.floating-select-trigger.has-value ~ .floating-label {
+  top: -0.625rem;
+  left: 0.625rem;
+  font-size: 0.75rem;
+  color: var(--primary);
+  background-color: var(--background);
+  transform: translateY(0);
+  font-weight: 500;
+  padding: 0 0.35rem;
+}
+
+/* Variante para inputs con bordes personalizados (warm-gray, gold, etc.) */
+.floating-input.border-warm-gray-300:focus {
+  border-color: var(--gold-500);
+  box-shadow: 0 0 0 2px rgba(185, 149, 100, 0.1);
+}
+
+.floating-input.border-warm-gray-300:focus ~ .floating-label {
+  color: var(--gold-500);
+}
+
+/* Ajuste para campos de fecha */
+.floating-input[type="date"] {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  height: 3.5rem; /* Altura fija para campos de fecha */
+}
+
+.floating-input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+}
+
+/* Label siempre flotante para campos de fecha */
+.floating-input[type="date"] ~ .floating-label {
+  top: -0.625rem;
+  left: 0.625rem;
+  font-size: 0.75rem;
+  color: var(--primary);
+  background-color: var(--background);
+  transform: translateY(0);
+  font-weight: 500;
+  padding: 0 0.35rem;
+}
+
+/* Estados de error/validación */
+.floating-input.error,
+.floating-textarea.error {
+  border-color: var(--destructive);
+}
+
+.floating-input.error:focus ~ .floating-label,
+.floating-textarea.error:focus ~ .floating-label {
+  color: var(--destructive);
+}
+
+/* Disabled state */
+.floating-input:disabled,
+.floating-textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: var(--muted);
+}
+
+.floating-input:disabled ~ .floating-label,
+.floating-textarea:disabled ~ .floating-label {
+  opacity: 0.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .floating-input,
+  .floating-textarea {
+    font-size: 16px; /* Previene zoom en iOS */
+  }
+
+  .floating-label {
+    font-size: 16px;
+  }
+
+  .floating-input:focus ~ .floating-label,
+  .floating-input:not(:placeholder-shown) ~ .floating-label,
+  .floating-input.has-value ~ .floating-label,
+  .floating-textarea:focus ~ .floating-label,
+  .floating-textarea:not(:placeholder-shown) ~ .floating-label,
+  .floating-textarea.has-value ~ .floating-label {
+    font-size: 0.75rem;
+  }
+}
+
+/* Dark mode support */
+.dark .floating-label {
+  color: var(--muted-foreground);
+  background-color: var(--background);
+}
+
+.dark .floating-input:focus ~ .floating-label,
+.dark .floating-input:not(:placeholder-shown) ~ .floating-label,
+.dark .floating-input.has-value ~ .floating-label,
+.dark .floating-textarea:focus ~ .floating-label,
+.dark .floating-textarea:not(:placeholder-shown) ~ .floating-label,
+.dark .floating-textarea.has-value ~ .floating-label,
+.dark .floating-select-trigger[data-state="open"] ~ .floating-label,
+.dark .floating-select-trigger.has-value ~ .floating-label {
+  color: var(--primary);
+  background-color: var(--background);
 }
 
 
-/* Estilos para la sección de desplazamiento de imágenes */
-.header76_content-right {
+
+/* Bordes negros para Register */
+.floating-input.border-black {
+  border-color: #000000;
+}
+
+.floating-input.border-black:focus {
+  border-color: #000000;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.floating-input.border-black:focus ~ .floating-label {
+  color: #000000;
+}
+
+
+
+/* Ocultar scrollbar en carrusel de categorías */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}
+
+
+
+/* Nuevos estilos para la sección de desplazamiento de imágenes */
+.image-scroll-section-container {
   position: relative;
   overflow: hidden;
 }
 
-.header76_images-layout {
+.image-lists-wrapper {
   position: relative;
+  height: 600px; /* Aumentado para móvil para mostrar más imágenes */
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 500px; /* Altura fija para la sección */
 }
 
-.header76_image-list-container {
+@media (min-width: 768px) {
+  .image-lists-wrapper {
+    height: 800px; /* Aumentado para escritorio para mostrar más imágenes */
+  }
+}
+
+.image-scroll-list-group {
   display: flex;
-  gap: 1rem; /* Espacio entre las columnas de imágenes */
+  gap: 1rem;
+  height: 100%;
 }
 
-.header76_image-list-left,
-.header76_image-list-right {
+.image-scroll-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem; /* Espacio entre las imágenes dentro de cada columna */
+  gap: 1rem;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
   animation-play-state: running;
+  /* Ajustar la duración de la animación aquí para un control más preciso */
+  animation-duration: 80s; /* Aumentado para movimiento más lento */
 }
 
-.header76_image-list-left {
+.image-scroll-list-left {
   animation-name: scroll-up;
 }
 
-.header76_image-list-right {
+.image-scroll-list-right {
   animation-name: scroll-down;
 }
 
-.header76_image-wrapper {
-  width: 256px; /* Ancho fijo para las imágenes */
-  height: auto;
+.image-wrapper {
+  width: 320px; /* Aumentado de 256px a 320px */
+  height: 480px; /* Recalculado para relación 2x3 (320px * 3/2 = 480px) */
   border-radius: 0.5rem;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.header76_image {
+.image-item {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -396,16 +686,18 @@
     transform: translateY(0%);
   }
   100% {
-    transform: translateY(-50%); /* Desplaza la mitad del contenido para un bucle sin fin */
+    transform: translateY(-100%); /* Desplaza el 100% del contenido para un bucle sin fin */
   }
 }
 
 @keyframes scroll-down {
   0% {
-    transform: translateY(-50%); /* Empieza desde la mitad para que el bucle sea inverso */
+    transform: translateY(-100%); /* Empieza desde el final para que el bucle sea inverso */
   }
   100% {
     transform: translateY(0%);
   }
 }
+
+
 
