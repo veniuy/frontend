@@ -97,12 +97,12 @@ export function AuthScreen() {
 
       {/* Imagen (visible en mobile, 100% ancho) */}
       <div
-        className="auth-image-section w-full h-64 bg-cover bg-center lg:w-1/2 lg:h-screen"
+        className="w-full h-64 bg-cover bg-center lg:w-1/2 lg:h-screen"
         style={{ backgroundImage: `url(${backgroundImage})` }}
       />
 
       {/* Formulario (100% en mobile, 50% en desktop) */}
-      <div className="auth-form-section w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12">
+      <div className="auth-form-section w-full lg:w-1/2 flex items-center justify-center p-6 py-12 lg:p-12">
         <div className="max-w-md w-full space-y-8">
           {/* Título mobile */}
           <div className="text-center lg:hidden">
