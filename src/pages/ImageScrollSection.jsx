@@ -56,13 +56,13 @@ const ImageScrollSection = () => {
         .pause-on-hover:hover .animate-down { animation-play-state: paused; }
       `}</style>
 
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-6 items-center">
         {/* Texto */}
-        <div className="text-center md:text-left md:w-1/2 px-4 md:px-8">
-          <h2 className="text-4xl lg:text-5xl font-display font-medium text-foreground mb-4">
+        <div className="text-center md:text-left">
+          <h2 className="text-3xl md:text-4xl font-display font-medium text-foreground mb-3">
             Crea momentos inolvidables
           </h2>
-          <p className="text-xl text-muted-foreground max-w-lg mx-auto md:mx-0">
+          <p className="text-lg text-muted-foreground max-w-md mx-auto md:mx-0">
             Diseños únicos y personalizados para cada ocasión especial.
           </p>
         </div>
