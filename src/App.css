@@ -191,7 +191,7 @@
 
 /* Gradient backgrounds */
 .bg-gradient-warm {
-  background: linear-gradient(180deg, #faf9f7 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #faf9f7 0%, #f2f0ed 100%);
 }
 
 .bg-gradient-sage {
@@ -757,4 +757,3 @@
   .auth-root{ display:flex !important; flex-direction:column !important; width:100% !important; }
   .auth-root > *{ width:100% !important; }
 }
-
