@@ -409,3 +409,11 @@
   }
 }
 
+.auth-container { min-height: 100vh; }
+@media (max-width: 767px){
+  .auth-image-section{ display:none !important; }
+}
+@media (min-width: 768px){
+  .auth-image-section{ display:flex; width:50%; }
+  .auth-form-section{ width:50%; }
+}
