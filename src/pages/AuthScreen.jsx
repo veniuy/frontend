@@ -86,7 +86,7 @@ export function AuthScreen() {
   };
 
   return (
-    <div className="auth-container relative flex flex-col xl:flex-row min-h-screen">
+    <div className="auth-container relative flex flex-col sm:flex-col xl:flex-row min-h-screen">
       {/* Volver */}
       <div className="absolute top-4 left-4 z-50 xl:top-8 xl:left-8">
         <Link to="/" className="flex items-center text-white hover:text-gray-200 transition-colors">
@@ -252,3 +252,4 @@ export function AuthScreen() {
 }
 
 export default AuthScreen;
+
