@@ -8,8 +8,8 @@ export default function MarketingBanner() {
       aria-label="Crea invitaciones en segundos con tus propios diseños"
     >
       <p className="mx-auto max-w-7xl px-3 py-1.5 text-center text-sm leading-tight">
-        <strong className="font-semibold">¡Nuevo!</strong>{" "}
-        Crea invitaciones en segundos con tus propios diseños.{" "}
+        <strong className="font-semibold">¡Hola!</strong>{" "}
+        Crea invitaciones en segundos.{" "}
         <span className="underline underline-offset-2">Comenzar</span>
       </p>
     </a>
