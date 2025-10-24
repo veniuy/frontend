@@ -38,8 +38,8 @@ const ImageScrollSection = () => {
         .rail {
           height: 450px; /* más alto, para mostrar más imagen */
         }
-        @media (min-width: 768px){ .rail { height: 760px; } }
-        @media (min-width: 1024px){ .rail { height: 880px; } }
+        @media (min-width: 768px){ .rail { height: 450px; } }
+        @media (min-width: 1024px){ .rail { height: 500px; } }
 
         @keyframes scroll-up {
           0% { transform: translateY(0); }
@@ -60,6 +60,7 @@ const ImageScrollSection = () => {
         {/* Texto */}
         <div className="text-center md:text-left md:w-1/2 px-4 md:px-8">
           <h2 className="text-4xl lg:text-5xl font-display font-medium text-foreground mb-4">
+            style={{ paddingTop: '10px' }}
             Crea momentos inolvidables
           </h2>
           <p className="text-xl text-muted-foreground max-w-lg mx-auto md:mx-0">
