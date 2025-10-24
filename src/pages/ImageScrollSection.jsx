@@ -60,7 +60,6 @@ const ImageScrollSection = () => {
         {/* Texto */}
         <div className="text-center md:text-left md:w-1/2 px-4 md:px-8">
           <h2 className="text-4xl lg:text-5xl font-display font-medium text-foreground mb-4">
-            style={{ paddingTop: '10px' }}
             Crea momentos inolvidables
           </h2>
           <p className="text-xl text-muted-foreground max-w-lg mx-auto md:mx-0">
@@ -106,5 +105,3 @@ const ImageScrollSection = () => {
 };
 
 export default ImageScrollSection;
-
-
