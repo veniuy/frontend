@@ -673,7 +673,7 @@
 
 .image-lists-wrapper {
   position: relative;
-  height: 400px; /* Altura para móvil */
+  height: 600px; /* Aumentado para móvil para mostrar más imágenes */
   width: 100%;
   display: flex;
   justify-content: center;
@@ -682,7 +682,7 @@
 
 @media (min-width: 768px) {
   .image-lists-wrapper {
-    height: 500px; /* Altura para escritorio */
+    height: 800px; /* Aumentado para escritorio para mostrar más imágenes */
   }
 }
 
@@ -700,7 +700,7 @@
   animation-timing-function: linear;
   animation-play-state: running;
   /* Ajustar la duración de la animación aquí para un control más preciso */
-  animation-duration: 80s; /* Duración por defecto, se puede ajustar en JS si es necesario */
+  animation-duration: 80s; /* Aumentado para movimiento más lento */
 }
 
 .image-scroll-list-left {
@@ -712,8 +712,8 @@
 }
 
 .image-wrapper {
-  width: 256px;
-  height: 384px; /* Ajustado para una relación de aspecto 2x3 (256px ancho * 3/2 = 384px alto) */
+  width: 320px; /* Aumentado de 256px a 320px */
+  height: 480px; /* Recalculado para relación 2x3 (320px * 3/2 = 480px) */
   border-radius: 0.5rem;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -743,6 +743,7 @@
     transform: translateY(0%);
   }
 }
+
 
 .auth-container { min-height: 100vh; }
 @media (max-width: 767px){
