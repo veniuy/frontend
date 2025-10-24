@@ -29,6 +29,7 @@ import {
 } from 'lucide-react'
 
 import { asset, onImgError } from '../utils/assets'
+import MarketingBanner from "../components/MarketingBanner";
 import PublicHeader from '../components/PublicHeader'
 
 function Landing() {
@@ -350,6 +351,7 @@ function Landing() {
   return (
     <div className="min-h-screen bg-background font-ui">
       {/* Header - Estilo getguestlist.app */}
+      <MarketingBanner />
       <PublicHeader 
         cartCount={cartCount}
         wishlistCount={wishlist.length}
