@@ -86,7 +86,7 @@ export function AuthScreen() {
   };
 
   return (
-    <div className="auth-container flex flex-col md:flex-row min-h-screen">
+    <div className="auth-container flex flex-col min-h-screen">
       {/* Volver */}
       <div className="absolute top-4 left-4 z-50">
         <Link to="/" className="flex items-center text-white hover:text-gray-200 transition-colors">
@@ -95,17 +95,17 @@ export function AuthScreen() {
         </Link>
       </div>
 
-      {/* Imagen (oculta en mobile) */}
+      {/* Imagen (visible en mobile, 100% ancho) */}
       <div
-        className="auth-image-section hidden md:flex md:w-1/2 bg-cover bg-center"
+        className="auth-image-section w-full h-64 md:h-auto md:w-1/2 bg-cover bg-center"
         style={{ backgroundImage: `url(${backgroundImage})` }}
       />
 
       {/* Formulario (100% en mobile, 50% en desktop) */}
       <div className="auth-form-section w-full md:w-1/2 flex items-center justify-center p-6 md:p-12">
         <div className="max-w-md w-full space-y-8">
-          {/* Título mobile */}
-          <div className="text-center md:hidden">
+          {/* Título mobile (oculto) */}
+          <div className="text-center hidden">
             <div className="font-display text-4xl font-black tracking-wide text-foreground">Invitaciones</div>
             <p className="mt-1 text-sm text-foreground">
               {isLoginView ? 'Accede a tu cuenta para gestionar tus invitaciones' : 'Únete y comienza a crear invitaciones únicas'}
