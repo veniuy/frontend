@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import PublicHeader from '../PublicHeader' // Asumo que PublicHeader.jsx está en el mismo nivel o lo ajustaré si es necesario
 import { useNavigate, useParams } from 'react-router-dom'
 import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
@@ -41,9 +42,9 @@ function ProductDetail() {
     name: "Cuadro foto personalizado Jazmín",
     category: "Productos con fotos",
     images: [
-      '/src/assets/cotton_bird_images/producto_jazmin_cuadro.webp',
-      '/src/assets/cotton_bird_images/categoria_productos_fotos.webp',
-      '/src/assets/cotton_bird_images/album_le_petit_quotidien.webp'
+      '/src/assets/te_espero_images/producto_jazmin_cuadro.webp',
+      '/src/assets/te_espero_images/categoria_productos_fotos.webp',
+      '/src/assets/te_espero_images/album_le_petit_quotidien.webp'
     ],
     price: 46.00,
     badge: "Nuevo",
@@ -77,9 +78,9 @@ function ProductDetail() {
   }
 
   const relatedProducts = [
-    { id: 2, name: "Cuadro Pequeño mensaje", image: '/src/assets/cotton_bird_images/album_le_petit_quotidien.webp', price: "46,00 €" },
-    { id: 3, name: "Cuadro Floral", image: '/src/assets/cotton_bird_images/categoria_productos_fotos.webp', price: "46,00 €" },
-    { id: 4, name: "Cuadro Pure", image: '/src/assets/cotton_bird_images/novedades_boda.webp', price: "44,00 €" }
+    { id: 2, name: "Cuadro Pequeño mensaje", image: '/src/assets/te_espero_images/album_le_petit_quotidien.webp', price: "46,00 €" },
+    { id: 3, name: "Cuadro Floral", image: '/src/assets/te_espero_images/categoria_productos_fotos.webp', price: "46,00 €" },
+    { id: 4, name: "Cuadro Pure", image: '/src/assets/te_espero_images/novedades_boda.webp', price: "44,00 €" }
   ]
 
   const getCurrentPrice = () => {
@@ -101,21 +102,7 @@ function ProductDetail() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="font-serif text-2xl font-medium text-gray-900 tracking-wide cursor-pointer" onClick={() => navigate('/')}>
-              Cotton Bird
-            </div>
-            <nav className="hidden md:flex items-center space-x-8">
-              <a href="#" className="text-gray-700 hover:text-pink-600 transition-colors">Boda</a>
-              <a href="#" className="text-gray-700 hover:text-pink-600 transition-colors">Bautizo</a>
-              <a href="#" className="text-gray-700 hover:text-pink-600 transition-colors">Comunión</a>
-              <a href="#" className="text-gray-700 hover:text-pink-600 transition-colors">Cumpleaños</a>
-            </nav>
-          </div>
-        </div>
-      </header>
+      <PublicHeader />
 
       {/* Breadcrumb */}
       <div className="bg-gray-50 border-b border-gray-200">
