@@ -57,14 +57,14 @@ const ImageScrollSection = () => {
           <div className="image-scroll-list-group flex space-x-4 h-full">
             <div ref={scrollRefLeft} className="image-scroll-list image-scroll-list-left flex flex-col space-y-4 animate-scroll-up">
               {imagesLeft.map((src, index) => (
-                <div key={`left-${index}`} className="image-wrapper w-64 h-auto rounded-lg overflow-hidden shadow-md">
+                <div key={`left-${index}`} className="image-wrapper w-64 rounded-lg overflow-hidden shadow-md">
                   <img src={src} alt={`Imagen ${index + 1}`} className="image-item w-full h-full object-cover" loading="lazy" />
                 </div>
               ))}
             </div>
             <div ref={scrollRefRight} className="image-scroll-list image-scroll-list-right flex flex-col space-y-4 animate-scroll-down">
               {imagesRight.map((src, index) => (
-                <div key={`right-${index}`} className="image-wrapper w-64 h-auto rounded-lg overflow-hidden shadow-md">
+                <div key={`right-${index}`} className="image-wrapper w-64 rounded-lg overflow-hidden shadow-md">
                   <img src={src} alt={`Imagen ${index + 1}`} className="image-item w-full h-full object-cover" loading="lazy" />
                 </div>
               ))}
@@ -77,4 +77,6 @@ const ImageScrollSection = () => {
 };
 
 export default ImageScrollSection;
+
+
 
