@@ -84,7 +84,8 @@ export function DashboardImproved() {
         api.get('/dashboard/stats')
       ]);
       
-      setEvents(eventsResponse.data || []);
+      // Backend devuelve { success: true, events: [...] }
+      setEvents(eventsResponse.events || eventsResponse.data || []);
       setStats(statsResponse.data || stats);
     } catch (err) {
       console.error('Error loading dashboard:', err);

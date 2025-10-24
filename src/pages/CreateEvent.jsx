@@ -1,72 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
-import { Badge } from '../components/ui/badge';
-import { Calendar, MapPin, Users, CreditCard, Building, Smartphone } from 'lucide-react';
+import { Calendar, MapPin, Sparkles, ArrowLeft } from 'lucide-react';
 import { api } from '../lib/api';
 
 const CreateEvent = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1);
-  const [plans, setPlans] = useState([]);
-  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [eventData, setEventData] = useState({
     title: '',
     description: '',
     event_date: '',
     location: '',
-    address: '',
-    max_guests: 50,
-    contact_info: ''
+    template_id: 'classic'
   });
-  const [paymentMethod, setPaymentMethod] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [plansLoading, setPlansLoading] = useState(false);
-  const [plansError, setPlansError] = useState(null);
-
-  useEffect(() => {
-    fetchPlans();
-  }, []);
-
-  const fetchPlans = async () => {
-    setPlansLoading(true);
-    setPlansError(null);
-    try {
-      const response = await api.get('/plans');
-      
-      // SOLUCIÓN: Verificar la estructura de la respuesta y manejar diferentes formatos
-      let plansData = [];
-      
-      if (response && response.plans && Array.isArray(response.plans)) {
-        // Formato: { plans: [...] }
-        plansData = response.plans;
-      } else if (response && response.data && Array.isArray(response.data)) {
-        // Formato: { data: [...] }
-        plansData = response.data;
-      } else if (response && response.data && response.data.data && Array.isArray(response.data.data)) {
-        // Formato: { data: { data: [...] } }
-        plansData = response.data.data;
-      } else if (Array.isArray(response)) {
-        // Formato: [...]
-        plansData = response;
-      } else {
-        console.warn('Formato de respuesta inesperado para planes:', response);
-        plansData = [];
-      }
-      
-      setPlans(plansData);
-    } catch (error) {
-      console.error('Error fetching plans:', error);
-      setPlansError('Error al cargar los planes. Por favor, intenta nuevamente.');
-      setPlans([]); // Asegurar que plans sea siempre un array
-    } finally {
-      setPlansLoading(false);
-    }
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -76,367 +28,242 @@ const CreateEvent = () => {
     }));
   };
 
-  const handleCreateEvent = async () => {
-    setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Validaciones básicas
+    if (!eventData.title || !eventData.event_date) {
+      setError('Por favor completa el nombre y la fecha del evento');
+      return;
+    }
+
     try {
-      // Crear evento en estado DRAFT
-      const eventResponse = await api.post('/events', {
-        ...eventData,
-        plan_id: selectedPlan.id
-      });
+      setLoading(true);
+      setError(null);
       
-      const eventId = eventResponse.data.event.id;
+      // Crear evento en DRAFT - GRATIS (sin plan_id)
+      const response = await api.post('/events', eventData);
       
-      // Iniciar checkout
-      const checkoutResponse = await api.post(`/events/${eventId}/checkout`, {
-        payment_method: paymentMethod,
-        plan_id: selectedPlan.id
-      });
-      
-      if (paymentMethod === 'mercadopago') {
-        // Crear preferencia de MercadoPago
-        const preferenceResponse = await api.post('/payments/mercadopago/create-preference', {
-          event_id: eventId
-        });
+      if (response.success && response.event) {
+        const eventId = response.event.id;
         
-        // Redirigir a MercadoPago
-        window.location.href = preferenceResponse.data.init_point;
-      } else if (paymentMethod === 'bank_transfer') {
-        // Mostrar información bancaria
-        navigate(`/payment/transfer/${eventId}`, { 
-          state: { 
-            bankInfo: checkoutResponse.data.data.bank_info,
-            paymentReference: checkoutResponse.data.data.payment_reference
-          }
+        // Redirigir al editor
+        navigate(`/app/events/${eventId}/editor`, {
+          state: { isNew: true, message: '¡Evento creado! Ahora puedes personalizarlo.' }
         });
-      } else if (paymentMethod === 'abitab' || paymentMethod === 'redpagos') {
-        // Mostrar código de pago
-        navigate(`/payment/code/${eventId}`, {
-          state: {
-            paymentCode: checkoutResponse.data.data.payment_code,
-            method: paymentMethod,
-            expiresAt: checkoutResponse.data.data.expires_at
-          }
-        });
+      } else {
+        throw new Error('Error al crear el evento');
       }
       
-    } catch (error) {
-      console.error('Error creating event:', error);
-      alert('Error al crear el evento. Por favor intenta nuevamente.');
+    } catch (err) {
+      console.error('Error creating event:', err);
+      setError(err.message || 'Error al crear el evento. Por favor intenta nuevamente.');
     } finally {
       setLoading(false);
     }
   };
 
-  const renderStep1 = () => (
-    <Card className="max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Calendar className="h-5 w-5" />
-          Información del Evento
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div>
-          <Label htmlFor="title">Nombre del Evento</Label>
-          <Input
-            id="title"
-            name="title"
-            value={eventData.title}
-            onChange={handleInputChange}
-            placeholder="Ej: Boda de María y Juan"
-          />
-        </div>
-        
-        <div>
-          <Label htmlFor="description">Descripción</Label>
-          <Textarea
-            id="description"
-            name="description"
-            value={eventData.description}
-            onChange={handleInputChange}
-            placeholder="Describe tu evento especial..."
-          />
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="event_date">Fecha y Hora</Label>
-            <Input
-              id="event_date"
-              name="event_date"
-              type="datetime-local"
-              value={eventData.event_date}
-              onChange={handleInputChange}
-            />
-          </div>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 py-12 px-4">
+      <div className="max-w-2xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/app/dashboard')}
+            className="mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Volver al Dashboard
+          </Button>
           
-          <div>
-            <Label htmlFor="max_guests">Máximo de Invitados</Label>
-            <Input
-              id="max_guests"
-              name="max_guests"
-              type="number"
-              value={eventData.max_guests}
-              onChange={handleInputChange}
-            />
+          <div className="text-center">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-full mb-4">
+              <Sparkles className="h-8 w-8 text-white" />
+            </div>
+            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+              Crea tu Evento
+            </h1>
+            <p className="text-lg text-gray-600">
+              ¡Completamente GRATIS! Personaliza después y paga solo al publicar
+            </p>
           </div>
         </div>
-        
-        <div>
-          <Label htmlFor="location">Ubicación</Label>
-          <Input
-            id="location"
-            name="location"
-            value={eventData.location}
-            onChange={handleInputChange}
-            placeholder="Ej: Salón de Eventos Paradise"
-          />
-        </div>
-        
-        <div>
-          <Label htmlFor="address">Dirección Completa</Label>
-          <Input
-            id="address"
-            name="address"
-            value={eventData.address}
-            onChange={handleInputChange}
-            placeholder="Ej: Av. 18 de Julio 1234, Montevideo"
-          />
-        </div>
-        
-        <div>
-          <Label htmlFor="contact_info">Información de Contacto</Label>
-          <Input
-            id="contact_info"
-            name="contact_info"
-            value={eventData.contact_info}
-            onChange={handleInputChange}
-            placeholder="Ej: María - 099 123 456"
-          />
-        </div>
-        
-        <Button 
-          onClick={() => setStep(2)} 
-          className="w-full"
-          disabled={!eventData.title || !eventData.event_date}
-        >
-          Continuar
-        </Button>
-      </CardContent>
-    </Card>
-  );
 
-  const renderStep2 = () => (
-    <Card className="max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle>Selecciona tu Plan</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {plansLoading && (
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
-            <p className="mt-2 text-gray-600">Cargando planes...</p>
-          </div>
-        )}
-        
-        {plansError && (
-          <div className="text-center py-8">
-            <p className="text-red-600 mb-4">{plansError}</p>
-            <Button onClick={fetchPlans} variant="outline">
-              Reintentar
-            </Button>
-          </div>
-        )}
-        
-        {!plansLoading && !plansError && (
-          <>
-            {plans.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-600">No hay planes disponibles en este momento.</p>
-                <Button onClick={fetchPlans} variant="outline" className="mt-4">
-                  Recargar
+        {/* Formulario */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              Información Básica
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Título del Evento */}
+              <div>
+                <Label htmlFor="title" className="text-base font-semibold">
+                  Nombre del Evento *
+                </Label>
+                <Input
+                  id="title"
+                  name="title"
+                  value={eventData.title}
+                  onChange={handleInputChange}
+                  placeholder="Ej: Boda de María y Juan"
+                  className="mt-2"
+                  required
+                />
+              </div>
+
+              {/* Descripción */}
+              <div>
+                <Label htmlFor="description" className="text-base font-semibold">
+                  Descripción (opcional)
+                </Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  value={eventData.description}
+                  onChange={handleInputChange}
+                  placeholder="Describe tu evento especial..."
+                  className="mt-2"
+                  rows={3}
+                />
+              </div>
+
+              {/* Fecha y Hora */}
+              <div>
+                <Label htmlFor="event_date" className="text-base font-semibold">
+                  Fecha y Hora *
+                </Label>
+                <Input
+                  id="event_date"
+                  name="event_date"
+                  type="datetime-local"
+                  value={eventData.event_date}
+                  onChange={handleInputChange}
+                  className="mt-2"
+                  required
+                />
+              </div>
+
+              {/* Ubicación */}
+              <div>
+                <Label htmlFor="location" className="text-base font-semibold">
+                  Ubicación (opcional)
+                </Label>
+                <div className="relative mt-2">
+                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <Input
+                    id="location"
+                    name="location"
+                    value={eventData.location}
+                    onChange={handleInputChange}
+                    placeholder="Ej: Salón de Eventos Paradise"
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+
+              {/* Plantilla */}
+              <div>
+                <Label htmlFor="template_id" className="text-base font-semibold">
+                  Plantilla (opcional)
+                </Label>
+                <select
+                  id="template_id"
+                  name="template_id"
+                  value={eventData.template_id}
+                  onChange={handleInputChange}
+                  className="mt-2 w-full border border-gray-300 rounded-md px-3 py-2"
+                >
+                  <option value="classic">Clásica</option>
+                  <option value="modern">Moderna</option>
+                  <option value="elegant">Elegante</option>
+                  <option value="minimal">Minimalista</option>
+                </select>
+                <p className="text-sm text-gray-500 mt-1">
+                  Puedes cambiar la plantilla después en el editor
+                </p>
+              </div>
+
+              {/* Error */}
+              {error && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-red-600 text-sm">{error}</p>
+                </div>
+              )}
+
+              {/* Info Box */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <Sparkles className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-semibold text-blue-900">¡Sin pagos ahora!</p>
+                    <p className="text-sm text-blue-700 mt-1">
+                      Crea tu evento gratis. Edita, personaliza y agrega invitados sin costo. 
+                      Solo pagarás cuando decidas publicarlo para tus invitados.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Botones */}
+              <div className="flex gap-4 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate('/app/dashboard')}
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
+                
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  {loading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Creando...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      Crear Evento Gratis
+                    </>
+                  )}
                 </Button>
               </div>
-            ) : (
-              <div className="grid md:grid-cols-2 gap-6">
-                {plans.map((plan) => (
-                  <Card 
-                    key={plan.id} 
-                    className={`cursor-pointer transition-all ${
-                      selectedPlan?.id === plan.id ? 'ring-2 ring-blue-500' : ''
-                    }`}
-                    onClick={() => setSelectedPlan(plan)}
-                  >
-                    <CardHeader>
-                      <CardTitle className="flex justify-between items-center">
-                        {plan.name}
-                        <Badge variant={plan.name === 'Free' ? 'secondary' : 'default'}>
-                          ${plan.price} {plan.currency}
-                        </Badge>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-gray-600 mb-4">{plan.description}</p>
-                      <ul className="space-y-2 text-sm">
-                        <li className="flex items-center gap-2">
-                          <Users className="h-4 w-4" />
-                          Hasta {plan.max_guests} invitados
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4" />
-                          {plan.max_images} imágenes
-                        </li>
-                        {plan.premium_templates && (
-                          <li className="flex items-center gap-2">
-                            <Badge variant="outline">Plantillas Premium</Badge>
-                          </li>
-                        )}
-                        {plan.remove_watermark && (
-                          <li className="flex items-center gap-2">
-                            <Badge variant="outline">Sin Marca de Agua</Badge>
-                          </li>
-                        )}
-                      </ul>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-        
-        <div className="flex gap-4 mt-6">
-          <Button variant="outline" onClick={() => setStep(1)}>
-            Atrás
-          </Button>
-          <Button 
-            onClick={() => setStep(3)} 
-            disabled={!selectedPlan || plansLoading}
-            className="flex-1"
-          >
-            Continuar
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
+            </form>
+          </CardContent>
+        </Card>
 
-  const renderStep3 = () => (
-    <Card className="max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>Método de Pago</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid gap-4">
-          <Card 
-            className={`cursor-pointer transition-all ${
-              paymentMethod === 'mercadopago' ? 'ring-2 ring-blue-500' : ''
-            }`}
-            onClick={() => setPaymentMethod('mercadopago')}
-          >
-            <CardContent className="flex items-center gap-3 p-4">
-              <CreditCard className="h-5 w-5" />
-              <div>
-                <h3 className="font-medium">Tarjeta de Crédito/Débito</h3>
-                <p className="text-sm text-gray-600">Pago seguro con MercadoPago</p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className={`cursor-pointer transition-all ${
-              paymentMethod === 'bank_transfer' ? 'ring-2 ring-blue-500' : ''
-            }`}
-            onClick={() => setPaymentMethod('bank_transfer')}
-          >
-            <CardContent className="flex items-center gap-3 p-4">
-              <Building className="h-5 w-5" />
-              <div>
-                <h3 className="font-medium">Transferencia Bancaria</h3>
-                <p className="text-sm text-gray-600">Transferencia directa a nuestra cuenta</p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className={`cursor-pointer transition-all ${
-              paymentMethod === 'abitab' ? 'ring-2 ring-blue-500' : ''
-            }`}
-            onClick={() => setPaymentMethod('abitab')}
-          >
-            <CardContent className="flex items-center gap-3 p-4">
-              <Smartphone className="h-5 w-5" />
-              <div>
-                <h3 className="font-medium">Abitab</h3>
-                <p className="text-sm text-gray-600">Pago en efectivo en locales Abitab</p>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card 
-            className={`cursor-pointer transition-all ${
-              paymentMethod === 'redpagos' ? 'ring-2 ring-blue-500' : ''
-            }`}
-            onClick={() => setPaymentMethod('redpagos')}
-          >
-            <CardContent className="flex items-center gap-3 p-4">
-              <Smartphone className="h-5 w-5" />
-              <div>
-                <h3 className="font-medium">Red Pagos</h3>
-                <p className="text-sm text-gray-600">Pago en efectivo en locales Red Pagos</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <div className="flex gap-4 mt-6">
-          <Button variant="outline" onClick={() => setStep(2)}>
-            Atrás
-          </Button>
-          <Button 
-            onClick={handleCreateEvent} 
-            disabled={!paymentMethod || loading}
-            className="flex-1"
-          >
-            {loading ? 'Procesando...' : `Crear Evento - $${selectedPlan?.price} ${selectedPlan?.currency}`}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Crear Nuevo Evento</h1>
-          <div className="flex justify-center mt-4">
-            <div className="flex items-center space-x-4">
-              {[1, 2, 3].map((stepNumber) => (
-                <div key={stepNumber} className="flex items-center">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                    step >= stepNumber ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-600'
-                  }`}>
-                    {stepNumber}
-                  </div>
-                  {stepNumber < 3 && (
-                    <div className={`w-12 h-1 mx-2 ${
-                      step > stepNumber ? 'bg-blue-500' : 'bg-gray-200'
-                    }`} />
-                  )}
-                </div>
-              ))}
-            </div>
+        {/* Features */}
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+            <div className="text-3xl mb-2">✨</div>
+            <p className="font-semibold text-gray-900">Crea Gratis</p>
+            <p className="text-sm text-gray-600">Sin costos iniciales</p>
+          </div>
+          <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+            <div className="text-3xl mb-2">🎨</div>
+            <p className="font-semibold text-gray-900">Personaliza</p>
+            <p className="text-sm text-gray-600">Edita a tu gusto</p>
+          </div>
+          <div className="text-center p-4 bg-white rounded-lg shadow-sm">
+            <div className="text-3xl mb-2">🚀</div>
+            <p className="font-semibold text-gray-900">Publica</p>
+            <p className="text-sm text-gray-600">Paga solo al publicar</p>
           </div>
         </div>
-        
-        {step === 1 && renderStep1()}
-        {step === 2 && renderStep2()}
-        {step === 3 && renderStep3()}
       </div>
     </div>
   );
 };
 
 export default CreateEvent;
+

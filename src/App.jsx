@@ -23,6 +23,7 @@ import VisualEditorPage from './pages/VisualEditorPage';
 import GuestManager from './pages/GuestManager';
 import PaymentTransfer from './pages/PaymentTransfer';
 import PaymentCode from './pages/PaymentCode';
+import PublishEvent from './pages/PublishEvent';
 import DemoWedding from './pages/DemoWedding';
 import DemoQuinceanera from './pages/DemoQuinceanera';
 import DemoBlack from './pages/DemoBlack';
@@ -112,6 +113,7 @@ function App() {
         <Route path="events/:id/builder" element={<EventBuilder />} />
         <Route path="events/:id/editor" element={<VisualEditorPage />} />
         <Route path="events/:id/preview" element={<EventPreview />} />
+        <Route path="events/:id/publish" element={<PublishEvent />} />
         <Route path="events/:id/guests" element={<GuestManager />} />
 
         {/* New feature pages */}
