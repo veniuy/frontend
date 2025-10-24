@@ -700,7 +700,7 @@
   animation-timing-function: linear;
   animation-play-state: running;
   /* Ajustar la duración de la animación aquí para un control más preciso */
-  animation-duration: 40s; /* Duración por defecto, se puede ajustar en JS si es necesario */
+  animation-duration: 80s; /* Duración por defecto, se puede ajustar en JS si es necesario */
 }
 
 .image-scroll-list-left {
