@@ -21,7 +21,7 @@ function GoogleIcon({ className = 'w-5 h-5' }) {
 }
 
 export function AuthScreen() {
-  const [isLoginView, setIsLoginView] = useState(true); // true = login, false = registro
+  const [isLoginView, setIsLoginView] = useState(true);
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -86,26 +86,30 @@ export function AuthScreen() {
   };
 
   return (
-    <div className="auth-container relative flex flex-col sm:flex-col xl:flex-row min-h-screen">
+    <div className="relative min-h-dvh flex flex-col lg:flex-row">
       {/* Volver */}
-      <div className="absolute top-4 left-4 z-50 xl:top-8 xl:left-8">
+      <div className="absolute top-4 left-4 z-50 lg:top-8 lg:left-8">
         <Link to="/" className="flex items-center text-white hover:text-gray-200 transition-colors">
           <ArrowLeft className="w-5 h-5 mr-2" />
           <span className="text-sm font-medium">Volver</span>
         </Link>
       </div>
 
-      {/* Imagen (visible en mobile, 100% ancho) */}
-      <div
-        className="w-full h-64 bg-cover bg-center xl:w-1/2 xl:h-screen"
-        style={{ backgroundImage: `url(${backgroundImage})` }}
-      />
+      {/* Imagen: full ancho arriba en mobile, 50% en desktop */}
+      <div className="w-full h-56 sm:h-72 lg:h-auto lg:w-1/2">
+        <img
+          src={backgroundImage}
+          alt="Invitaciones"
+          className="w-full h-full object-cover block"
+          fetchpriority="high"
+        />
+      </div>
 
-      {/* Formulario (100% en mobile, 50% en desktop) */}
-      <div className="auth-form-section w-full xl:w-1/2 flex items-center justify-center p-6 py-12 xl:p-12">
-        <div className="w-full xl:max-w-md space-y-8">
+      {/* Formulario: full ancho en mobile, 50% en desktop */}
+      <section className="w-full lg:w-1/2 flex items-center justify-center px-4 py-8 sm:px-6 sm:py-12 lg:p-12">
+        <div className="w-full max-w-[560px] space-y-8">
           {/* Título mobile */}
-          <div className="text-center xl:hidden">
+          <div className="text-center lg:hidden">
             <div className="font-display text-4xl font-black tracking-wide text-foreground">Invitaciones</div>
             <p className="mt-1 text-sm text-foreground">
               {isLoginView ? 'Accede a tu cuenta para gestionar tus invitaciones' : 'Únete y comienza a crear invitaciones únicas'}
@@ -113,7 +117,7 @@ export function AuthScreen() {
           </div>
 
           <Card className="border-none shadow-none">
-            <CardHeader>
+            <CardHeader className="p-0">
               <CardTitle className="text-foreground">
                 {isLoginView ? 'Bienvenido de vuelta' : 'Crear Cuenta'}
               </CardTitle>
@@ -122,7 +126,7 @@ export function AuthScreen() {
               </CardDescription>
             </CardHeader>
 
-            <CardContent>
+            <CardContent className="p-0 pt-4">
               <Button
                 type="button"
                 variant="outline"
@@ -211,7 +215,6 @@ export function AuthScreen() {
                   </button>
                 </div>
 
-                {/* Textos auxiliares fuera del input para no alterar la altura */}
                 {isLoginView && (
                   <div className="text-right -mt-2">
                     <Link to="/forgot-password" className="text-sm font-medium underline underline-offset-4 text-foreground hover:opacity-80">
@@ -246,7 +249,7 @@ export function AuthScreen() {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
