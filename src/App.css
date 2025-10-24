@@ -753,3 +753,8 @@
   .auth-image-section{ display:flex; width:100%; }
   .auth-form-section{ width:100%; }
 }
+@media (max-width: 1023.98px){
+  .auth-root{ display:flex !important; flex-direction:column !important; width:100% !important; }
+  .auth-root > *{ width:100% !important; }
+}
+
