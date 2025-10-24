@@ -103,7 +103,7 @@ export function AuthScreen() {
 
       {/* Formulario (100% en mobile, 50% en desktop) */}
       <div className="auth-form-section w-full xl:w-1/2 flex items-center justify-center p-6 py-12 xl:p-12">
-        <div className="max-w-md w-full space-y-8">
+        <div className="w-full xl:max-w-md space-y-8">
           {/* Título mobile */}
           <div className="text-center xl:hidden">
             <div className="font-display text-4xl font-black tracking-wide text-foreground">Invitaciones</div>
@@ -252,4 +252,3 @@ export function AuthScreen() {
 }
 
 export default AuthScreen;
-
