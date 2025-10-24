@@ -21,7 +21,7 @@ function GoogleIcon({ className = 'w-5 h-5' }) {
 }
 
 export function AuthScreen() {
-  const [isLoginView, setIsLoginView] = useState(true);
+  const [isLoginView, setIsLoginView] = useState(true); // true = login, false = registro
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -45,7 +45,6 @@ export function AuthScreen() {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     try {
       if (isLoginView) {
         await login({ username: formData.email, password: formData.password });
@@ -87,7 +86,8 @@ export function AuthScreen() {
   };
 
   return (
-    <div className="auth-container">
+    <div className="auth-container flex flex-col md:flex-row min-h-screen">
+      {/* Volver */}
       <div className="absolute top-4 left-4 z-50">
         <Link to="/" className="flex items-center text-white hover:text-gray-200 transition-colors">
           <ArrowLeft className="w-5 h-5 mr-2" />
@@ -95,13 +95,16 @@ export function AuthScreen() {
         </Link>
       </div>
 
+      {/* Imagen (oculta en mobile) */}
       <div
-        className="auth-image-section hidden md:flex"
+        className="auth-image-section hidden md:flex md:w-1/2 bg-cover bg-center"
         style={{ backgroundImage: `url(${backgroundImage})` }}
       />
 
-      <div className="auth-form-section">
-        <div className="max-w-md w-full space-y-8 p-4 md:p-0">
+      {/* Formulario (100% en mobile, 50% en desktop) */}
+      <div className="auth-form-section w-full md:w-1/2 flex items-center justify-center p-6 md:p-12">
+        <div className="max-w-md w-full space-y-8">
+          {/* Título mobile */}
           <div className="text-center md:hidden">
             <div className="font-display text-4xl font-black tracking-wide text-foreground">Invitaciones</div>
             <p className="mt-1 text-sm text-foreground">
@@ -154,6 +157,7 @@ export function AuthScreen() {
                       value={formData.username}
                       onChange={handleChange}
                       autoComplete="username"
+                      style={{ height: '48px', lineHeight: '48px' }}
                     />
                     <label htmlFor="username" className="floating-label has-icon">
                       Nombre de Usuario
@@ -173,6 +177,7 @@ export function AuthScreen() {
                     value={formData.email}
                     onChange={handleChange}
                     autoComplete="email"
+                    style={{ height: '48px', lineHeight: '48px' }}
                   />
                   <label htmlFor="email" className="floating-label has-icon">
                     Correo electrónico
@@ -191,7 +196,7 @@ export function AuthScreen() {
                     value={formData.password}
                     onChange={handleChange}
                     autoComplete={isLoginView ? 'current-password' : 'new-password'}
-                    style={{ height: '48px', lineHeight: '48px' }}
+                    style={{ height: '48px', lineHeight: '48px', paddingRight: '2.5rem' }}
                   />
                   <label htmlFor="password" className="floating-label has-icon">
                     Contraseña
@@ -206,6 +211,7 @@ export function AuthScreen() {
                   </button>
                 </div>
 
+                {/* Textos auxiliares fuera del input para no alterar la altura */}
                 {isLoginView && (
                   <div className="text-right -mt-2">
                     <Link to="/forgot-password" className="text-sm font-medium underline underline-offset-4 text-foreground hover:opacity-80">
@@ -213,7 +219,6 @@ export function AuthScreen() {
                     </Link>
                   </div>
                 )}
-
                 {!isLoginView && (
                   <p className="text-xs text-muted-foreground -mt-2">
                     Mínimo 6 caracteres
@@ -247,5 +252,3 @@ export function AuthScreen() {
 }
 
 export default AuthScreen;
-
-
