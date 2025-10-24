@@ -36,7 +36,7 @@ const ImageScrollSection = () => {
         @media (min-width: 1024px){ .card { width: 16rem; } }
 
         .rail {
-          height: 640px; /* más alto, para mostrar más imagen */
+          height: 450px; /* más alto, para mostrar más imagen */
         }
         @media (min-width: 768px){ .rail { height: 760px; } }
         @media (min-width: 1024px){ .rail { height: 880px; } }
