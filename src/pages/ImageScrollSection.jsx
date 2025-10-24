@@ -53,8 +53,8 @@ const ImageScrollSection = () => {
           0% { transform: translateY(-50%); }
           100% { transform: translateY(0); }
         }
-        .animate-up   { animation: scroll-up 20s linear infinite; }
-        .animate-down { animation: scroll-down 22s linear infinite; } /* leve desfasaje */
+        .animate-up   { animation: scroll-up 80s linear infinite; }
+        .animate-down { animation: scroll-down 80s linear infinite; } /* leve desfasaje */
         .pause-on-hover:hover .animate-up,
         .pause-on-hover:hover .animate-down { animation-play-state: paused; }
       `}</style>
