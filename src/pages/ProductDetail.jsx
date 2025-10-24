@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import PublicHeader from '../PublicHeader' // Asumo que PublicHeader.jsx está en el mismo nivel o lo ajustaré si es necesario
+import PublicHeader from '../components/PublicHeader'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Button } from '../components/ui/button'
 import { Card, CardContent } from '../components/ui/card'
