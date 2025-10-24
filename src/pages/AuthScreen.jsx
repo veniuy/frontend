@@ -8,7 +8,7 @@ import { Mail, Lock, User, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import '../App.css';
 import backgroundImage from '../assets/wedding-cake.webp';
 
-// Icono oficial “G” de Google (inline SVG, escalable)
+// Icono oficial “G” de Google (inline SVG)
 function GoogleIcon({ className = 'w-5 h-5' }) {
   return (
     <svg className={className} viewBox="0 0 533.5 544.3" aria-hidden="true" focusable="false">
@@ -86,7 +86,7 @@ export function AuthScreen() {
   };
 
   return (
-    <div className="relative min-h-dvh flex flex-col lg:flex-row">
+    <div className="auth-root relative min-h-dvh flex flex-col lg:flex-row w-full">
       {/* Volver */}
       <div className="absolute top-4 left-4 z-50 lg:top-8 lg:left-8">
         <Link to="/" className="flex items-center text-white hover:text-gray-200 transition-colors">
@@ -95,8 +95,8 @@ export function AuthScreen() {
         </Link>
       </div>
 
-      {/* Imagen: full ancho arriba en mobile, 50% en desktop */}
-      <div className="w-full h-56 sm:h-72 lg:h-auto lg:w-1/2">
+      {/* Imagen: full en mobile, 50% en desktop */}
+      <div className="w-full h-56 sm:h-72 lg:h-auto lg:w-1/2 shrink-0">
         <img
           src={backgroundImage}
           alt="Invitaciones"
@@ -105,8 +105,8 @@ export function AuthScreen() {
         />
       </div>
 
-      {/* Formulario: full ancho en mobile, 50% en desktop */}
-      <section className="w-full lg:w-1/2 flex items-center justify-center px-4 py-8 sm:px-6 sm:py-12 lg:p-12">
+      {/* Formulario: full en mobile, 50% en desktop */}
+      <section className="w-full lg:w-1/2 shrink-0 flex items-center justify-center px-4 py-8 sm:px-6 sm:py-12 lg:p-12">
         <div className="w-full max-w-[560px] space-y-8">
           {/* Título mobile */}
           <div className="text-center lg:hidden">
@@ -255,3 +255,4 @@ export function AuthScreen() {
 }
 
 export default AuthScreen;
+
