@@ -43,7 +43,11 @@ import {
   Copy,
   MoreHorizontal,
   Sticker,
-  LogIn
+  LogIn,
+  Calendar, // Añadir iconos necesarios
+  MapPin,
+  Users,
+  Gift
 } from 'lucide-react';
 
 const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange = null, onSave = null }) => {
@@ -58,7 +62,7 @@ const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange =
   const [isSaving, setIsSaving] = useState(false);
 
   // Estados para herramientas
-  const [activeTab, setActiveTab] = useState(initialDesign ? 'text-styles' : 'templates');
+  const [activeTab, setActiveTab] = useState(initialDesign ? 'design' : 'templates');
   const [activeTool, setActiveTool] = useState('select');
   const [templates, setTemplates] = useState([]);
 
@@ -216,23 +220,23 @@ const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange =
 
   const handleTemplateSelect = (template) => {
     setSelectedTemplate(template);
-    
-    // Crear diseño basado en la plantilla
-    const newDesign = {
-      id: `design_${template.id}`,
-      design_name: `Diseño ${template.name}`,
-      template_id: template.id,
+// Si la API falla, crear un diseño local por defecto
+    const defaultDesign = {
+      id: `local_${eventId}`,
+      design_name: `Diseño para ${eventData?.title || 'Mi Evento'}`,
+      event_id: eventId,
+      template_id: null,
       design_data: {
         canvas: {
           width: 800,
           height: 1200,
-          background: '#ffffff'
+          background: '#f4f2ed' // Usar color de app.css
         },
         elements: [
           {
             id: 'title',
             type: 'text',
-            content: event?.title || 'Título del Evento',
+            content: eventData?.title || 'Mi Evento',
             x: 100,
             y: 100,
             width: 600,
@@ -240,30 +244,29 @@ const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange =
             fontSize: 48,
             fontFamily: 'Playfair Display, serif',
             fontWeight: 'Bold',
-            color: '#2c3e50',
+            color: '#000000', // Usar color de app.css
             textAlign: 'center'
           },
           {
-            id: 'subtitle',
+            id: 'date',
             type: 'text',
-            content: event?.description || 'Descripción del evento',
+            content: formatDate(eventData?.date_time),
             x: 100,
             y: 200,
             width: 600,
-            height: 60,
+            height: 40,
             fontSize: 24,
             fontFamily: 'Inter, sans-serif',
             fontWeight: 'Regular',
-            color: '#34495e',
+            color: '#7a746b', // Usar color de app.css
             textAlign: 'center'
           }
         ]
       }
     };
-
-    setDesignData(newDesign);
-    addToHistory(newDesign.design_data);
-    setActiveTab('text-styles');
+    setDesign(defaultDesign);
+    return defaultDesign;
+  };eTab('text-styles');
     
     // Notificar al componente padre
     if (onDesignChange) {

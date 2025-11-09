@@ -5,7 +5,8 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
-import { Calendar, MapPin, Sparkles, ArrowLeft } from 'lucide-react';
+import { Calendar, MapPin, Sparkles, ArrowLeft, Users, Gift, Home } from 'lucide-react';
+import { ColorPicker } from '../components/ColorPicker';
 import { api } from '../lib/api';
 
 const CreateEvent = () => {
@@ -17,7 +18,13 @@ const CreateEvent = () => {
     description: '',
     event_date: '',
     location: '',
-    template_id: 'classic'
+    template_id: 'classic',
+    event_type: 'wedding', // Nuevo campo
+    primary_color: '#000000', // Nuevo campo
+    secondary_color: '#f4f2ed', // Nuevo campo
+    enable_rsvp: true, // Nuevo campo
+    enable_accommodations: false, // Nuevo campo
+    enable_gift_registry: false, // Nuevo campo
   });
 
   const handleInputChange = (e) => {
@@ -25,6 +32,21 @@ const CreateEvent = () => {
     setEventData(prev => ({
       ...prev,
       [name]: value
+    }));
+  };
+
+  const handleColorChange = (name, color) => {
+    setEventData(prev => ({
+      ...prev,
+      [name]: color
+    }));
+  };
+
+  const handleCheckboxChange = (e) => {
+    const { name, checked } = e.target;
+    setEventData(prev => ({
+      ...prev,
+      [name]: checked
     }));
   };
 
@@ -43,6 +65,14 @@ const CreateEvent = () => {
       
       // Crear evento en DRAFT - GRATIS (sin plan_id)
       const response = await api.post('/events', eventData);
+      
+      // Crear diseño por defecto
+      const eventId = response.event.id;
+      await api.post('/api/editor/designs', {
+        event_id: eventId,
+        template_id: eventData.template_id,
+        design_name: `Invitación de ${eventData.title}`
+      });
       
       if (response.success && response.event) {
         const eventId = response.event.id;
@@ -183,6 +213,87 @@ const CreateEvent = () => {
                   <option value="elegant">Elegante</option>
                   <option value="minimal">Minimalista</option>
                 </select>
+                <p className="text-sm text-gray-500 mt-1">
+                  Puedes cambiar la plantilla después en el editor
+                </p>
+              </div>
+
+              {/* Tipo de Evento */}
+              <div>
+                <Label htmlFor="event_type" className="text-base font-semibold">
+                  Tipo de Evento
+                </Label>
+                <select
+                  id="event_type"
+                  name="event_type"
+                  value={eventData.event_type}
+                  onChange={handleInputChange}
+                  className="mt-2 w-full border border-gray-300 rounded-md px-3 py-2"
+                >
+                  <option value="wedding">Boda</option>
+                  <option value="quinceanera">Quinceañera</option>
+                  <option value="birthday">Cumpleaños</option>
+                  <option value="baptism">Bautizo</option>
+                  <option value="corporate">Corporativo</option>
+                  <option value="other">Otro</option>
+                </select>
+              </div>
+
+              {/* Colores */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <ColorPicker 
+                  label="Color Principal" 
+                  value={eventData.primary_color} 
+                  onChange={(color) => handleColorChange('primary_color', color)} 
+                />
+                <ColorPicker 
+                  label="Color Secundario" 
+                  value={eventData.secondary_color} 
+                  onChange={(color) => handleColorChange('secondary_color', color)} 
+                />
+              </div>
+
+              {/* Funcionalidades */}
+              <div className="pt-4">
+                <h3 className="text-lg font-semibold mb-3">
+                  Funcionalidades del Evento
+                </h3>
+                <div className="space-y-3">
+                  <label className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      name="enable_rsvp"
+                      checked={eventData.enable_rsvp}
+                      onChange={handleCheckboxChange}
+                      className="form-checkbox h-5 w-5 text-blue-600"
+                    />
+                    <Users className="h-5 w-5 text-gray-600" />
+                    <span className="text-base">Gestión de Invitados (RSVP)</span>
+                  </label>
+                  <label className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      name="enable_accommodations"
+                      checked={eventData.enable_accommodations}
+                      onChange={handleCheckboxChange}
+                      className="form-checkbox h-5 w-5 text-blue-600"
+                    />
+                    <Home className="h-5 w-5 text-gray-600" />
+                    <span className="text-base">Alojamientos y Hoteles</span>
+                  </label>
+                  <label className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      name="enable_gift_registry"
+                      checked={eventData.enable_gift_registry}
+                      onChange={handleCheckboxChange}
+                      className="form-checkbox h-5 w-5 text-blue-600"
+                    />
+                    <Gift className="h-5 w-5 text-gray-600" />
+                    <span className="text-base">Lista de Regalos</span>
+                  </label>
+                </div>
+              </div>
                 <p className="text-sm text-gray-500 mt-1">
                   Puedes cambiar la plantilla después en el editor
                 </p>

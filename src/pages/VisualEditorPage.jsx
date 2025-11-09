@@ -11,8 +11,12 @@ import {
   AlertCircle,
   Save,
   Eye,
-  Share2
+  Share2,
+  Palette
 } from "lucide-react";
+import { api } from "../lib/api";
+import { formatDate } from "../utils/formatters"; // Asumiendo que existe un archivo de utilidades
+import { CountdownTimer } from "../components/CountdownTimer"; // Importar el nuevo componente
 
 export default function VisualEditorPage() {
   const { id } = useParams();
@@ -35,136 +39,118 @@ export default function VisualEditorPage() {
     setError(null);
     
     try {
-      // Intentar cargar datos del evento
-      let eventData = null;
-      try {
-        const eventResponse = await fetch(`/api/events/${id}`);
-        if (eventResponse.ok) {
-          eventData = await eventResponse.json();
-          setEvent(eventData);
-        } else {
-          console.warn('No se pudo cargar el evento desde la API, usando datos de prueba');
-        }
-      } catch (apiError) {
-        console.warn('Error de API para evento:', apiError);
-      }
+      // 1. Cargar evento
+      const eventResponse = await api.get(`/events/${id}`);
+      const eventData = eventResponse.event;
+      setEvent(eventData);
 
-      // Si no se pudo cargar el evento, usar datos de prueba
-      if (!eventData) {
-        eventData = {
-          id: id,
-          title: 'Mi Evento de Prueba',
-          description: 'Descripción del evento',
-          date_time: new Date().toISOString(),
-          location: 'Ubicación del evento'
-        };
-        setEvent(eventData);
-      }
-
-      // Intentar cargar diseño asociado al evento
+      // 2. Buscar diseño asociado
       let designData = null;
       try {
-        const designResponse = await fetch(`/api/events/${id}/design`);
-        if (designResponse.ok) {
-          const data = await designResponse.json();
-          if (data.design) {
-            designData = data.design;
-            setDesign(designData);
-          }
-        }
-      } catch (apiError) {
-        console.warn('Error de API para diseño:', apiError);
+        const designResponse = await api.get(`/api/editor/designs/by-event/${id}`);
+        designData = designResponse.design;
+        setDesign(designData);
+      } catch (e) {
+        console.warn('No se encontró diseño asociado, creando uno por defecto:', e);
       }
 
-      // Si no hay diseño, crear uno por defecto
+      // 3. Si no hay diseño, crear uno basado en los datos del evento
       if (!designData) {
-        await createDefaultDesign(id, eventData);
+        designData = await createDesignFromEvent(eventData);
+        setDesign(designData);
       }
     } catch (err) {
       console.error('Error general loading event and design:', err);
-      // En caso de error general, usar datos de prueba para que el editor funcione
-      const fallbackEvent = {
-        id: id,
-        title: 'Mi Evento',
-        description: 'Evento de prueba',
-        date_time: new Date().toISOString(),
-        location: 'Ubicación'
-      };
-      setEvent(fallbackEvent);
-      await createDefaultDesign(id, fallbackEvent);
+      // En caso de error general, mostrar error
+      setError('Error al cargar el evento. Asegúrate de que el ID es correcto y tienes permisos.');
     } finally {
       setLoading(false);
     }
   };
 
-  const createDefaultDesign = async (eventId, eventData) => {
-    try {
-      // Intentar crear diseño a través de la API
-      const response = await fetch('/api/designs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          event_id: eventId,
-          design_name: 'Mi Diseño',
-          template_id: null // Diseño en blanco
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setDesign(data.design);
-        return;
-      }
-    } catch (err) {
-      console.warn('Error creating design via API:', err);
-    }
-
-    // Si la API falla, crear un diseño local por defecto
-    const defaultDesign = {
-      id: `local_${eventId}`,
-      design_name: `Diseño para ${eventData?.title || 'Mi Evento'}`,
-      event_id: eventId,
-      template_id: null,
-      design_data: {
-        canvas: {
-          width: 800,
-          height: 1200,
-          background: '#ffffff'
-        },
-        elements: [
-          {
-            id: 'title',
-            type: 'text',
-            content: eventData?.title || 'Mi Evento',
-            x: 100,
-            y: 100,
-            width: 600,
-            height: 80,
-            fontSize: 48,
-            fontFamily: 'Playfair Display, serif',
-            fontWeight: 'Bold',
-            color: '#2c3e50',
-            textAlign: 'center'
-          },
-          {
-            id: 'description',
-            type: 'text',
-            content: eventData?.description || 'Descripción del evento',
-            x: 100,
-            y: 200,
-            width: 600,
-            height: 60,
-            fontSize: 24,
-            fontFamily: 'Inter, sans-serif',
-            fontWeight: 'Regular',
-            color: '#34495e',
-            textAlign: 'center'
-          }
-        ]
+  // Función auxiliar para formatear fecha (si no existe en utils/formatters)
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };  const createDesignFromEvent = async (event) => {
+    const primaryColor = event.primary_color || '#000000';
+    const secondaryColor = event.secondary_color || '#f4f2ed';
+    
+    const designData = {
+      canvas: {
+        width: 800,
+        height: 1200,
+        background: secondaryColor
       },
-      created_at: new Date().toISOString(),
+      elements: [
+        {
+          id: 'title',
+          type: 'text',
+          content: event.title || 'Mi Evento',
+          x: 100,
+          y: 100,
+          width: 600,
+          height: 80,
+          fontSize: 48,
+          fontFamily: 'Playfair Display, serif',
+          fontWeight: 'Bold',
+          color: primaryColor,
+          textAlign: 'center'
+        },
+        {
+          id: 'date',
+          type: 'text',
+          content: formatDate(event.event_date),
+          x: 100,
+          y: 200,
+          width: 600,
+          height: 40,
+          fontSize: 24,
+          fontFamily: 'Inter, sans-serif',
+          fontWeight: 'Regular',
+          color: primaryColor,
+          textAlign: 'center'
+        },
+        {
+          id: 'countdown',
+          type: 'component',
+          component: 'CountdownTimer',
+          props: {
+            targetDate: event.event_date,
+            color: primaryColor
+          },
+          x: 100,
+          y: 300,
+          width: 600,
+          height: 100
+        }
+      ]
+    };
+
+    try {
+      const response = await api.post('/api/editor/designs', {
+        event_id: event.id,
+        design_name: `Invitación de ${event.title}`,
+        design_data: designData
+      });
+      return response.design;
+    } catch (err) {
+      console.error('Error creando diseño via API:', err);
+      // Fallback local
+      return {
+        id: `local_${event.id}`,
+        design_name: `Diseño para ${event.title}`,
+        event_id: event.id,
+        design_data: designData
+      };
+    }
+  };g(),
       updated_at: new Date().toISOString()
     };
 
