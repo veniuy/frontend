@@ -784,6 +784,6 @@ const InvitationEditor = ({ initialDesign = null, event = null, onDesignChange =
       />
     </div>
   );
-};
+
 
 export default InvitationEditor;
