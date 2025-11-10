@@ -299,3 +299,5 @@ export function DashboardImproved() {
   );
 }
 
+
+export default DashboardImproved;
