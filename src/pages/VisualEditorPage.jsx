@@ -151,7 +151,6 @@ export default function VisualEditorPage() {
       };
     }
   };
-    };
 
     setDesign(defaultDesign);
   };
