@@ -150,8 +150,7 @@ export default function VisualEditorPage() {
         design_data: designData
       };
     }
-  };g(),
-      updated_at: new Date().toISOString()
+  };
     };
 
     setDesign(defaultDesign);
