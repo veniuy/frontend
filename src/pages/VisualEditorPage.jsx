@@ -342,7 +342,7 @@ export default function VisualEditorPage() {
             <div className="text-center">
               <AlertCircle className="w-12 h-12 mx-auto text-gray-400 mb-4" />
               <p className="text-gray-600">No se pudo cargar el diseño</p>
-              <Button onClick={loadEventAndDesign} className="mt-4">
+              <Button onClick={loadEventAndDesign}>
                 Reintentar
               </Button>
             </div>
@@ -352,3 +352,4 @@ export default function VisualEditorPage() {
     </div>
   );
 }
+
