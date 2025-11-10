@@ -12,12 +12,25 @@ import {
   Save,
   Eye,
   Share2,
-  Palette
+  Palette,
 } from "lucide-react";
-
 import { api } from "../lib/api";
-import { formatDate } from "../utils/formatters"; // ya existe en utils
-import { CountdownTimer } from "../components/CountdownTimer"; // usado en el diseño por defecto
+// ❗ Quitamos el import roto de ../utils/formatters
+// import { formatDate } from "../utils/formatters";
+import { CountdownTimer } from "../components/CountdownTimer";
+
+// ---- Utilidades locales ----
+function formatDate(input) {
+  if (!input) return "";
+  const d = new Date(input);
+  if (Number.isNaN(d.getTime())) return String(input);
+  // Ajusta a tu formato preferido
+  return d.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
 
 export default function VisualEditorPage() {
   const { id } = useParams();
@@ -41,7 +54,11 @@ export default function VisualEditorPage() {
     try {
       // 1) Evento
       const eventResponse = await api.get(`/events/${id}`);
-      const eventData = eventResponse.event || eventResponse.data?.event || eventResponse.data || eventResponse;
+      const eventData =
+        eventResponse.event ||
+        eventResponse.data?.event ||
+        eventResponse.data ||
+        eventResponse;
       if (!eventData || !eventData.id) {
         throw new Error("Evento no encontrado");
       }
@@ -50,11 +67,13 @@ export default function VisualEditorPage() {
       // 2) Diseño existente (si hay)
       let designData = null;
       try {
-        const designResponse = await api.get(`/api/editor/designs/by-event/${id}`);
-        designData = designResponse.design || designResponse.data?.design || null;
-      } catch (e) {
-        // no hay diseño creado aún
-        // console.warn("No se encontró diseño asociado:", e);
+        const designResponse = await api.get(
+          `/api/editor/designs/by-event/${id}`
+        );
+        designData =
+          designResponse.design || designResponse.data?.design || null;
+      } catch {
+        // no design yet
       }
 
       // 3) Crear si no existe
@@ -70,7 +89,7 @@ export default function VisualEditorPage() {
     }
   };
 
-  // Crea un diseño base a partir del evento (y lo guarda vía API si es posible)
+  // Crea diseño base a partir del evento (y lo guarda vía API si es posible)
   const createDesignFromEvent = async (ev) => {
     const primaryColor = ev.primary_color || "#000000";
     const secondaryColor = ev.secondary_color || "#f4f2ed";
@@ -79,7 +98,7 @@ export default function VisualEditorPage() {
       canvas: {
         width: 800,
         height: 1200,
-        background: secondaryColor
+        background: secondaryColor,
       },
       elements: [
         {
@@ -94,7 +113,7 @@ export default function VisualEditorPage() {
           fontFamily: "Playfair Display, serif",
           fontWeight: "700",
           color: primaryColor,
-          textAlign: "center"
+          textAlign: "center",
         },
         {
           id: "date",
@@ -108,7 +127,7 @@ export default function VisualEditorPage() {
           fontFamily: "Inter, sans-serif",
           fontWeight: "400",
           color: primaryColor,
-          textAlign: "center"
+          textAlign: "center",
         },
         {
           id: "countdown",
@@ -116,31 +135,32 @@ export default function VisualEditorPage() {
           component: "CountdownTimer",
           props: {
             targetDate: ev.event_date || null,
-            color: primaryColor
+            color: primaryColor,
           },
           x: 100,
           y: 300,
           width: 600,
-          height: 100
-        }
-      ]
+          height: 100,
+        },
+      ],
     };
 
     try {
       const response = await api.post("/api/editor/designs", {
         event_id: ev.id,
         design_name: `Invitación de ${ev.title || "Evento"}`,
-        design_data: designData
+        design_data: designData,
       });
-      // API típica -> { design: {...} }
-      return response.design || response.data?.design || response.data || response;
+      return (
+        response.design || response.data?.design || response.data || response
+      );
     } catch (err) {
       console.error("Error creando diseño vía API. Usando fallback local:", err);
       return {
         id: `local_${ev.id}`,
         design_name: `Diseño para ${ev.title || "Evento"}`,
         event_id: ev.id,
-        design_data: designData
+        design_data: designData,
       };
     }
   };
@@ -150,19 +170,20 @@ export default function VisualEditorPage() {
     setSaving(true);
     setError(null);
     try {
-      // si es local_* creamos; si existe id real, actualizamos
       if (design.id && !String(design.id).startsWith("local_")) {
         const resp = await api.put(`/api/editor/designs/${design.id}`, {
-          design_name: design.design_name || `Invitación de ${event.title || "Evento"}`,
-          design_data: design.design_data || design
+          design_name:
+            design.design_name || `Invitación de ${event.title || "Evento"}`,
+          design_data: design.design_data || design,
         });
         const saved = resp.design || resp.data?.design || resp.data || resp;
         setDesign(saved);
       } else {
         const resp = await api.post("/api/editor/designs", {
           event_id: event.id,
-          design_name: design.design_name || `Invitación de ${event.title || "Evento"}`,
-          design_data: design.design_data || design
+          design_name:
+            design.design_name || `Invitación de ${event.title || "Evento"}`,
+          design_data: design.design_data || design,
         });
         const saved = resp.design || resp.data?.design || resp.data || resp;
         setDesign(saved);
@@ -184,23 +205,17 @@ export default function VisualEditorPage() {
     if (!event || !design) return;
     setError(null);
     try {
-      // Guardar antes de publicar
       await handleSave();
 
-      // Publicar diseño si existe id real
       if (design.id && !String(design.id).startsWith("local_")) {
-        const designResp = await api.post(`/api/designs/${design.id}/publish`, {});
-        // publicar evento
+        await api.post(`/api/designs/${design.id}/publish`, {});
         const eventResp = await api.post(`/api/publish/event/${event.id}`, {});
-        const publishData =
-          eventResp.data || eventResp || {};
-
+        const publishData = eventResp.data || eventResp || {};
         if (publishData.payment_url) {
           window.location.href = publishData.payment_url;
           return;
         }
       } else {
-        // Si no hay ID real (local), simulamos publicación
         alert("Invitación publicada (modo local)");
       }
 
