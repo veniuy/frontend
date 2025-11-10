@@ -293,9 +293,8 @@ const CreateEvent = () => {
                     <span className="text-base">Lista de Regalos</span>
                   </label>
                 </div>
-              </div>
                 <p className="text-sm text-gray-500 mt-1">
-                  Puedes cambiar la plantilla después en el editor
+                  Las funcionalidades seleccionadas se activarán en el Dashboard.
                 </p>
               </div>
 
