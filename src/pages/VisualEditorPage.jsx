@@ -68,7 +68,7 @@ export default function VisualEditorPage() {
       let designData = null;
       try {
         const designResponse = await api.get(
-          `/api/editor/designs/by-event/${id}`
+          `/editor/designs/by-event/${id}`
         );
         designData =
           designResponse.design || designResponse.data?.design || null;
@@ -146,7 +146,7 @@ export default function VisualEditorPage() {
     };
 
     try {
-      const response = await api.post("/api/editor/designs", {
+      const response = await api.post("/editor/designs", {
         event_id: ev.id,
         design_name: `Invitación de ${ev.title || "Evento"}`,
         design_data: designData,
@@ -171,7 +171,7 @@ export default function VisualEditorPage() {
     setError(null);
     try {
       if (design.id && !String(design.id).startsWith("local_")) {
-        const resp = await api.put(`/api/editor/designs/${design.id}`, {
+        const resp = await api.put(`/editor/designs/${design.id}`, {
           design_name:
             design.design_name || `Invitación de ${event.title || "Evento"}`,
           design_data: design.design_data || design,
@@ -179,7 +179,7 @@ export default function VisualEditorPage() {
         const saved = resp.design || resp.data?.design || resp.data || resp;
         setDesign(saved);
       } else {
-        const resp = await api.post("/api/editor/designs", {
+        const resp = await api.post("/editor/designs", {
           event_id: event.id,
           design_name:
             design.design_name || `Invitación de ${event.title || "Evento"}`,
@@ -208,8 +208,8 @@ export default function VisualEditorPage() {
       await handleSave();
 
       if (design.id && !String(design.id).startsWith("local_")) {
-        await api.post(`/api/designs/${design.id}/publish`, {});
-        const eventResp = await api.post(`/api/publish/event/${event.id}`, {});
+        await api.post(`/editor/designs/${design.id}/publish`, {});
+        const eventResp = await api.post(`/publish/event/${event.id}`, {});
         const publishData = eventResp.data || eventResp || {};
         if (publishData.payment_url) {
           window.location.href = publishData.payment_url;
