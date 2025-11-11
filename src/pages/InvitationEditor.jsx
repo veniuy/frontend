@@ -119,33 +119,32 @@ const InvitationEditor = () => {
     loadTemplates();
   }, []);
 
-  const loadTemplates = async () => {
-    try {
-      const response = await fetch('/api/templates');
-      if (response.ok) {
-        const data = await response.json();
-        setTemplates(data.templates);
-      }
-    } catch (error) {
-      console.error('Error loading templates:', error);
-    }
-  };
+ const loadTemplates = async () => {
+  try {
+    const resp = await fetch(`${API}/editor/templates`, {
+      credentials: 'include',
+    });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+    setTemplates(data.templates || []);
+  } catch (err) {
+    console.error('Error loading templates:', err);
+  }
+};
 
-  const handleTemplateSelect = async (template) => {
-    try {
-      setSelectedTemplate(template);
-      
-      // Crear nuevo diseño basado en la plantilla
-      const response = await fetch('/api/designs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          template_id: template.id,
-          design_name: `Mi ${template.name}`
-        }),
-      });
+const handleTemplateSelect = async (template) => {
+  try {
+    setSelectedTemplate(template);
+    const resp = await fetch(`${API}/editor/designs`, {
+      method: 'POST',
+      credentials: 'include',            // <-- importante para la sesión
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        template_id: template.id,
+        design_name: `Mi ${template.name}`,
+        // event_id: <opcional si corresponde>
+      }),
+    });
 
       if (response.ok) {
         const data = await response.json();
