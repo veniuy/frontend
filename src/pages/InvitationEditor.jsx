@@ -46,6 +46,8 @@ import {
   LogIn
 } from 'lucide-react';
 
+const API = import.meta.env.VITE_API_BASE_URL || 'https://backend-xtqe.onrender.com/api';
+
 const InvitationEditor = () => {
   // Estados principales
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -119,39 +121,37 @@ const InvitationEditor = () => {
     loadTemplates();
   }, []);
 
- const loadTemplates = async () => {
-  try {
-    const resp = await fetch(`${API}/editor/templates`, {
-      credentials: 'include',
-    });
-    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const data = await resp.json();
-    setTemplates(data.templates || []);
-  } catch (err) {
-    console.error('Error loading templates:', err);
-  }
-};
+  const loadTemplates = async () => {
+    try {
+      const resp = await fetch(`${API}/editor/templates`, {
+        credentials: 'include',
+      });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      setTemplates(data.templates || []);
+    } catch (err) {
+      console.error('Error loading templates:', err);
+    }
+  };
 
-const handleTemplateSelect = async (template) => {
-  try {
-    setSelectedTemplate(template);
-    const resp = await fetch(`${API}/editor/designs`, {
-      method: 'POST',
-      credentials: 'include',            // <-- importante para la sesión
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        template_id: template.id,
-        design_name: `Mi ${template.name}`,
-        // event_id: <opcional si corresponde>
-      }),
-    });
-
-      if (response.ok) {
-        const data = await response.json();
-        setDesignData(data.design);
-        addToHistory(data.design.design_data);
-        setActiveTab('text-styles');
-      }
+  const handleTemplateSelect = async (template) => {
+    try {
+      setSelectedTemplate(template);
+      const resp = await fetch(`${API}/editor/designs`, {
+        method: 'POST',
+        credentials: 'include',            // sesión
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          template_id: template.id,
+          design_name: `Mi ${template.name}`,
+          // event_id: <opcional si corresponde>
+        }),
+      });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      setDesignData(data.design);
+      addToHistory(data.design.design_data);
+      setActiveTab('text-styles');
     } catch (error) {
       console.error('Error selecting template:', error);
     }
@@ -186,22 +186,18 @@ const handleTemplateSelect = async (template) => {
 
   const saveDesign = async () => {
     if (!designData) return;
-    
     setIsSaving(true);
     try {
-      const response = await fetch(`/api/designs/${designData.id}`, {
+      const resp = await fetch(`${API}/editor/designs/${designData.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           design_data: designData.design_data
         }),
       });
-
-      if (response.ok) {
-        console.log('Design saved successfully');
-      }
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      // opcional: toast
     } catch (error) {
       console.error('Error saving design:', error);
     } finally {
@@ -291,40 +287,39 @@ const handleTemplateSelect = async (template) => {
     formData.append('file', file);
 
     try {
-      const response = await fetch(`/api/designs/${designData.id}/assets`, {
+      const resp = await fetch(`${API}/editor/designs/${designData.id}/assets`, {
         method: 'POST',
+        credentials: 'include',
         body: formData,
       });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      
+      const newElement = {
+        id: Date.now().toString(),
+        type: 'image',
+        src: data.asset_url,
+        x: 100,
+        y: 100,
+        width: 200,
+        height: 200,
+        rotation: 0,
+        opacity: 1,
+        zIndex: 1
+      };
 
-      if (response.ok) {
-        const data = await response.json();
-        
-        const newElement = {
-          id: Date.now().toString(),
-          type: 'image',
-          src: data.asset_url,
-          x: 100,
-          y: 100,
-          width: 200,
-          height: 200,
-          rotation: 0,
-          opacity: 1,
-          zIndex: 1
-        };
+      const updatedDesignData = {
+        ...designData.design_data,
+        elements: [...(designData.design_data.elements || []), newElement]
+      };
 
-        const updatedDesignData = {
-          ...designData.design_data,
-          elements: [...(designData.design_data.elements || []), newElement]
-        };
+      setDesignData(prev => ({
+        ...prev,
+        design_data: updatedDesignData
+      }));
 
-        setDesignData(prev => ({
-          ...prev,
-          design_data: updatedDesignData
-        }));
-
-        addToHistory(updatedDesignData);
-        setSelectedElement(newElement);
-      }
+      addToHistory(updatedDesignData);
+      setSelectedElement(newElement);
     } catch (error) {
       console.error('Error uploading image:', error);
     }
@@ -953,7 +948,7 @@ const handleTemplateSelect = async (template) => {
                       <div className="border-t pt-4">
                         <h4 className="font-medium mb-3">Propiedades del Elemento</h4>
                         
-                        {/* Opacity */}
+                        {/* Opacidad */}
                         <div>
                           <Label className="text-sm">Opacidad</Label>
                           <Slider
@@ -1080,3 +1075,4 @@ const handleTemplateSelect = async (template) => {
 };
 
 export default InvitationEditor;
+
